@@ -51,9 +51,27 @@
   setTheme(theme, false);
   $('#adminTheme').addEventListener('click', () => setTheme(theme === 'light' ? 'dark' : 'light'));
 
-  // ── Language Setup ────────────────────────────────────────────────────────
+  // ── Language & State Setup ────────────────────────────────────────────────
   let adminLang = 'ar';
   try { adminLang = localStorage.getItem('rooh-lang') || 'ar'; } catch (_) {}
+
+  const arabicNum = n => adminLang === 'ar' ? String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : String(n);
+  const money = value => {
+    const n = Number(value || 0);
+    return adminLang === 'ar' ? `${n.toLocaleString('ar-EG')} ج.م` : `${n.toLocaleString('en-US')} EGP`;
+  };
+
+  let currentProducts = [];
+  try {
+    const cachedP = localStorage.getItem('rooh-cached-products');
+    if (cachedP) currentProducts = JSON.parse(cachedP) || [];
+  } catch (_) {}
+
+  let currentOrders = [];
+  try {
+    const cachedO = localStorage.getItem('rooh-cached-orders');
+    if (cachedO) currentOrders = JSON.parse(cachedO) || [];
+  } catch (_) {}
 
   function updateAdminDate() {
     const locale = adminLang === 'ar' ? 'ar-EG' : 'en-US';
@@ -80,8 +98,12 @@
       try { localStorage.setItem('rooh-lang', adminLang); } catch (_) {}
     }
 
-    if (currentProducts.length) renderProductsTable(currentProducts);
-    if (currentOrders.length) renderOrders(currentOrders);
+    if (typeof renderProductsTable === 'function' && currentProducts && currentProducts.length) {
+      renderProductsTable(currentProducts);
+    }
+    if (typeof renderOrders === 'function' && currentOrders && currentOrders.length) {
+      renderOrders(currentOrders);
+    }
   }
 
   $('#adminLangToggle')?.addEventListener('click', () => {
@@ -137,24 +159,6 @@
   });
 
   // ── Load orders & products from Supabase ──────────────────────────────────
-  const arabicNum = n => adminLang === 'ar' ? String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : String(n);
-  const money = value => {
-    const n = Number(value || 0);
-    return adminLang === 'ar' ? `${n.toLocaleString('ar-EG')} ج.م` : `${n.toLocaleString('en-US')} EGP`;
-  };
-
-  let currentProducts = [];
-  try {
-    const cachedP = localStorage.getItem('rooh-cached-products');
-    if (cachedP) currentProducts = JSON.parse(cachedP) || [];
-  } catch (_) {}
-
-  let currentOrders = [];
-  try {
-    const cachedO = localStorage.getItem('rooh-cached-orders');
-    if (cachedO) currentOrders = JSON.parse(cachedO) || [];
-  } catch (_) {}
-
   function cleanPhoneForWhatsApp(phone) {
     if (!phone) return '';
     let digits = String(phone).replace(/[^0-9]/g, '');
