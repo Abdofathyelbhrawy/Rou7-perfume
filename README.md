@@ -13,3 +13,5 @@ The storefront currently has no seeded product records. Its catalog and cart are
 The home hero now renders the featured product (`is_featured`) from a product record's `image_url`, `name`, and `notes`; with the catalog empty, it shows a prepared placeholder. The pink promotion below the hero is editable and schedulable from the admin page. Until Supabase is connected, promo settings use same-browser local storage.
 
 The admin page promotion form saves its content and start/end times in local storage for this front-end phase. Connect the form and product query to Supabase when the project URL, anon key, tables, and storage policy are ready.
+=======
+# Rooh-perfume
