@@ -7,21 +7,33 @@
   const SUPABASE_ANON     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95c2xib21iZ2R2Y295cW90eWFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1NzEwNTksImV4cCI6MjExMDE0NzA1OX0.VxKOxH3MTxC2Pdnf6GSCSHoBd6bWIiEvqTV9dQTh3SU';
 
   async function supaFetch(table, { method = 'GET', filters = '', body = null, select = '*' } = {}) {
-    const url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
-    const res = await fetch(url, {
-      method,
-      headers: {
-        'apikey':        SUPABASE_ANON,
-        'Authorization': `Bearer ${SUPABASE_ANON}`,
-        'Content-Type':  'application/json',
-        'Prefer':        (method === 'POST' || method === 'PATCH') ? 'return=representation' : '',
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    if (!res.ok) throw new Error(await res.text());
-    if (res.status === 204 || method === 'DELETE') return null;
-    const text = await res.text();
-    return text ? JSON.parse(text) : null;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    try {
+      const url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
+      const res = await fetch(url, {
+        method,
+        signal: controller.signal,
+        headers: {
+          'apikey':        SUPABASE_ANON,
+          'Authorization': `Bearer ${SUPABASE_ANON}`,
+          'Content-Type':  'application/json',
+          'Prefer':        (method === 'POST' || method === 'PATCH') ? 'return=representation' : '',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      clearTimeout(timeoutId);
+      if (!res.ok) throw new Error(await res.text());
+      if (res.status === 204 || method === 'DELETE') return null;
+      const text = await res.text();
+      return text ? JSON.parse(text) : null;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        throw new Error('انتهت مهلة الاتصال بالخادم. تحقق من اتصال الإنترنت.');
+      }
+      throw err;
+    }
   }
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -204,6 +216,13 @@
   try { currentLang = localStorage.getItem('rooh-lang') || 'ar'; } catch (_) {}
 
   let products = [];
+  try {
+    const cachedP = localStorage.getItem('rooh-cached-products');
+    if (cachedP) {
+      const parsed = JSON.parse(cachedP);
+      if (Array.isArray(parsed) && parsed.length) products = parsed;
+    }
+  } catch (_) {}
   const PROMO_KEY = 'rooh-promo';
   const defaultPromo = { title: 'شحن مجاني للطلبات فوق ١٥٠٠ جنيه', details: '', startsAt: '', endsAt: '', active: true };
   const arabicDigits = value => String(value).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
@@ -378,11 +397,18 @@
   window.roohStore = {
     setProducts(rows) {
       products = Array.isArray(rows) ? rows : [];
+      try { localStorage.setItem('rooh-cached-products', JSON.stringify(products)); } catch (_) {}
       renderProducts();
       renderHeroProduct();
       updateCart();
     }
   };
+
+  // Render cached products immediately on initial execution
+  if (products.length) {
+    renderProducts();
+    renderHeroProduct();
+  }
 
   // ── Load products from Supabase (Once on load + Realtime) ───────────────────
   function loadProductsFromSupa() {
@@ -397,8 +423,9 @@
 
   loadProductsFromSupa();
 
-  // Realtime subscription
-  if (window.supabase) {
+  // Non-blocking Realtime subscription
+  function initStoreRealtime() {
+    if (!window.supabase) return;
     try {
       const storeRealtime = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
       storeRealtime.channel('store-products-feed')
@@ -410,6 +437,22 @@
     } catch (e) {
       console.warn('Store realtime error:', e);
     }
+  }
+
+  if (window.supabase) {
+    initStoreRealtime();
+  } else {
+    window.addEventListener('load', () => {
+      let tries = 0;
+      const t = setInterval(() => {
+        if (window.supabase) {
+          clearInterval(t);
+          initStoreRealtime();
+        } else if (++tries > 12) {
+          clearInterval(t);
+        }
+      }, 500);
+    });
   }
 
   function showToast(message) {

@@ -28,7 +28,10 @@
           <p class="admin-kicker">مجموعة عطور رُوح</p>
           <h2>إدارة العطور والمخزون</h2>
         </div>
-        <button class="button button-primary" id="openAddProduct"><span>＋</span> إضافة عطر جديد</button>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="button button-outline" id="refreshProdsBtn" style="padding:10px 14px;" title="تحديث العطور"><span>🔄</span> تحديث</button>
+          <button class="button button-primary" id="openAddProduct"><span>＋</span> إضافة عطر جديد</button>
+        </div>
       </div>
       <div class="table-wrap">
         <table>
@@ -57,7 +60,10 @@
           <p class="admin-kicker">متابعة المتجر والمبيعات</p>
           <h2>إدارة الطلبات الواردة</h2>
         </div>
-        <span class="local-label" id="ordersCountBadge">٠ طلبات</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="button button-outline" id="refreshOrdersBtn" style="padding:10px 14px;" title="تحديث الطلبات"><span>🔄</span> تحديث</button>
+          <span class="local-label" id="ordersCountBadge">٠ طلبات</span>
+        </div>
       </div>
       <div class="table-wrap">
         <table>
@@ -220,7 +226,7 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="admin.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
 </body>
 </html>

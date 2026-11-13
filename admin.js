@@ -6,21 +6,33 @@
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95c2xib21iZ2R2Y295cW90eWFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1NzEwNTksImV4cCI6MjExMDE0NzA1OX0.VxKOxH3MTxC2Pdnf6GSCSHoBd6bWIiEvqTV9dQTh3SU';
 
   async function supaFetch(table, { method = 'GET', filters = '', body = null, select = '*' } = {}) {
-    const url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
-    const res = await fetch(url, {
-      method,
-      headers: {
-        'apikey':        SUPABASE_ANON,
-        'Authorization': `Bearer ${SUPABASE_ANON}`,
-        'Content-Type':  'application/json',
-        'Prefer':        (method === 'POST' || method === 'PATCH') ? 'return=representation' : '',
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    if (!res.ok) throw new Error(await res.text());
-    if (res.status === 204 || method === 'DELETE') return null;
-    const text = await res.text();
-    return text ? JSON.parse(text) : null;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    try {
+      const url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
+      const res = await fetch(url, {
+        method,
+        signal: controller.signal,
+        headers: {
+          'apikey':        SUPABASE_ANON,
+          'Authorization': `Bearer ${SUPABASE_ANON}`,
+          'Content-Type':  'application/json',
+          'Prefer':        (method === 'POST' || method === 'PATCH') ? 'return=representation' : '',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      clearTimeout(timeoutId);
+      if (!res.ok) throw new Error(await res.text());
+      if (res.status === 204 || method === 'DELETE') return null;
+      const text = await res.text();
+      return text ? JSON.parse(text) : null;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        throw new Error('انتهت مهلة الاتصال بالخادم. تحقق من اتصال الإنترنت.');
+      }
+      throw err;
+    }
   }
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -132,7 +144,16 @@
   };
 
   let currentProducts = [];
+  try {
+    const cachedP = localStorage.getItem('rooh-cached-products');
+    if (cachedP) currentProducts = JSON.parse(cachedP) || [];
+  } catch (_) {}
+
   let currentOrders = [];
+  try {
+    const cachedO = localStorage.getItem('rooh-cached-orders');
+    if (cachedO) currentOrders = JSON.parse(cachedO) || [];
+  } catch (_) {}
 
   function cleanPhoneForWhatsApp(phone) {
     if (!phone) return '';
@@ -169,6 +190,7 @@
 
   function renderOrders(orders) {
     currentOrders = orders || [];
+    try { localStorage.setItem('rooh-cached-orders', JSON.stringify(currentOrders)); } catch (_) {}
     const count = currentOrders.length;
     $('#statOrders').textContent = arabicNum(count);
     $('#orderBadge').textContent = arabicNum(count);
@@ -240,14 +262,25 @@
     }).join('');
   }
 
-  function loadOrders() {
+  function loadOrders(isManual = false) {
+    const refreshBtn = $('#refreshOrdersBtn');
+    if (refreshBtn && isManual) refreshBtn.classList.add('spinning');
     supaFetch('orders', { filters: '&order=created_at.desc&limit=50' })
       .then(renderOrders)
-      .catch(err => console.error('Admin orders:', err));
+      .catch(err => {
+        console.error('Admin orders:', err);
+        if (!currentOrders.length) {
+          $('#ordersTable').innerHTML = `<tr><td colspan="7" class="empty-table error">${adminLang === 'ar' ? 'تعذر تحميل الطلبات. تحقق من الاتصال.' : 'Failed to load orders. Check connection.'}</td></tr>`;
+        }
+      })
+      .finally(() => {
+        if (refreshBtn) refreshBtn.classList.remove('spinning');
+      });
   }
 
   function renderProductsTable(products) {
     currentProducts = products || [];
+    try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
     $('#statProducts').textContent = arabicNum(currentProducts.length);
     $('#prodBadge').textContent     = arabicNum(currentProducts.length);
 
@@ -295,12 +328,19 @@
     }).join('');
   }
 
-  function loadProducts() {
+  function loadProducts(isManual = false) {
+    const refreshBtn = $('#refreshProdsBtn');
+    if (refreshBtn && isManual) refreshBtn.classList.add('spinning');
     supaFetch('products', { filters: '&order=sort_order.asc,created_at.desc' })
       .then(renderProductsTable)
       .catch(err => {
         console.error('Admin products:', err);
-        $('#productsTable').innerHTML = '<tr><td colspan="7" class="empty-table error">تعذر تحميل العطور. تأكد من إعدادات الصلاحيات.</td></tr>';
+        if (!currentProducts.length) {
+          $('#productsTable').innerHTML = `<tr><td colspan="7" class="empty-table error">${adminLang === 'ar' ? 'تعذر تحميل العطور. تحقق من الاتصال.' : 'Failed to load fragrances. Check connection.'}</td></tr>`;
+        }
+      })
+      .finally(() => {
+        if (refreshBtn) refreshBtn.classList.remove('spinning');
       });
   }
 
@@ -714,12 +754,21 @@
     }
   });
 
-  // ── Initial Data Load ─────────────────────────────────────────────────────
+  // ── Manual Refresh Buttons ───────────────────────────────────────────────
+  $('#refreshProdsBtn')?.addEventListener('click', () => loadProducts(true));
+  $('#refreshOrdersBtn')?.addEventListener('click', () => loadOrders(true));
+
+  // ── Immediate Cache Render (0ms Instant Load) ─────────────────────────────
+  if (currentProducts.length) renderProductsTable(currentProducts);
+  if (currentOrders.length) renderOrders(currentOrders);
+
+  // ── Background Revalidation from Supabase ─────────────────────────────────
   loadOrders();
   loadProducts();
 
-  // ── Realtime Setup via Supabase Client ────────────────────────────────────
-  if (window.supabase) {
+  // ── Realtime Setup via Supabase Client (Non-blocking) ─────────────────────
+  function initAdminRealtime() {
+    if (!window.supabase) return;
     try {
       const supaClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
       supaClient.channel('admin-realtime-feed')
@@ -737,6 +786,22 @@
     } catch (err) {
       console.warn('Realtime initialization error:', err);
     }
+  }
+
+  if (window.supabase) {
+    initAdminRealtime();
+  } else {
+    window.addEventListener('load', () => {
+      let tries = 0;
+      const t = setInterval(() => {
+        if (window.supabase) {
+          clearInterval(t);
+          initAdminRealtime();
+        } else if (++tries > 12) {
+          clearInterval(t);
+        }
+      }, 500);
+    });
   }
   // ─────────────────────────────────────────────────────────────────────────
 })();
