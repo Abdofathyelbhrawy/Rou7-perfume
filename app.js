@@ -31,8 +31,8 @@
   // ── Bilingual / i18n Translations ─────────────────────────────────────────
   const I18N = {
     ar: {
-      site_title: 'رُوح | ROOH Perfume — عطر يلامس أعماقك',
-      site_desc: 'رُوح | ROOH Perfume — اكتشف عطرك، واترك أثراً لا يُنسى.',
+      site_title: 'رُوح | Rou7 Perfume — عطر يلامس أعماقك',
+      site_desc: 'رُوح | Rou7 Perfume — اكتشف عطرك، واترك أثراً لا يُنسى.',
       nav_home: 'الرئيسية',
       nav_collection: 'تسوق العطور',
       nav_story: 'حكايتنا',
@@ -53,7 +53,7 @@
       hero_cta: 'اكتشف مجموعتنا',
       hero_note: 'صُنعت بحب،<br>لتبقى في الذاكرة',
       hero_scroll: 'اكتشف رُوح',
-      hero_featured_tag: 'ROOH · عطر مميز',
+      hero_featured_tag: 'Rou7 · عطر مميز',
       val_1: 'تركيبات غنية تدوم طويلاً',
       val_2: 'خامات مختارة بعناية',
       val_3: 'صُنع بحب في مصر',
@@ -81,7 +81,7 @@
       news_placeholder: 'name@example.com',
       news_disclaimer: 'بالاشتراك، أنت توافق على استقبال رسائل رُوح.',
       footer_tagline: 'عطر يلامس أعماقك.<br>رائحة تُشبهك، وذكرى تبقى.',
-      footer_rights: '© ٢٠٢٦ رُوح | ROOH Perfume. جميع الحقوق محفوظة.',
+      footer_rights: '© ٢٠٢٦ رُوح | Rou7 Perfume. جميع الحقوق محفوظة.',
       footer_made: 'صُنع بحب في مصر <b>✳</b>',
       checkout_eyebrow: 'خطوة أخيرة',
       checkout_title: 'بيانات <em>التوصيل</em>',
@@ -107,7 +107,7 @@
       track_searching: 'جاري البحث…',
       track_not_found: 'لم نجد هذا الطلب. راجع الرقم أو تواصل معنا للمساعدة.',
       wa_tooltip: 'تواصل معنا عبر واتساب 💬',
-      wa_inquiry_msg: 'مرحباً رُوح | ROOH Perfume، أود الاستفسار عن عطوركم 🌸',
+      wa_inquiry_msg: 'مرحباً رُوح | Rou7 Perfume، أود الاستفسار عن عطوركم 🌸',
       toast_added: 'اتضاف عطرك للسلة ✳',
       toast_newsletter: 'أهلاً بك في حكاية رُوح ✳',
       lang_btn_code: 'EN',
@@ -115,8 +115,8 @@
       lang_switch_title: 'Switch to English',
     },
     en: {
-      site_title: 'ROOH Perfume — A Scent Touching Your Depths',
-      site_desc: 'ROOH Perfume — Discover your fragrance, leave an unforgettable trace.',
+      site_title: 'Rou7 Perfume — A Scent Touching Your Depths',
+      site_desc: 'Rou7 Perfume — Discover your fragrance, leave an unforgettable trace.',
       nav_home: 'Home',
       nav_collection: 'Shop Fragrances',
       nav_story: 'Our Story',
@@ -136,14 +136,14 @@
       hero_text: 'In every note a story, in every trace a memory. Discover a world of fragrances that express who you are and linger with you.',
       hero_cta: 'Explore Collection',
       hero_note: 'Crafted with love,<br>made to be remembered',
-      hero_scroll: 'Discover ROOH',
-      hero_featured_tag: 'ROOH · FEATURED',
+      hero_scroll: 'Discover Rou7',
+      hero_featured_tag: 'Rou7 · FEATURED',
       val_1: 'Long-lasting rich formulas',
       val_2: 'Carefully selected essences',
       val_3: 'Crafted with love in Egypt',
       val_4: 'A gift that speaks of you',
       coll_eyebrow: 'Discover Your Scent',
-      coll_title: 'ROOH <em>Curations</em>',
+      coll_title: 'Rou7 <em>Curations</em>',
       coll_all_link: 'All Fragrances',
       filter_all: 'All',
       filter_women: 'For Her',
@@ -154,18 +154,18 @@
       story_eyebrow: 'Our Story',
       story_title: 'Fragrance is a language<br>before <em>words</em>',
       story_text: 'Our story began with a simple belief: everyone has a scent that mirrors their soul. We blend carefully chosen notes to craft authentic, intimate perfumes that leave a memorable trace wherever you go.',
-      story_signature: 'With all love, <span>ROOH Team</span>',
-      story_link: 'Discover ROOH Philosophy',
+      story_signature: 'With all love, <span>Rou7 Team</span>',
+      story_link: 'Discover Rou7 Philosophy',
       quote_text: '“Some stories aren\'t told… <em>they are smelled.</em>”',
-      quote_caption: 'ROOH · A Scent Touching Your Depths',
-      news_eyebrow: 'Letters from ROOH',
+      quote_caption: 'Rou7 · A Scent Touching Your Depths',
+      news_eyebrow: 'Letters from Rou7',
       news_title: 'Let your story <em>unfold</em>',
       news_text: 'Subscribe to receive our latest collections and subtle touches from the world of fragrance.',
       news_label: 'Your Email Address',
       news_placeholder: 'name@example.com',
-      news_disclaimer: 'By subscribing, you agree to receive letters from ROOH.',
+      news_disclaimer: 'By subscribing, you agree to receive letters from Rou7.',
       footer_tagline: 'A scent that touches your depths.<br>A fragrance like you, a memory that lasts.',
-      footer_rights: '© 2026 ROOH Perfume. All rights reserved.',
+      footer_rights: '© 2026 Rou7 Perfume. All rights reserved.',
       footer_made: 'Crafted with love in Egypt <b>✳</b>',
       checkout_eyebrow: 'One Last Step',
       checkout_title: 'Delivery <em>Details</em>',
@@ -178,7 +178,7 @@
       checkout_submit: 'Confirm Order',
       checkout_submitting: 'Submitting…',
       success_eyebrow: 'Your story has reached us',
-      success_title: 'Thank you for choosing <em>ROOH</em>',
+      success_title: 'Thank you for choosing <em>Rou7</em>',
       success_order_msg: 'Your order was registered successfully. Order number:',
       success_wa_note: 'Opening WhatsApp to send your order details directly 💬',
       success_wa_btn: 'Send Order via WhatsApp 💬',
@@ -191,9 +191,9 @@
       track_searching: 'Searching…',
       track_not_found: 'Order not found. Please verify the number or contact us.',
       wa_tooltip: 'Chat with us on WhatsApp 💬',
-      wa_inquiry_msg: 'Hello ROOH Perfume, I would like to inquire about your fragrances 🌸',
+      wa_inquiry_msg: 'Hello Rou7 Perfume, I would like to inquire about your fragrances 🌸',
       toast_added: 'Added to your shopping bag ✳',
-      toast_newsletter: 'Welcome to the story of ROOH ✳',
+      toast_newsletter: 'Welcome to the story of Rou7 ✳',
       lang_btn_code: 'عربي',
       lang_btn_mobile: 'العربية',
       lang_switch_title: 'التبديل إلى اللغة العربية',
@@ -329,7 +329,7 @@
       return;
     }
     const nameToDisplay = currentLang === 'en' ? (featured.latin || featured.name) : (featured.name || featured.latin);
-    const safeName = escapeHtml(nameToDisplay || 'ROOH');
+    const safeName = escapeHtml(nameToDisplay || 'Rou7');
     const safeImage = escapeHtml(featured.image_url || '');
     const safeNotes = escapeHtml(featured.notes || '');
     hero.innerHTML = `<div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><span class="hero-spark spark-one">✳</span><span class="hero-spark spark-two">✦</span>${safeImage ? `<img class="hero-featured-image" src="${safeImage}" alt="${safeName}" fetchpriority="high">` : '<div class="hero-product-empty"><span>✳</span></div>'}<div class="hero-product-caption"><span>${t.hero_featured_tag}</span><h2>${safeName}</h2>${safeNotes ? `<p>${safeNotes}</p>` : ''}</div>`;
@@ -367,7 +367,7 @@
             </div>
           </article>`;
         }).join('') || `<p class="no-results">${t.no_results}</p>`
-      : `<div class="catalog-empty"><span>✳</span><h3>${currentLang === 'ar' ? 'قريباً، عطور رُوح هنا' : 'ROOH Fragrances Coming Soon'}</h3></div>`;
+      : `<div class="catalog-empty"><span>✳</span><h3>${currentLang === 'ar' ? 'قريباً، عطور رُوح هنا' : 'Rou7 Fragrances Coming Soon'}</h3></div>`;
 
     const countText = currentLang === 'ar'
       ? `${arabicDigits(visible.length)} ${visible.length === 1 ? 'عطر' : 'عطور'}`
@@ -626,7 +626,7 @@
     if (currentLang === 'en') {
       const itemsTextEn = items.map(i => `• ${i.latin || i.name} × ${i.qty} — ${money(i.price * i.qty)}`).join('\n');
       waMessage =
-`✨ *New Order from ROOH Perfume* ✨
+`✨ *New Order from Rou7 Perfume* ✨
 ━━━━━━━━━━━━━━━━━━
 📋 *Order ID:* #${orderNumber}
 👤 *Name:* ${name}
@@ -644,7 +644,7 @@ I would like to confirm my order please 🌸`;
     } else {
       const itemsTextAr = items.map(i => `• ${i.name} × ${i.qty} — ${money(i.price * i.qty)}`).join('\n');
       waMessage =
-`✨ *طلب جديد من متجر رُوح | ROOH Perfume* ✨
+`✨ *طلب جديد من متجر رُوح | Rou7 Perfume* ✨
 ━━━━━━━━━━━━━━━━━━
 📋 *رقم الطلب:* #${orderNumber}
 👤 *الاسم:* ${name}
@@ -705,7 +705,7 @@ ${itemsTextAr}
         const order = rows?.[0];
         if (order) {
           const statusMap = {
-            pending:   currentLang === 'ar' ? 'قيد المراجعة — فريق رُوح هيتواصل معاك قريباً' : 'Under Review — ROOH team will contact you shortly',
+            pending:   currentLang === 'ar' ? 'قيد المراجعة — فريق رُوح هيتواصل معاك قريباً' : 'Under Review — Rou7 team will contact you shortly',
             confirmed: currentLang === 'ar' ? 'تم تأكيد الطلب ✓' : 'Order Confirmed ✓',
             shipped:   currentLang === 'ar' ? 'الطلب في الطريق إليك 🚚' : 'Order in transit 🚚',
             delivered: currentLang === 'ar' ? 'تم التسليم بنجاح ✓' : 'Delivered Successfully ✓',
@@ -724,7 +724,7 @@ ${itemsTextAr}
     if (lastOrder?.id === input) {
       result.textContent = currentLang === 'ar'
         ? `طلبك ${lastOrder.id} وصلنا، وفريق رُوح هيتواصل معاك لتأكيد التوصيل.`
-        : `Your order ${lastOrder.id} is received, and the ROOH team will reach out soon.`;
+        : `Your order ${lastOrder.id} is received, and the Rou7 team will reach out soon.`;
     } else {
       result.textContent = I18N[currentLang].track_not_found;
     }

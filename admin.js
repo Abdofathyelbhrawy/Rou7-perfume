@@ -202,7 +202,7 @@
       const cleanPhone = cleanPhoneForWhatsApp(o.phone);
       const waMsg = encodeURIComponent(adminLang === 'ar'
         ? `مرحباً أستاذ ${o.customer_name || ''}، معك فريق رُوح بخصوص طلبك رقم ${o.order_number}`
-        : `Hello ${o.customer_name || ''}, this is ROOH team regarding your order #${o.order_number}`);
+        : `Hello ${o.customer_name || ''}, this is Rou7 Perfume team regarding your order #${o.order_number}`);
       const waLink = cleanPhone ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${waMsg}` : '';
 
       const itemsList = parseOrderItems(o.items);
@@ -218,7 +218,7 @@
       return `<tr>
         <td><span class="order-num-pill">${escapeHtml(o.order_number || '—')}</span></td>
         <td class="client-cell">
-          <strong>${escapeHtml(o.customer_name || (adminLang === 'ar' ? 'عميل رُوح' : 'ROOH Customer'))}</strong>
+          <strong>${escapeHtml(o.customer_name || (adminLang === 'ar' ? 'عميل رُوح' : 'Rou7 Customer'))}</strong>
           <small dir="ltr">${escapeHtml(o.phone || '—')}</small>
           ${waLink ? `<a href="${waLink}" target="_blank" class="btn-wa-client" title="WhatsApp">💬 WhatsApp</a>` : ''}
         </td>
