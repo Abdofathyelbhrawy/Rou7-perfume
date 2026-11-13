@@ -107,7 +107,7 @@
       track_searching: 'جاري البحث…',
       track_not_found: 'لم نجد هذا الطلب. راجع الرقم أو تواصل معنا للمساعدة.',
       wa_tooltip: 'تواصل معنا عبر واتساب 💬',
-      wa_inquiry_msg: 'مرحباً رُوح | Rou7 Perfume، أود الاستفسار عن عطوركم 🌸',
+      wa_inquiry_msg: 'مرحباً رُوح | Rou7-perfume، أود الاستفسار عن عطوركم 🌸',
       toast_added: 'اتضاف عطرك للسلة ✳',
       toast_newsletter: 'أهلاً بك في حكاية رُوح ✳',
       lang_btn_code: 'EN',
@@ -191,7 +191,7 @@
       track_searching: 'Searching…',
       track_not_found: 'Order not found. Please verify the number or contact us.',
       wa_tooltip: 'Chat with us on WhatsApp 💬',
-      wa_inquiry_msg: 'Hello Rou7 Perfume, I would like to inquire about your fragrances 🌸',
+      wa_inquiry_msg: 'Hello Rou7-perfume, I would like to inquire about your fragrances 🌸',
       toast_added: 'Added to your shopping bag ✳',
       toast_newsletter: 'Welcome to the story of Rou7 ✳',
       lang_btn_code: 'عربي',
@@ -626,7 +626,7 @@
     if (currentLang === 'en') {
       const itemsTextEn = items.map(i => `• ${i.latin || i.name} × ${i.qty} — ${money(i.price * i.qty)}`).join('\n');
       waMessage =
-`✨ *New Order from Rou7 Perfume* ✨
+`✨ *New Order from Rou7-perfume* ✨
 ━━━━━━━━━━━━━━━━━━
 📋 *Order ID:* #${orderNumber}
 👤 *Name:* ${name}
@@ -644,7 +644,7 @@ I would like to confirm my order please 🌸`;
     } else {
       const itemsTextAr = items.map(i => `• ${i.name} × ${i.qty} — ${money(i.price * i.qty)}`).join('\n');
       waMessage =
-`✨ *طلب جديد من متجر رُوح | Rou7 Perfume* ✨
+`✨ *طلب جديد من متجر رُوح | Rou7-perfume* ✨
 ━━━━━━━━━━━━━━━━━━
 📋 *رقم الطلب:* #${orderNumber}
 👤 *الاسم:* ${name}
