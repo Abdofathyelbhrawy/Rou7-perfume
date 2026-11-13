@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#192940"><meta name="description" content="لوحة إدارة رُوح | ROOH Perfume">
+  <title>لوحة رُوح | ROOH Perfume</title><link rel="icon" type="image/png" href="assets/branding/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <aside class="admin-sidebar"><a href="index.html" class="admin-logo"><img class="brand-logo" src="assets/branding/logo-dark.png" data-dark="assets/branding/logo-dark.png" data-light="assets/branding/logo-light.png" alt="رُوح | ROOH Perfume"></a><div class="side-label">القائمة الرئيسية</div><a class="side-link selected" href="#overview"><span>◫</span> نظرة عامة</a><a class="side-link" href="#products-panel"><span>🧴</span> إدارة العطور <b id="prodBadge">٠</b></a><a class="side-link" href="#campaign"><span>✳</span> إعلان الصفحة الرئيسية</a><a class="side-link" href="#orders"><span>▤</span> الطلبات <b id="orderBadge">٠</b></a><a class="side-link" href="index.html#collection"><span>✳</span> مجموعة العطور</a><div class="sidebar-bottom"><span class="admin-avatar">ر</span><span><strong>فريق رُوح</strong><small>مساحة الإدارة</small></span></div></aside>
+  <main class="admin-main" id="overview">
+    <header class="admin-topbar">
+      <div><span class="crumb">رُوح /</span> <span id="adminTopTitle">نظرة عامة</span></div>
+      <div class="top-actions">
+        <button class="admin-lang-toggle" id="adminLangToggle" aria-label="Switch Language" title="تغيير اللغة | Switch Language"><span class="lang-globe">🌐</span> <span id="adminLangText">EN</span></button>
+        <a class="view-store" href="index.html" id="adminViewStore">عرض المتجر <span>↗</span></a>
+        <button id="adminTheme" aria-label="تغيير المظهر">◐</button>
+        <span class="date-badge"><span id="adminDateLabel">اليوم</span> · <span id="adminDate"></span></span>
+      </div>
+    </header>
+    <section class="welcome"><div><p class="admin-kicker">مساحة رُوح</p><h1>أهلاً بفريق <em>رُوح</em></h1><p>نظرة هادئة على حركة متجرك اليوم.</p></div><span class="welcome-flower">✳</span></section>
+    <section class="stats-grid"><article class="stat-card"><span>إجمالي الطلبات المسجلة</span><strong id="statOrders">٠</strong><small>تحديث فوري Realtime</small><i>▤</i></article><article class="stat-card"><span>منتجات المجموعة</span><strong id="statProducts">٠</strong><small>متوفرة في المتجر</small><i>✳</i></article><article class="stat-card"><span>إجمالي قيمة الطلبات</span><strong id="statTotal">٠ ج.م</strong><small>من مبيعات المتجر</small><i>↗</i></article></section>
+
+    <section class="products-panel" id="products-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="admin-kicker">مجموعة عطور رُوح</p>
+          <h2>إدارة العطور والمخزون</h2>
+        </div>
+        <button class="button button-primary" id="openAddProduct"><span>＋</span> إضافة عطر جديد</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>الصورة</th>
+              <th>اسم العطر</th>
+              <th>الصنف</th>
+              <th>السعر</th>
+              <th>الوصف والنوتات</th>
+              <th>المخزون / الوسام</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="productsTable">
+            <tr><td colspan="7" class="empty-table">جاري تحميل العطور…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="campaign-panel" id="campaign"><div class="panel-heading"><div><p class="admin-kicker">إدارة محتوى المتجر</p><h2>إعلان الصفحة الرئيسية</h2></div><span class="local-label">تحكم بالموعد والنص</span></div><div class="campaign-body"><form id="campaignForm"><label>نص الإعلان<input id="promoTitleInput" name="title" maxlength="100" required placeholder="مثال: شحن مجاني للطلبات فوق ١٥٠٠ جنيه"></label><label>سطر توضيحي <span>(اختياري)</span><textarea id="promoDetailsInput" name="details" rows="2" maxlength="180" placeholder="اكتب تفاصيل إضافية للعرض"></textarea></label><div class="campaign-dates"><label>يبدأ في<input id="promoStartInput" type="datetime-local"></label><label>ينتهي في<input id="promoEndInput" type="datetime-local"></label></div><small class="campaign-help">اترك البداية فارغة ليظهر فوراً، والنهاية فارغة ليبقى الإعلان فعالاً حتى توقفه.</small><label class="campaign-active"><input id="promoActiveInput" type="checkbox"><span>تفعيل الإعلان خلال الفترة المحددة</span></label><div class="campaign-actions"><button class="button button-primary" type="submit">حفظ الإعلان <span>←</span></button><p id="campaignStatus" role="status"></p></div></form><div class="campaign-preview"><span>معاينة الإعلان</span><div class="campaign-preview-card"><small id="promoPreviewKicker">عرض من رُوح</small><strong id="promoPreviewTitle">شحن مجاني للطلبات فوق ١٥٠٠ جنيه</strong><p id="promoPreviewDetails"></p></div><small class="preview-note">يظهر أسفل الواجهة الرئيسية عند تفعيله وحلول موعده.</small></div></div></section>
+    <section class="orders-panel" id="orders">
+      <div class="panel-heading">
+        <div>
+          <p class="admin-kicker">متابعة المتجر والمبيعات</p>
+          <h2>إدارة الطلبات الواردة</h2>
+        </div>
+        <span class="local-label" id="ordersCountBadge">٠ طلبات</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>رقم الطلب</th>
+              <th>العميل والهاتف</th>
+              <th>العطور المطلوبة</th>
+              <th>المبلغ</th>
+              <th>حالة الطلب</th>
+              <th>التاريخ</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable">
+            <tr><td colspan="7" class="empty-table">جاري تحميل الطلبات…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <footer class="admin-footer"><span>رُوح | ROOH Perfume</span><span>عطر يلامس أعماقك <b>✳</b></span></footer>
+  </main>
+
+  <!-- Modal إضافة وتعديل عطر -->
+  <div class="modal" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalProductTitle">
+    <div class="modal-card">
+      <button class="modal-close" id="productModalClose" aria-label="إغلاق">×</button>
+      <div class="modal-brand"><img class="brand-logo" src="assets/branding/logo-dark.png" data-dark="assets/branding/logo-dark.png" data-light="assets/branding/logo-light.png" alt="رُوح"></div>
+      <div class="product-form-view">
+        <p class="eyebrow"><span></span> إدارة المجموعة</p>
+        <h2 id="modalProductTitle">إضافة <em>عطر جديد</em></h2>
+        <form id="productForm">
+          <input type="hidden" id="productId" name="id">
+          <div class="form-row">
+            <label>اسم العطر (عربي) *
+              <input id="prodName" name="name" required placeholder="مثال: رُوح الورد">
+            </label>
+            <label>الاسم اللاتيني / الإنجليزي
+              <input id="prodLatin" name="latin" placeholder="مثال: Roh Al Ward">
+            </label>
+          </div>
+          <div class="form-row">
+            <label>السعر (ج.م) *
+              <input id="prodPrice" name="price" type="number" step="0.01" min="0" required placeholder="مثال: 350">
+            </label>
+            <label>الصنف *
+              <select id="prodCategory" name="category" required>
+                <option value="women">نسائي</option>
+                <option value="men">رجالي</option>
+                <option value="unisex">للجميع (Unisex)</option>
+              </select>
+            </label>
+          </div>
+          <label>الوصف والنوتات العطرية
+            <textarea id="prodNotes" name="notes" rows="2" placeholder="مثال: ياسمين، عنبر دافئ، مسك أبيض، لمسة عود فاخرة"></textarea>
+          </label>
+          <div class="form-group image-upload-group">
+            <label>صورة العطر</label>
+            <div class="image-dropzone" id="imageDropzone">
+              <input type="file" id="prodFileInput" accept="image/*" style="display:none">
+              <div class="dropzone-preview" id="dropzonePreview" hidden>
+                <img id="imagePreviewImg" src="" alt="معاينة الصورة">
+                <button type="button" class="btn-remove-image" id="btnRemoveImage" title="إزالة أو تغيير الصورة">×</button>
+              </div>
+              <div class="dropzone-prompt" id="dropzonePrompt">
+                <span class="upload-icon">📷</span>
+                <p><strong>اضغط لاختيار صورة العطر من جهازك</strong> أو اسحبها هنا</p>
+                <small>يدعم JPG, PNG, WebP حتى 5MB</small>
+              </div>
+            </div>
+            <input type="hidden" id="prodImage" name="image_url">
+          </div>
+
+          <div class="form-row">
+            <label>شارة أو وسام (اختياري)
+              <input id="prodTag" name="tag" placeholder="مثال: جديد / الأكثر مبيعاً">
+            </label>
+            <label>أو أدخل رابط صورة مباشر (اختياري)
+              <input id="prodImageManual" type="url" placeholder="https://... رابط صورة">
+            </label>
+          </div>
+          <div class="form-checks">
+            <label class="check-label">
+              <input id="prodFeatured" name="is_featured" type="checkbox">
+              <span>إبراز كعطر مميز في واجهة المتجر (Hero)</span>
+            </label>
+            <label class="check-label">
+              <input id="prodInStock" name="in_stock" type="checkbox" checked>
+              <span>متوفر في المخزون</span>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button class="button button-primary" type="submit" id="saveProdBtn">حفظ العطر <span>←</span></button>
+            <button class="button button-outline" type="button" id="cancelProdBtn">إلغاء</button>
+            <p id="prodFormStatus" role="status"></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal تفاصيل الطلب والفاتورة -->
+  <div class="modal" id="orderDetailsModal" role="dialog" aria-modal="true" aria-labelledby="modalOrderNumber">
+    <div class="modal-card invoice-card">
+      <button class="modal-close" id="orderModalClose" aria-label="إغلاق">×</button>
+      <div class="invoice-header">
+        <div class="modal-brand"><img class="brand-logo" src="assets/branding/logo-dark.png" data-dark="assets/branding/logo-dark.png" data-light="assets/branding/logo-light.png" alt="رُوح"></div>
+        <div class="invoice-meta">
+          <p class="eyebrow"><span></span> فاتورة طلب رسمية</p>
+          <h2 id="modalOrderNumber">#RO-123456</h2>
+          <span class="order-date-text" id="modalOrderDate"></span>
+        </div>
+      </div>
+
+      <div class="invoice-client-box">
+        <div class="client-info-item">
+          <small>اسم العميل</small>
+          <strong id="modalOrderName">—</strong>
+        </div>
+        <div class="client-info-item">
+          <small>رقم الهاتف والتواصل</small>
+          <div class="phone-wa-wrap">
+            <strong id="modalOrderPhone" dir="ltr">—</strong>
+            <a href="#" id="modalOrderWaBtn" class="btn-wa-direct" target="_blank" title="محادثة واتساب">
+              💬 مراسلة واتساب
+            </a>
+          </div>
+        </div>
+        <div class="client-info-item full">
+          <small>عنوان التوصيل بالكامل</small>
+          <p id="modalOrderAddress">—</p>
+        </div>
+      </div>
+
+      <div class="invoice-items-box">
+        <p class="box-title">العطور المطلوبة</p>
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>العطر</th>
+              <th>الكمية</th>
+              <th>السعر</th>
+              <th>المجموع</th>
+            </tr>
+          </thead>
+          <tbody id="modalOrderItemsTable">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="invoice-total-row">
+        <span>الإجمالي المستحق:</span>
+        <strong id="modalOrderTotal">٠ ج.م</strong>
+      </div>
+
+      <div class="invoice-actions no-print">
+        <button class="button button-primary" id="printInvoiceBtn"><span>🖨️</span> طباعة الفاتورة</button>
+        <button class="button button-outline" id="closeInvoiceBtn">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin.js" defer></script>
+</body>
+</html>
