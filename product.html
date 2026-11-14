@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#192940">
+  <title id="pageTitle">رُوح | Rou7 Perfume — تفاصيل العطر</title>
+  <link rel="icon" type="image/png" href="assets/branding/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="product.css">
+</head>
+<body>
+  <div class="loader" id="loader" aria-label="جاري التحميل">
+    <img src="assets/branding/logo-dark.png" alt="رُوح | Rou7 Perfume">
+    <span class="loader-line"></span>
+  </div>
+
+  <div class="announcement">
+    <span class="announcement-star">✳</span>
+    <span data-i18n="announcement">شحن لجميع المحافظات · دفع عند الاستلام · ضمان الثبات والفوحان</span>
+    <span class="announcement-star">✳</span>
+  </div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <nav class="desktop-nav" aria-label="التنقل الرئيسي">
+        <a href="index.html" data-i18n="nav_home">الرئيسية</a>
+        <a href="index.html#collection" data-i18n="nav_collection">تسوق العطور</a>
+        <a href="index.html#story" data-i18n="nav_story">حكايتنا</a>
+        <a href="https://wa.me/message/2YHV6BH76ZRGO1" target="_blank" rel="noopener" data-i18n="nav_contact">تواصل معنا</a>
+      </nav>
+      <a class="brand" href="index.html" aria-label="رُوح">
+        <img class="brand-logo" src="assets/branding/logo-dark.png" data-dark="assets/branding/logo-dark.png" data-light="assets/branding/logo-light.png" alt="رُوح | Rou7 Perfume">
+      </a>
+      <div class="header-actions">
+        <button class="lang-toggle-btn" id="langToggle" aria-label="Switch Language" title="تغيير اللغة | Switch Language">
+          <span class="lang-globe">🌐</span>
+          <span id="langText">EN</span>
+        </button>
+        <button class="icon-btn theme-toggle" id="themeToggle" aria-label="تبديل المظهر">
+          <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8A9.06 9.06 0 0 0 12 3z"/></svg>
+        </button>
+        <button class="icon-btn" id="cartToggle" aria-label="سلة الشراء">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="product-page-main">
+    <div class="product-page-container">
+      <!-- Breadcrumb -->
+      <nav class="product-breadcrumbs" aria-label="المسار">
+        <a href="index.html" data-i18n="nav_home">الرئيسية</a>
+        <span>/</span>
+        <a href="index.html#collection" data-i18n="nav_collection">العطور</a>
+        <span>/</span>
+        <span class="bc-current" id="bcProductName">...</span>
+      </nav>
+
+      <!-- Main Product Hero Grid -->
+      <section class="prod-hero-grid">
+        <!-- Visual Column with Floating Scent Notes -->
+        <div class="prod-visual-stage">
+          <div class="prod-stage-halo"></div>
+          <div class="prod-floating-notes" id="prodFloatingNotes">
+            <!-- Dynamically populated floating notes -->
+          </div>
+          <div class="prod-bottle-frame" id="prodBottleFrame">
+            <span class="prod-badge-tag" id="prodBadgeTag" hidden></span>
+            <img class="prod-hero-image" id="prodHeroImage" src="" alt="" fetchpriority="high">
+          </div>
+        </div>
+
+        <!-- Info & Buy Column -->
+        <div class="prod-info-col">
+          <div class="prod-cat-pill" id="prodCategoryPill">عطر فاخر · للجميع</div>
+          <h1 class="prod-main-title" id="prodMainTitle">...</h1>
+          <p class="prod-latin-subtitle" id="prodLatinTitle"></p>
+
+          <div class="prod-price-strip">
+            <span class="prod-price-tag" id="prodPriceTag">...</span>
+            <span class="prod-stock-badge" id="prodStockBadge">متوفر في المخزون ✓</span>
+          </div>
+
+          <!-- INSPIRED BY BOX (Exact match to reference image) -->
+          <div class="pdp-inspired-card" id="pdpInspiredCard" hidden>
+            <div class="pdp-inspired-icon">
+              <svg viewBox="0 0 36 24" width="36" height="24" fill="none" stroke="currentColor" stroke-width="1.3">
+                <rect x="2" y="7" width="9" height="13" rx="2"/>
+                <rect x="4.5" y="4" width="4" height="3" rx="0.5"/>
+                <path d="M14 13.5h5m-2-2.5 2.5 2.5-2.5 2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="22" y="7" width="11" height="13" rx="2" stroke="var(--pink)"/>
+                <rect x="25" y="4" width="5" height="3" rx="0.5" stroke="var(--pink)"/>
+                <text x="27.5" y="16.5" font-size="6.5" font-family="'DM Sans',sans-serif" font-weight="700" fill="var(--pink)" stroke="none" text-anchor="middle">R</text>
+              </svg>
+            </div>
+            <div class="pdp-inspired-text">
+              <span class="pdp-inspired-label" data-i18n="inspired_by_label">INSPIRED BY</span>
+              <h3 class="pdp-inspired-name" id="pdpInspiredName"></h3>
+            </div>
+          </div>
+
+          <!-- Poetic Description -->
+          <div class="prod-desc-block">
+            <p id="prodDescriptionText"></p>
+          </div>
+
+          <!-- Quick Accord Tags Row -->
+          <div class="prod-quick-accords" id="prodQuickAccords"></div>
+
+          <!-- Purchase Action Bar -->
+          <div class="prod-actions-bar">
+            <div class="qty-selector">
+              <button type="button" class="qty-btn" id="qtyMinus" aria-label="تقليل الكمية">−</button>
+              <span class="qty-num" id="qtyDisplay">1</span>
+              <button type="button" class="qty-btn" id="qtyPlus" aria-label="زيادة الكمية">+</button>
+            </div>
+            <button class="button button-primary btn-add-bag" id="pdpAddBagBtn">
+              <span data-i18n="add_to_bag">أضف إلى السلة</span>
+              <span>＋</span>
+            </button>
+            <a class="button btn-wa-order" id="pdpWaBtn" target="_blank" rel="noopener">
+              <span>طلب مباشر عبر WhatsApp</span>
+              <span>💬</span>
+            </a>
+          </div>
+
+          <!-- Trust Badges Strip -->
+          <div class="prod-trust-strip">
+            <div class="trust-item">
+              <span>🚚</span>
+              <div>
+                <strong>شحن سريع</strong>
+                <small>لكل المحافظات</small>
+              </div>
+            </div>
+            <div class="trust-item">
+              <span>💵</span>
+              <div>
+                <strong>دفع عند الاستلام</strong>
+                <small>عاين قبل الدفع</small>
+              </div>
+            </div>
+            <div class="trust-item">
+              <span>⭐</span>
+              <div>
+                <strong>ثبات وفوحان</strong>
+                <small>زيوت نقية 100%</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           IN-DEPTH SCENT ANALYSIS (Exact match to reference images)
+           ══════════════════════════════════════════════════════════════ -->
+      <section class="scent-analysis-section">
+        <div class="section-title-wrap">
+          <p class="eyebrow"><span></span> <span data-i18n="analysis_eyebrow">تحليل عميق ومفصل</span></p>
+          <h2 class="analysis-heading" data-i18n="analysis_heading">البصمة العطرية <em>والهرم العطري</em></h2>
+          <p class="analysis-subtext" data-i18n="analysis_subtext">اكتشف تدرّج العطر على بشرتك مع الوقت ونسب مكوناته ودرجات أدائه وثباته.</p>
+        </div>
+
+        <div class="analysis-grid">
+          <!-- CARD 1: SCENT PYRAMID (Left Card) -->
+          <article class="pdp-card pdp-pyramid-card">
+            <div class="pdp-card-head">
+              <h3 data-i18n="pyramid_title">Scent pyramid</h3>
+              <small data-i18n="pyramid_subtitle">Tap any note to learn how it smells.</small>
+            </div>
+
+            <div class="pyramid-levels" id="pyramidLevelsContainer">
+              <!-- Top Notes -->
+              <div class="p-level-row" id="topLevelRow">
+                <div class="p-level-badge">
+                  <span class="shape-icon shape-triangle">▲</span>
+                  <div class="p-level-meta">
+                    <strong>Top</strong>
+                    <small>First 15 min</small>
+                  </div>
+                </div>
+                <div class="p-level-pills" id="topPillsContainer"></div>
+              </div>
+
+              <!-- Heart Notes -->
+              <div class="p-level-row" id="heartLevelRow">
+                <div class="p-level-badge">
+                  <span class="shape-icon shape-trapezoid">■</span>
+                  <div class="p-level-meta">
+                    <strong>Heart</strong>
+                    <small>15 min to 3 h</small>
+                  </div>
+                </div>
+                <div class="p-level-pills" id="heartPillsContainer"></div>
+              </div>
+
+              <!-- Base Notes -->
+              <div class="p-level-row" id="baseLevelRow">
+                <div class="p-level-badge">
+                  <span class="shape-icon shape-square">◼</span>
+                  <div class="p-level-meta">
+                    <strong>Base</strong>
+                    <small>3 h and more</small>
+                  </div>
+                </div>
+                <div class="p-level-pills" id="basePillsContainer"></div>
+              </div>
+            </div>
+          </article>
+
+          <!-- RIGHT SIDE STACK (Scent DNA + Performance) -->
+          <div class="analysis-right-stack">
+            <!-- CARD 2: SCENT DNA (Donut & Accords Bars) -->
+            <article class="pdp-card pdp-dna-card">
+              <div class="pdp-card-head">
+                <h3 data-i18n="dna_title">Scent DNA</h3>
+                <small data-i18n="dna_subtitle">Built from its main accords.</small>
+              </div>
+
+              <div class="dna-body">
+                <!-- Donut Chart -->
+                <div class="dna-chart-wrap">
+                  <svg class="dna-donut-svg" viewBox="0 0 160 160" id="dnaDonutSvg"></svg>
+                  <div class="dna-donut-center">
+                    <strong id="dnaMainAccordLabel">Woody</strong>
+                    <small data-i18n="dna_main_label">Main accord</small>
+                  </div>
+                </div>
+
+                <!-- Accords Progress Bars -->
+                <div class="dna-bars-wrap" id="dnaBarsContainer"></div>
+              </div>
+            </article>
+
+            <!-- CARD 3: PERFORMANCE METRICS -->
+            <article class="pdp-card pdp-perf-card">
+              <div class="pdp-card-head">
+                <h3 data-i18n="perf_title">Performance</h3>
+                <small data-i18n="perf_subtitle">Tested and rated by our team.</small>
+              </div>
+
+              <div class="perf-metrics-grid">
+                <!-- Longevity -->
+                <div class="perf-pill-box">
+                  <span class="ppm-tag">LONGEVITY</span>
+                  <strong class="ppm-val" id="ppmLongVal">8-10hrs</strong>
+                  <div class="ppm-bars" id="ppmLongBars"></div>
+                </div>
+
+                <!-- Sillage -->
+                <div class="perf-pill-box">
+                  <span class="ppm-tag">SILLAGE</span>
+                  <strong class="ppm-val" id="ppmSilVal">1-2hrs</strong>
+                  <div class="ppm-bars" id="ppmSilBars"></div>
+                </div>
+              </div>
+
+              <!-- Accords Chips Row -->
+              <div class="perf-accords-footer" id="perfAccordsFooter"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- RELATED FRAGRANCES SECTION -->
+      <section class="related-section">
+        <div class="section-title-wrap">
+          <p class="eyebrow"><span></span> <span data-i18n="related_eyebrow">مجموعات مختارة</span></p>
+          <h2 class="analysis-heading" data-i18n="related_heading">عطور أخرى <em>قد تلامس روحك</em></h2>
+        </div>
+        <div class="related-grid" id="relatedGrid"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Cart Drawer -->
+  <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+    <div class="drawer-head">
+      <h2 id="cartTitle"><span data-i18n="bag_title">حقيبة التسوق</span> <span id="cartDrawerCount">(0)</span></h2>
+      <button class="drawer-close" id="cartClose" aria-label="إغلاق">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-empty" id="cartEmpty">
+      <span>✳</span>
+      <p data-i18n="bag_empty_title">حقيبتك فارغة الآن</p>
+      <small data-i18n="bag_empty_text">استكشف مجموعتنا واختر عطرك المفضل.</small>
+      <a href="index.html#collection" class="button button-outline" data-i18n="bag_empty_btn">تصفح المجموعة</a>
+    </div>
+    <div class="cart-summary" id="cartSummary">
+      <div>
+        <span data-i18n="total_label">الإجمالي</span>
+        <strong id="cartTotal">٠ ج.م</strong>
+      </div>
+      <button class="button button-primary" id="checkoutBtn"><span data-i18n="checkout_btn">إتمام الطلب الآن</span> <span class="arrow-icon">←</span></button>
+      <small data-i18n="checkout_note">الدفع عند الاستلام · تأكيد عبر واتساب</small>
+    </div>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div>
+        <a class="footer-brand" href="index.html"><img class="brand-logo" src="assets/branding/logo-dark.png" data-dark="assets/branding/logo-dark.png" data-light="assets/branding/logo-light.png" alt="رُوح | Rou7 Perfume"></a>
+        <p data-i18n-html="footer_tagline">عطر يلامس أعماقك.<br>رائحة تُشبهك، وذكرى تبقى.</p>
+      </div>
+      <div class="footer-links">
+        <a href="index.html#collection" data-i18n="nav_collection">تسوق العطور</a>
+        <a href="index.html#story" data-i18n="nav_story">حكايتنا</a>
+        <a href="https://wa.me/message/2YHV6BH76ZRGO1" target="_blank" rel="noopener" data-i18n="nav_contact">تواصل معنا</a>
+      </div>
+      <div class="social-links">
+        <a href="https://www.instagram.com/roou7_perfume?mdxt=MWR6bnhobnNjNjZjNg==" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+        </a>
+        <a href="https://www.facebook.com/share/1ZeZtRoWD5/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a href="https://wa.me/message/2YHV6BH76ZRGO1" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">
+          <svg viewBox="0 0 32 32" width="14" height="14" fill="currentColor"><path d="M16.02 2C8.28 2 2 8.28 2 16.02c0 2.58.7 5.1 2.03 7.3L2 30l6.89-1.99a13.9 13.9 0 0 0 7.13 1.95h.01c7.74 0 14.02-6.28 14.02-14.02 0-3.75-1.46-7.27-4.11-9.92A13.95 13.95 0 0 0 16.02 2zm8.21 19.83c-.35.98-1.74 1.88-2.82 2.11-.74.16-1.71.29-4.96-1.06-4.16-1.72-6.84-5.96-7.05-6.23-.2-.28-1.7-2.26-1.7-4.31 0-2.05 1.07-3.06 1.45-3.48.38-.42.83-.53 1.1-.53.28 0 .55.01.8.02.25.01.6.09.92.77.34.72 1.15 2.8 1.25 3.01.1.21.17.46.03.73-.13.28-.21.45-.41.68-.21.24-.43.53-.62.71-.21.2-.42.42-.18.83.24.42 1.07 1.76 2.3 2.85 1.58 1.41 2.91 1.85 3.33 2.05.41.21.66.17.9-.1.25-.28 1.07-1.25 1.35-1.68.28-.42.56-.35.95-.21.38.14 2.45 1.15 2.87 1.36.42.21.7.31.8.49.1.17.1 1-.25 1.98z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="footer_rights">© ٢٠٢٦ رُوح | Rou7-perfume. جميع الحقوق محفوظة.</span>
+      <span data-i18n-html="footer_made">صُنع بحب في مصر <b>✳</b></span>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp -->
+  <a href="https://wa.me/message/2YHV6BH76ZRGO1" class="whatsapp-float" id="whatsappFloat" target="_blank" rel="noopener" aria-label="تواصل معنا عبر واتساب">
+    <span class="whatsapp-tooltip" id="whatsappTooltip">تواصل معنا عبر واتساب 💬</span>
+    <svg viewBox="0 0 32 32" fill="currentColor">
+      <path d="M16.02 2C8.28 2 2 8.28 2 16.02c0 2.58.7 5.1 2.03 7.3L2 30l6.89-1.99a13.9 13.9 0 0 0 7.13 1.95h.01c7.74 0 14.02-6.28 14.02-14.02 0-3.75-1.46-7.27-4.11-9.92A13.95 13.95 0 0 0 16.02 2zm8.21 19.83c-.35.98-1.74 1.88-2.82 2.11-.74.16-1.71.29-4.96-1.06-4.16-1.72-6.84-5.96-7.05-6.23-.2-.28-1.7-2.26-1.7-4.31 0-2.05 1.07-3.06 1.45-3.48.38-.42.83-.53 1.1-.53.28 0 .55.01.8.02.25.01.6.09.92.77.34.72 1.15 2.8 1.25 3.01.1.21.17.46.03.73-.13.28-.21.45-.41.68-.21.24-.43.53-.62.71-.21.2-.42.42-.18.83.24.42 1.07 1.76 2.3 2.85 1.58 1.41 2.91 1.85 3.33 2.05.41.21.66.17.9-.1.25-.28 1.07-1.25 1.35-1.68.28-.42.56-.35.95-.21.38.14 2.45 1.15 2.87 1.36.42.21.7.31.8.49.1.17.1 1-.25 1.98z"/>
+    </svg>
+  </a>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="product.js" defer></script>
+</body>
+</html>

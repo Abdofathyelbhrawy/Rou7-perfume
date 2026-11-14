@@ -1,0 +1,953 @@
+/* ==========================================================
+   ROU7 PERFUME — DEDICATED PRODUCT PAGE STYLES (product.css)
+   Brand Identity: Navy #192940, Cream #f5f0eb, Pink #f5a5ad, Burgundy #812d35
+   ========================================================== */
+
+/* Main Page Container */
+.product-page-main {
+  min-height: calc(100vh - 120px);
+  padding: 32px 24px 100px;
+}
+
+.product-page-container {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+/* Breadcrumbs */
+.product-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 34px;
+}
+
+.product-breadcrumbs a {
+  color: var(--muted);
+  transition: color .2s;
+  text-decoration: none;
+}
+
+.product-breadcrumbs a:hover {
+  color: var(--ink);
+}
+
+.product-breadcrumbs span {
+  opacity: .5;
+}
+
+.product-breadcrumbs .bc-current {
+  opacity: 1;
+  color: var(--accent);
+  font-weight: 500;
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================
+   PRODUCT HERO GRID
+   ========================================================== */
+.prod-hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 56px;
+  align-items: center;
+  margin-bottom: 90px;
+}
+
+@media (max-width: 980px) {
+  .prod-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+/* Visual Stage */
+.prod-visual-stage {
+  position: relative;
+  min-height: 540px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, rgba(245, 165, 173, 0.08) 0%, rgba(25, 41, 64, 0.3) 70%);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 40px 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
+}
+
+body.light .prod-visual-stage {
+  background: radial-gradient(circle at center, rgba(245, 165, 173, 0.18) 0%, rgba(245, 240, 235, 0.7) 70%);
+  box-shadow: 0 20px 60px rgba(66, 44, 36, 0.08);
+}
+
+.prod-stage-halo {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  border: 1px dashed rgba(245, 165, 173, 0.22);
+  pointer-events: none;
+  animation: stageHaloSpin 50s linear infinite;
+}
+
+@keyframes stageHaloSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.prod-bottle-frame {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  height: 440px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.prod-hero-image {
+  max-width: 86%;
+  max-height: 94%;
+  object-fit: contain;
+  filter: drop-shadow(0 26px 45px rgba(0, 0, 0, 0.5));
+  transition: transform .45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.prod-bottle-frame:hover .prod-hero-image {
+  transform: translateY(-8px) scale(1.03);
+}
+
+.prod-badge-tag {
+  position: absolute;
+  top: 10px;
+  inset-inline-start: 10px;
+  background: var(--pink);
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 6px 14px;
+  border-radius: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  z-index: 4;
+}
+
+/* Floating Notes in Visual Stage */
+.prod-floating-notes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.p-float-badge {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(25, 41, 64, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 165, 173, 0.28);
+  padding: 7px 14px;
+  border-radius: 30px;
+  font-size: 11px;
+  color: var(--cream);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  animation: floatGentle 5s ease-in-out infinite alternate;
+}
+
+body.light .p-float-badge {
+  background: rgba(255, 253, 251, 0.92);
+  border-color: rgba(129, 45, 53, 0.2);
+  color: var(--navy);
+  box-shadow: 0 10px 25px rgba(66, 44, 36, 0.1);
+}
+
+.p-float-badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.p-float-badge:nth-child(1) { top: 12%; inset-inline-start: 6%; animation-delay: 0s; }
+.p-float-badge:nth-child(2) { top: 28%; inset-inline-end: 5%; animation-delay: 1.2s; }
+.p-float-badge:nth-child(3) { bottom: 22%; inset-inline-start: 8%; animation-delay: 2.3s; }
+.p-float-badge:nth-child(4) { bottom: 10%; inset-inline-end: 10%; animation-delay: 3.4s; }
+
+@keyframes floatGentle {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-10px) rotate(1deg); }
+}
+
+/* Info Column */
+.prod-info-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.prod-cat-pill {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.prod-main-title {
+  font-size: clamp(32px, 3.8vw, 48px);
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+
+.prod-latin-subtitle {
+  font-size: 16px;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: .04em;
+  margin: 0 0 20px;
+}
+
+.prod-price-strip {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.prod-price-tag {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--ink);
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', sans-serif;
+}
+
+.prod-stock-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* INSPIRED BY BOX (Exact match to reference card) */
+.pdp-inspired-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  border-radius: 14px;
+  background: rgba(245, 240, 235, 0.04);
+  border: 1px solid rgba(212, 163, 115, 0.35);
+  margin-bottom: 24px;
+  transition: all .25s ease;
+}
+
+body.light .pdp-inspired-card {
+  background: rgba(255, 253, 251, 0.95);
+  border-color: rgba(129, 45, 53, 0.2);
+}
+
+.pdp-inspired-card:hover {
+  border-color: var(--pink);
+  transform: translateY(-1px);
+}
+
+.pdp-inspired-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d4a373;
+}
+
+.pdp-inspired-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pdp-inspired-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: #d4a373;
+  text-transform: uppercase;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.pdp-inspired-name {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0;
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', serif;
+}
+
+/* Description Text */
+.prod-desc-block {
+  font-size: 14.5px;
+  line-height: 1.9;
+  color: var(--muted);
+  margin-bottom: 24px;
+  max-width: 580px;
+}
+
+.prod-desc-block p {
+  margin: 0;
+}
+
+/* Quick Accord Chips */
+.prod-quick-accords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+/* Purchase Actions Bar */
+.prod-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.qty-selector {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 3px;
+  height: 48px;
+}
+
+.qty-btn {
+  width: 38px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  transition: background .15s;
+}
+
+.qty-btn:hover {
+  background: rgba(245, 165, 173, 0.15);
+}
+
+.qty-num {
+  min-width: 34px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.btn-add-bag {
+  flex: 1;
+  min-width: 170px;
+  height: 48px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.btn-wa-order {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #25D366;
+  color: #fff !important;
+  height: 48px;
+  padding: 0 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 0;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .2s, filter .2s;
+}
+
+.btn-wa-order:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+/* Trust Strip */
+.prod-trust-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 600px) {
+  .prod-trust-strip {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.trust-item > span {
+  font-size: 20px;
+}
+
+.trust-item strong {
+  display: block;
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.trust-item small {
+  display: block;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+/* ==========================================================
+   IN-DEPTH SCENT ANALYSIS SECTION
+   ========================================================== */
+.scent-analysis-section {
+  margin: 60px 0 90px;
+}
+
+.section-title-wrap {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 46px;
+}
+
+.analysis-heading {
+  font-size: clamp(30px, 4vw, 44px);
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 8px 0 12px;
+  color: var(--ink);
+}
+
+.analysis-heading em {
+  font-weight: 400;
+  color: var(--accent);
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', serif;
+  font-style: italic;
+}
+
+.analysis-subtext {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* Analysis 2-column Grid */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+@media (max-width: 1040px) {
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Common PDP Card Style */
+.pdp-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.18);
+  transition: transform .3s ease, border-color .3s ease;
+}
+
+body.light .pdp-card {
+  background: #ffffff;
+  box-shadow: 0 16px 45px rgba(66, 44, 36, 0.06);
+}
+
+.pdp-card-head {
+  margin-bottom: 24px;
+}
+
+.pdp-card-head h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', sans-serif;
+}
+
+.pdp-card-head small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ──────────────────────────────────────────────────────────
+   CARD 1: SCENT PYRAMID
+   ────────────────────────────────────────────────────────── */
+.pdp-pyramid-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.pyramid-levels {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.p-level-row {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.p-level-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+@media (max-width: 580px) {
+  .p-level-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+.p-level-badge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 130px;
+  flex-shrink: 0;
+}
+
+.shape-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.shape-triangle {
+  color: #eab308; /* Yellow/Gold for Top */
+}
+
+.shape-trapezoid {
+  color: #f472b6; /* Pink/Rose for Heart */
+}
+
+.shape-square {
+  color: #b45309; /* Warm Amber/Brown for Base */
+}
+
+.p-level-meta strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', sans-serif;
+}
+
+.p-level-meta small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.p-level-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+
+/* Note Pill matching the reference image */
+.note-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 15px;
+  border-radius: 30px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 12.5px;
+  color: var(--ink);
+  transition: all .2s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+body.light .note-pill {
+  background: #fbf9f6;
+  border-color: rgba(25, 41, 64, 0.12);
+}
+
+.note-pill:hover {
+  border-color: var(--pink);
+  transform: translateY(-2px);
+  background: rgba(245, 165, 173, 0.1);
+}
+
+.note-pill-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 6px currentColor;
+  flex-shrink: 0;
+}
+
+/* ──────────────────────────────────────────────────────────
+   RIGHT SIDE STACK (Scent DNA + Performance)
+   ────────────────────────────────────────────────────────── */
+.analysis-right-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* CARD 2: SCENT DNA */
+.dna-body {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 26px;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .dna-body {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+}
+
+.dna-chart-wrap {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dna-donut-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.dna-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  text-align: center;
+  padding: 10px;
+}
+
+.dna-donut-center strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.dna-donut-center small {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Accords Bars */
+.dna-bars-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.dna-bar-row {
+  display: grid;
+  grid-template-columns: 85px 1fr;
+  align-items: center;
+  gap: 14px;
+}
+
+.dna-bar-name {
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dna-bar-track {
+  position: relative;
+  height: 9px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+body.light .dna-bar-track {
+  background: rgba(25, 41, 64, 0.08);
+}
+
+.dna-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ──────────────────────────────────────────────────────────
+   CARD 3: PERFORMANCE METRICS
+   ────────────────────────────────────────────────────────── */
+.perf-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 540px) {
+  .perf-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.perf-pill-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.light .perf-pill-box {
+  background: #faf8f5;
+  border-color: rgba(25, 41, 64, 0.1);
+}
+
+.ppm-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: #d4a373;
+  text-transform: uppercase;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.ppm-val {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', sans-serif;
+}
+
+.ppm-bars {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.ppm-segment {
+  flex: 1;
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  transition: background .3s ease;
+}
+
+body.light .ppm-segment {
+  background: rgba(25, 41, 64, 0.15);
+}
+
+.ppm-segment.filled {
+  background: #111d2e;
+}
+
+body.light .ppm-segment.filled {
+  background: #192940;
+}
+
+/* Accord & Season Chips in Footer */
+.perf-accords-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.accord-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 11.5px;
+  color: var(--ink);
+  transition: border-color .2s;
+}
+
+body.light .accord-pill {
+  background: #fbf9f6;
+}
+
+.accord-pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ==========================================================
+   RELATED FRAGRANCES SECTION
+   ========================================================== */
+.related-section {
+  margin-top: 80px;
+  padding-top: 60px;
+  border-top: 1px solid var(--line);
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 26px;
+  margin-top: 36px;
+}
+
+.related-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.related-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--pink);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+}
+
+.related-img-wrap {
+  position: relative;
+  height: 230px;
+  background: radial-gradient(circle at center, rgba(245, 165, 173, 0.05) 0%, transparent 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.related-img-wrap img {
+  max-width: 80%;
+  max-height: 85%;
+  object-fit: contain;
+  transition: transform .4s ease;
+}
+
+.related-card:hover .related-img-wrap img {
+  transform: scale(1.05);
+}
+
+.related-body {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.related-body h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: var(--ink);
+}
+
+.related-body .rel-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.related-body .rel-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-top: auto;
+  margin-bottom: 12px;
+}
+
+.btn-view-prod {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .2s;
+}
+
+.btn-view-prod:hover {
+  background: var(--pink);
+  color: var(--navy);
+  border-color: var(--pink);
+}

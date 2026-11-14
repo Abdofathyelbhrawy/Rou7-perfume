@@ -983,3 +983,30 @@ html[dir="ltr"] #trackingForm label {
   .fn-pos-3 { bottom: 18px; inset-inline-start: 1%; }
   .fn-pos-4 { bottom: 8px; inset-inline-end: 1%; }
 }
+
+/* Product Card Link Enhancements */
+.product-thumb-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+.product-thumb-link img {
+  width: 100%;
+  height: 100%;
+  padding: 25px;
+  object-fit: contain;
+  transition: transform .35s ease;
+}
+.product-card:hover .product-thumb-link img {
+  transform: scale(1.05);
+}
+.prod-title-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color .2s;
+}
+.prod-title-link:hover {
+  color: var(--accent);
+}

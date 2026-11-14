@@ -479,9 +479,9 @@
         <h2 class="hero-caption-title">${safeName}</h2>
         ${cleanDesc ? `<p class="hero-caption-desc">${cleanDesc}</p>` : ''}
         <div class="hero-caption-footer">
-          <button class="btn-hero-explore" data-explore="${featured.id}" type="button">
-            <span>✦</span> ${currentLang === 'ar' ? 'استكشف هرم النوتات' : 'Explore Scent Pyramid'}
-          </button>
+          <a class="btn-hero-explore" href="product.html?id=${featured.id}">
+            <span>✦</span> ${currentLang === 'ar' ? 'استكشف هرم النوتات والتحليل' : 'Explore Scent DNA & Notes'}
+          </a>
           <button class="btn-hero-quickadd" data-add="${featured.id}" type="button">
             <span>＋</span> ${t.quick_add} · ${money(featured.price)}
           </button>
@@ -663,19 +663,21 @@
 
           return `<article class="product-card" data-product-id="${product.id}">
             <div class="product-image">
-              ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}" loading="lazy">` : ''}
+              <a href="product.html?id=${product.id}" class="product-thumb-link" aria-label="${escapeHtml(prodName)}">
+                ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}" loading="lazy">` : ''}
+              </a>
               ${product.tag ? `<span class="product-tag">${escapeHtml(product.tag)}</span>` : ''}
               <button class="quick-add" data-add="${product.id}">${t.quick_add} <span>＋</span></button>
             </div>
             <div class="product-info">
               <div class="product-meta">
-                <h3>${escapeHtml(prodName)} ${prodSub ? `<small style="font-size:10px;opacity:.7;display:block;">${escapeHtml(prodSub)}</small>` : ''}</h3>
+                <h3><a href="product.html?id=${product.id}" class="prod-title-link">${escapeHtml(prodName)}</a> ${prodSub ? `<small style="font-size:10px;opacity:.7;display:block;">${escapeHtml(prodSub)}</small>` : ''}</h3>
                 <span>${money(product.price)}</span>
               </div>
               ${d.inspired_by ? `<div class="card-inspired-tag"><span class="ci-label">${currentLang === 'ar' ? 'مستوحى من' : 'Inspired by'}</span> <strong>${escapeHtml(d.inspired_by)}</strong></div>` : ''}
               <p class="product-desc">${escapeHtml(d.notes || '')}</p>
               ${d.accords ? `<div class="card-accords-row">${renderAccordPills(d.accords)}</div>` : ''}
-              ${hasDetails ? `<button class="btn-explore-notes" data-explore="${product.id}" type="button"><span>✦</span> ${currentLang === 'ar' ? 'هرم النوتات والتفاصيل' : 'Scent Pyramid & Notes'}</button>` : ''}
+              <a href="product.html?id=${product.id}" class="btn-explore-notes"><span>✦</span> ${currentLang === 'ar' ? 'تفاصيل وتحليل العطر' : 'Fragrance Profile & Notes'}</a>
             </div>
           </article>`;
         }).join('') || `<p class="no-results">${t.no_results}</p>`
