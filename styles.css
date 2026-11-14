@@ -1010,3 +1010,106 @@ html[dir="ltr"] #trackingForm label {
 .prod-title-link:hover {
   color: var(--accent);
 }
+
+/* -- Hero Horizontal Product Scroll -------------------------------------- */
+.hero-scroll-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-scroll-header {
+  margin-bottom: 14px;
+}
+
+.hero-scroll-heading {
+  font-size: clamp(24px, 3.5vw, 36px);
+  font-weight: 400;
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.hero-scroll-heading em {
+  font-weight: 400;
+  color: var(--accent);
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', serif;
+  font-style: italic;
+}
+
+.hero-products-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 8px 4px 18px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pink) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hero-products-scroll::-webkit-scrollbar {
+  height: 5px;
+}
+
+.hero-products-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.hero-products-scroll::-webkit-scrollbar-thumb {
+  background: var(--pink);
+  border-radius: 4px;
+}
+
+.hero-scroll-card {
+  flex: 0 0 240px;
+  scroll-snap-align: start;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+body.light .hero-scroll-card {
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(66, 44, 36, 0.06);
+}
+
+.hero-scroll-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--pink);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.hero-scroll-card .product-image {
+  height: 190px;
+  background: radial-gradient(circle at center, rgba(245, 165, 173, 0.06) 0%, transparent 70%);
+}
+
+.hero-scroll-card .product-info {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.hero-scroll-card .product-meta h3 {
+  font-size: 13px;
+}
+
+.hero-scroll-card .product-meta span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hero-scroll-card .btn-explore-notes {
+  margin-top: 10px;
+  font-size: 11px;
+  padding: 7px 12px;
+}

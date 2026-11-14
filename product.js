@@ -507,18 +507,18 @@
       donutSvg.innerHTML = circles;
     }
 
-    // Accords Progress Bars Render
+    // Accords Progress Bars Render (Clean luxury descending bars without raw percentage numbers)
     if (barsContainer) {
-      barsContainer.innerHTML = accords.map(acc => {
+      const barWidths = [88, 72, 56, 42, 28];
+      barsContainer.innerHTML = accords.map((acc, i) => {
         const label = currentLang === 'ar' ? acc.nameAr : acc.nameEn;
-        const pct = Math.round((acc.score / 95) * 100);
+        const width = barWidths[i] || 25;
         return `
           <div class="dna-bar-row">
             <span class="dna-bar-name" title="${escapeHtml(label)}">${escapeHtml(label)}</span>
             <div class="dna-bar-track">
-              <div class="dna-bar-fill" style="width: ${pct}%; background: ${acc.color}"></div>
+              <div class="dna-bar-fill" style="width: ${width}%; background: ${acc.color}"></div>
             </div>
-            <span class="dna-bar-pct">${pct}%</span>
           </div>
         `;
       }).join('');

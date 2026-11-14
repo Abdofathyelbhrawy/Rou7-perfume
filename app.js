@@ -60,6 +60,7 @@
       cart_checkout: 'إتمام الطلب',
       cart_shipping_note: 'الشحن يُحسب عند إتمام الطلب',
       hero_eyebrow: 'عطور صُنعت لتُشبهك',
+      hero_scroll_heading: 'تصفح <em>عطور رُوح</em>',
       hero_title: 'عطرك…<br>حكاية <em>روحك</em>',
       hero_text: 'في كل نفحة حكاية، وفي كل أثر ذكرى. اكتشف عالماً من العطور التي تعبّر عنك وتبقى معك.',
       hero_cta: 'اكتشف مجموعتنا',
@@ -144,6 +145,7 @@
       cart_checkout: 'Proceed to Checkout',
       cart_shipping_note: 'Shipping calculated at checkout',
       hero_eyebrow: 'Fragrances Crafted to Resemble You',
+      hero_scroll_heading: 'Explore <em>Rou7 Fragrances</em>',
       hero_title: 'Your Scent…<br>The Essence of <em>Your Soul</em>',
       hero_text: 'In every note a story, in every trace a memory. Discover a world of fragrances that express who you are and linger with you.',
       hero_cta: 'Explore Collection',
@@ -315,6 +317,7 @@
 
     renderProducts();
     renderHeroProduct();
+    renderHeroProductsScroll();
     updateCart();
   }
 
@@ -494,6 +497,38 @@
         </div>
       </div>
     `;
+  }
+
+  function renderHeroProductsScroll() {
+    const container = $('#heroProductsScroll');
+    if (!container) return;
+    const t = I18N[currentLang];
+    if (!products.length) return;
+
+    container.innerHTML = products.map(product => {
+      const d = unpackProduct(product);
+      const prodName = currentLang === 'en' ? (product.latin || product.name) : product.name;
+      const prodSub  = currentLang === 'en' ? (product.latin ? product.name : '') : (product.latin || '');
+      return `
+        <article class="hero-scroll-card" data-product-id="${product.id}">
+          <div class="product-image">
+            <a href="product.html?id=${product.id}" class="product-thumb-link" aria-label="${escapeHtml(prodName)}">
+              ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}" loading="lazy">` : ''}
+            </a>
+            ${product.tag ? `<span class="product-tag">${escapeHtml(product.tag)}</span>` : ''}
+            <button class="quick-add" data-add="${product.id}" type="button">${t.quick_add} <span>＋</span></button>
+          </div>
+          <div class="product-info">
+            <div class="product-meta">
+              <h3><a href="product.html?id=${product.id}" class="prod-title-link">${escapeHtml(prodName)}</a> ${prodSub ? `<small style="font-size:10px;opacity:.7;display:block;">${escapeHtml(prodSub)}</small>` : ''}</h3>
+              <span>${money(product.price)}</span>
+            </div>
+            ${d.inspired_by ? `<div class="card-inspired-tag"><span class="ci-label">${currentLang === 'ar' ? 'مستوحى من' : 'Inspired by'}</span> <strong>${escapeHtml(d.inspired_by)}</strong></div>` : ''}
+            <a href="product.html?id=${product.id}" class="btn-explore-notes"><span>✦</span> ${currentLang === 'ar' ? 'تفاصيل وتحليل العطر' : 'Fragrance Profile'}</a>
+          </div>
+        </article>
+      `;
+    }).join('');
   }
 
   function escapeHtml(value) {
@@ -779,6 +814,7 @@
       try { localStorage.setItem('rooh-cached-products', JSON.stringify(products)); } catch (_) {}
       renderProducts();
       renderHeroProduct();
+      renderHeroProductsScroll();
       updateCart();
     }
   };
@@ -787,6 +823,7 @@
   if (products.length) {
     renderProducts();
     renderHeroProduct();
+    renderHeroProductsScroll();
   }
 
   // ── Load products from Supabase (Once on load + Realtime) ───────────────────
@@ -896,6 +933,15 @@
   $('#productGrid').addEventListener('click', event => {
     const button = event.target.closest('[data-add]');
     if (button) addToCart(button.dataset.add);
+  });
+
+  $('#heroProductsScroll')?.addEventListener('click', event => {
+    const button = event.target.closest('[data-add]');
+    if (button) {
+      event.preventDefault();
+      event.stopPropagation();
+      addToCart(button.dataset.add);
+    }
   });
 
   $('#cartItems').addEventListener('click', event => {
