@@ -36,11 +36,11 @@
       analysis_subtext: 'اكتشف تدرّج العطر على بشرتك مع الوقت ونسب مكوناته ودرجات أدائه وثباته.',
       pyramid_title: 'Scent pyramid',
       pyramid_subtitle: 'المكونات وتدرجها الزمني',
-      top_title: 'Top',
+      top_title: 'قمة العطر (Top)',
       top_time: 'أول 15 دقيقة',
-      heart_title: 'Heart',
-      heart_time: 'من 15 دقيقة إلى 3 ساعات',
-      base_title: 'Base',
+      heart_title: 'قلب العطر (Heart)',
+      heart_time: '15 دقيقة إلى 3 ساعات',
+      base_title: 'قاعدة العطر (Base)',
       base_time: 'بعد 3 ساعات وأكثر',
       dna_title: 'Scent DNA',
       dna_subtitle: 'مركب من أبرز العناصر والأكوردات',
@@ -127,15 +127,15 @@
     aromatic:  { color: '#43A047', en: 'Aromatic', ar: 'أروماتك' },
     fresh:     { color: '#00ACC1', en: 'Fresh', ar: 'منعش' },
     amber:     { color: '#D4A373', en: 'Amber', ar: 'عنبري' },
-    sweet:     { color: '#EC407A', en: 'Sweet', ar: 'حلو وسكري' },
+    sweet:     { color: '#EC407A', en: 'Sweet', ar: 'حلو' },
     citrus:    { color: '#FBC02D', en: 'Citrus', ar: 'حمضيات' },
     floral:    { color: '#E91E63', en: 'Floral', ar: 'زهري' },
     oriental:  { color: '#8E24AA', en: 'Oriental', ar: 'شرقي فاخر' },
     fruity:    { color: '#FB8C00', en: 'Fruity', ar: 'فاكهي' },
-    powdery:   { color: '#90A4AE', en: 'Powdery', ar: 'بودري' },
+    powdery:   { color: '#78909C', en: 'Powdery', ar: 'بودري' },
     vanilla:   { color: '#D7CCC8', en: 'Vanilla', ar: 'فانيليا ناعمة' },
     leather:   { color: '#5D4037', en: 'Leather', ar: 'جلود' },
-    musky:     { color: '#78909C', en: 'Musky', ar: 'مسكي' }
+    musky:     { color: '#90A4AE', en: 'Musky', ar: 'مسكي' }
   };
 
   const DEFAULT_COLORS = ['#8B5A2B', '#E65100', '#43A047', '#00ACC1', '#D4A373', '#EC407A', '#8E24AA'];
@@ -168,12 +168,12 @@
     price: 1600,
     tag: 'الأكثر طلباً · Best Seller',
     category: 'عطور شرقية',
-    image_url: 'assets/branding/logo-dark.png',
+    image_url: 'https://oyslbombgdvcoyqotyao.supabase.co/storage/v1/object/public/products/rooh_1794685786337_Nude_Coral_Diam.png',
     in_stock: true,
     notes: 'عطر يأخذ الصدارة كنغمة مضيئة في سيمفونية الغروب. يرقص البرغموت مع الزعفران، تلتقي بهما زهرة البرتقال وجوز الهند، بينما دفء الكشميران والفانيليا يكتمل بهما هذا الأثر العطري البديع.',
-    top_notes: 'برغموت, تفاح, زعفران',
-    middle_notes: 'زهر البرتقال, جوز هند, خشب الغاياك',
-    base_notes: 'فانيليا, عنبر, كشميران',
+    top_notes: 'Bergamot, Apple, Saffron',
+    middle_notes: 'Orange Blossom, Coconut, Guaiac Wood',
+    base_notes: 'Vanilla, Amber, Cashmeran',
     inspired_by: 'Vanilla Powder - Matière Première',
     longevity: 4,
     sillage: 4,
@@ -243,6 +243,57 @@
     return res.json();
   }
 
+  // ── Intelligent Fragrance Accords Extractor ──────────────────
+  function extractAccords(d, p) {
+    const textToScan = `${d.accords || ''} ${d.desc || ''} ${d.top_notes || ''} ${d.middle_notes || ''} ${d.base_notes || ''} ${d.inspired_by || ''}`.toLowerCase();
+
+    const masterAccords = [
+      { key: 'sweet',    nameEn: 'Sweet',    nameAr: 'حلو وسكري',     keywords: ['sweet', 'حلو', 'سكر', 'كراميل', 'caramel', 'tonka', 'honey', 'عسل'], color: '#EC407A', baseWeight: 90 },
+      { key: 'oriental', nameEn: 'Oriental', nameAr: 'شرقي فاخر',     keywords: ['oriental', 'شرق', 'بخور', 'incense'], color: '#8E24AA', baseWeight: 82 },
+      { key: 'vanilla',  nameEn: 'Vanilla',  nameAr: 'فانيليا ناعمة', keywords: ['vanilla', 'فانيليا'], color: '#D4A373', baseWeight: 84 },
+      { key: 'woody',    nameEn: 'Woody',    nameAr: 'خشبي دافئ',     keywords: ['wood', 'خشب', 'صندل', 'أرز', 'عود', 'cedar', 'sandalwood', 'guaiac', 'oud'], color: '#8B5A2B', baseWeight: 76 },
+      { key: 'spicy',    nameEn: 'Spicy',    nameAr: 'توابل دافئة',   keywords: ['spic', 'توابل', 'حار', 'زعفران', 'فلفل', 'هيل', 'saffron', 'pepper', 'cardamom', 'cinnamon'], color: '#E65100', baseWeight: 72 },
+      { key: 'fresh',    nameEn: 'Fresh',    nameAr: 'منعش ونقي',     keywords: ['fresh', 'منعش', 'حمض', 'برغموت', 'ليمون', 'bergamot', 'citrus', 'grapefruit', 'تفاح', 'apple'], color: '#00ACC1', baseWeight: 66 },
+      { key: 'floral',   nameEn: 'Floral',   nameAr: 'زهري راقي',     keywords: ['floral', 'زهر', 'ورد', 'ياسمين', 'rose', 'jasmine', 'blossom', 'neroli'], color: '#E91E63', baseWeight: 70 },
+      { key: 'powdery',  nameEn: 'Powdery',  nameAr: 'بودري مخملي',   keywords: ['powder', 'بودر', 'كشميران', 'cashmeran', 'مسك', 'musk', 'iris'], color: '#78909C', baseWeight: 62 },
+      { key: 'amber',    nameEn: 'Amber',    nameAr: 'عنبري دافئ',    keywords: ['amber', 'عنبر'], color: '#C58F28', baseWeight: 68 },
+      { key: 'aromatic', nameEn: 'Aromatic', nameAr: 'أروماتك',       keywords: ['aromatic', 'أروماتك', 'خزامى', 'لافندر', 'lavender', 'cypress'], color: '#43A047', baseWeight: 64 }
+    ];
+
+    const matched = [];
+    for (const acc of masterAccords) {
+      let score = 0;
+      for (const kw of acc.keywords) {
+        if (textToScan.includes(kw)) score += 20;
+      }
+      if (score > 0) {
+        matched.push({ ...acc, score: Math.min(95, acc.baseWeight + score) });
+      }
+    }
+
+    matched.sort((a, b) => b.score - a.score);
+
+    // If fewer than 5 accords matched, complement from defaults
+    if (matched.length < 5) {
+      const defaults = [
+        masterAccords[0], // Sweet
+        masterAccords[1], // Oriental
+        masterAccords[2], // Vanilla
+        masterAccords[3], // Woody
+        masterAccords[4], // Spicy
+        masterAccords[5]  // Fresh
+      ];
+      for (const def of defaults) {
+        if (!matched.some(m => m.key === def.key)) {
+          matched.push({ ...def, score: def.baseWeight });
+        }
+        if (matched.length >= 5) break;
+      }
+    }
+
+    return matched.slice(0, 5);
+  }
+
   // ── Render Product Page ──────────────────────────────────────
   function renderProductDetails(p) {
     if (!p) return;
@@ -296,16 +347,16 @@
       : 'An exquisite fragrance meticulously blended to reflect your unique presence and leave an indelible impression.');
 
     // Quick Accords in Hero
-    renderHeroAccords(d.accords);
+    renderHeroAccords(d, p);
 
     // Scent Pyramid Card
     renderScentPyramid(d);
 
     // Scent DNA Card
-    renderScentDNA(d.accords);
+    renderScentDNA(d, p);
 
     // Performance Card
-    renderPerformance(d);
+    renderPerformance(d, p);
 
     // WhatsApp Direct Order button link
     updateWaOrderLink();
@@ -319,7 +370,6 @@
     const container = $('#prodFloatingNotes');
     if (!container) return;
 
-    // Collect candidates from top and middle notes
     const rawNotes = `${d.top_notes}, ${d.middle_notes}`.split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
     const notesToShow = rawNotes.slice(0, 4);
 
@@ -340,22 +390,17 @@
   }
 
   // ── Hero Quick Accords ───────────────────────────────────────
-  function renderHeroAccords(accordsStr) {
+  function renderHeroAccords(d, p) {
     const container = $('#prodQuickAccords');
     if (!container) return;
 
-    const accords = (accordsStr || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
-    if (!accords.length) {
-      container.innerHTML = '';
-      return;
-    }
-
-    container.innerHTML = accords.map(acc => {
-      const st = resolveAccordStyle(acc);
+    const rich = extractAccords(d, p).slice(0, 4);
+    container.innerHTML = rich.map(acc => {
+      const label = currentLang === 'ar' ? acc.nameAr : acc.nameEn;
       return `
         <span class="accord-pill">
-          <span class="accord-pill-dot" style="background:${st.color}"></span>
-          <span>${escapeHtml(acc)}</span>
+          <span class="accord-pill-dot" style="background:${acc.color}"></span>
+          <span>${escapeHtml(label)}</span>
         </span>
       `;
     }).join('');
@@ -363,6 +408,23 @@
 
   // ── Scent Pyramid ────────────────────────────────────────────
   function renderScentPyramid(d) {
+    const t = I18N[currentLang];
+
+    // Update level meta names & times
+    const topName = $('#topLevelName');
+    const topTime = $('#topLevelTime');
+    const heartName = $('#heartLevelName');
+    const heartTime = $('#heartLevelTime');
+    const baseName = $('#baseLevelName');
+    const baseTime = $('#baseLevelTime');
+
+    if (topName) topName.textContent = t.top_title;
+    if (topTime) topTime.innerHTML = `<bdi>${t.top_time}</bdi>`;
+    if (heartName) heartName.textContent = t.heart_title;
+    if (heartTime) heartTime.innerHTML = `<bdi>${t.heart_time}</bdi>`;
+    if (baseName) baseName.textContent = t.base_title;
+    if (baseTime) baseTime.innerHTML = `<bdi>${t.base_time}</bdi>`;
+
     function populateLevel(containerId, rowId, notesString, defaultNotes) {
       const container = $(`#${containerId}`);
       const row = $(`#${rowId}`);
@@ -400,27 +462,22 @@
   }
 
   // ── Scent DNA Donut Chart & Progress Bars ─────────────────────
-  function renderScentDNA(accordsStr) {
+  function renderScentDNA(d, p) {
     const donutSvg = $('#dnaDonutSvg');
     const barsContainer = $('#dnaBarsContainer');
     const mainLabel = $('#dnaMainAccordLabel');
+    const t = I18N[currentLang];
 
-    let accords = (accordsStr || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
-    if (!accords.length) {
-      accords = currentLang === 'ar'
-        ? ['Woody', 'Spicy', 'Aromatic', 'Fresh', 'Amber']
-        : ['Woody', 'Spicy', 'Aromatic', 'Fresh', 'Amber'];
+    const accords = extractAccords(d, p);
+
+    // Main accord in center
+    const primary = accords[0];
+    if (mainLabel && primary) {
+      mainLabel.textContent = currentLang === 'ar' ? primary.nameAr : primary.nameEn;
     }
 
-    // Set Main accord label in center of donut
-    const mainAccord = accords[0] || 'Woody';
-    if (mainLabel) mainLabel.textContent = mainAccord;
-
-    // Percentages distribution
-    const count = accords.length;
-    const baseShares = [35, 25, 18, 12, 10, 8, 6];
-    const percentages = accords.map((_, i) => baseShares[i] || Math.max(5, Math.round(100 / count)));
-    const totalShare = percentages.reduce((a, b) => a + b, 0);
+    // Percentages distribution based on matched scores
+    const totalScore = accords.reduce((sum, a) => sum + a.score, 0);
 
     // SVG Donut Render
     // Circumference = 2 * PI * 54 ≈ 339.29
@@ -428,16 +485,15 @@
     const c = 2 * Math.PI * r;
     let accumulatedOffset = 0;
 
-    const circles = accords.map((acc, i) => {
-      const share = percentages[i] / totalShare;
+    const circles = accords.map(acc => {
+      const share = acc.score / totalScore;
       const strokeLength = share * c;
       const strokeGap = c - strokeLength;
-      const st = resolveAccordStyle(acc);
 
       const circleSvg = `
         <circle cx="80" cy="80" r="${r}" fill="none"
-          stroke="${st.color}"
-          stroke-width="16"
+          stroke="${acc.color}"
+          stroke-width="17"
           stroke-dasharray="${strokeLength.toFixed(2)} ${strokeGap.toFixed(2)}"
           stroke-dashoffset="${(-accumulatedOffset).toFixed(2)}"
           stroke-linecap="butt"
@@ -453,16 +509,16 @@
 
     // Accords Progress Bars Render
     if (barsContainer) {
-      const barRatios = [88, 74, 58, 44, 34, 26, 20];
-      barsContainer.innerHTML = accords.map((acc, i) => {
-        const st = resolveAccordStyle(acc);
-        const percent = barRatios[i] || 30;
+      barsContainer.innerHTML = accords.map(acc => {
+        const label = currentLang === 'ar' ? acc.nameAr : acc.nameEn;
+        const pct = Math.round((acc.score / 95) * 100);
         return `
           <div class="dna-bar-row">
-            <span class="dna-bar-name" title="${escapeHtml(acc)}">${escapeHtml(acc)}</span>
+            <span class="dna-bar-name" title="${escapeHtml(label)}">${escapeHtml(label)}</span>
             <div class="dna-bar-track">
-              <div class="dna-bar-fill" style="width: ${percent}%; background: ${st.color}"></div>
+              <div class="dna-bar-fill" style="width: ${pct}%; background: ${acc.color}"></div>
             </div>
+            <span class="dna-bar-pct">${pct}%</span>
           </div>
         `;
       }).join('');
@@ -470,7 +526,7 @@
   }
 
   // ── Performance Metrics ──────────────────────────────────────
-  function renderPerformance(d) {
+  function renderPerformance(d, p) {
     const longVal = $('#ppmLongVal');
     const longBars = $('#ppmLongBars');
     const silVal = $('#ppmSilVal');
@@ -511,21 +567,21 @@
 
     // Footer Chips: Accords + Seasons
     if (footerAccords) {
-      const accordsList = (d.accords || 'Sweet, Woody, Spicy').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
+      const rich = extractAccords(d, p).slice(0, 3);
       const seasons = currentLang === 'ar' ? ['شتاء', 'خريف'] : ['Winter', 'Fall'];
 
-      const accordChips = accordsList.map(a => {
-        const st = resolveAccordStyle(a);
+      const accordChips = rich.map(a => {
+        const label = currentLang === 'ar' ? a.nameAr : a.nameEn;
         return `
           <span class="accord-pill">
-            <span class="accord-pill-dot" style="background:${st.color}"></span>
-            <span>${escapeHtml(a)}</span>
+            <span class="accord-pill-dot" style="background:${a.color}"></span>
+            <span>${escapeHtml(label)}</span>
           </span>
         `;
       });
 
       const seasonChips = seasons.map(s => `
-        <span class="accord-pill" style="opacity: .85">
+        <span class="accord-pill" style="opacity: .88">
           <span>❄</span>
           <span>${escapeHtml(s)}</span>
         </span>
@@ -533,6 +589,42 @@
 
       footerAccords.innerHTML = [...accordChips, ...seasonChips].join('');
     }
+  }
+
+  // ── Luxury Bottle SVG / Photo Render Helper ──────────────────
+  function renderBottleMedia(imgUrl, altName) {
+    if (imgUrl) {
+      return `<img src="${imgUrl}" class="related-img-photo" alt="${escapeHtml(altName)}" loading="lazy">`;
+    }
+    // High luxury bespoke bottle silhouette when no photo is uploaded
+    return `
+      <div class="rel-bottle-svg-wrap">
+        <svg viewBox="0 0 160 220" class="rel-bottle-svg" aria-label="${escapeHtml(altName)}">
+          <defs>
+            <linearGradient id="relBottleGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#2c3e55" stop-opacity="0.95"/>
+              <stop offset="50%" stop-color="#192940" stop-opacity="0.98"/>
+              <stop offset="100%" stop-color="#101a28" stop-opacity="1"/>
+            </linearGradient>
+            <linearGradient id="relGoldGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#c59b27"/>
+              <stop offset="50%" stop-color="#faecc5"/>
+              <stop offset="100%" stop-color="#a87a1c"/>
+            </linearGradient>
+          </defs>
+          <circle cx="80" cy="18" r="9" fill="url(#relGoldGrad)"/>
+          <rect x="63" y="18" width="34" height="25" rx="5" fill="url(#relGoldGrad)" stroke="#dfb954" stroke-width="0.8"/>
+          <rect x="71" y="43" width="18" height="11" fill="url(#relGoldGrad)"/>
+          <rect x="36" y="54" width="88" height="144" rx="18" fill="url(#relBottleGrad)" stroke="rgba(245, 165, 173, 0.4)" stroke-width="1.2"/>
+          <rect x="42" y="60" width="76" height="132" rx="12" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1"/>
+          <path d="M46 66 L46 182" stroke="rgba(255,255,255,0.22)" stroke-width="2.5" stroke-linecap="round"/>
+          <rect x="47" y="98" width="66" height="58" rx="6" fill="rgba(255, 255, 255, 0.04)" stroke="url(#relGoldGrad)" stroke-width="0.8"/>
+          <text x="80" y="122" font-family="'DM Sans',sans-serif" font-size="9" font-weight="700" fill="#faecc5" text-anchor="middle" letter-spacing="2">ROU7</text>
+          <text x="80" y="137" font-family="'IBM Plex Sans Arabic',sans-serif" font-size="8" fill="#f5a5ad" text-anchor="middle">رُوح</text>
+          <circle cx="80" cy="146" r="1.5" fill="#c59b27"/>
+        </svg>
+      </div>
+    `;
   }
 
   // ── Related Fragrances ───────────────────────────────────────
@@ -549,13 +641,12 @@
     }
 
     grid.innerHTML = related.map(p => {
-      const d = unpackProduct(p);
       const name = currentLang === 'en' ? (p.latin || p.name) : p.name;
       const sub  = currentLang === 'en' ? (p.latin ? p.name : '') : (p.latin || '');
       return `
         <article class="related-card">
           <div class="related-img-wrap">
-            <img src="${p.image_url || 'assets/branding/logo-dark.png'}" alt="${escapeHtml(name)}" loading="lazy">
+            ${renderBottleMedia(p.image_url, name)}
           </div>
           <div class="related-body">
             <h4>${escapeHtml(name)}</h4>
@@ -688,7 +779,13 @@
     const t = I18N[lang];
     $$('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
-      if (t[key]) el.textContent = t[key];
+      if (t[key]) {
+        if (t[key].includes('<') || t[key].includes('&')) {
+          el.innerHTML = t[key];
+        } else {
+          el.textContent = t[key];
+        }
+      }
     });
     $$('[data-i18n-html]').forEach(el => {
       const key = el.dataset.i18nHtml;

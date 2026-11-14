@@ -163,7 +163,7 @@
       <section class="scent-analysis-section">
         <div class="section-title-wrap">
           <p class="eyebrow"><span></span> <span data-i18n="analysis_eyebrow">تحليل عميق ومفصل</span></p>
-          <h2 class="analysis-heading" data-i18n="analysis_heading">البصمة العطرية <em>والهرم العطري</em></h2>
+          <h2 class="analysis-heading" data-i18n-html="analysis_heading">البصمة العطرية <em>والهرم العطري</em></h2>
           <p class="analysis-subtext" data-i18n="analysis_subtext">اكتشف تدرّج العطر على بشرتك مع الوقت ونسب مكوناته ودرجات أدائه وثباته.</p>
         </div>
 
@@ -181,8 +181,8 @@
                 <div class="p-level-badge">
                   <span class="shape-icon shape-triangle">▲</span>
                   <div class="p-level-meta">
-                    <strong>Top</strong>
-                    <small>First 15 min</small>
+                    <strong id="topLevelName">Top</strong>
+                    <small id="topLevelTime">First 15 min</small>
                   </div>
                 </div>
                 <div class="p-level-pills" id="topPillsContainer"></div>
@@ -193,8 +193,8 @@
                 <div class="p-level-badge">
                   <span class="shape-icon shape-trapezoid">■</span>
                   <div class="p-level-meta">
-                    <strong>Heart</strong>
-                    <small>15 min to 3 h</small>
+                    <strong id="heartLevelName">Heart</strong>
+                    <small id="heartLevelTime">15 min to 3 h</small>
                   </div>
                 </div>
                 <div class="p-level-pills" id="heartPillsContainer"></div>
@@ -205,8 +205,8 @@
                 <div class="p-level-badge">
                   <span class="shape-icon shape-square">◼</span>
                   <div class="p-level-meta">
-                    <strong>Base</strong>
-                    <small>3 h and more</small>
+                    <strong id="baseLevelName">Base</strong>
+                    <small id="baseLevelTime">3 h and more</small>
                   </div>
                 </div>
                 <div class="p-level-pills" id="basePillsContainer"></div>
@@ -272,7 +272,7 @@
       <section class="related-section">
         <div class="section-title-wrap">
           <p class="eyebrow"><span></span> <span data-i18n="related_eyebrow">مجموعات مختارة</span></p>
-          <h2 class="analysis-heading" data-i18n="related_heading">عطور أخرى <em>قد تلامس روحك</em></h2>
+          <h2 class="analysis-heading" data-i18n-html="related_heading">عطور أخرى <em>قد تلامس روحك</em></h2>
         </div>
         <div class="related-grid" id="relatedGrid"></div>
       </section>

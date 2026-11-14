@@ -273,7 +273,13 @@
     // Apply translations across all tagged elements
     $$('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
-      if (t[key]) el.textContent = t[key];
+      if (t[key]) {
+        if (t[key].includes('<') || t[key].includes('&')) {
+          el.innerHTML = t[key];
+        } else {
+          el.textContent = t[key];
+        }
+      }
     });
 
     $$('[data-i18n-html]').forEach(el => {
