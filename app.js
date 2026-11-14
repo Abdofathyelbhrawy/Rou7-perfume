@@ -363,15 +363,169 @@
     if (event.key === PROMO_KEY) renderPromo();
   });
 
+  function unpackProduct(p) {
+    if (!p) return {};
+    let meta = {};
+    if (p.notes && typeof p.notes === 'string' && (p.notes.trim().startsWith('{') || p.notes.trim().startsWith('['))) {
+      try { meta = JSON.parse(p.notes); } catch (_) {}
+    }
+    return {
+      notes:        meta.desc !== undefined ? meta.desc : (p.notes || ''),
+      top_notes:    p.top_notes || meta.top_notes || '',
+      middle_notes: p.middle_notes || meta.middle_notes || '',
+      base_notes:   p.base_notes || meta.base_notes || '',
+      inspired_by:  p.inspired_by || meta.inspired_by || '',
+      longevity:    parseInt(p.longevity || meta.longevity) || 3,
+      sillage:      parseInt(p.sillage || meta.sillage) || 2,
+      accords:      p.accords || meta.accords || '',
+    };
+  }
+
+  function getAccordDotColor(name) {
+    const n = String(name || '').toLowerCase().trim();
+    if (n.includes('sweet') || n.includes('حلو') || n.includes('كراميل') || n.includes('فانيليا')) return '#d97706';
+    if (n.includes('wood') || n.includes('خشب') || n.includes('صندل') || n.includes('عود')) return '#8b5a2b';
+    if (n.includes('spic') || n.includes('توابل') || n.includes('حار') || n.includes('فلفل')) return '#ea580c';
+    if (n.includes('fresh') || n.includes('منعش') || n.includes('حمض') || n.includes('جريب')) return '#0284c7';
+    if (n.includes('amber') || n.includes('عنبر')) return '#b45309';
+    if (n.includes('floral') || n.includes('زهر') || n.includes('ورد') || n.includes('ياسمين')) return '#ec4899';
+    if (n.includes('aromatic') || n.includes('عطري') || n.includes('لافندر') || n.includes('سرو')) return '#10b981';
+    if (n.includes('fruit') || n.includes('فاكه') || n.includes('توت')) return '#e11d48';
+    if (n.includes('leather') || n.includes('جلد')) return '#451a03';
+    return 'var(--pink)';
+  }
+
+  function renderNotePills(notesStr, defaultColor = '#e2b38b') {
+    if (!notesStr) return '';
+    return notesStr.split(',').map(n => n.trim()).filter(Boolean).map(n => {
+      const dotCol = getAccordDotColor(n) || defaultColor;
+      return `<span class="note-pill"><span class="note-dot" style="background:${dotCol};"></span>${escapeHtml(n)}</span>`;
+    }).join('');
+  }
+
+  function renderPerfBars(level, max = 5) {
+    let html = '<div class="perf-bar-group">';
+    for (let i = 1; i <= max; i++) {
+      html += `<span class="perf-bar-segment ${i <= level ? 'filled' : ''}"></span>`;
+    }
+    html += '</div>';
+    return html;
+  }
+
+  const longevityLabels = { 1: '<1hr', 2: '1-3hrs', 3: '4-6hrs', 4: '8-10hrs', 5: '12hrs+' };
+  const sillageLabels   = { 1: 'Skin (ملاصق)', 2: '1-2hrs', 3: 'Moderate (معتدل)', 4: 'Strong (قوي)', 5: 'Beast (وحش)' };
+
+  function renderAccordPills(accordsStr) {
+    if (!accordsStr) return '';
+    return accordsStr.split(',').map(a => a.trim()).filter(Boolean).map(a => {
+      const lower = a.toLowerCase();
+      const isSeason = lower.includes('winter') || lower.includes('fall') || lower.includes('summer') || lower.includes('spring') || lower.includes('شتاء') || lower.includes('خريف') || lower.includes('صيف') || lower.includes('ربيع');
+      const dotHtml = isSeason ? '' : `<span class="note-dot" style="background:${getAccordDotColor(a)};"></span>`;
+      return `<span class="accord-pill">${dotHtml}${escapeHtml(a)}</span>`;
+    }).join('');
+  }
+
+  function renderInspiredHtml(inspiredStr) {
+    if (!inspiredStr) return '';
+    return `<div class="inspired-card">
+      <div class="inspired-icon">
+        <svg viewBox="0 0 36 24" width="34" height="24" fill="none" stroke="currentColor" stroke-width="1.3">
+          <rect x="2" y="7" width="9" height="13" rx="2"/>
+          <rect x="4.5" y="4" width="4" height="3" rx="0.5"/>
+          <path d="M14 13.5h5m-2-2.5 2.5 2.5-2.5 2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="22" y="7" width="11" height="13" rx="2" stroke="var(--pink)"/>
+          <rect x="25" y="4" width="5" height="3" rx="0.5" stroke="var(--pink)"/>
+          <text x="27.5" y="16.5" font-size="6.5" font-family="'DM Sans',sans-serif" font-weight="700" fill="var(--pink)" stroke="none" text-anchor="middle">R</text>
+        </svg>
+      </div>
+      <div class="inspired-text">
+        <span class="inspired-label">${currentLang === 'ar' ? 'مستوحى من' : 'INSPIRED BY'}</span>
+        <h4 class="inspired-name">${escapeHtml(inspiredStr)}</h4>
+      </div>
+    </div>`;
+  }
+
+  function renderScentPyramidHtml(d) {
+    const hasNotes = d.top_notes || d.middle_notes || d.base_notes;
+    if (!hasNotes) return '';
+    return `<div class="scent-pyramid-card">
+      <div class="sp-header">
+        <h4>${currentLang === 'ar' ? 'هرم النوتات العطرية' : 'Scent pyramid'}</h4>
+        <small>${currentLang === 'ar' ? 'تعرّف على نوتات عطرك وتدرّجها مع الوقت' : 'Tap any note to learn how it smells.'}</small>
+      </div>
+      ${d.top_notes ? `
+        <div class="sp-level-row">
+          <div class="sp-badge-col">
+            <span class="sp-shape sp-triangle" title="Top Notes">▲</span>
+            <div class="sp-badge-meta">
+              <strong>Top</strong>
+              <small>${currentLang === 'ar' ? 'أول 15 دقيقة' : 'First 15 min'}</small>
+            </div>
+          </div>
+          <div class="sp-pills-col">${renderNotePills(d.top_notes, '#f59e0b')}</div>
+        </div>
+      ` : ''}
+      ${d.middle_notes ? `
+        <div class="sp-level-row">
+          <div class="sp-badge-col">
+            <span class="sp-shape sp-trapezoid" title="Heart Notes">■</span>
+            <div class="sp-badge-meta">
+              <strong>Heart</strong>
+              <small>${currentLang === 'ar' ? '15 دقيقة إلى 3 ساعات' : '15 min to 3 h'}</small>
+            </div>
+          </div>
+          <div class="sp-pills-col">${renderNotePills(d.middle_notes, '#ec4899')}</div>
+        </div>
+      ` : ''}
+      ${d.base_notes ? `
+        <div class="sp-level-row">
+          <div class="sp-badge-col">
+            <span class="sp-shape sp-square" title="Base Notes">◼</span>
+            <div class="sp-badge-meta">
+              <strong>Base</strong>
+              <small>${currentLang === 'ar' ? '3 ساعات وأكثر' : '3 h and more'}</small>
+            </div>
+          </div>
+          <div class="sp-pills-col">${renderNotePills(d.base_notes, '#b45309')}</div>
+        </div>
+      ` : ''}
+    </div>`;
+  }
+
+  function renderPerformanceCardsHtml(d) {
+    const longVal = d.longevity || 3;
+    const silVal  = d.sillage || 2;
+    return `<div class="perf-cards-row">
+      <div class="perf-metric-box">
+        <span class="perf-metric-tag">${currentLang === 'ar' ? 'الثبات · LONGEVITY' : 'LONGEVITY'}</span>
+        <strong class="perf-metric-val">${longevityLabels[longVal] || '4-6hrs'}</strong>
+        ${renderPerfBars(longVal)}
+      </div>
+      <div class="perf-metric-box">
+        <span class="perf-metric-tag">${currentLang === 'ar' ? 'الانتشار · SILLAGE' : 'SILLAGE'}</span>
+        <strong class="perf-metric-val">${sillageLabels[silVal] || 'Moderate'}</strong>
+        ${renderPerfBars(silVal)}
+      </div>
+    </div>`;
+  }
+
   function renderProducts() {
     const t = I18N[currentLang];
-    const visible = products.filter(product => (activeFilter === 'all' || product.category === activeFilter) && (!query || `${product.name} ${product.latin} ${product.notes}`.toLowerCase().includes(query.toLowerCase())));
+    const visible = products.filter(product => {
+      const d = unpackProduct(product);
+      const combined = `${product.name} ${product.latin || ''} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.inspired_by} ${d.accords}`.toLowerCase();
+      return (activeFilter === 'all' || product.category === activeFilter) && (!query || combined.includes(query.toLowerCase()));
+    });
 
     $('#productGrid').innerHTML = products.length
       ? visible.map(product => {
+          const d = unpackProduct(product);
           const prodName = currentLang === 'en' ? (product.latin || product.name) : product.name;
           const prodSub  = currentLang === 'en' ? (product.latin ? product.name : '') : (product.latin || '');
-          return `<article class="product-card">
+
+          const hasDetails = d.top_notes || d.middle_notes || d.base_notes || d.inspired_by || d.accords;
+
+          return `<article class="product-card" data-product-id="${product.id}">
             <div class="product-image">
               ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}" loading="lazy">` : ''}
               ${product.tag ? `<span class="product-tag">${escapeHtml(product.tag)}</span>` : ''}
@@ -382,7 +536,10 @@
                 <h3>${escapeHtml(prodName)} ${prodSub ? `<small style="font-size:10px;opacity:.7;display:block;">${escapeHtml(prodSub)}</small>` : ''}</h3>
                 <span>${money(product.price)}</span>
               </div>
-              <p>${escapeHtml(product.notes || '')}</p>
+              ${d.inspired_by ? `<div class="card-inspired-tag"><span class="ci-label">${currentLang === 'ar' ? 'مستوحى من' : 'Inspired by'}</span> <strong>${escapeHtml(d.inspired_by)}</strong></div>` : ''}
+              <p class="product-desc">${escapeHtml(d.notes || '')}</p>
+              ${d.accords ? `<div class="card-accords-row">${renderAccordPills(d.accords)}</div>` : ''}
+              ${hasDetails ? `<button class="btn-explore-notes" data-explore="${product.id}" type="button"><span>✦</span> ${currentLang === 'ar' ? 'هرم النوتات والتفاصيل' : 'Scent Pyramid & Notes'}</button>` : ''}
             </div>
           </article>`;
         }).join('') || `<p class="no-results">${t.no_results}</p>`
@@ -393,6 +550,67 @@
       : `${visible.length} ${visible.length === 1 ? 'fragrance' : 'fragrances'}`;
     $('#resultCount').textContent = countText;
   }
+
+  // ── Product Details Modal Handler ─────────────────────────────────────────
+  const detailModal = $('#productDetailsModal');
+  const detailBody  = $('#productDetailBody');
+
+  function openProductDetailModal(productId) {
+    const product = products.find(p => String(p.id) === String(productId));
+    if (!product || !detailModal || !detailBody) return;
+
+    const d = unpackProduct(product);
+    const prodName = currentLang === 'en' ? (product.latin || product.name) : product.name;
+    const prodSub  = currentLang === 'en' ? (product.latin ? product.name : '') : (product.latin || '');
+    const t = I18N[currentLang];
+
+    detailBody.innerHTML = `
+      <div class="detail-header-section">
+        <div class="detail-media">
+          ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}">` : '<span class="detail-placeholder">🧴</span>'}
+        </div>
+        <div class="detail-title-col">
+          <p class="eyebrow"><span></span> ${currentLang === 'ar' ? 'تفاصيل العطر' : 'Fragrance Profile'}</p>
+          <h2 id="detailProdName">${escapeHtml(prodName)}</h2>
+          ${prodSub ? `<p class="detail-sub">${escapeHtml(prodSub)}</p>` : ''}
+          <div class="detail-price-row">
+            <span class="detail-price">${money(product.price)}</span>
+            <button class="button button-primary detail-add-btn" data-add="${product.id}">${t.quick_add} <span>＋</span></button>
+          </div>
+        </div>
+      </div>
+
+      ${d.notes ? `<div class="detail-desc-box"><p>${escapeHtml(d.notes)}</p></div>` : ''}
+
+      <div class="detail-sections-grid">
+        ${renderScentPyramidHtml(d)}
+        <div class="detail-side-perf">
+          ${renderPerformanceCardsHtml(d)}
+          ${d.accords ? `<div class="detail-accords-box"><div class="accords-list">${renderAccordPills(d.accords)}</div></div>` : ''}
+          ${renderInspiredHtml(d.inspired_by)}
+        </div>
+      </div>
+    `;
+
+    detailModal.classList.add('open');
+  }
+
+  function closeProductDetailModal() {
+    if (detailModal) detailModal.classList.remove('open');
+  }
+
+  $('#detailModalClose')?.addEventListener('click', closeProductDetailModal);
+  detailModal?.addEventListener('click', e => { if (e.target === detailModal) closeProductDetailModal(); });
+
+  $('#productGrid')?.addEventListener('click', event => {
+    const exploreBtn = event.target.closest('[data-explore]');
+    if (exploreBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      openProductDetailModal(exploreBtn.dataset.explore);
+      return;
+    }
+  });
 
   window.roohStore = {
     setProducts(rows) {

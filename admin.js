@@ -441,6 +441,24 @@
     }
   });
 
+  function unpackProductDetails(p) {
+    if (!p) return {};
+    let meta = {};
+    if (p.notes && typeof p.notes === 'string' && (p.notes.trim().startsWith('{') || p.notes.trim().startsWith('['))) {
+      try { meta = JSON.parse(p.notes); } catch (_) {}
+    }
+    return {
+      notes:        meta.desc !== undefined ? meta.desc : (p.notes || ''),
+      top_notes:    p.top_notes || meta.top_notes || '',
+      middle_notes: p.middle_notes || meta.middle_notes || '',
+      base_notes:   p.base_notes || meta.base_notes || '',
+      inspired_by:  p.inspired_by || meta.inspired_by || '',
+      longevity:    p.longevity || meta.longevity || '3',
+      sillage:      p.sillage || meta.sillage || '2',
+      accords:      p.accords || meta.accords || '',
+    };
+  }
+
   function openProductModal(product = null) {
     prodForm.reset();
     formStatus.textContent = '';
@@ -448,26 +466,36 @@
     clearImagePreview();
 
     if (product) {
+      const details = unpackProductDetails(product);
       modalTitle.innerHTML = `تعديل عطر: <em>${escapeHtml(product.name)}</em>`;
-      $('#productId').value     = product.id;
-      $('#prodName').value      = product.name || '';
-      $('#prodLatin').value     = product.latin || '';
-      $('#prodPrice').value     = product.price || '';
-      $('#prodCategory').value  = product.category || 'unisex';
-      $('#prodNotes').value     = product.notes || '';
-      $('#prodImage').value     = product.image_url || '';
+      $('#productId').value       = product.id;
+      $('#prodName').value        = product.name || '';
+      $('#prodLatin').value       = product.latin || '';
+      $('#prodPrice').value       = product.price || '';
+      $('#prodCategory').value    = product.category || 'unisex';
+      $('#prodNotes').value       = details.notes;
+      $('#prodImage').value       = product.image_url || '';
       if (manualImg) manualImg.value = product.image_url || '';
       if (product.image_url) {
         showImagePreview(product.image_url);
       }
-      $('#prodTag').value       = product.tag || '';
-      $('#prodFeatured').checked = Boolean(product.is_featured);
-      $('#prodInStock').checked  = product.in_stock !== false;
+      $('#prodTag').value         = product.tag || '';
+      $('#prodTopNotes').value    = details.top_notes;
+      $('#prodMiddleNotes').value = details.middle_notes;
+      $('#prodBaseNotes').value   = details.base_notes;
+      $('#prodInspiredBy').value  = details.inspired_by;
+      $('#prodLongevity').value   = details.longevity;
+      $('#prodSillage').value     = details.sillage;
+      $('#prodAccords').value     = details.accords;
+      $('#prodFeatured').checked  = Boolean(product.is_featured);
+      $('#prodInStock').checked   = product.in_stock !== false;
       $('#saveProdBtn').innerHTML = 'حفظ التعديلات <span>←</span>';
     } else {
       modalTitle.innerHTML = 'إضافة <em>عطر جديد</em>';
       $('#productId').value     = '';
       $('#prodCategory').value  = 'unisex';
+      $('#prodLongevity').value = '3';
+      $('#prodSillage').value   = '2';
       $('#prodInStock').checked  = true;
       $('#saveProdBtn').innerHTML = 'إضافة العطر <span>←</span>';
     }
@@ -607,24 +635,73 @@
       notes:       $('#prodNotes').value.trim() || null,
       image_url:   imageUrl,
       tag:         $('#prodTag').value.trim() || null,
+      top_notes:   $('#prodTopNotes').value.trim() || null,
+      middle_notes:$('#prodMiddleNotes').value.trim() || null,
+      base_notes:  $('#prodBaseNotes').value.trim() || null,
+      inspired_by: $('#prodInspiredBy').value.trim() || null,
+      longevity:   parseInt($('#prodLongevity').value) || 3,
+      sillage:     parseInt($('#prodSillage').value) || 2,
+      accords:     $('#prodAccords').value.trim() || null,
       is_featured: $('#prodFeatured').checked,
       in_stock:    $('#prodInStock').checked,
     };
 
     try {
-      if (id) {
-        // تحديث عطر موجود
-        await supaFetch('products', {
-          method: 'PATCH',
-          filters: `&id=eq.${encodeURIComponent(id)}`,
-          body: payload,
-        });
-      } else {
-        // إضافة عطر جديد
-        await supaFetch('products', {
-          method: 'POST',
-          body: payload,
-        });
+      try {
+        if (id) {
+          // تحديث عطر موجود
+          await supaFetch('products', {
+            method: 'PATCH',
+            filters: `&id=eq.${encodeURIComponent(id)}`,
+            body: payload,
+          });
+        } else {
+          // إضافة عطر جديد
+          await supaFetch('products', {
+            method: 'POST',
+            body: payload,
+          });
+        }
+      } catch (colErr) {
+        // إذا لم تكن الأعمدة الجديدة مضافة في Supabase بعد، نحفظها كـ JSON داخل notes تلقائياً
+        const errMsg = String(colErr?.message || '');
+        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('top_notes')) {
+          console.warn('Columns not yet in Supabase schema, falling back to JSON notes:', colErr);
+          const fallbackPayload = {
+            name:        payload.name,
+            latin:       payload.latin,
+            price:       payload.price,
+            category:    payload.category,
+            image_url:   payload.image_url,
+            tag:         payload.tag,
+            is_featured: payload.is_featured,
+            in_stock:    payload.in_stock,
+            notes:       JSON.stringify({
+              desc:         payload.notes || '',
+              top_notes:    payload.top_notes,
+              middle_notes: payload.middle_notes,
+              base_notes:   payload.base_notes,
+              inspired_by:  payload.inspired_by,
+              longevity:    payload.longevity,
+              sillage:      payload.sillage,
+              accords:      payload.accords,
+            }),
+          };
+          if (id) {
+            await supaFetch('products', {
+              method: 'PATCH',
+              filters: `&id=eq.${encodeURIComponent(id)}`,
+              body: fallbackPayload,
+            });
+          } else {
+            await supaFetch('products', {
+              method: 'POST',
+              body: fallbackPayload,
+            });
+          }
+        } else {
+          throw colErr;
+        }
       }
 
       formStatus.className = 'saved';

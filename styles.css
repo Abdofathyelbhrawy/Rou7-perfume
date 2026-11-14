@@ -314,3 +314,373 @@ html[dir="ltr"] #trackingForm label {
   text-align: left;
 }
 
+
+
+/* ==========================================================
+   SCENT PYRAMID & PERFORMANCE CARD STYLING (Inspired by Reference)
+   ========================================================== */
+
+/* Product Card Additions */
+.card-inspired-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(245, 165, 173, 0.14);
+  border: 1px solid rgba(245, 165, 173, 0.3);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 10px;
+  color: var(--pink);
+  margin-top: 6px;
+}
+.light .card-inspired-tag {
+  background: #fbf2ec;
+  border-color: #ebd3c2;
+  color: #92582b;
+}
+.card-inspired-tag .ci-label {
+  opacity: .75;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.card-accords-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.btn-explore-notes {
+  margin-top: 10px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-explore-notes:hover {
+  background: var(--pink);
+  color: var(--navy);
+  border-color: var(--pink);
+}
+.btn-explore-notes span {
+  color: var(--pink);
+}
+.btn-explore-notes:hover span {
+  color: var(--navy);
+}
+
+/* ── Scent Details Modal ─────────────────────────────────── */
+.detail-modal-card {
+  width: min(840px, 95vw) !important;
+  max-height: 88vh;
+  padding: 34px !important;
+  border-radius: 18px;
+}
+
+.detail-header-section {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+}
+.detail-media {
+  width: 110px;
+  height: 110px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.detail-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+}
+.detail-placeholder {
+  font-size: 42px;
+}
+.detail-title-col {
+  flex: 1;
+}
+.detail-title-col h2 {
+  font-size: clamp(24px, 4vw, 34px);
+  font-weight: 500;
+  margin: 4px 0 2px;
+  line-height: 1.2;
+}
+.detail-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.detail-price-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.detail-price {
+  font: 18px 'DM Sans', sans-serif;
+  color: var(--pink);
+  font-weight: 600;
+}
+.detail-add-btn {
+  min-height: 38px !important;
+  padding: 0 16px !important;
+  font-size: 11px !important;
+  gap: 8px !important;
+}
+
+.detail-desc-box {
+  margin: 18px 0;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-inline-start: 3px solid var(--pink);
+}
+.detail-desc-box p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--ink);
+}
+
+.detail-sections-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 20px;
+  margin-top: 14px;
+}
+@media (max-width: 720px) {
+  .detail-sections-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Scent Pyramid Card ──────────────────────────────────── */
+.scent-pyramid-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.light .scent-pyramid-card {
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+
+.sp-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+.sp-header small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.sp-level-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.sp-badge-col {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sp-shape {
+  font-size: 18px;
+  line-height: 1;
+}
+.sp-triangle { color: #f59e0b; }
+.sp-trapezoid { color: #ec4899; }
+.sp-square { color: #8b5a2b; }
+
+.sp-badge-meta strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+}
+.sp-badge-meta small {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.sp-pills-col {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.note-pill, .accord-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: transform .15s;
+}
+.light .note-pill, .light .accord-pill {
+  background: #fbf9f6;
+  border-color: #ede7e1;
+}
+.note-pill:hover, .accord-pill:hover {
+  transform: translateY(-1px);
+}
+.note-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ── Performance & Inspired Column ───────────────────────── */
+.detail-side-perf {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.perf-cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.perf-metric-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.light .perf-metric-box {
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+.perf-metric-tag {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  color: #d97706;
+}
+.light .perf-metric-tag {
+  color: #b45309;
+}
+.perf-metric-val {
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+}
+
+.perf-bar-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.perf-bar-segment {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.light .perf-bar-segment {
+  background: #e7e2dd;
+}
+.perf-bar-segment.filled {
+  background: var(--pink);
+}
+.light .perf-bar-segment.filled {
+  background: #192940;
+}
+
+.detail-accords-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.light .detail-accords-box {
+  background: #ffffff;
+}
+.detail-accords-box .accords-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ── INSPIRED BY CARD ────────────────────────────────────── */
+.inspired-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: rgba(245, 165, 173, 0.08);
+  border: 1px solid rgba(245, 165, 173, 0.28);
+}
+.light .inspired-card {
+  background: #fdf8f4;
+  border-color: #ebd6c4;
+}
+.inspired-icon {
+  display: grid;
+  place-items: center;
+  color: #d97706;
+  flex-shrink: 0;
+}
+.light .inspired-icon {
+  color: #b45309;
+}
+.inspired-text small,
+.inspired-text .inspired-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: #d97706;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.light .inspired-text .inspired-label {
+  color: #b45309;
+}
+.inspired-text h4,
+.inspired-text .inspired-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', serif;
+  color: var(--ink);
+}
