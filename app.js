@@ -339,6 +339,24 @@
     }
   }
 
+  function unpackProduct(p) {
+    if (!p) return {};
+    let meta = {};
+    if (p.notes && typeof p.notes === 'string' && (p.notes.trim().startsWith('{') || p.notes.trim().startsWith('['))) {
+      try { meta = JSON.parse(p.notes); } catch (_) {}
+    }
+    return {
+      notes:        meta.desc !== undefined ? meta.desc : (p.notes || ''),
+      top_notes:    p.top_notes || meta.top_notes || '',
+      middle_notes: p.middle_notes || meta.middle_notes || '',
+      base_notes:   p.base_notes || meta.base_notes || '',
+      inspired_by:  p.inspired_by || meta.inspired_by || '',
+      longevity:    parseInt(p.longevity || meta.longevity) || 3,
+      sillage:      parseInt(p.sillage || meta.sillage) || 2,
+      accords:      p.accords || meta.accords || '',
+    };
+  }
+
   function renderHeroProduct() {
     const featured = products.find(product => product.is_featured) || products[0];
     const hero = $('#heroProduct');
@@ -347,11 +365,129 @@
       hero.innerHTML = `<div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="hero-product-empty"><span>✳</span><p>${currentLang === 'ar' ? 'المنتج المميز سيظهر هنا' : 'Featured fragrance will appear here'}</p></div>`;
       return;
     }
+
+    const d = unpackProduct(featured);
     const nameToDisplay = currentLang === 'en' ? (featured.latin || featured.name) : (featured.name || featured.latin);
     const safeName = escapeHtml(nameToDisplay || 'Rou7');
     const safeImage = escapeHtml(featured.image_url || '');
-    const safeNotes = escapeHtml(featured.notes || '');
-    hero.innerHTML = `<div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><span class="hero-spark spark-one">✳</span><span class="hero-spark spark-two">✦</span>${safeImage ? `<img class="hero-featured-image" src="${safeImage}" alt="${safeName}" fetchpriority="high">` : '<div class="hero-product-empty"><span>✳</span></div>'}<div class="hero-product-caption"><span>${t.hero_featured_tag}</span><h2>${safeName}</h2>${safeNotes ? `<p>${safeNotes}</p>` : ''}</div>`;
+    const cleanDesc = escapeHtml(d.notes || '');
+
+    // Collect floating notes from top, heart, base, and inspired_by
+    const floatingNotes = [];
+
+    if (d.top_notes) {
+      const firstTop = d.top_notes.split(/[,،]/)[0].trim();
+      floatingNotes.push({
+        pos: 'fn-pos-1',
+        icon: '▲',
+        iconClass: 'sp-top',
+        phase: currentLang === 'ar' ? 'قمة العطر · Top' : 'TOP NOTE',
+        text: escapeHtml(firstTop)
+      });
+    }
+
+    if (d.middle_notes) {
+      const firstMid = d.middle_notes.split(/[,،]/)[0].trim();
+      floatingNotes.push({
+        pos: 'fn-pos-2',
+        icon: '■',
+        iconClass: 'sp-trapezoid',
+        phase: currentLang === 'ar' ? 'قلب العطر · Heart' : 'HEART NOTE',
+        text: escapeHtml(firstMid)
+      });
+    }
+
+    if (d.base_notes) {
+      const firstBase = d.base_notes.split(/[,،]/)[0].trim();
+      floatingNotes.push({
+        pos: 'fn-pos-3',
+        icon: '◼',
+        iconClass: 'sp-square',
+        phase: currentLang === 'ar' ? 'قاعدة العطر · Base' : 'BASE NOTE',
+        text: escapeHtml(firstBase)
+      });
+    }
+
+    if (d.inspired_by) {
+      floatingNotes.push({
+        pos: 'fn-pos-4',
+        icon: '✦',
+        iconClass: 'sp-spark',
+        phase: currentLang === 'ar' ? 'مستوحى من' : 'INSPIRED BY',
+        text: escapeHtml(d.inspired_by)
+      });
+    } else if (d.accords) {
+      const firstAccord = d.accords.split(/[,،]/)[0].trim();
+      floatingNotes.push({
+        pos: 'fn-pos-4',
+        icon: '●',
+        iconClass: 'sp-accord',
+        phase: currentLang === 'ar' ? 'الطابع' : 'ACCORD',
+        text: escapeHtml(firstAccord)
+      });
+    }
+
+    // Fallback if no structured notes: split general notes
+    if (floatingNotes.length === 0 && d.notes) {
+      const parts = d.notes.split(/[,،]/).map(s => s.trim()).filter(Boolean);
+      const icons = ['▲', '■', '◼', '✦'];
+      const iconClasses = ['sp-top', 'sp-trapezoid', 'sp-square', 'sp-spark'];
+      const phases = [
+        currentLang === 'ar' ? 'نوتة عليا' : 'TOP',
+        currentLang === 'ar' ? 'قلب العطر' : 'HEART',
+        currentLang === 'ar' ? 'نوتة دافئة' : 'BASE',
+        currentLang === 'ar' ? 'طابع العطر' : 'ACCORD'
+      ];
+      parts.slice(0, 4).forEach((part, idx) => {
+        floatingNotes.push({
+          pos: `fn-pos-${idx + 1}`,
+          icon: icons[idx] || '●',
+          iconClass: iconClasses[idx] || 'sp-accord',
+          phase: phases[idx] || 'NOTE',
+          text: escapeHtml(part)
+        });
+      });
+    }
+
+    const floatingNotesHtml = floatingNotes.map(fn => `
+      <div class="floating-note-badge ${fn.pos}" title="${fn.phase}: ${fn.text}">
+        <span class="fn-badge-icon ${fn.iconClass}">${fn.icon}</span>
+        <div class="fn-badge-text">
+          <small class="fn-badge-phase">${fn.phase}</small>
+          <strong class="fn-badge-name">${fn.text}</strong>
+        </div>
+      </div>
+    `).join('');
+
+    hero.innerHTML = `
+      <div class="hero-orbit orbit-one"></div>
+      <div class="hero-orbit orbit-two"></div>
+      <div class="hero-bottle-halo"></div>
+      <span class="hero-spark spark-one">✳</span>
+      <span class="hero-spark spark-two">✦</span>
+
+      <div class="hero-creative-showcase">
+        ${floatingNotesHtml}
+        
+        <div class="hero-bottle-center">
+          ${safeImage ? `<img class="hero-featured-image" src="${safeImage}" alt="${safeName}" fetchpriority="high">` : '<div class="hero-product-empty"><span>✳</span></div>'}
+        </div>
+      </div>
+
+      <div class="hero-product-caption">
+        <span class="hero-caption-kicker">${t.hero_featured_tag}</span>
+        <h2 class="hero-caption-title">${safeName}</h2>
+        ${cleanDesc ? `<p class="hero-caption-desc">${cleanDesc}</p>` : ''}
+        <div class="hero-caption-footer">
+          <button class="btn-hero-explore" data-explore="${featured.id}" type="button">
+            <span>✦</span> ${currentLang === 'ar' ? 'استكشف هرم النوتات' : 'Explore Scent Pyramid'}
+          </button>
+          <button class="btn-hero-quickadd" data-add="${featured.id}" type="button">
+            <span>＋</span> ${t.quick_add} · ${money(featured.price)}
+          </button>
+        </div>
+      </div>
+    `;
   }
 
   function escapeHtml(value) {
@@ -608,6 +744,23 @@
       event.preventDefault();
       event.stopPropagation();
       openProductDetailModal(exploreBtn.dataset.explore);
+      return;
+    }
+  });
+
+  $('#heroProduct')?.addEventListener('click', event => {
+    const exploreBtn = event.target.closest('[data-explore]');
+    if (exploreBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      openProductDetailModal(exploreBtn.dataset.explore);
+      return;
+    }
+    const addBtn = event.target.closest('[data-add]');
+    if (addBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      addToCart(addBtn.dataset.add);
       return;
     }
   });
