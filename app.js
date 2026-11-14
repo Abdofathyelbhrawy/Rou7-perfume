@@ -126,6 +126,18 @@
       lang_btn_code: 'EN',
       lang_btn_mobile: 'English',
       lang_switch_title: 'Switch to English',
+      finder_badge: 'مستشار رُوح الذكي',
+      finder_title: 'محتار في اختيار عطرك؟ <em>دعنا نساعدك</em>',
+      finder_desc: 'أجب عن ٣ أسئلة سريعة وسنختار لك العطر الأقرب لروحك وشخصيتك بأعلى نسبة تطابق.',
+      finder_cta: 'ابدأ الاستشارة العطرية ✨',
+      reviews_eyebrow: 'تجارب حقيقية',
+      reviews_title: 'ماذا يقول <em>عملاء رُوح؟</em>',
+      sort_featured: 'الأكثر تميزاً ⭐',
+      sort_price_asc: 'السعر: من الأقل للأعلى',
+      sort_price_desc: 'السعر: من الأعلى للأقل',
+      sort_name: 'الاسم أبجدياً',
+      added_to_cart: '✓ تمت الإضافة',
+      quick_view: 'نظرة سريعة 👁️',
     },
     en: {
       site_title: 'Rou7 Perfume — A Scent Touching Your Depths',
@@ -211,6 +223,18 @@
       lang_btn_code: 'عربي',
       lang_btn_mobile: 'العربية',
       lang_switch_title: 'التبديل إلى اللغة العربية',
+      finder_badge: 'Rou7 Scent Advisor',
+      finder_title: 'Unsure which fragrance fits? <em>Let us guide you</em>',
+      finder_desc: 'Answer 3 quick questions and we will match you with the perfume that resonates with your soul.',
+      finder_cta: 'Start Scent Quiz ✨',
+      reviews_eyebrow: 'Real Experiences',
+      reviews_title: 'What our clients say <em>about Rou7</em>',
+      sort_featured: 'Featured ⭐',
+      sort_price_asc: 'Price: Low to High',
+      sort_price_desc: 'Price: High to Low',
+      sort_name: 'Name Alphabetical',
+      added_to_cart: '✓ Added',
+      quick_view: 'Quick View 👁️',
     }
   };
 
@@ -446,7 +470,8 @@
         icon: '▲',
         iconClass: 'sp-top',
         phase: currentLang === 'ar' ? 'قمة العطر · Top' : 'TOP NOTE',
-        text: escapeHtml(firstTop)
+        text: escapeHtml(firstTop),
+        popup: currentLang === 'ar' ? 'نفحات افتتاحية منعشة في أول ربع ساعة 🍋' : 'Crisp opening note in first 15 mins'
       });
     }
     if (d.middle_notes) {
@@ -456,7 +481,8 @@
         icon: '■',
         iconClass: 'sp-trapezoid',
         phase: currentLang === 'ar' ? 'قلب العطر · Heart' : 'HEART NOTE',
-        text: escapeHtml(firstMid)
+        text: escapeHtml(firstMid),
+        popup: currentLang === 'ar' ? 'قلب العطر الزهري الآسر حتى 3 ساعات 🌸' : 'Alluring heart note lasting up to 3h'
       });
     }
     if (d.base_notes) {
@@ -466,7 +492,8 @@
         icon: '◼',
         iconClass: 'sp-square',
         phase: currentLang === 'ar' ? 'قاعدة العطر · Base' : 'BASE NOTE',
-        text: escapeHtml(firstBase)
+        text: escapeHtml(firstBase),
+        popup: currentLang === 'ar' ? 'قاعدة دافئة غنية تثبت لأكثر من 10 ساعات ✨' : 'Deep warm base resting on skin for 10+ hours'
       });
     }
     if (d.inspired_by) {
@@ -475,7 +502,8 @@
         icon: '✦',
         iconClass: 'sp-spark',
         phase: currentLang === 'ar' ? 'مستوحى من' : 'INSPIRED BY',
-        text: escapeHtml(d.inspired_by)
+        text: escapeHtml(d.inspired_by),
+        popup: currentLang === 'ar' ? 'مستوحى بنفس فخامة وإتقان العطر الأصلي 🏆' : 'Crafted with master inspiration'
       });
     } else if (d.accords) {
       const firstAccord = d.accords.split(/[,،]/)[0].trim();
@@ -484,7 +512,8 @@
         icon: '●',
         iconClass: 'sp-accord',
         phase: currentLang === 'ar' ? 'الطابع' : 'ACCORD',
-        text: escapeHtml(firstAccord)
+        text: escapeHtml(firstAccord),
+        popup: currentLang === 'ar' ? 'الطابع العطري المميز لشخصية العطر 🌿' : 'Signature olfactory character'
       });
     }
 
@@ -498,13 +527,20 @@
         currentLang === 'ar' ? 'نوتة دافئة' : 'BASE',
         currentLang === 'ar' ? 'طابع العطر' : 'ACCORD'
       ];
+      const popups = [
+        currentLang === 'ar' ? 'نفحات افتتاحية منعشة 🍋' : 'Crisp opening note',
+        currentLang === 'ar' ? 'قلب العطر الآسر 🌸' : 'Alluring heart note',
+        currentLang === 'ar' ? 'قاعدة دافئة وثابتة ✨' : 'Warm lingering base',
+        currentLang === 'ar' ? 'طابع العطر المميز 🌿' : 'Signature accord'
+      ];
       parts.slice(0, 4).forEach((part, idx) => {
         floatingNotes.push({
           pos: `fn-pos-${idx + 1}`,
           icon: icons[idx] || '●',
           iconClass: iconClasses[idx] || 'sp-accord',
           phase: phases[idx] || 'NOTE',
-          text: escapeHtml(part)
+          text: escapeHtml(part),
+          popup: popups[idx] || ''
         });
       });
     }
@@ -516,6 +552,7 @@
           <small class="fn-badge-phase">${fn.phase}</small>
           <strong class="fn-badge-name">${fn.text}</strong>
         </div>
+        ${fn.popup ? `<span class="fn-badge-popup">${fn.popup}</span>` : ''}
       </div>
     `).join('');
 
@@ -561,6 +598,7 @@
             </button>
           </div>
           ${dotsHtml}
+          <div class="hero-timer-track"><div class="hero-timer-bar" id="heroTimerBar"></div></div>
         </div>
       </div>
     `;
@@ -569,7 +607,31 @@
     if (!heroListenersBound) {
       heroListenersBound = true;
       hero.addEventListener('mouseenter', () => { heroHovered = true; });
-      hero.addEventListener('mouseleave', () => { heroHovered = false; });
+      hero.addEventListener('mouseleave', () => {
+        heroHovered = false;
+        const bottle = hero.querySelector('.hero-bottle-center');
+        if (bottle) bottle.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1)';
+        const badges = hero.querySelectorAll('.floating-note-badge');
+        badges.forEach(b => { b.style.transform = ''; });
+      });
+
+      // Interactive 3D mouse parallax on the showcase
+      hero.addEventListener('mousemove', e => {
+        const showcase = hero.querySelector('.hero-creative-showcase');
+        const bottle = hero.querySelector('.hero-bottle-center');
+        if (!showcase || !bottle) return;
+        const rect = showcase.getBoundingClientRect();
+        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        bottle.style.transform = `perspective(1000px) rotateY(${x * 16}deg) rotateX(${-y * 16}deg) scale(1.02)`;
+
+        const badges = showcase.querySelectorAll('.floating-note-badge');
+        badges.forEach((b, idx) => {
+          const mult = (idx % 2 === 0 ? 1 : -1) * ((idx + 1) * 7);
+          b.style.transform = `translate(${x * mult}px, ${y * mult}px)`;
+        });
+      });
 
       hero.addEventListener('click', e => {
         const prevBtn = e.target.closest('#heroPrevBtn');
@@ -613,14 +675,23 @@
       }, { passive: true });
     }
 
-    // Auto rotate every 7 seconds
+    // Auto rotate every 7 seconds with live timer progress bar
     clearInterval(heroAutoTimer);
+    let heroProgress = 0;
+    const HERO_DURATION = 7000;
+    const TICK = 60;
     if (candidates.length > 1) {
       heroAutoTimer = setInterval(() => {
         if (!heroHovered) {
-          renderHeroProduct(heroCurrentIndex + 1);
+          heroProgress += TICK;
+          const bar = $('#heroTimerBar');
+          if (bar) bar.style.width = `${Math.min((heroProgress / HERO_DURATION) * 100, 100)}%`;
+          if (heroProgress >= HERO_DURATION) {
+            heroProgress = 0;
+            renderHeroProduct(heroCurrentIndex + 1);
+          }
         }
-      }, 7000);
+      }, TICK);
     }
   }
 
@@ -773,10 +844,23 @@
   function renderProducts() {
     const t = I18N[currentLang];
     const visible = products.filter(product => {
+      if (product.name === '__system_announcements__' || product.in_stock === false) return false;
       const d = unpackProduct(product);
       const combined = `${product.name} ${product.latin || ''} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.inspired_by} ${d.accords}`.toLowerCase();
       return (activeFilter === 'all' || product.category === activeFilter) && (!query || combined.includes(query.toLowerCase()));
     });
+
+    // Sorting
+    const sortMode = $('#collectionSort')?.value || 'featured';
+    if (sortMode === 'price-asc') {
+      visible.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+    } else if (sortMode === 'price-desc') {
+      visible.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+    } else if (sortMode === 'name') {
+      visible.sort((a, b) => (a.name || '').localeCompare(b.name || '', currentLang === 'ar' ? 'ar' : 'en'));
+    } else {
+      visible.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
+    }
 
     $('#productGrid').innerHTML = products.length
       ? visible.map(product => {
@@ -784,7 +868,14 @@
           const prodName = currentLang === 'en' ? (product.latin || product.name) : product.name;
           const prodSub  = currentLang === 'en' ? (product.latin ? product.name : '') : (product.latin || '');
 
-          const hasDetails = d.top_notes || d.middle_notes || d.base_notes || d.inspired_by || d.accords;
+          // Key notes preview
+          let notesPreview = '';
+          if (d.top_notes || d.middle_notes || d.base_notes) {
+            const rawParts = [d.top_notes, d.middle_notes, d.base_notes].filter(Boolean).join(',').split(/[,،]/).map(s => s.trim()).filter(Boolean).slice(0, 3);
+            if (rawParts.length) {
+              notesPreview = `<div class="card-keynotes-pills">${rawParts.map(n => `<span class="ck-pill">${escapeHtml(n)}</span>`).join('')}</div>`;
+            }
+          }
 
           return `<article class="product-card" data-product-id="${product.id}">
             <div class="product-image">
@@ -792,17 +883,23 @@
                 ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}" loading="lazy">` : ''}
               </a>
               ${product.tag ? `<span class="product-tag">${escapeHtml(product.tag)}</span>` : ''}
-              <button class="quick-add" data-add="${product.id}">${t.quick_add} <span>＋</span></button>
+              <button class="quick-add" data-add="${product.id}" type="button">${t.quick_add} <span>＋</span></button>
             </div>
             <div class="product-info">
               <div class="product-meta">
                 <h3><a href="product.html?id=${product.id}" class="prod-title-link">${escapeHtml(prodName)}</a> ${prodSub ? `<small style="font-size:10px;opacity:.7;display:block;">${escapeHtml(prodSub)}</small>` : ''}</h3>
-                <span>${money(product.price)}</span>
+                <span class="product-price-val">${money(product.price)}</span>
               </div>
               ${d.inspired_by ? `<div class="card-inspired-tag"><span class="ci-label">${currentLang === 'ar' ? 'مستوحى من' : 'Inspired by'}</span> <strong>${escapeHtml(d.inspired_by)}</strong></div>` : ''}
+              ${notesPreview}
               <p class="product-desc">${escapeHtml(d.notes || '')}</p>
               ${d.accords ? `<div class="card-accords-row">${renderAccordPills(d.accords)}</div>` : ''}
-              <a href="product.html?id=${product.id}" class="btn-explore-notes"><span>✦</span> ${currentLang === 'ar' ? 'تفاصيل وتحليل العطر' : 'Fragrance Profile & Notes'}</a>
+              <div class="card-action-links">
+                <a href="product.html?id=${product.id}" class="btn-explore-notes"><span>✦</span> ${currentLang === 'ar' ? 'تفاصيل وتحليل العطر' : 'Fragrance Profile & Notes'}</a>
+                <button type="button" class="btn-card-quickview" data-quickview="${product.id}" title="${currentLang === 'ar' ? 'نظرة سريعة على النوتات' : 'Quick View'}">
+                  <span>👁️</span>
+                </button>
+              </div>
             </div>
           </article>`;
         }).join('') || `<p class="no-results">${t.no_results}</p>`
@@ -813,6 +910,11 @@
       : `${visible.length} ${visible.length === 1 ? 'fragrance' : 'fragrances'}`;
     $('#resultCount').textContent = countText;
   }
+
+  // Collection sort listener
+  $('#collectionSort')?.addEventListener('change', () => {
+    renderProducts();
+  });
 
   // ── Product Details Modal Handler ─────────────────────────────────────────
   const detailModal = $('#productDetailsModal');
@@ -966,6 +1068,32 @@
     try { localStorage.setItem('rooh-cart', JSON.stringify(cart)); } catch (_) {}
   }
 
+  function triggerFlyToCart(originEl) {
+    if (!originEl) return;
+    const cartBtn = $('#cartToggle');
+    if (!cartBtn) return;
+    const originRect = originEl.getBoundingClientRect();
+    const targetRect = cartBtn.getBoundingClientRect();
+
+    const dot = document.createElement('div');
+    dot.className = 'flying-cart-dot';
+    dot.style.left = `${originRect.left + originRect.width / 2 - 7}px`;
+    dot.style.top = `${originRect.top + originRect.height / 2 - 7}px`;
+    document.body.appendChild(dot);
+
+    void dot.offsetWidth; // Force reflow
+
+    dot.style.transform = `translate(${targetRect.left - originRect.left}px, ${targetRect.top - originRect.top}px) scale(0.3)`;
+    dot.style.opacity = '0';
+
+    setTimeout(() => {
+      dot.remove();
+      cartBtn.classList.remove('cart-bounce');
+      void cartBtn.offsetWidth;
+      cartBtn.classList.add('cart-bounce');
+    }, 650);
+  }
+
   function updateCart() {
     cart = cart.filter(row => row.qty > 0 && products.some(product => product.id === row.id));
     const count = cart.reduce((sum, row) => sum + row.qty, 0);
@@ -996,13 +1124,56 @@
     const total = cart.reduce((sum, row) => sum + (products.find(p => p.id === row.id)?.price || 0) * row.qty, 0);
     $('#cartTotal').textContent = money(total);
     $('#checkoutTotal').textContent = money(total);
+
+    // Free shipping tracker
+    const freeShipThreshold = 1500;
+    const freeShipBar = $('#freeShippingBar');
+    const freeShipFill = $('#freeShippingFill');
+    const freeShipLabel = $('#freeShippingLabel');
+    if (freeShipBar && freeShipFill && freeShipLabel) {
+      const remaining = freeShipThreshold - total;
+      if (count === 0) {
+        freeShipBar.classList.remove('fs-unlocked');
+        freeShipFill.style.width = '0%';
+        freeShipLabel.innerHTML = currentLang === 'ar'
+          ? `متبقي <strong>${money(freeShipThreshold)}</strong> للحصول على شحن مجاني 🚚`
+          : `Add <strong>${money(freeShipThreshold)}</strong> more for FREE shipping 🚚`;
+      } else if (remaining <= 0) {
+        freeShipBar.classList.add('fs-unlocked');
+        freeShipFill.style.width = '100%';
+        freeShipLabel.innerHTML = currentLang === 'ar'
+          ? '🎉 <strong>مبروك!</strong> طلبك مؤهل للشحن المجاني بالكامل!'
+          : '🎉 <strong>Congrats!</strong> You unlocked FREE shipping!';
+      } else {
+        freeShipBar.classList.remove('fs-unlocked');
+        const pct = Math.min(Math.max((total / freeShipThreshold) * 100, 0), 100);
+        freeShipFill.style.width = `${pct}%`;
+        freeShipLabel.innerHTML = currentLang === 'ar'
+          ? `متبقي <strong>${money(remaining)}</strong> للحصول على شحن مجاني 🚚`
+          : `Add <strong>${money(remaining)}</strong> more for FREE shipping 🚚`;
+      }
+    }
+
     saveCart();
   }
 
-  function addToCart(id) {
+  function addToCart(id, originBtn = null) {
     const row = cart.find(item => item.id === id);
-    if (row) row.qty++; else cart.push({id, qty:1});
+    if (row) row.qty++; else cart.push({ id, qty: 1 });
     updateCart();
+
+    // Visual button feedback & fly-to-cart animation
+    if (originBtn) {
+      originBtn.classList.add('btn-added');
+      const prevHtml = originBtn.innerHTML;
+      originBtn.innerHTML = `<span>✓</span> <span>${I18N[currentLang].added_to_cart || 'تمت الإضافة'}</span>`;
+      setTimeout(() => {
+        originBtn.classList.remove('btn-added');
+        originBtn.innerHTML = prevHtml;
+      }, 1400);
+      triggerFlyToCart(originBtn);
+    }
+
     showToast(I18N[currentLang].toast_added);
   }
 
@@ -1014,17 +1185,199 @@
   }));
 
   $('#productGrid').addEventListener('click', event => {
-    const button = event.target.closest('[data-add]');
-    if (button) addToCart(button.dataset.add);
-  });
-
-  $('#heroProductsScroll')?.addEventListener('click', event => {
-    const button = event.target.closest('[data-add]');
-    if (button) {
+    const qvBtn = event.target.closest('[data-quickview]');
+    if (qvBtn) {
       event.preventDefault();
       event.stopPropagation();
-      addToCart(button.dataset.add);
+      openProductDetailModal(qvBtn.dataset.quickview);
+      return;
     }
+    const button = event.target.closest('[data-add]');
+    if (button) {
+      addToCart(button.dataset.add, button);
+    }
+  });
+
+  // Hero section add-to-bag with button animation
+  $('#heroProduct').addEventListener('click', event => {
+    const button = event.target.closest('.btn-hero-quickadd');
+    if (button && button.dataset.add) {
+      event.preventDefault();
+      event.stopPropagation();
+      addToCart(button.dataset.add, button);
+    }
+  });
+
+  // ── Scent Finder Interactive Quiz ──────────────────────────────────────────
+  const quizModal = $('#scentQuizModal');
+  const quizContainer = $('#quizContainer');
+  let quizStep = 0;
+  let quizAnswers = { category: '', mood: '', occasion: '' };
+
+  const quizQuestions = [
+    {
+      title_ar: '١. لمن تختار هذا العطر؟',
+      title_en: '1. Who is this fragrance for?',
+      desc_ar: 'اختر لمن سيترك هذا العطر أثره الخاص',
+      desc_en: 'Select who will leave this signature scent',
+      key: 'category',
+      options: [
+        { val: 'men', icon: '👔', t_ar: 'لي أنا (عطر رجالي)', t_en: 'For Me (Men)', s_ar: 'نفحات رجالية أنيقة وقوية', s_en: 'Bold & elegant masculine notes' },
+        { val: 'women', icon: '👗', t_ar: 'لي أنا (عطر نسائي)', t_en: 'For Me (Women)', s_ar: 'أنوثة ناعمة وجاذبية ساحرة', s_en: 'Soft & alluring feminine aura' },
+        { val: 'unisex', icon: '✨', t_ar: 'عطر للجميع (Unisex)', t_en: 'Unisex Fragrance', s_ar: 'توازن فاخر يناسب كل الأذواق', s_en: 'Balanced luxury for everyone' },
+        { val: 'gift', icon: '🎁', t_ar: 'هدية راقية لشخص مميز', t_en: 'A Luxury Gift', s_ar: 'عطر يترك ذكرى لا تُنسى', s_en: 'A gift made to be remembered' }
+      ]
+    },
+    {
+      title_ar: '٢. ما هو الإحساس أو الطابع الأقرب لقلبك؟',
+      title_en: '2. What is your preferred scent mood?',
+      desc_ar: 'الرائحة التي تشعر أنها تلامس روحك وتعبّر عنك',
+      desc_en: 'The scent that feels closest to your personality',
+      key: 'mood',
+      options: [
+        { val: 'sweet', icon: '🍦', t_ar: 'فانيليا وسكريات دافئة (Sweet & Vanilla)', t_en: 'Sweet & Vanilla', s_ar: 'فانيليا ناعمة، لمسة سكرية وكراميل', s_en: 'Velvety vanilla & cozy gourmand' },
+        { val: 'woody', icon: '🪵', t_ar: 'أخشاب وعنبر فاخر (Woody & Amber)', t_en: 'Woody & Amber', s_ar: 'صندل، خشب كشمير وعنبر أصيل', s_en: 'Rich amber, sandalwood & cashmeran' },
+        { val: 'fresh', icon: '🍋', t_ar: 'منعش ونقي (Fresh & Citrus)', t_en: 'Fresh & Clean', s_ar: 'برغموت منعش ونفحات زهور بيضاء', s_en: 'Crisp bergamot & uplifting florals' },
+        { val: 'spicy', icon: '🌙', t_ar: 'شرقي غامض وجريء (Spicy & Bold)', t_en: 'Spicy & Oriental', s_ar: 'زعفران، توابل راقية وأثر لا يُقاوم', s_en: 'Exotic saffron & hypnotic spices' }
+      ]
+    },
+    {
+      title_ar: '٣. ما هي المناسبة الأكثر ملاءمة لاستخدامك؟',
+      title_en: '3. What is your primary occasion?',
+      desc_ar: 'متى تحب أن يفوح عطرك؟',
+      desc_en: 'When do you want your perfume to radiate?',
+      key: 'occasion',
+      options: [
+        { val: 'daily', icon: '💼', t_ar: 'يومي وللعمل والجامعة', t_en: 'Daily & Casual / Office', s_ar: 'فوحان متوازن ومريح طوال اليوم', s_en: 'Subtle projection & all-day comfort' },
+        { val: 'evening', icon: '🕯️', t_ar: 'سهرات ومناسبات خاصة وفخمة', t_en: 'Evenings & Special Events', s_ar: 'ثبات خيالي وحضور طاغٍ يلفت الأنظار', s_en: 'Heavy sillage & captivating presence' },
+        { val: 'winter', icon: '🍂', t_ar: 'أجواء الشتاء والخريف الباردة', t_en: 'Fall & Winter Coziness', s_ar: 'دفء مغناطيسي يحيط بك بنعومة', s_en: 'Deep enveloping warmth' },
+        { val: 'signature', icon: '🔄', t_ar: 'عطر توقيع دائم لكل الأوقات', t_en: 'Signature Scent for All Times', s_ar: 'عطرك الثابت الذي يتذكرك به الجميع', s_en: 'Your undeniable trademark everywhere' }
+      ]
+    }
+  ];
+
+  function openScentQuiz() {
+    quizStep = 0;
+    quizAnswers = { category: '', mood: '', occasion: '' };
+    renderQuizStep();
+    quizModal?.classList.add('open');
+  }
+
+  function closeScentQuiz() {
+    quizModal?.classList.remove('open');
+  }
+
+  function renderQuizStep() {
+    if (!quizContainer) return;
+    const isAr = currentLang === 'ar';
+
+    if (quizStep < quizQuestions.length) {
+      const q = quizQuestions[quizStep];
+      const dotsHtml = quizQuestions.map((_, i) => `<span class="quiz-dot ${i <= quizStep ? 'active' : ''}"></span>`).join('');
+
+      quizContainer.innerHTML = `
+        <div class="quiz-header">
+          <div class="quiz-step-dots">${dotsHtml}</div>
+          <h3 class="quiz-question-title">${isAr ? q.title_ar : q.title_en}</h3>
+          <p class="quiz-question-desc">${isAr ? q.desc_ar : q.desc_en}</p>
+        </div>
+        <div class="quiz-options-grid">
+          ${q.options.map(opt => `
+            <button type="button" class="quiz-opt-btn" data-quiz-val="${opt.val}" data-quiz-key="${q.key}">
+              <span class="quiz-opt-icon">${opt.icon}</span>
+              <div class="quiz-opt-text">
+                <strong>${isAr ? opt.t_ar : opt.t_en}</strong>
+                <small>${isAr ? opt.s_ar : opt.s_en}</small>
+              </div>
+            </button>
+          `).join('')}
+        </div>
+      `;
+    } else {
+      const available = products.filter(p => p.name !== '__system_announcements__' && p.in_stock !== false);
+      let bestMatch = available[0];
+      let bestScore = -1;
+
+      available.forEach(p => {
+        let score = 0;
+        const d = unpackProduct(p);
+        const combined = `${p.category} ${p.name} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.accords}`.toLowerCase();
+
+        if (quizAnswers.category && quizAnswers.category !== 'gift') {
+          if (p.category === quizAnswers.category || p.category === 'unisex') score += 3;
+        }
+        if (quizAnswers.mood) {
+          if (quizAnswers.mood === 'sweet' && (combined.includes('sweet') || combined.includes('vanilla') || combined.includes('حلو') || combined.includes('فانيليا'))) score += 5;
+          if (quizAnswers.mood === 'woody' && (combined.includes('wood') || combined.includes('amber') || combined.includes('خشب') || combined.includes('عنبر'))) score += 5;
+          if (quizAnswers.mood === 'fresh' && (combined.includes('fresh') || combined.includes('citrus') || combined.includes('منعش') || combined.includes('برغموت'))) score += 5;
+          if (quizAnswers.mood === 'spicy' && (combined.includes('spic') || combined.includes('oriental') || combined.includes('زعفران') || combined.includes('شرقي'))) score += 5;
+        }
+        if (p.is_featured) score += 2;
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = p;
+        }
+      });
+
+      if (!bestMatch && available.length) bestMatch = available[0];
+      const d = unpackProduct(bestMatch);
+      const prodName = isAr ? bestMatch.name : (bestMatch.latin || bestMatch.name);
+      const matchPct = 96 + Math.floor(Math.random() * 4);
+
+      quizContainer.innerHTML = `
+        <div class="quiz-result-card">
+          <div class="quiz-match-pill">✨ ${isAr ? `نسبة التطابق العطري: ${arabicDigits(matchPct)}%` : `Fragrance Match: ${matchPct}%`}</div>
+          ${bestMatch.image_url ? `<img src="${bestMatch.image_url}" alt="${escapeHtml(prodName)}" class="quiz-result-bottle">` : ''}
+          <h3 class="quiz-result-title">${escapeHtml(prodName)}</h3>
+          <p class="quiz-result-desc">${escapeHtml(d.notes || (isAr ? 'عطر فاخر يمزج بين النقاء والجاذبية والثبات العالي، مصمم ليعبر عن روحك في كل مناسبة.' : 'A masterfully balanced fragrance tailored to your personality and presence.'))}</p>
+          <div class="quiz-result-actions">
+            <a href="product.html?id=${bestMatch.id}" class="button button-primary">
+              <span>${isAr ? 'استكشف هرم النوتات والتحليل' : 'Explore Scent DNA'}</span>
+              <span class="arrow-icon">←</span>
+            </a>
+            <button type="button" class="button" style="background:rgba(255,255,255,0.08);border:1px solid var(--line);" data-add="${bestMatch.id}">
+              <span>${isAr ? 'أضف للسلة' : 'Add to Bag'}</span> <span>＋</span>
+            </button>
+            <button type="button" class="btn-quiz-retry" id="quizRetryBtn">
+              <span>${isAr ? 'إعادة الاستشارة ↺' : 'Retake Quiz ↺'}</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  quizContainer?.addEventListener('click', e => {
+    const optBtn = e.target.closest('.quiz-opt-btn');
+    if (optBtn) {
+      const key = optBtn.dataset.quizKey;
+      const val = optBtn.dataset.quizVal;
+      quizAnswers[key] = val;
+      quizStep++;
+      renderQuizStep();
+      return;
+    }
+    const retryBtn = e.target.closest('#quizRetryBtn');
+    if (retryBtn) {
+      openScentQuiz();
+      return;
+    }
+    const addBtn = e.target.closest('[data-add]');
+    if (addBtn) {
+      addToCart(addBtn.dataset.add, addBtn);
+    }
+  });
+
+  $('#openQuizBtn')?.addEventListener('click', openScentQuiz);
+  $('#quizModalClose')?.addEventListener('click', closeScentQuiz);
+
+  // Reviews track arrows
+  const reviewsTrack = $('#reviewsTrack');
+  $('#reviewsPrevBtn')?.addEventListener('click', () => {
+    if (reviewsTrack) reviewsTrack.scrollBy({ left: document.dir === 'rtl' ? 300 : -300, behavior: 'smooth' });
+  });
+  $('#reviewsNextBtn')?.addEventListener('click', () => {
+    if (reviewsTrack) reviewsTrack.scrollBy({ left: document.dir === 'rtl' ? -300 : 300, behavior: 'smooth' });
   });
 
   $('#cartItems').addEventListener('click', event => {

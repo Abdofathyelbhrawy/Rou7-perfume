@@ -212,6 +212,8 @@
                 <div class="p-level-pills" id="basePillsContainer"></div>
               </div>
             </div>
+            <!-- Interactive Note Inspector Box -->
+            <div class="pyramid-note-inspector" id="pyramidInspector" hidden></div>
           </article>
 
           <!-- RIGHT SIDE STACK (Scent DNA + Performance) -->
@@ -332,6 +334,20 @@
       <span data-i18n-html="footer_made">صُنع بحب في مصر <b>✳</b></span>
     </div>
   </footer>
+
+  <!-- Sticky Mobile Action Bar -->
+  <aside class="sticky-mobile-buy-bar" id="stickyMobileBar">
+    <div class="sm-prod-meta">
+      <img class="sm-prod-img" id="smThumb" src="" alt="">
+      <div class="sm-prod-text">
+        <strong id="smTitle">...</strong>
+        <span id="smPrice">...</span>
+      </div>
+    </div>
+    <button type="button" class="button button-primary sm-add-btn" id="smAddBtn">
+      <span data-i18n="add_to_bag">أضف إلى السلة</span> <span>＋</span>
+    </button>
+  </aside>
 
   <!-- Floating WhatsApp -->
   <a href="https://wa.me/message/2YHV6BH76ZRGO1" class="whatsapp-float" id="whatsappFloat" target="_blank" rel="noopener" aria-label="تواصل معنا عبر واتساب">

@@ -349,6 +349,14 @@
     // Quick Accords in Hero
     renderHeroAccords(d, p);
 
+    // Update sticky mobile bar metadata
+    const smThumb = $('#smThumb');
+    const smTitle = $('#smTitle');
+    const smPrice = $('#smPrice');
+    if (smThumb) smThumb.src = p.image_url || 'assets/branding/logo-dark.png';
+    if (smTitle) smTitle.textContent = prodName;
+    if (smPrice) smPrice.textContent = money(p.price);
+
     // Scent Pyramid Card
     renderScentPyramid(d);
 
@@ -455,8 +463,43 @@
     // Attach click feedback on note pills
     $$('.note-pill').forEach(btn => {
       btn.addEventListener('click', () => {
+        $$('.note-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
         const noteName = btn.dataset.note;
-        showToast(currentLang === 'ar' ? `نوتة [${noteName}]: تمنح العطر طابعاً فاخراً ومميزاً` : `Note [${noteName}]: Infuses the fragrance with distinct character`);
+        const inspector = $('#pyramidInspector');
+        if (inspector) {
+          const st = resolveAccordStyle(noteName);
+          const descriptions = {
+            bergamot: { ar: 'انتعاش حمضي إيطالي منعش يوقظ الحواس بنقاء ووضوح في الدقائق الأولى.', en: 'Vibrant Italian citrus opening with crisp and sparkling clarity.' },
+            apple: { ar: 'نفحة فاكهية مقرمشة ولطيفة تعطي لمسة شبابية بهيجة للعطر.', en: 'Crisp fruity nuance providing an energetic and modern touch.' },
+            saffron: { ar: 'ذهب التوابل الأحمر، يمنح العطر غموضاً شرقياً فخماً وأثراً دافئاً.', en: 'The red gold of perfumery, adding opulent spicy mystery.' },
+            vanilla: { ar: 'فانيليا بوربون ناعمة كريمية تمنح العطر دفئاً ساحراً يدوم لساعات طويلة.', en: 'Velvety bourbon vanilla imparting deep sensuous warmth.' },
+            amber: { ar: 'عنبر دافئ ذهبي بلسمي يعزز ثبات العطر ويترك بصمة مغناطيسية على البشرة.', en: 'Warm golden amber anchoring the scent with a magnetic trail.' },
+            cashmeran: { ar: 'خشب الكشمير الأرستقراطي، ملمس كالمخمل يجمع بين الدفء الحريري والمسك.', en: 'Velvety aristocratic wood combining silky musky depth.' },
+            'orange blossom': { ar: 'زهر البرتقال المتوسطي، قلب زهري نقي مفعم بالرقة والأناقة.', en: 'Mediterranean orange blossom radiating delicate floral poise.' },
+            coconut: { ar: 'لمسة استوائية كريمية ناعمة تضفي راحة وجاذبية ناعمة.', en: 'Creamy tropical sweetness providing a luscious comforting veil.' },
+            'guaiac wood': { ar: 'خشب الغاياك الدخاني النادر، عمق خشبي مهيب لا يُنسى.', en: 'Smoky sacred guaiac wood imparting profound timbered depth.' }
+          };
+
+          const lower = (noteName || '').toLowerCase();
+          let desc = currentLang === 'ar' ? 'نوتة عطرية أصيلة تمنح التركيبة توازناً استثنائياً وفوحاناً راقياً.' : 'A natural aromatic nuance enhancing the formula poise and projection.';
+          for (const [k, v] of Object.entries(descriptions)) {
+            if (lower.includes(k) || (st.ar && st.ar.toLowerCase().includes(k))) {
+              desc = currentLang === 'ar' ? v.ar : v.en;
+              break;
+            }
+          }
+
+          inspector.hidden = false;
+          inspector.innerHTML = `
+            <div class="pni-icon" style="background:${st.color}22; color:${st.color};">✦</div>
+            <div class="pni-copy">
+              <strong>${escapeHtml(noteName)}</strong>
+              <p>${desc}</p>
+            </div>
+          `;
+        }
       });
     });
   }
@@ -952,6 +995,50 @@
     if (loader) {
       setTimeout(() => loader.classList.add('done'), 200);
     }
+
+    // 11. Sticky Mobile Buy Bar
+    initStickyMobileBar();
+
+    // 12. Interactive 3D Bottle Parallax
+    initBottleParallax();
+  }
+
+  function initStickyMobileBar() {
+    const stickyBar = $('#stickyMobileBar');
+    const mainBuyBtn = $('#pdpAddBagBtn');
+    if (!stickyBar || !mainBuyBtn) return;
+
+    window.addEventListener('scroll', () => {
+      const rect = mainBuyBtn.getBoundingClientRect();
+      if (rect.bottom < 60) {
+        stickyBar.classList.add('show');
+      } else {
+        stickyBar.classList.remove('show');
+      }
+    }, { passive: true });
+
+    $('#smAddBtn')?.addEventListener('click', () => {
+      if (currentProduct) {
+        addToCart(currentProduct, currentQty || 1);
+      }
+    });
+  }
+
+  function initBottleParallax() {
+    const stage = document.querySelector('.prod-visual-stage');
+    const frame = $('#prodBottleFrame');
+    if (!stage || !frame) return;
+
+    stage.addEventListener('mousemove', e => {
+      const rect = stage.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      frame.style.transform = `perspective(1000px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) scale(1.02)`;
+    });
+
+    stage.addEventListener('mouseleave', () => {
+      frame.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1)';
+    });
   }
 
   document.addEventListener('DOMContentLoaded', init);

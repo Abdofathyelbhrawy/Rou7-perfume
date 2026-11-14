@@ -75,6 +75,22 @@
         </div>
         <a class="text-link" href="#collection"><span data-i18n="coll_all_link">كل العطور</span> <span class="arrow-icon">←</span></a>
       </div>
+
+      <!-- Scent Finder Interactive Banner -->
+      <div class="scent-finder-banner" id="scentFinderBanner">
+        <div class="sfb-badge"><span>✨</span> <span data-i18n="finder_badge">مستشار رُوح الذكي</span></div>
+        <div class="sfb-body">
+          <div class="sfb-copy">
+            <h3 data-i18n-html="finder_title">محتار في اختيار عطرك؟ <em>دعنا نساعدك</em></h3>
+            <p data-i18n="finder_desc">أجب عن ٣ أسئلة سريعة وسنختار لك العطر الأقرب لروحك وشخصيتك بأعلى نسبة تطابق.</p>
+          </div>
+          <button type="button" class="button button-primary btn-start-quiz" id="openQuizBtn">
+            <span data-i18n="finder_cta">ابدأ الاستشارة العطرية ✨</span>
+            <span class="arrow-icon">←</span>
+          </button>
+        </div>
+      </div>
+
       <div class="collection-tools">
         <div class="filters" role="group" aria-label="تصنيف العطور">
           <button class="filter active" data-filter="all" data-i18n="filter_all">الكل</button>
@@ -82,9 +98,79 @@
           <button class="filter" data-filter="men" data-i18n="filter_men">رجالي</button>
           <button class="filter" data-filter="unisex" data-i18n="filter_unisex">للجميع</button>
         </div>
-        <span class="result-count" id="resultCount">٠ عطور</span>
+        <div class="collection-actions">
+          <div class="collection-sort-wrap">
+            <select id="collectionSort" class="collection-sort-select" aria-label="ترتيب العطور">
+              <option value="featured" data-i18n="sort_featured">الأكثر تميزاً ⭐</option>
+              <option value="price-asc" data-i18n="sort_price_asc">السعر: من الأقل للأعلى</option>
+              <option value="price-desc" data-i18n="sort_price_desc">السعر: من الأعلى للأقل</option>
+              <option value="name" data-i18n="sort_name">الاسم أبجدياً</option>
+            </select>
+          </div>
+          <span class="result-count" id="resultCount">٠ عطور</span>
+        </div>
       </div>
       <div class="product-grid" id="productGrid"></div>
+    </section>
+
+    <!-- Reviews & Social Proof Section -->
+    <section class="reviews-section section-wrap" id="reviews">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow"><span></span> <span data-i18n="reviews_eyebrow">تجارب حقيقية</span></p>
+          <h2 data-i18n-html="reviews_title">ماذا يقول <em>عملاء رُوح؟</em></h2>
+        </div>
+        <div class="reviews-nav-arrows">
+          <button class="reviews-arrow-btn" id="reviewsPrevBtn" type="button" aria-label="السابق">‹</button>
+          <button class="reviews-arrow-btn" id="reviewsNextBtn" type="button" aria-label="التالي">›</button>
+        </div>
+      </div>
+      <div class="reviews-slider-track" id="reviewsTrack">
+        <article class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-quote">«نود كورال دايموند قنبلة ثبات وفوحان بجد! ريحة الفانيليا والعنبر مش طبيعية وكل ما أروح مكان لازم حد يسألني عن العطر.»</p>
+          <div class="review-author">
+            <div class="review-avatar">ن.م</div>
+            <div>
+              <strong>نور محمود</strong>
+              <small>القاهرة · مشترية موثقة ✓ · <em>نود كورال دايموند</em></small>
+            </div>
+          </div>
+        </article>
+        <article class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-quote">«التغليف راقي جداً جداً والتوصيل سريع خلال يومين. عطر ملك الشرق فخم جداً وريحته ثقيلة ورجالية شيك للمناسبات.»</p>
+          <div class="review-author">
+            <div class="review-avatar">ع.ح</div>
+            <div>
+              <strong>عمر حسام</strong>
+              <small>الإسكندرية · مشتري موثق ✓ · <em>ملك الشرق</em></small>
+            </div>
+          </div>
+        </article>
+        <article class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-quote">«حبيت فكرة معاينة الأوردر قبل الاستلام. ريحة نسمة الفجر فريش ومنعشة ومناسبة للشغل وكل يوم. شكراً رُوح!»</p>
+          <div class="review-author">
+            <div class="review-avatar">س.ع</div>
+            <div>
+              <strong>سارة عادل</strong>
+              <small>الجيزة · مشترية موثقة ✓ · <em>نسمة الفجر</em></small>
+            </div>
+          </div>
+        </article>
+        <article class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-quote">«أفضل جودة زيوت عطرية جربتها في مصر بدون أي ريحة كحول نفاذة. ثبات حقيقي يفضل في الهدوم لليوم التاني.»</p>
+          <div class="review-author">
+            <div class="review-avatar">م.ف</div>
+            <div>
+              <strong>محمد فتحي</strong>
+              <small>المنصورة · مشتري موثق ✓ · <em>نجمة الليل</em></small>
+            </div>
+          </div>
+        </article>
+      </div>
     </section>
 
     <section class="story" id="story">
@@ -160,6 +246,16 @@
       <h2><span data-i18n="cart_title">سلة التسوق</span> <span id="drawerCount">(٠)</span></h2>
       <button id="cartClose" aria-label="إغلاق">×</button>
     </div>
+    <!-- Free Shipping Progress Tracker -->
+    <div class="free-shipping-bar" id="freeShippingBar">
+      <div class="fs-text-row">
+        <span class="fs-icon">🚚</span>
+        <span class="fs-label" id="freeShippingLabel">متبقي <strong>١,٥٠٠ ج.م</strong> للحصول على شحن مجاني</span>
+      </div>
+      <div class="fs-progress-track">
+        <div class="fs-progress-fill" id="freeShippingFill" style="width: 0%;"></div>
+      </div>
+    </div>
     <div class="cart-items" id="cartItems"></div>
     <div class="cart-empty" id="cartEmpty">
       <span>✳</span>
@@ -168,6 +264,12 @@
       <a href="#collection" id="continueShopping" data-i18n="cart_continue">العودة للمجموعة</a>
     </div>
     <div class="cart-summary" id="cartSummary">
+      <!-- Trust Strip in Drawer -->
+      <div class="cart-trust-badges">
+        <span>🛡️ عاين طلبك قبل الدفع</span>
+        <span>💵 دفع عند الاستلام</span>
+        <span>✨ ضمان الثبات والفوحان</span>
+      </div>
       <div><span data-i18n="cart_total">الإجمالي</span><strong id="cartTotal">٠ ج.م</strong></div>
       <button class="button button-primary" id="checkoutButton"><span data-i18n="cart_checkout">إتمام الطلب</span> <span class="arrow-icon">←</span></button>
       <small data-i18n="cart_shipping_note">الشحن يُحسب عند إتمام الطلب</small>
@@ -227,6 +329,16 @@
     <div class="modal-card detail-modal-card">
       <button class="modal-close" id="detailModalClose" aria-label="إغلاق">×</button>
       <div id="productDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- Modal مستشار رُوح الذكي -->
+  <div class="modal" id="scentQuizModal" role="dialog" aria-modal="true" aria-labelledby="quizModalTitle">
+    <div class="modal-card quiz-modal-card">
+      <button class="modal-close" id="quizModalClose" aria-label="إغلاق">×</button>
+      <div class="quiz-container" id="quizContainer">
+        <!-- Dynamically injected via JavaScript -->
+      </div>
     </div>
   </div>
 
