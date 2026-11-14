@@ -317,73 +317,128 @@
 
     renderProducts();
     renderHeroProduct();
-    renderHeroProductsScroll();
     updateCart();
   }
 
-  function readPromo() {
-    try { return { ...defaultPromo, ...JSON.parse(localStorage.getItem(PROMO_KEY) || '{}') }; }
-    catch (_) { return defaultPromo; }
+  function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
   }
 
+  // ── Announcements & Campaign Management ──────────────────────────────
   let promoTimer;
-  function renderPromo() {
+  function applyAnnouncements(data) {
+    if (!data) return;
     clearTimeout(promoTimer);
-    const promo = readPromo();
+
+    // 1. Top Announcement Bar
+    const topBar = document.querySelector('.announcement') || $('#topAnnouncement');
+    if (topBar) {
+      if (data.top_bar_active === false) {
+        topBar.style.display = 'none';
+      } else {
+        topBar.style.display = '';
+        const textEl = topBar.querySelector('[data-i18n="announcement"]') || topBar.querySelector('.announcement-content') || $('#topAnnouncementText');
+        if (data.top_bar && textEl) {
+          textEl.textContent = data.top_bar;
+        }
+      }
+    }
+
+    // 2. Main Promo Banner
     const banner = $('#promoBanner');
-    const now = Date.now();
-    const startsAt = promo.startsAt ? new Date(promo.startsAt).getTime() : -Infinity;
-    const endsAt = promo.endsAt ? new Date(promo.endsAt).getTime() : Infinity;
-    const hasValidSchedule = startsAt < endsAt;
-    const visible = Boolean(promo.active && promo.title && hasValidSchedule && now >= startsAt && now < endsAt);
-    banner.hidden = !visible;
-    if (visible) {
-      $('#promoTitle').textContent = promo.title;
-      $('#promoDetails').textContent = promo.details || '';
-      $('#promoDetails').hidden = !promo.details;
-    }
-    const nextChange = now < startsAt ? startsAt : endsAt;
-    if (promo.active && hasValidSchedule && Number.isFinite(nextChange) && nextChange > now) {
-      promoTimer = setTimeout(renderPromo, Math.min(nextChange - now + 50, 2147483647));
+    if (banner) {
+      const now = Date.now();
+      const startsAt = data.promo_starts_at ? new Date(data.promo_starts_at).getTime() : -Infinity;
+      const endsAt = data.promo_ends_at ? new Date(data.promo_ends_at).getTime() : Infinity;
+      const hasValidSchedule = startsAt < endsAt;
+      const visible = Boolean(data.promo_active !== false && data.promo_title && hasValidSchedule && now >= startsAt && now < endsAt);
+      banner.hidden = !visible;
+      if (visible) {
+        if ($('#promoTitle')) $('#promoTitle').textContent = data.promo_title;
+        if ($('#promoDetails')) {
+          $('#promoDetails').textContent = data.promo_details || '';
+          $('#promoDetails').hidden = !data.promo_details;
+        }
+      }
+      const nextChange = now < startsAt ? startsAt : endsAt;
+      if (data.promo_active !== false && hasValidSchedule && Number.isFinite(nextChange) && nextChange > now) {
+        promoTimer = setTimeout(() => applyAnnouncements(data), Math.min(nextChange - now + 50, 2147483647));
+      }
     }
   }
 
-  function unpackProduct(p) {
-    if (!p) return {};
-    let meta = {};
-    if (p.notes && typeof p.notes === 'string' && (p.notes.trim().startsWith('{') || p.notes.trim().startsWith('['))) {
-      try { meta = JSON.parse(p.notes); } catch (_) {}
-    }
-    return {
-      notes:        meta.desc !== undefined ? meta.desc : (p.notes || ''),
-      top_notes:    p.top_notes || meta.top_notes || '',
-      middle_notes: p.middle_notes || meta.middle_notes || '',
-      base_notes:   p.base_notes || meta.base_notes || '',
-      inspired_by:  p.inspired_by || meta.inspired_by || '',
-      longevity:    parseInt(p.longevity || meta.longevity) || 3,
-      sillage:      parseInt(p.sillage || meta.sillage) || 2,
-      accords:      p.accords || meta.accords || '',
-    };
+  function loadAnnouncements() {
+    try {
+      const stored = localStorage.getItem('rooh-announcements') || localStorage.getItem('rooh-campaign-settings') || localStorage.getItem('rooh-promo');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        applyAnnouncements({
+          top_bar: parsed.top_bar,
+          top_bar_active: parsed.top_bar_active !== false,
+          promo_title: parsed.promo_title || parsed.title,
+          promo_details: parsed.promo_details !== undefined ? parsed.promo_details : parsed.details,
+          promo_starts_at: parsed.promo_starts_at || parsed.startsAt,
+          promo_ends_at: parsed.promo_ends_at || parsed.endsAt,
+          promo_active: parsed.promo_active !== undefined ? parsed.promo_active : (parsed.active !== false)
+        });
+      }
+    } catch (_) {}
+
+    supaFetch('products', { filters: '&name=eq.__system_announcements__' })
+      .then(rows => {
+        if (rows && rows.length && rows[0].notes) {
+          try {
+            const data = JSON.parse(rows[0].notes);
+            localStorage.setItem('rooh-announcements', JSON.stringify(data));
+            applyAnnouncements(data);
+          } catch (e) {
+            console.error('Error parsing announcement data:', e);
+          }
+        }
+      })
+      .catch(err => console.warn('Announcements fetch error:', err));
   }
 
-  function renderHeroProduct() {
-    const featured = products.find(product => product.is_featured) || products[0];
+  loadAnnouncements();
+  window.addEventListener('storage', event => {
+    if (event.key && (event.key.includes('promo') || event.key.includes('announcement') || event.key.includes('campaign'))) {
+      loadAnnouncements();
+    }
+  });
+
+  // ── Hero Perfume Carousel with Floating Notes ──────────────────────
+  let heroCurrentIndex = 0;
+  let heroAutoTimer = null;
+  let heroHovered = false;
+  let heroListenersBound = false;
+
+  function renderHeroProduct(targetIndex = null) {
     const hero = $('#heroProduct');
+    if (!hero) return;
     const t = I18N[currentLang];
-    if (!featured) {
+
+    const candidates = products.filter(p => p.name !== '__system_announcements__' && p.in_stock !== false);
+    if (!candidates.length) {
       hero.innerHTML = `<div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="hero-product-empty"><span>✳</span><p>${currentLang === 'ar' ? 'المنتج المميز سيظهر هنا' : 'Featured fragrance will appear here'}</p></div>`;
       return;
     }
 
-    const d = unpackProduct(featured);
-    const nameToDisplay = currentLang === 'en' ? (featured.latin || featured.name) : (featured.name || featured.latin);
+    if (targetIndex !== null) {
+      heroCurrentIndex = ((targetIndex % candidates.length) + candidates.length) % candidates.length;
+    } else if (heroCurrentIndex >= candidates.length) {
+      const featIdx = candidates.findIndex(p => p.is_featured);
+      heroCurrentIndex = featIdx >= 0 ? featIdx : 0;
+    }
+
+    const currentProduct = candidates[heroCurrentIndex];
+    const d = unpackProduct(currentProduct);
+    const nameToDisplay = currentLang === 'en' ? (currentProduct.latin || currentProduct.name) : (currentProduct.name || currentProduct.latin);
     const safeName = escapeHtml(nameToDisplay || 'Rou7');
-    const safeImage = escapeHtml(featured.image_url || '');
+    const safeImage = escapeHtml(currentProduct.image_url || '');
     const cleanDesc = escapeHtml(d.notes || '');
 
-    // Collect floating notes from top, heart, base, and inspired_by
+    // Floating notes orbiting around the bottle
     const floatingNotes = [];
-
     if (d.top_notes) {
       const firstTop = d.top_notes.split(/[,،]/)[0].trim();
       floatingNotes.push({
@@ -394,7 +449,6 @@
         text: escapeHtml(firstTop)
       });
     }
-
     if (d.middle_notes) {
       const firstMid = d.middle_notes.split(/[,،]/)[0].trim();
       floatingNotes.push({
@@ -405,7 +459,6 @@
         text: escapeHtml(firstMid)
       });
     }
-
     if (d.base_notes) {
       const firstBase = d.base_notes.split(/[,،]/)[0].trim();
       floatingNotes.push({
@@ -416,7 +469,6 @@
         text: escapeHtml(firstBase)
       });
     }
-
     if (d.inspired_by) {
       floatingNotes.push({
         pos: 'fn-pos-4',
@@ -436,7 +488,6 @@
       });
     }
 
-    // Fallback if no structured notes: split general notes
     if (floatingNotes.length === 0 && d.notes) {
       const parts = d.notes.split(/[,،]/).map(s => s.trim()).filter(Boolean);
       const icons = ['▲', '■', '◼', '✦'];
@@ -468,6 +519,17 @@
       </div>
     `).join('');
 
+    const dotsHtml = candidates.length > 1 ? `
+      <div class="hero-carousel-dots" aria-label="${currentLang === 'ar' ? 'مؤشرات العطور' : 'Fragrance indicators'}">
+        ${candidates.map((_, i) => `<button type="button" class="hero-carousel-dot ${i === heroCurrentIndex ? 'active' : ''}" data-hero-dot="${i}" aria-label="${currentLang === 'ar' ? 'عطر ' + (i + 1) : 'Fragrance ' + (i + 1)}"></button>`).join('')}
+      </div>
+    ` : '';
+
+    const navArrowsHtml = candidates.length > 1 ? `
+      <button class="hero-nav-arrow hero-prev" id="heroPrevBtn" type="button" aria-label="${currentLang === 'ar' ? 'العطر السابق' : 'Previous Fragrance'}">‹</button>
+      <button class="hero-nav-arrow hero-next" id="heroNextBtn" type="button" aria-label="${currentLang === 'ar' ? 'العطر التالي' : 'Next Fragrance'}">›</button>
+    ` : '';
+
     hero.innerHTML = `
       <div class="hero-orbit orbit-one"></div>
       <div class="hero-orbit orbit-two"></div>
@@ -475,70 +537,92 @@
       <span class="hero-spark spark-one">✳</span>
       <span class="hero-spark spark-two">✦</span>
 
-      <div class="hero-creative-showcase">
-        ${floatingNotesHtml}
-        
-        <div class="hero-bottle-center">
-          ${safeImage ? `<img class="hero-featured-image" src="${safeImage}" alt="${safeName}" fetchpriority="high">` : '<div class="hero-product-empty"><span>✳</span></div>'}
-        </div>
-      </div>
+      ${navArrowsHtml}
 
-      <div class="hero-product-caption">
-        <span class="hero-caption-kicker">${t.hero_featured_tag}</span>
-        <h2 class="hero-caption-title">${safeName}</h2>
-        ${cleanDesc ? `<p class="hero-caption-desc">${cleanDesc}</p>` : ''}
-        <div class="hero-caption-footer">
-          <a class="btn-hero-explore" href="product.html?id=${featured.id}">
-            <span>✦</span> ${currentLang === 'ar' ? 'استكشف هرم النوتات والتحليل' : 'Explore Scent DNA & Notes'}
-          </a>
-          <button class="btn-hero-quickadd" data-add="${featured.id}" type="button">
-            <span>＋</span> ${t.quick_add} · ${money(featured.price)}
-          </button>
+      <div class="hero-slide-content hero-slide-fade" key="${currentProduct.id}">
+        <div class="hero-creative-showcase">
+          ${floatingNotesHtml}
+          
+          <div class="hero-bottle-center">
+            ${safeImage ? `<img class="hero-featured-image" src="${safeImage}" alt="${safeName}" fetchpriority="high">` : '<div class="hero-product-empty"><span>✳</span></div>'}
+          </div>
+        </div>
+
+        <div class="hero-product-caption">
+          <span class="hero-caption-kicker">${t.hero_featured_tag}</span>
+          <h2 class="hero-caption-title">${safeName}</h2>
+          ${cleanDesc ? `<p class="hero-caption-desc">${cleanDesc}</p>` : ''}
+          <div class="hero-caption-footer">
+            <a class="btn-hero-explore" href="product.html?id=${currentProduct.id}">
+              <span>✦</span> ${currentLang === 'ar' ? 'استكشف هرم النوتات والتحليل' : 'Explore Scent DNA & Notes'}
+            </a>
+            <button class="btn-hero-quickadd" data-add="${currentProduct.id}" type="button">
+              <span>＋</span> ${t.quick_add} · ${money(currentProduct.price)}
+            </button>
+          </div>
+          ${dotsHtml}
         </div>
       </div>
     `;
+
+    // Event listeners on hero container
+    if (!heroListenersBound) {
+      heroListenersBound = true;
+      hero.addEventListener('mouseenter', () => { heroHovered = true; });
+      hero.addEventListener('mouseleave', () => { heroHovered = false; });
+
+      hero.addEventListener('click', e => {
+        const prevBtn = e.target.closest('#heroPrevBtn');
+        if (prevBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          renderHeroProduct(heroCurrentIndex - 1);
+          return;
+        }
+        const nextBtn = e.target.closest('#heroNextBtn');
+        if (nextBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          renderHeroProduct(heroCurrentIndex + 1);
+          return;
+        }
+        const dot = e.target.closest('[data-hero-dot]');
+        if (dot) {
+          e.preventDefault();
+          e.stopPropagation();
+          const idx = parseInt(dot.getAttribute('data-hero-dot'), 10);
+          if (!isNaN(idx)) renderHeroProduct(idx);
+          return;
+        }
+      });
+
+      let touchStartX = 0;
+      hero.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+      hero.addEventListener('touchend', e => {
+        const touchEndX = e.changedTouches[0].screenX;
+        const diff = touchEndX - touchStartX;
+        if (Math.abs(diff) > 40) {
+          if (diff > 0) {
+            renderHeroProduct(document.dir === 'rtl' ? heroCurrentIndex + 1 : heroCurrentIndex - 1);
+          } else {
+            renderHeroProduct(document.dir === 'rtl' ? heroCurrentIndex - 1 : heroCurrentIndex + 1);
+          }
+        }
+      }, { passive: true });
+    }
+
+    // Auto rotate every 7 seconds
+    clearInterval(heroAutoTimer);
+    if (candidates.length > 1) {
+      heroAutoTimer = setInterval(() => {
+        if (!heroHovered) {
+          renderHeroProduct(heroCurrentIndex + 1);
+        }
+      }, 7000);
+    }
   }
-
-  function renderHeroProductsScroll() {
-    const container = $('#heroProductsScroll');
-    if (!container) return;
-    const t = I18N[currentLang];
-    if (!products.length) return;
-
-    container.innerHTML = products.map(product => {
-      const d = unpackProduct(product);
-      const prodName = currentLang === 'en' ? (product.latin || product.name) : product.name;
-      const prodSub  = currentLang === 'en' ? (product.latin ? product.name : '') : (product.latin || '');
-      return `
-        <article class="hero-scroll-card" data-product-id="${product.id}">
-          <div class="product-image">
-            <a href="product.html?id=${product.id}" class="product-thumb-link" aria-label="${escapeHtml(prodName)}">
-              ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}" loading="lazy">` : ''}
-            </a>
-            ${product.tag ? `<span class="product-tag">${escapeHtml(product.tag)}</span>` : ''}
-            <button class="quick-add" data-add="${product.id}" type="button">${t.quick_add} <span>＋</span></button>
-          </div>
-          <div class="product-info">
-            <div class="product-meta">
-              <h3><a href="product.html?id=${product.id}" class="prod-title-link">${escapeHtml(prodName)}</a> ${prodSub ? `<small style="font-size:10px;opacity:.7;display:block;">${escapeHtml(prodSub)}</small>` : ''}</h3>
-              <span>${money(product.price)}</span>
-            </div>
-            ${d.inspired_by ? `<div class="card-inspired-tag"><span class="ci-label">${currentLang === 'ar' ? 'مستوحى من' : 'Inspired by'}</span> <strong>${escapeHtml(d.inspired_by)}</strong></div>` : ''}
-            <a href="product.html?id=${product.id}" class="btn-explore-notes"><span>✦</span> ${currentLang === 'ar' ? 'تفاصيل وتحليل العطر' : 'Fragrance Profile'}</a>
-          </div>
-        </article>
-      `;
-    }).join('');
-  }
-
-  function escapeHtml(value) {
-    return String(value || '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
-  }
-
-  renderPromo();
-  window.addEventListener('storage', event => {
-    if (event.key === PROMO_KEY) renderPromo();
-  });
 
   function unpackProduct(p) {
     if (!p) return {};
@@ -814,7 +898,6 @@
       try { localStorage.setItem('rooh-cached-products', JSON.stringify(products)); } catch (_) {}
       renderProducts();
       renderHeroProduct();
-      renderHeroProductsScroll();
       updateCart();
     }
   };
@@ -823,7 +906,6 @@
   if (products.length) {
     renderProducts();
     renderHeroProduct();
-    renderHeroProductsScroll();
   }
 
   // ── Load products from Supabase (Once on load + Realtime) ───────────────────
@@ -848,6 +930,7 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
           console.log('ROOH: Realtime product change');
           loadProductsFromSupa();
+          loadAnnouncements();
         })
         .subscribe();
     } catch (e) {

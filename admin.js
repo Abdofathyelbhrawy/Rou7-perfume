@@ -112,51 +112,184 @@
 
   setAdminLanguage(adminLang, false);
 
-  const promoKey = 'rooh-promo';
-  const defaultPromo = { title: 'شحن مجاني للطلبات فوق ١٥٠٠ جنيه', details: '', startsAt: '', endsAt: '', active: true };
+  const campaignKey = 'rooh-campaign-settings';
+  const defaultCampaign = {
+    top_bar: 'شحن لجميع المحافظات · دفع عند الاستلام · ضمان الثبات والفوحان',
+    top_bar_active: true,
+    promo_title: 'شحن مجاني للطلبات فوق ١٥٠٠ جنيه',
+    promo_details: '',
+    promo_starts_at: '',
+    promo_ends_at: '',
+    promo_active: true
+  };
   const campaignForm = $('#campaignForm');
-  function readPromo() {
-    try { return { ...defaultPromo, ...JSON.parse(localStorage.getItem(promoKey) || '{}') }; }
-    catch (_) { return defaultPromo; }
-  }
-  function showCampaignPreview() {
-    $('#promoPreviewTitle').textContent = $('#promoTitleInput').value.trim() || 'اكتب نص الإعلان هنا';
-    $('#promoPreviewDetails').textContent = $('#promoDetailsInput').value.trim();
-  }
-  const promo = readPromo();
-  $('#promoTitleInput').value = promo.title;
-  $('#promoDetailsInput').value = promo.details;
-  $('#promoStartInput').value = promo.startsAt;
-  $('#promoEndInput').value = promo.endsAt;
-  $('#promoActiveInput').checked = promo.active !== false;
-  showCampaignPreview();
-  campaignForm.addEventListener('input', showCampaignPreview);
-  campaignForm.addEventListener('submit', event => {
-    event.preventDefault();
-    const startsAt = $('#promoStartInput').value;
-    const endsAt = $('#promoEndInput').value;
-    const status = $('#campaignStatus');
-    if (startsAt && endsAt && new Date(startsAt) >= new Date(endsAt)) {
-      status.className = 'error';
-      status.textContent = 'موعد الانتهاء لازم يكون بعد موعد البداية.';
-      return;
-    }
-    const updatedPromo = {
-      title: $('#promoTitleInput').value.trim(),
-      details: $('#promoDetailsInput').value.trim(),
-      startsAt,
-      endsAt,
-      active: $('#promoActiveInput').checked
-    };
+
+  function readCampaignLocal() {
     try {
-      localStorage.setItem(promoKey, JSON.stringify(updatedPromo));
-      status.className = 'saved';
-      status.textContent = updatedPromo.active ? 'تم حفظ الإعلان وجدولته.' : 'تم حفظ الإعلان كمسودة غير مفعلة.';
-    } catch (_) {
-      status.className = 'error';
-      status.textContent = 'تعذر الحفظ في هذا المتصفح.';
+      const stored = localStorage.getItem(campaignKey) || localStorage.getItem('rooh-announcements') || localStorage.getItem('rooh-promo');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return {
+          ...defaultCampaign,
+          top_bar: parsed.top_bar !== undefined ? parsed.top_bar : defaultCampaign.top_bar,
+          top_bar_active: parsed.top_bar_active !== undefined ? parsed.top_bar_active : true,
+          promo_title: parsed.promo_title || parsed.title || defaultCampaign.promo_title,
+          promo_details: parsed.promo_details !== undefined ? parsed.promo_details : (parsed.details || ''),
+          promo_starts_at: parsed.promo_starts_at || parsed.startsAt || '',
+          promo_ends_at: parsed.promo_ends_at || parsed.endsAt || '',
+          promo_active: parsed.promo_active !== undefined ? parsed.promo_active : (parsed.active !== false)
+        };
+      }
+    } catch (_) {}
+    return defaultCampaign;
+  }
+
+  function showCampaignPreview() {
+    const topBarInput = $('#topBarTextInput');
+    const topBarActiveInput = $('#topBarActiveInput');
+    const topBarPreview = $('#topBarPreview');
+    if (topBarPreview && topBarInput) {
+      topBarPreview.textContent = topBarInput.value.trim() || 'شحن لجميع المحافظات · دفع عند الاستلام · ضمان الثبات والفوحان';
+      topBarPreview.style.opacity = topBarActiveInput && topBarActiveInput.checked ? '1' : '0.4';
+      topBarPreview.style.textDecoration = topBarActiveInput && topBarActiveInput.checked ? 'none' : 'line-through';
     }
-  });
+
+    const promoTitleInput = $('#promoTitleInput');
+    const promoDetailsInput = $('#promoDetailsInput');
+    const promoActiveInput = $('#promoActiveInput');
+    const promoPreviewTitle = $('#promoPreviewTitle');
+    const promoPreviewDetails = $('#promoPreviewDetails');
+    const previewCard = document.querySelector('.campaign-preview-card');
+    if (promoPreviewTitle && promoTitleInput) {
+      promoPreviewTitle.textContent = promoTitleInput.value.trim() || 'اكتب نص الإعلان هنا';
+    }
+    if (promoPreviewDetails && promoDetailsInput) {
+      const det = promoDetailsInput.value.trim();
+      promoPreviewDetails.textContent = det;
+      promoPreviewDetails.style.display = det ? 'block' : 'none';
+    }
+    if (previewCard && promoActiveInput) {
+      previewCard.style.opacity = promoActiveInput.checked ? '1' : '0.4';
+    }
+  }
+
+  function populateCampaignInputs(data) {
+    if ($('#topBarTextInput')) $('#topBarTextInput').value = data.top_bar || '';
+    if ($('#topBarActiveInput')) $('#topBarActiveInput').checked = data.top_bar_active !== false;
+    if ($('#promoTitleInput')) $('#promoTitleInput').value = data.promo_title || '';
+    if ($('#promoDetailsInput')) $('#promoDetailsInput').value = data.promo_details || '';
+    if ($('#promoStartInput')) $('#promoStartInput').value = data.promo_starts_at || '';
+    if ($('#promoEndInput')) $('#promoEndInput').value = data.promo_ends_at || '';
+    if ($('#promoActiveInput')) $('#promoActiveInput').checked = data.promo_active !== false;
+    showCampaignPreview();
+  }
+
+  // Populate from local storage initially
+  populateCampaignInputs(readCampaignLocal());
+
+  // Then fetch latest from Supabase
+  function loadCampaignFromSupa() {
+    supaFetch('products', { filters: '&name=eq.__system_announcements__' })
+      .then(rows => {
+        if (rows && rows.length && rows[0].notes) {
+          try {
+            const data = JSON.parse(rows[0].notes);
+            populateCampaignInputs({
+              ...defaultCampaign,
+              ...data
+            });
+            try {
+              localStorage.setItem(campaignKey, JSON.stringify(data));
+              localStorage.setItem('rooh-announcements', JSON.stringify(data));
+            } catch (_) {}
+          } catch (e) {
+            console.error('Error parsing campaign notes:', e);
+          }
+        }
+      })
+      .catch(err => console.warn('Campaign fetch error:', err));
+  }
+  loadCampaignFromSupa();
+
+  if (campaignForm) {
+    campaignForm.addEventListener('input', showCampaignPreview);
+    campaignForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      const startsAt = $('#promoStartInput')?.value || '';
+      const endsAt = $('#promoEndInput')?.value || '';
+      const status = $('#campaignStatus');
+      if (startsAt && endsAt && new Date(startsAt) >= new Date(endsAt)) {
+        if (status) {
+          status.className = 'error';
+          status.textContent = 'موعد الانتهاء لازم يكون بعد موعد البداية.';
+        }
+        return;
+      }
+      if (status) {
+        status.className = '';
+        status.textContent = 'جاري حفظ ونشر الإعلانات فوراً...';
+      }
+
+      const updatedCampaign = {
+        top_bar: $('#topBarTextInput')?.value.trim() || '',
+        top_bar_active: $('#topBarActiveInput')?.checked !== false,
+        promo_title: $('#promoTitleInput')?.value.trim() || '',
+        promo_details: $('#promoDetailsInput')?.value.trim() || '',
+        promo_starts_at: startsAt,
+        promo_ends_at: endsAt,
+        promo_active: $('#promoActiveInput')?.checked !== false
+      };
+
+      try {
+        localStorage.setItem(campaignKey, JSON.stringify(updatedCampaign));
+        localStorage.setItem('rooh-announcements', JSON.stringify(updatedCampaign));
+        localStorage.setItem('rooh-promo', JSON.stringify({
+          title: updatedCampaign.promo_title,
+          details: updatedCampaign.promo_details,
+          startsAt: updatedCampaign.promo_starts_at,
+          endsAt: updatedCampaign.promo_ends_at,
+          active: updatedCampaign.promo_active
+        }));
+      } catch (_) {}
+
+      try {
+        await supaFetch('products?name=eq.__system_announcements__', {
+          method: 'PATCH',
+          body: {
+            notes: JSON.stringify(updatedCampaign),
+            category: 'unisex',
+            in_stock: false
+          }
+        });
+        if (status) {
+          status.className = 'saved';
+          status.textContent = 'تم حفظ ونشر الإعلانات بنجاح في المتجر! ✓';
+        }
+      } catch (err) {
+        console.error('Failed to save to Supabase:', err);
+        try {
+          await supaFetch('products', {
+            method: 'POST',
+            body: {
+              name: '__system_announcements__',
+              category: 'unisex',
+              in_stock: false,
+              notes: JSON.stringify(updatedCampaign)
+            }
+          });
+          if (status) {
+            status.className = 'saved';
+            status.textContent = 'تم حفظ ونشر الإعلانات بنجاح في المتجر! ✓';
+          }
+        } catch (e2) {
+          if (status) {
+            status.className = 'error';
+            status.textContent = 'تم الحفظ محلياً فقط. تحقق من اتصال الإنترنت أو إعدادات Supabase.';
+          }
+        }
+      }
+    });
+  }
 
   // ── Load orders & products from Supabase ──────────────────────────────────
   function cleanPhoneForWhatsApp(phone) {
@@ -283,7 +416,7 @@
   }
 
   function renderProductsTable(products) {
-    currentProducts = products || [];
+    currentProducts = (products || []).filter(p => p.name !== '__system_announcements__');
     try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
     $('#statProducts').textContent = arabicNum(currentProducts.length);
     $('#prodBadge').textContent     = arabicNum(currentProducts.length);
@@ -308,6 +441,14 @@
       const titlePrimary = adminLang === 'en' ? (p.latin || p.name) : p.name;
       const titleSub = adminLang === 'en' ? (p.latin ? p.name : '') : (p.latin || '');
 
+      let displayNotes = p.notes || '—';
+      if (typeof displayNotes === 'string' && (displayNotes.trim().startsWith('{') || displayNotes.trim().startsWith('['))) {
+        try {
+          const meta = JSON.parse(displayNotes);
+          displayNotes = meta.desc || meta.top_notes || (meta.inspired_by ? (`${adminLang === 'ar' ? 'مستوحى من' : 'Inspired by'}: ${meta.inspired_by}`) : displayNotes);
+        } catch (_) {}
+      }
+
       return `<tr>
         <td>${imgHtml}</td>
         <td class="prod-title-cell">
@@ -316,7 +457,7 @@
         </td>
         <td><span class="cat-pill ${cat.class}">${cat.text}</span></td>
         <td><strong>${money(p.price)}</strong></td>
-        <td><span style="font-size:10px;color:var(--muted);">${escapeHtml(p.notes || '—')}</span></td>
+        <td><span style="font-size:10px;color:var(--muted);">${escapeHtml(displayNotes)}</span></td>
         <td>
           <span class="stock-tag ${p.in_stock !== false ? 'in' : 'out'}">${p.in_stock !== false ? (adminLang === 'ar' ? 'متوفر ✓' : 'In Stock ✓') : (adminLang === 'ar' ? 'غير متوفر' : 'Out of Stock')}</span>
           ${p.is_featured ? `<span class="featured-mark" title="${adminLang === 'ar' ? 'عطر مميز في الواجهة' : 'Featured Hero Fragrance'}">⭐</span>` : ''}

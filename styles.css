@@ -1113,3 +1113,122 @@ body.light .hero-scroll-card {
   font-size: 11px;
   padding: 7px 12px;
 }
+
+/* -- Hero Carousel Slider with Floating Notes -------------------------- */
+.hero-art {
+  position: relative;
+}
+
+.hero-nav-arrow {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(25, 41, 64, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(245, 165, 173, 0.35);
+  color: var(--cream);
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all .25s ease;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  user-select: none;
+}
+
+body.light .hero-nav-arrow {
+  background: rgba(255, 253, 251, 0.94);
+  color: var(--navy);
+  border-color: rgba(129, 45, 53, 0.22);
+  box-shadow: 0 10px 24px rgba(66, 44, 36, 0.12);
+}
+
+.hero-nav-arrow:hover {
+  background: var(--pink);
+  color: var(--navy);
+  border-color: var(--pink);
+  transform: translateY(-50%) scale(1.12);
+}
+
+.hero-prev {
+  inset-inline-start: -8px;
+}
+
+.hero-next {
+  inset-inline-end: -8px;
+}
+
+@media (max-width: 600px) {
+  .hero-nav-arrow {
+    width: 38px;
+    height: 38px;
+    font-size: 20px;
+  }
+  .hero-prev { inset-inline-start: 2px; }
+  .hero-next { inset-inline-end: 2px; }
+}
+
+.hero-carousel-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  position: relative;
+  z-index: 5;
+}
+
+.hero-carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: all .25s ease;
+}
+
+.hero-carousel-dot:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+body.light .hero-carousel-dot {
+  background: rgba(25, 41, 64, 0.2);
+}
+
+body.light .hero-carousel-dot:hover {
+  background: rgba(25, 41, 64, 0.4);
+}
+
+.hero-carousel-dot.active {
+  width: 22px;
+  border-radius: 10px;
+  background: var(--pink);
+}
+
+body.light .hero-carousel-dot.active {
+  background: var(--burgundy);
+}
+
+.hero-slide-fade {
+  animation: heroSlideFadeIn .4s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+}
+
+@keyframes heroSlideFadeIn {
+  from {
+    opacity: 0.15;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

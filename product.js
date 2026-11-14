@@ -816,6 +816,38 @@
     const savedTheme = localStorage.getItem(THEME_KEY);
     if (savedTheme === 'light') setTheme(true);
 
+    // 1.1 Load top announcement bar settings
+    function applyAnnouncements(data) {
+      if (!data) return;
+      const topBar = document.querySelector('.announcement');
+      if (topBar) {
+        if (data.top_bar_active === false) {
+          topBar.style.display = 'none';
+        } else {
+          topBar.style.display = '';
+          const textEl = topBar.querySelector('[data-i18n="announcement"]');
+          if (textEl && data.top_bar) {
+            textEl.textContent = data.top_bar;
+          }
+        }
+      }
+    }
+    try {
+      const stored = localStorage.getItem('rooh-announcements') || localStorage.getItem('rooh-campaign-settings');
+      if (stored) applyAnnouncements(JSON.parse(stored));
+    } catch (_) {}
+    supaFetch('products', { filters: '&name=eq.__system_announcements__' })
+      .then(rows => {
+        if (rows && rows.length && rows[0].notes) {
+          try {
+            const data = JSON.parse(rows[0].notes);
+            localStorage.setItem('rooh-announcements', JSON.stringify(data));
+            applyAnnouncements(data);
+          } catch (_) {}
+        }
+      })
+      .catch(() => {});
+
     // 2. Read Cached Products first
     try {
       const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');

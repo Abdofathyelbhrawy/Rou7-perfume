@@ -53,7 +53,82 @@
       </div>
     </section>
 
-    <section class="campaign-panel" id="campaign"><div class="panel-heading"><div><p class="admin-kicker">إدارة محتوى المتجر</p><h2>إعلان الصفحة الرئيسية</h2></div><span class="local-label">تحكم بالموعد والنص</span></div><div class="campaign-body"><form id="campaignForm"><label>نص الإعلان<input id="promoTitleInput" name="title" maxlength="100" required placeholder="مثال: شحن مجاني للطلبات فوق ١٥٠٠ جنيه"></label><label>سطر توضيحي <span>(اختياري)</span><textarea id="promoDetailsInput" name="details" rows="2" maxlength="180" placeholder="اكتب تفاصيل إضافية للعرض"></textarea></label><div class="campaign-dates"><label>يبدأ في<input id="promoStartInput" type="datetime-local"></label><label>ينتهي في<input id="promoEndInput" type="datetime-local"></label></div><small class="campaign-help">اترك البداية فارغة ليظهر فوراً، والنهاية فارغة ليبقى الإعلان فعالاً حتى توقفه.</small><label class="campaign-active"><input id="promoActiveInput" type="checkbox"><span>تفعيل الإعلان خلال الفترة المحددة</span></label><div class="campaign-actions"><button class="button button-primary" type="submit">حفظ الإعلان <span>←</span></button><p id="campaignStatus" role="status"></p></div></form><div class="campaign-preview"><span>معاينة الإعلان</span><div class="campaign-preview-card"><small id="promoPreviewKicker">عرض من رُوح</small><strong id="promoPreviewTitle">شحن مجاني للطلبات فوق ١٥٠٠ جنيه</strong><p id="promoPreviewDetails"></p></div><small class="preview-note">يظهر أسفل الواجهة الرئيسية عند تفعيله وحلول موعده.</small></div></div></section>
+    <section class="campaign-panel" id="campaign">
+      <div class="panel-heading">
+        <div>
+          <p class="admin-kicker">إدارة محتوى وعروض المتجر</p>
+          <h2>إدارة الإعلانات والشريط العلوي</h2>
+        </div>
+        <span class="local-label">تحكم كامل بالإعلانات</span>
+      </div>
+      <div class="campaign-body">
+        <form id="campaignForm">
+          <!-- 1. Top Announcement Bar -->
+          <div class="campaign-fieldset" style="border: 1px solid var(--admin-line); border-radius: 12px; padding: 18px; margin-bottom: 20px; background: rgba(255,255,255,0.02);">
+            <h3 style="font-size: 14px; margin: 0 0 12px; color: var(--admin-accent); display: flex; align-items: center; gap: 8px;">
+              <span>📢</span> الشريط الإعلاني العلوي (أعلى الموقع)
+            </h3>
+            <label style="margin-bottom: 12px;">نص الشريط العلوي
+              <input id="topBarTextInput" name="top_bar" maxlength="160" placeholder="مثال: شحن لجميع المحافظات · دفع عند الاستلام · ضمان الثبات والفوحان">
+            </label>
+            <label class="campaign-active" style="margin: 0;">
+              <input id="topBarActiveInput" type="checkbox" checked>
+              <span>تفعيل وإظهار الشريط العلوي في كل الصفحات</span>
+            </label>
+          </div>
+
+          <!-- 2. Main Promo Banner -->
+          <div class="campaign-fieldset" style="border: 1px solid var(--admin-line); border-radius: 12px; padding: 18px; margin-bottom: 20px; background: rgba(255,255,255,0.02);">
+            <h3 style="font-size: 14px; margin: 0 0 12px; color: var(--admin-accent); display: flex; align-items: center; gap: 8px;">
+              <span>✳</span> بانر العرض الترويجي المميز (أسفل الواجهة)
+            </h3>
+            <label>عنوان العرض الرئيسي
+              <input id="promoTitleInput" name="title" maxlength="100" placeholder="مثال: شحن مجاني للطلبات فوق ١٥٠٠ جنيه">
+            </label>
+            <label>سطر توضيحي إضافي <span>(اختياري)</span>
+              <textarea id="promoDetailsInput" name="details" rows="2" maxlength="180" placeholder="اكتب تفاصيل إضافية للعرض أو كود الخصم"></textarea>
+            </label>
+            <div class="campaign-dates">
+              <label>يبدأ في
+                <input id="promoStartInput" type="datetime-local">
+              </label>
+              <label>ينتهي في
+                <input id="promoEndInput" type="datetime-local">
+              </label>
+            </div>
+            <small class="campaign-help">اترك البداية فارغة ليظهر فوراً، والنهاية فارغة ليبقى الإعلان فعالاً حتى توقفه.</small>
+            <label class="campaign-active">
+              <input id="promoActiveInput" type="checkbox">
+              <span>تفعيل بانر العرض الترويجي خلال الفترة المحددة</span>
+            </label>
+          </div>
+
+          <div class="campaign-actions">
+            <button class="button button-primary" type="submit" id="saveCampaignBtn">حفظ ونشر الإعلانات فوراً <span>←</span></button>
+            <p id="campaignStatus" role="status"></p>
+          </div>
+        </form>
+
+        <div class="campaign-preview">
+          <span>معاينة حية للإعلانات</span>
+          <!-- Top Bar Preview -->
+          <div style="margin-bottom: 16px;">
+            <small style="display:block; margin-bottom:6px; color:var(--admin-muted); font-size:11px;">الشريط العلوي:</small>
+            <div id="topBarPreview" style="background:var(--pink); color:#192940; font-size:11px; padding:8px 12px; border-radius:6px; text-align:center; font-weight:500;">
+              شحن لجميع المحافظات · دفع عند الاستلام · ضمان الثبات والفوحان
+            </div>
+          </div>
+          <!-- Banner Preview -->
+          <small style="display:block; margin-bottom:6px; color:var(--admin-muted); font-size:11px;">بانر العرض الترويجي:</small>
+          <div class="campaign-preview-card">
+            <small id="promoPreviewKicker">عرض من رُوح</small>
+            <strong id="promoPreviewTitle">شحن مجاني للطلبات فوق ١٥٠٠ جنيه</strong>
+            <p id="promoPreviewDetails"></p>
+          </div>
+          <small class="preview-note">تنعكس التعديلات مباشرة على المتجر للعملاء فور الحفظ.</small>
+        </div>
+      </div>
+    </section>
     <section class="orders-panel" id="orders">
       <div class="panel-heading">
         <div>
