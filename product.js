@@ -65,6 +65,16 @@
       toast_added: 'تمت إضافة العطر إلى الحقيبة ✳',
       toast_qty_err: 'يرجى اختيار كمية صحيحة',
       currency: 'ج.م',
+      spray_btn_text: 'بخّة الرذاذ واختبار الفوحان',
+      spray_hint: 'انقر على الزجاجة أو الزر لبخّ العطر واستكشاف النوتات',
+      sillage_beast: 'فوحان استثنائي (Beast Mode)',
+      sillage_beast_desc: 'انتشار محيطي واسع يملأ المكان حتى ٣+ أمتار',
+      sillage_strong: 'فوحان قوي جداً وملحوظ',
+      sillage_strong_desc: 'انتشار محيطي مميز حتى ٢-٣ أمتار ويترك بصمة واضحة',
+      sillage_moderate: 'فوحان متوازن وملحوظ',
+      sillage_moderate_desc: 'حضور ناعم وواضح لمسافة ١-٢ متر',
+      sillage_intimate: 'فوحان هادئ وقريب',
+      sillage_intimate_desc: 'يداعب البشرة بنعومة ومثالي للمسافات القريبة',
       wa_inquiry_msg: 'مرحباً رُوح، أود الاستفسار عن عطوركم 🌸',
       wa_order_template: (name, qty, price) => `مرحباً رُوح، أود طلب عطر "${name}" عدد (${qty}) عبوة.\nالقيمة الإجمالية: ${price} ج.م.\nبرجاء تأكيد الطلب ومعلومات الشحن.`
     },
@@ -81,6 +91,16 @@
       inspired_by_label: 'INSPIRED BY',
       add_to_bag: 'Add to Bag',
       wa_order_btn: 'Direct Order via WhatsApp',
+      spray_btn_text: 'Spray Mist & Test Sillage',
+      spray_hint: 'Click the bottle or button to spray and discover floating notes',
+      sillage_beast: 'Beast Mode Sillage',
+      sillage_beast_desc: 'Massive projection filling the entire room (3+ meters)',
+      sillage_strong: 'Very Strong Sillage',
+      sillage_strong_desc: 'Radiant projection reaching 2-3 meters with strong trail',
+      sillage_moderate: 'Balanced Sillage',
+      sillage_moderate_desc: 'Pleasant aura projecting 1-2 meters around you',
+      sillage_intimate: 'Intimate Sillage',
+      sillage_intimate_desc: 'Soft and close to the skin, ideal for personal moments',
       analysis_eyebrow: 'Deep Fragrance Analysis',
       analysis_heading: 'Scent DNA <em>& Fragrance Pyramid</em>',
       analysis_subtext: 'Discover the evolution of the fragrance on your skin, key notes, and tested performance.',
@@ -1235,6 +1255,346 @@
 
     // 12. Interactive 3D Bottle Parallax
     initBottleParallax();
+
+    // 13. Interactive Atomizer & Sillage Spray Simulator
+    initAtomizerSimulator();
+  }
+
+  // ── Web Audio Engine for Fragrance Experience ──────────────────
+  class PerfumeAudioEngine {
+    constructor() {
+      this.ctx = null;
+    }
+
+    ensureContext() {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) this.ctx = new AudioCtx();
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+      return this.ctx;
+    }
+
+    playSpraySound(sillageRating = 3) {
+      try {
+        const ctx = this.ensureContext();
+        if (!ctx) return;
+
+        const duration = 0.28 + (Number(sillageRating || 3) * 0.04);
+        const bufferSize = Math.floor(ctx.sampleRate * duration);
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+
+        let b0 = 0, b1 = 0, b2 = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99 * b0 + white * 0.05;
+          b1 = 0.95 * b1 + white * 0.08;
+          b2 = 0.85 * b2 + white * 0.12;
+          data[i] = (b0 + b1 + b2 + white * 0.15) * 0.45;
+        }
+
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(2600, ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + duration);
+        filter.Q.setValueAtTime(2.2, ctx.currentTime);
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.01, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.38, ctx.currentTime + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+
+        noise.start();
+        noise.stop(ctx.currentTime + duration);
+
+        setTimeout(() => {
+          if (!this.ctx) return;
+          const freqs = [1046.5, 1318.5, 1567.98];
+          freqs.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + (idx * 0.05));
+            g.gain.setValueAtTime(0.001, ctx.currentTime + (idx * 0.05));
+            g.gain.linearRampToValueAtTime(0.035, ctx.currentTime + (idx * 0.05) + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (idx * 0.05) + 0.35);
+            osc.connect(g);
+            g.connect(ctx.destination);
+            osc.start(ctx.currentTime + (idx * 0.05));
+            osc.stop(ctx.currentTime + (idx * 0.05) + 0.4);
+          });
+        }, 110);
+      } catch (err) {
+        console.warn('Audio spray failed:', err);
+      }
+    }
+
+    playBubblePop() {
+      try {
+        const ctx = this.ensureContext();
+        if (!ctx) return;
+
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(450, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(950, ctx.currentTime + 0.09);
+
+        gain.gain.setValueAtTime(0.14, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.09);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.09);
+      } catch (_) {}
+    }
+  }
+
+  const pdpAudio = new PerfumeAudioEngine();
+  let activeParticleAnim = null;
+  let hudDismissTimeout = null;
+
+  function initAtomizerSimulator() {
+    const sprayBtn = $('#btnAtomizerSpray');
+    const bottleFrame = $('#prodBottleFrame');
+
+    function handleSpray(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      if (!currentProduct) return;
+      const d = unpackProduct(currentProduct);
+      triggerAtomizerSpray(currentProduct, d);
+    }
+
+    sprayBtn?.addEventListener('click', handleSpray);
+    bottleFrame?.addEventListener('click', handleSpray);
+    bottleFrame?.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        handleSpray(e);
+      }
+    });
+  }
+
+  function triggerAtomizerSpray(p, d) {
+    const t = I18N[currentLang];
+    const sillageLevel = Math.min(5, Math.max(1, parseInt(d.sillage) || 3));
+    const mainAcc = extractAccords(d, p)[0];
+    const accordColor = mainAcc ? mainAcc.color : '#f5a5ad';
+
+    // 1. Audio Effect
+    pdpAudio.playSpraySound(sillageLevel);
+
+    // 2. Bottle Animation
+    const bottleFrame = $('#prodBottleFrame');
+    if (bottleFrame) {
+      bottleFrame.classList.add('spraying');
+      setTimeout(() => bottleFrame.classList.remove('spraying'), 420);
+    }
+
+    // 3. Sillage Shockwave Rings
+    const auraWrap = $('#sillageAuraWaves');
+    if (auraWrap) {
+      auraWrap.innerHTML = `
+        <div class="sillage-ring" style="border-color: ${accordColor}; animation-delay: 0s;"></div>
+        <div class="sillage-ring" style="border-color: ${accordColor}; animation-delay: 0.22s;"></div>
+      `;
+      setTimeout(() => { if (auraWrap) auraWrap.innerHTML = ''; }, 1800);
+    }
+
+    // 4. Canvas Particle Mist Cloud
+    const canvas = $('#atomizerCanvas');
+    if (canvas) {
+      runMistCanvas(canvas, sillageLevel, accordColor);
+    }
+
+    // 5. Floating Aroma Capsules
+    spawnAromaCapsules(d, accordColor);
+
+    // 6. Sillage Readout HUD
+    showSillageHud(sillageLevel, t);
+  }
+
+  function runMistCanvas(canvas, sillageLevel, accordColor) {
+    if (activeParticleAnim) {
+      cancelAnimationFrame(activeParticleAnim);
+      activeParticleAnim = null;
+    }
+
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const originX = rect.width * 0.5;
+    const originY = rect.height * 0.22; // Atomizer nozzle position
+
+    const count = 90 + (sillageLevel * 18);
+    const spread = 0.8 + (sillageLevel * 0.14);
+    const particles = [];
+
+    for (let i = 0; i < count; i++) {
+      const angle = -Math.PI / 2 + (Math.random() - 0.5) * spread;
+      const speed = 2.4 + Math.random() * (4.2 + sillageLevel * 0.85);
+      particles.push({
+        x: originX + (Math.random() - 0.5) * 8,
+        y: originY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 1.4 + Math.random() * 3.6,
+        alpha: 0.85 + Math.random() * 0.15,
+        decay: 0.012 + Math.random() * 0.018,
+        drag: 0.945 + Math.random() * 0.025,
+        gravity: -0.03 + Math.random() * 0.08,
+        color: Math.random() > 0.4 ? accordColor : '#ffffff',
+        sparkle: Math.random() > 0.6
+      });
+    }
+
+    function step() {
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      let alive = false;
+
+      for (let p of particles) {
+        if (p.alpha <= 0.01) continue;
+        alive = true;
+
+        p.vx *= p.drag;
+        p.vy *= p.drag;
+        p.vy += p.gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.color;
+
+        if (p.sparkle) {
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 8;
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (alive) {
+        activeParticleAnim = requestAnimationFrame(step);
+      } else {
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        activeParticleAnim = null;
+      }
+    }
+
+    step();
+  }
+
+  function spawnAromaCapsules(d, accordColor) {
+    const wrap = $('#aromaCapsulesWrap');
+    if (!wrap) return;
+
+    // Collect notes
+    const topNotes = (d.top_notes || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
+    const midNotes = (d.middle_notes || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
+    const baseNotes = (d.base_notes || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
+
+    const candidates = [
+      topNotes[0] ? { note: topNotes[0], type: currentLang === 'ar' ? 'قمة العطر' : 'Top Note', icon: '🍊' } : null,
+      midNotes[0] ? { note: midNotes[0], type: currentLang === 'ar' ? 'قلب العطر' : 'Heart Note', icon: '🌸' } : null,
+      baseNotes[0] ? { note: baseNotes[0], type: currentLang === 'ar' ? 'قاعدة العطر' : 'Base Note', icon: '🪵' } : null
+    ].filter(Boolean);
+
+    if (!candidates.length) return;
+
+    const positions = [
+      { top: '18%', left: '12%' },
+      { top: '34%', right: '10%' },
+      { top: '56%', left: '14%' }
+    ];
+
+    wrap.innerHTML = candidates.map((c, i) => {
+      const pos = positions[i] || { top: `${20 + i * 20}%`, left: '15%' };
+      const posStyle = Object.entries(pos).map(([k, v]) => `${k}:${v}`).join(';');
+      return `
+        <div class="aroma-capsule" style="${posStyle}; animation-delay: ${(i * 0.4).toFixed(1)}s;" data-note-idx="${i}" title="${escapeHtml(c.type)}: ${escapeHtml(c.note)}">
+          <span class="capsule-icon">${c.icon}</span>
+          <span class="capsule-name">${escapeHtml(c.note)}</span>
+          <span class="capsule-dot" style="background:${accordColor};"></span>
+        </div>
+      `;
+    }).join('');
+
+    wrap.querySelectorAll('.aroma-capsule').forEach(cap => {
+      cap.addEventListener('click', e => {
+        e.stopPropagation();
+        pdpAudio.playBubblePop();
+        cap.classList.add('popped');
+        setTimeout(() => cap.remove(), 320);
+      });
+    });
+
+    // Auto fade after 8 seconds
+    setTimeout(() => {
+      if (wrap) wrap.innerHTML = '';
+    }, 8000);
+  }
+
+  function showSillageHud(level, t) {
+    const hud = $('#sillageHud');
+    const meter = $('#shMeter');
+    const levelEl = $('#shLevel');
+    const rangeEl = $('#shRange');
+    if (!hud) return;
+
+    if (hudDismissTimeout) {
+      clearTimeout(hudDismissTimeout);
+      hudDismissTimeout = null;
+    }
+
+    const dots = meter?.querySelectorAll('.sh-dot') || [];
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle('filled', idx < level);
+    });
+
+    let lvlTitle = t.sillage_moderate;
+    let lvlDesc = t.sillage_moderate_desc;
+    if (level >= 5) {
+      lvlTitle = t.sillage_beast;
+      lvlDesc = t.sillage_beast_desc;
+    } else if (level === 4) {
+      lvlTitle = t.sillage_strong;
+      lvlDesc = t.sillage_strong_desc;
+    } else if (level <= 2) {
+      lvlTitle = t.sillage_intimate;
+      lvlDesc = t.sillage_intimate_desc;
+    }
+
+    if (levelEl) levelEl.textContent = lvlTitle;
+    if (rangeEl) rangeEl.textContent = lvlDesc;
+
+    hud.hidden = false;
+
+    hudDismissTimeout = setTimeout(() => {
+      hud.hidden = true;
+    }, 4500);
   }
 
   function initStickyMobileBar() {

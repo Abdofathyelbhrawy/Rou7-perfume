@@ -2678,3 +2678,492 @@ body.light .product-price-val.price-sale {
   border-radius: 4px;
   font-weight: 700;
 }
+
+/* ==========================================================
+   SCENT MOOD & MEMORY PORTAL (Idea 3: بوابة اللحظات والمشاعر)
+   ========================================================== */
+.mood-portal-section {
+  position: relative;
+  background: linear-gradient(145deg, rgba(25, 41, 64, 0.55), rgba(17, 29, 46, 0.75));
+  border: 1px solid rgba(245, 165, 173, 0.15);
+  border-radius: 20px;
+  padding: 24px 28px;
+  margin: 0 0 32px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+body.light .mood-portal-section {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(245, 240, 235, 0.85));
+  border-color: rgba(129, 45, 53, 0.12);
+  box-shadow: 0 12px 32px rgba(129, 45, 53, 0.06);
+}
+
+.mood-portal-section::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  inset-inline-end: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(245, 165, 173, 0.12), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(30px);
+}
+
+.mood-portal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.mood-header-titles {
+  max-width: 650px;
+}
+
+.mood-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  letter-spacing: 0.8px;
+  color: var(--pink);
+  font-weight: 700;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+body.light .mood-eyebrow {
+  color: var(--burgundy);
+}
+
+.mood-sparkle {
+  animation: sparkleRotate 3s infinite linear;
+  display: inline-block;
+}
+
+@keyframes sparkleRotate {
+  0% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+  50% { transform: scale(1.25) rotate(180deg); opacity: 1; filter: drop-shadow(0 0 6px var(--pink)); }
+  100% { transform: scale(1) rotate(360deg); opacity: 0.8; }
+}
+
+.mood-main-title {
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+  line-height: 1.35;
+  color: #ffffff;
+}
+
+body.light .mood-main-title {
+  color: var(--navy);
+}
+
+.mood-main-title em {
+  font-style: normal;
+  color: var(--pink);
+  font-family: inherit;
+  font-weight: 800;
+}
+
+body.light .mood-main-title em {
+  color: var(--burgundy);
+}
+
+.mood-subtitle {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.mood-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.mood-sound-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--cream);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+body.light .mood-sound-btn {
+  background: rgba(129, 45, 53, 0.05);
+  border-color: rgba(129, 45, 53, 0.15);
+  color: var(--navy);
+}
+
+.mood-sound-btn:hover {
+  background: rgba(245, 165, 173, 0.15);
+  border-color: var(--pink);
+}
+
+.mood-sound-btn.playing {
+  background: rgba(245, 165, 173, 0.2);
+  border-color: var(--pink);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(245, 165, 173, 0.35);
+}
+
+.sound-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: all 0.3s ease;
+}
+
+.mood-sound-btn.playing .sound-status-dot {
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+  animation: pulseDot 1.4s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.mood-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: rgba(233, 30, 99, 0.12);
+  border: 1px solid rgba(233, 30, 99, 0.3);
+  color: #ff80ab;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.mood-reset-btn:hover {
+  background: rgba(233, 30, 99, 0.22);
+}
+
+/* ── Mood Cards Track ─────────────────────────────────────── */
+.mood-cards-track {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 1024px) {
+  .mood-cards-track {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .mood-cards-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+.mood-card {
+  position: relative;
+  background: rgba(17, 29, 46, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+  user-select: none;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 680px) {
+  .mood-card {
+    min-width: 200px;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+}
+
+body.light .mood-card {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.mood-card-aura {
+  position: absolute;
+  top: -30px;
+  inset-inline-end: -30px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--aura-color, #e07a5f) 0%, transparent 70%);
+  opacity: 0.15;
+  filter: blur(12px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.mood-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(245, 165, 173, 0.3);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+
+body.light .mood-card:hover {
+  box-shadow: 0 10px 24px rgba(129, 45, 53, 0.1);
+}
+
+.mood-card:hover .mood-card-aura {
+  opacity: 0.4;
+  transform: scale(1.2);
+}
+
+.mood-card.active {
+  border-color: var(--pink);
+  background: rgba(245, 165, 173, 0.08);
+  box-shadow: 0 0 20px rgba(245, 165, 173, 0.25), inset 0 0 16px rgba(245, 165, 173, 0.05);
+  transform: translateY(-2px);
+}
+
+body.light .mood-card.active {
+  border-color: var(--burgundy);
+  background: rgba(129, 45, 53, 0.06);
+  box-shadow: 0 4px 16px rgba(129, 45, 53, 0.15);
+}
+
+.mood-card.active .mood-card-aura {
+  opacity: 0.6;
+}
+
+.mood-card-icon {
+  font-size: 26px;
+  margin-bottom: 10px;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.mood-card:hover .mood-card-icon {
+  transform: scale(1.15) rotate(4deg);
+}
+
+.mood-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mood-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--pink);
+  letter-spacing: 0.4px;
+}
+
+body.light .mood-tag {
+  color: var(--burgundy);
+}
+
+.mood-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+body.light .mood-title {
+  color: var(--navy);
+}
+
+.mood-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 2px 0 0;
+}
+
+.mood-select-indicator {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--pink);
+  color: #111d2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+body.light .mood-select-indicator {
+  background: var(--burgundy);
+  color: #ffffff;
+}
+
+.mood-card.active .mood-select-indicator {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Active Mood Banner */
+.mood-active-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(245, 165, 173, 0.12);
+  border: 1px solid rgba(245, 165, 173, 0.25);
+  margin-top: 10px;
+  animation: fadeInBanner 0.35s ease;
+}
+
+@keyframes fadeInBanner {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mab-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mab-icon {
+  font-size: 18px;
+}
+
+.mab-text strong {
+  display: block;
+  font-size: 12.5px;
+  color: #ffffff;
+}
+
+body.light .mab-text strong {
+  color: var(--navy);
+}
+
+.mab-text span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.mab-close {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--cream);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mab-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Mood Match Pill on Product Cards */
+.card-mood-match-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(245, 165, 173, 0.14);
+  color: var(--pink);
+  border: 1px solid rgba(245, 165, 173, 0.25);
+  margin-top: 6px;
+}
+
+body.light .card-mood-match-pill {
+  background: rgba(129, 45, 53, 0.08);
+  color: var(--burgundy);
+  border-color: rgba(129, 45, 53, 0.2);
+}
+
+/* ── Story Section Mini-Spray (Atomizer on Homepage) ─────── */
+.btn-story-spray {
+  position: absolute;
+  bottom: 30px;
+  inset-inline-start: 50%;
+  transform: translateX(50%);
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(245, 165, 173, 0.25), rgba(129, 45, 53, 0.45));
+  border: 1px solid rgba(245, 165, 173, 0.4);
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 14px rgba(245, 165, 173, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.25s ease;
+}
+
+[dir="ltr"] .btn-story-spray {
+  transform: translateX(-50%);
+}
+
+.btn-story-spray:hover {
+  transform: translateX(50%) scale(1.06);
+  border-color: var(--pink);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 165, 173, 0.4);
+}
+
+[dir="ltr"] .btn-story-spray:hover {
+  transform: translateX(-50%) scale(1.06);
+}
+
+.story-atomizer-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}

@@ -70,9 +70,37 @@
           <div class="prod-floating-notes" id="prodFloatingNotes">
             <!-- Dynamically populated floating notes -->
           </div>
-          <div class="prod-bottle-frame" id="prodBottleFrame">
+          <div class="prod-bottle-frame" id="prodBottleFrame" title="انقر على الزجاجة لبخّ الرذاذ واختبار الفوحان 💨" tabindex="0" role="button" aria-label="بخّ رذاذ العطر">
             <span class="prod-badge-tag" id="prodBadgeTag" hidden></span>
             <img class="prod-hero-image" id="prodHeroImage" src="" alt="" fetchpriority="high">
+            <div class="sillage-aura-waves" id="sillageAuraWaves"></div>
+            <canvas class="atomizer-canvas" id="atomizerCanvas"></canvas>
+            <div class="aroma-capsules-wrap" id="aromaCapsulesWrap"></div>
+          </div>
+
+          <!-- Atomizer Controls & Sillage Trigger -->
+          <div class="atomizer-controls-row">
+            <button type="button" class="btn-atomizer-spray" id="btnAtomizerSpray" aria-label="جرّب بخّة الرذاذ واختبر الفوحان">
+              <span class="spray-btn-icon">💨</span>
+              <span class="spray-btn-text" data-i18n="spray_btn_text">بخّة الرذاذ واختبار الفوحان</span>
+              <span class="spray-btn-sparkle">✨</span>
+            </button>
+            <span class="spray-hint-text" data-i18n="spray_hint">انقر على الزجاجة أو الزر لبخّ العطر واستكشاف النوتات</span>
+          </div>
+
+          <!-- Sillage Readout HUD -->
+          <div class="sillage-hud" id="sillageHud" hidden>
+            <div class="sh-meter" id="shMeter">
+              <span class="sh-dot"></span>
+              <span class="sh-dot"></span>
+              <span class="sh-dot"></span>
+              <span class="sh-dot"></span>
+              <span class="sh-dot"></span>
+            </div>
+            <div class="sh-info">
+              <strong class="sh-level" id="shLevel">فوحان قوي جداً</strong>
+              <span class="sh-range" id="shRange">انتشار محيطي حتى ٣ أمتار · يترك أثراً جذاباً</span>
+            </div>
           </div>
         </div>
 

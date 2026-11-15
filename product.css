@@ -1225,3 +1225,295 @@ body.light .sticky-mobile-buy-bar {
     display: flex;
   }
 }
+
+/* ==========================================================
+   INTERACTIVE ATOMIZER & SILLAGE CLOUD (Idea 1: محاكي الرذاذ)
+   ========================================================== */
+.prod-bottle-frame {
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.prod-bottle-frame:hover {
+  transform: translateY(-4px) scale(1.015);
+}
+
+.prod-bottle-frame.spraying {
+  animation: bottleSpraying 0.4s ease;
+}
+
+@keyframes bottleSpraying {
+  0% { transform: scale(1); }
+  25% { transform: scale(0.97) translateY(4px); }
+  60% { transform: scale(1.02) translateY(-2px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+/* Atomizer Mist Canvas */
+.atomizer-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Sillage Expanding Shockwaves */
+.sillage-aura-waves {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.sillage-ring {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.2);
+  border-radius: 50%;
+  border: 2px solid rgba(245, 165, 173, 0.6);
+  box-shadow: 0 0 30px rgba(245, 165, 173, 0.4), inset 0 0 20px rgba(245, 165, 173, 0.2);
+  opacity: 0.9;
+  animation: ringExpand 1.6s cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes ringExpand {
+  0% {
+    width: 60px;
+    height: 60px;
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  100% {
+    width: 480px;
+    height: 480px;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.4);
+  }
+}
+
+/* Floating Aroma Capsules */
+.aroma-capsules-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 14;
+}
+
+.aroma-capsule {
+  position: absolute;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(17, 29, 46, 0.75);
+  border: 1px solid rgba(245, 165, 173, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 12px rgba(245, 165, 173, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  animation: floatCapsule 3.5s infinite ease-in-out alternate;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.light .aroma-capsule {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--navy);
+  border-color: rgba(129, 45, 53, 0.25);
+  box-shadow: 0 8px 20px rgba(129, 45, 53, 0.12);
+}
+
+.aroma-capsule:hover {
+  transform: scale(1.12);
+  border-color: var(--pink);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), 0 0 18px rgba(245, 165, 173, 0.4);
+}
+
+.aroma-capsule.popped {
+  animation: capsulePop 0.35s ease forwards;
+}
+
+@keyframes capsulePop {
+  0% { transform: scale(1.1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; filter: brightness(2); }
+  100% { transform: scale(0.1); opacity: 0; }
+}
+
+@keyframes floatCapsule {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+  100% { transform: translateY(-4px) rotate(-1deg); }
+}
+
+.capsule-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pink);
+  box-shadow: 0 0 6px var(--pink);
+}
+
+/* Atomizer Controls Row */
+.atomizer-controls-row {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.btn-atomizer-spray {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(245, 165, 173, 0.2), rgba(129, 45, 53, 0.45));
+  border: 1px solid rgba(245, 165, 173, 0.4);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35), 0 0 16px rgba(245, 165, 173, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+body.light .btn-atomizer-spray {
+  background: linear-gradient(135deg, rgba(129, 45, 53, 0.12), rgba(245, 165, 173, 0.25));
+  color: var(--burgundy);
+  border-color: rgba(129, 45, 53, 0.3);
+  box-shadow: 0 6px 20px rgba(129, 45, 53, 0.12);
+}
+
+.btn-atomizer-spray:hover {
+  transform: translateY(-3px) scale(1.03);
+  border-color: var(--pink);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45), 0 0 24px rgba(245, 165, 173, 0.35);
+}
+
+.btn-atomizer-spray:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.spray-btn-icon {
+  font-size: 17px;
+  animation: sprayIconFloat 2s infinite ease-in-out;
+}
+
+@keyframes sprayIconFloat {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+
+.spray-btn-sparkle {
+  font-size: 13px;
+  color: var(--pink);
+}
+
+.spray-hint-text {
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: center;
+  opacity: 0.85;
+}
+
+/* Sillage Readout HUD */
+.sillage-hud {
+  margin-top: 12px;
+  width: 100%;
+  max-width: 380px;
+  background: rgba(17, 29, 46, 0.88);
+  border: 1px solid rgba(245, 165, 173, 0.25);
+  border-radius: 14px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: sillageHudIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+body.light .sillage-hud {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(129, 45, 53, 0.2);
+  box-shadow: 0 8px 24px rgba(129, 45, 53, 0.1);
+}
+
+@keyframes sillageHudIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sh-meter {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.sh-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+body.light .sh-dot {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.sh-dot.filled {
+  background: var(--pink);
+  box-shadow: 0 0 8px var(--pink);
+}
+
+body.light .sh-dot.filled {
+  background: var(--burgundy);
+  box-shadow: 0 0 6px var(--burgundy);
+}
+
+.sh-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sh-level {
+  font-size: 12.5px;
+  color: #ffffff;
+}
+
+body.light .sh-level {
+  color: var(--navy);
+}
+
+.sh-range {
+  font-size: 11px;
+  color: var(--muted);
+}

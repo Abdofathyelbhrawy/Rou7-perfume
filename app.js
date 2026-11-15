@@ -143,6 +143,11 @@
       sort_name: 'الاسم أبجدياً',
       added_to_cart: '✓ تمت الإضافة',
       quick_view: 'نظرة سريعة 👁️',
+      mood_eyebrow: 'بوابة اللحظات والمشاعر العطرية',
+      mood_main_title: 'اختَر <em>شعورك أو لحظتك</em>… وسندلّك على عطرك',
+      mood_subtitle: 'العطر ليس مجرد نفحات، بل شعور يتجسد وذكرى تدوم. انقر على أي لحظة لترى العطور التي تليق بها وتعيش أجواءها:',
+      mood_sound_text: 'همس الأجواء',
+      mood_reset: 'عرض الكل',
     },
     en: {
       site_title: 'Rou7 Perfume — A Scent Touching Your Depths',
@@ -245,6 +250,11 @@
       sort_name: 'Name Alphabetical',
       added_to_cart: '✓ Added',
       quick_view: 'Quick View 👁️',
+      mood_eyebrow: 'Scent Mood & Atmosphere Portal',
+      mood_main_title: 'Choose <em>Your Mood or Moment</em>… Discover Your Scent',
+      mood_subtitle: 'A fragrance is more than notes—it is an embodied memory. Pick any atmosphere to reveal matching scents:',
+      mood_sound_text: 'Atmosphere Audio',
+      mood_reset: 'Show All',
     }
   };
 
@@ -506,6 +516,240 @@
     window.location.href = `product.html?id=${encodeURIComponent(id)}`;
   }
 
+  // ── Web Audio Engine for Homepage & Mood Portal ──────────────────
+  class PerfumeAudioEngine {
+    constructor() {
+      this.ctx = null;
+      this.ambientNodes = [];
+      this.activeMood = null;
+    }
+
+    ensureContext() {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) this.ctx = new AudioCtx();
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+      return this.ctx;
+    }
+
+    playSpraySound(sillageRating = 3) {
+      try {
+        const ctx = this.ensureContext();
+        if (!ctx) return;
+
+        const duration = 0.28 + (Number(sillageRating || 3) * 0.04);
+        const bufferSize = Math.floor(ctx.sampleRate * duration);
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+
+        let b0 = 0, b1 = 0, b2 = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99 * b0 + white * 0.05;
+          b1 = 0.95 * b1 + white * 0.08;
+          b2 = 0.85 * b2 + white * 0.12;
+          data[i] = (b0 + b1 + b2 + white * 0.15) * 0.45;
+        }
+
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(2600, ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + duration);
+        filter.Q.setValueAtTime(2.2, ctx.currentTime);
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.01, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.38, ctx.currentTime + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+
+        noise.start();
+        noise.stop(ctx.currentTime + duration);
+      } catch (err) {
+        console.warn('Audio spray failed:', err);
+      }
+    }
+
+    stopAmbient() {
+      this.ambientNodes.forEach(n => {
+        try {
+          if (n.stop) n.stop();
+          if (n.disconnect) n.disconnect();
+        } catch (_) {}
+      });
+      this.ambientNodes = [];
+      this.activeMood = null;
+    }
+
+    playMoodAmbient(moodKey) {
+      this.stopAmbient();
+      if (!moodKey) return;
+
+      try {
+        const ctx = this.ensureContext();
+        if (!ctx) return;
+        this.activeMood = moodKey;
+
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(0.001, ctx.currentTime);
+        masterGain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.8);
+        masterGain.connect(ctx.destination);
+        this.ambientNodes.push(masterGain);
+
+        if (moodKey === 'winter_cozy') {
+          [130.81, 196.00, 261.63].forEach(freq => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            g.gain.value = 0.25;
+            osc.connect(g);
+            g.connect(masterGain);
+            osc.start();
+            this.ambientNodes.push(osc);
+          });
+        } else if (moodKey === 'majestic_power') {
+          [98.0, 146.8, 220.0].forEach(freq => {
+            const osc = ctx.createOscillator();
+            osc.type = 'sawtooth';
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 380;
+            const g = ctx.createGain();
+            g.gain.value = 0.18;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            osc.connect(filter);
+            filter.connect(g);
+            g.connect(masterGain);
+            osc.start();
+            this.ambientNodes.push(osc);
+          });
+        } else if (moodKey === 'morning_radiance') {
+          [528, 792, 1056].forEach(freq => {
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            const g = ctx.createGain();
+            g.gain.value = 0.16;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            osc.connect(g);
+            g.connect(masterGain);
+            osc.start();
+            this.ambientNodes.push(osc);
+          });
+        } else if (moodKey === 'romantic_twilight') {
+          [220, 277.18, 329.63].forEach(freq => {
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            const g = ctx.createGain();
+            g.gain.value = 0.2;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            osc.connect(g);
+            g.connect(masterGain);
+            osc.start();
+            this.ambientNodes.push(osc);
+          });
+        } else if (moodKey === 'aquatic_freedom') {
+          const bufferSize = ctx.sampleRate * 2;
+          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          let lastOut = 0.0;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            data[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = data[i];
+            data[i] *= 1.4;
+          }
+          const noise = ctx.createBufferSource();
+          noise.buffer = buffer;
+          noise.loop = true;
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(350, ctx.currentTime);
+          filter.Q.value = 1.2;
+          noise.connect(filter);
+          filter.connect(masterGain);
+          noise.start();
+          this.ambientNodes.push(noise);
+        }
+      } catch (err) {
+        console.warn('Mood audio failed:', err);
+      }
+    }
+  }
+
+  const homeAudio = new PerfumeAudioEngine();
+  let activeMood = null;
+  let isMoodAudioPlaying = false;
+
+  const MOOD_PROFILES = {
+    winter_cozy: {
+      ar: 'سهرة شتوية دافئة',
+      en: 'Cozy Winter Evening',
+      icon: '☕',
+      badgeAr: '✨ خيارك المثالي لسهرة الشتاء',
+      badgeEn: '✨ Perfect for a cozy winter evening',
+      auraColor: '#e07a5f',
+      keywords: ['vanilla', 'sweet', 'amber', 'woody', 'tonka', 'warm', 'عنبر', 'فانيليا', 'خشب', 'تونكا', 'دافئ', 'شتاء', 'خريف', 'winter', 'fall']
+    },
+    majestic_power: {
+      ar: 'حضور رسمي استثنائي',
+      en: 'Majestic Official Presence',
+      icon: '👑',
+      badgeAr: '👑 هيبة وفخامة لا تُنسى',
+      badgeEn: '👑 Unforgettable Majestic Presence',
+      auraColor: '#d4af37',
+      keywords: ['oriental', 'leather', 'smoky', 'spicy', 'woody', 'oud', 'patchouli', 'عود', 'جلود', 'بخور', 'توابل', 'شرقي', 'باتشولي', 'صندل']
+    },
+    morning_radiance: {
+      ar: 'صباح مشرق وثقة متجددة',
+      en: 'Radiant Morning & Fresh Energy',
+      icon: '🌅',
+      badgeAr: '☀️ إشراقة صباحية مفعمة بالطاقة',
+      badgeEn: '☀️ Radiant Morning Freshness',
+      auraColor: '#f6bd60',
+      keywords: ['citrus', 'floral', 'fresh', 'bergamot', 'orange blossom', 'neroli', 'حمضيات', 'منعش', 'برغموت', 'زهور', 'نقاء', 'spring', 'summer', 'ربيع', 'صيف', 'نهاري']
+    },
+    romantic_twilight: {
+      ar: 'غموض رومانسي ساحر',
+      en: 'Romantic Twilight & Sensual Night',
+      icon: '🌙',
+      badgeAr: '🌙 جاذبية رومانسية مخملية',
+      badgeEn: '🌙 Velvet Romantic Allure',
+      auraColor: '#f5a5ad',
+      keywords: ['rose', 'powdery', 'musk', 'musky', 'berry', 'sweet', 'floral', 'ورد', 'بودري', 'مسك', 'رومانسي', 'توت', 'ناعم', 'سهرة', 'night']
+    },
+    aquatic_freedom: {
+      ar: 'نسيم البحر وحرية الصيف',
+      en: 'Aquatic Breeze & Summer Freedom',
+      icon: '🌊',
+      badgeAr: '🌊 نسيم منعش يمنحك شعور الحرية',
+      badgeEn: '🌊 Refreshing Aquatic Breeze',
+      auraColor: '#48cae4',
+      keywords: ['aquatic', 'marine', 'fresh', 'sea', 'citrus', 'mint', 'aromatic', 'مائي', 'بحر', 'منعش', 'صيفي', 'نعناع', 'أروماتك']
+    }
+  };
+
+  function getProductMoodScore(product, moodKey) {
+    if (!moodKey || !MOOD_PROFILES[moodKey]) return 0;
+    const profile = MOOD_PROFILES[moodKey];
+    const d = unpackProduct(product);
+    const text = `${product.name} ${product.latin || ''} ${product.notes || ''} ${d.accords || ''} ${d.seasons || ''} ${d.main_accord || ''} ${d.top_notes || ''} ${d.middle_notes || ''} ${d.base_notes || ''} ${d.inspired_by || ''}`.toLowerCase();
+    let score = 0;
+    for (const kw of profile.keywords) {
+      if (text.includes(kw.toLowerCase())) score += 10;
+    }
+    return score;
+  }
+
   // ── Announcements & Campaign Management ──────────────────────────────
   let promoTimer;
   let currentAnnouncements = null;
@@ -660,11 +904,89 @@
     });
 
     storyArt.addEventListener('click', e => {
-      if (e.target.closest('#storyQuickAddBtn') || e.target.closest('#storyDetailsBtn')) return;
+      if (e.target.closest('#storyQuickAddBtn') || e.target.closest('#storyDetailsBtn') || e.target.closest('#btnStorySpray')) return;
       if (currentSpotlightPerfume) {
         openProductDetails(currentSpotlightPerfume.id);
       }
     });
+  }
+
+  function initStorySpray() {
+    const sprayBtn = $('#btnStorySpray');
+    const canvas = $('#storyAtomizerCanvas');
+    const bottleWrap = $('#storyBottleWrapper');
+    if (!sprayBtn || !canvas) return;
+
+    sprayBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      homeAudio.playSpraySound(4);
+      runStoryMist(canvas);
+      if (bottleWrap) {
+        bottleWrap.classList.add('spraying');
+        setTimeout(() => bottleWrap.classList.remove('spraying'), 420);
+      }
+      const prevHtml = sprayBtn.innerHTML;
+      sprayBtn.innerHTML = `<span>✨</span> <span>${currentLang === 'ar' ? 'فوحان رائع!' : 'Magnificent!'}</span>`;
+      setTimeout(() => {
+        sprayBtn.innerHTML = prevHtml;
+      }, 1600);
+    });
+  }
+
+  function runStoryMist(canvas) {
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const originX = rect.width * 0.5;
+    const originY = rect.height * 0.28;
+
+    const particles = [];
+    const count = 75;
+    for (let i = 0; i < count; i++) {
+      const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.1;
+      const speed = 2.0 + Math.random() * 4.5;
+      particles.push({
+        x: originX,
+        y: originY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 1.5 + Math.random() * 3.5,
+        alpha: 0.85,
+        decay: 0.015 + Math.random() * 0.02,
+        drag: 0.95,
+        color: Math.random() > 0.4 ? '#f5a5ad' : '#ffffff'
+      });
+    }
+
+    function step() {
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      let alive = false;
+      for (let p of particles) {
+        if (p.alpha <= 0.01) continue;
+        alive = true;
+        p.vx *= p.drag;
+        p.vy *= p.drag;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      if (alive) requestAnimationFrame(step);
+      else ctx.clearRect(0, 0, rect.width, rect.height);
+    }
+    step();
   }
 
   function applyAnnouncements(data) {
@@ -757,6 +1079,8 @@
 
   loadAnnouncements();
   initStoryParallax();
+  initStorySpray();
+  initMoodPortal();
   window.addEventListener('storage', event => {
     if (event.key && (event.key.includes('promo') || event.key.includes('announcement') || event.key.includes('campaign'))) {
       loadAnnouncements();
@@ -1472,6 +1796,96 @@
     }
   }
 
+  function initMoodPortal() {
+    const track = $('#moodCardsTrack');
+    const soundToggle = $('#moodSoundToggle');
+    const soundText = $('#moodSoundText');
+    const resetBtn = $('#moodResetBtn');
+    const activeBanner = $('#moodActiveBanner');
+    const mabTitle = $('#mabTitle');
+    const mabDesc = $('#mabDesc');
+    const mabIcon = $('#mabIcon');
+    const mabClose = $('#mabCloseBtn');
+    const portalSection = $('#moodPortalSection');
+
+    if (!track) return;
+
+    function applyMood(moodKey) {
+      activeMood = moodKey;
+      const isAr = currentLang === 'ar';
+
+      track.querySelectorAll('.mood-card').forEach(card => {
+        const isMatch = card.dataset.mood === moodKey;
+        card.classList.toggle('active', isMatch);
+        card.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+      });
+
+      if (moodKey && MOOD_PROFILES[moodKey]) {
+        const prof = MOOD_PROFILES[moodKey];
+        if (activeBanner) activeBanner.style.display = 'flex';
+        if (resetBtn) resetBtn.style.display = 'inline-flex';
+        if (mabIcon) mabIcon.textContent = prof.icon;
+        if (mabTitle) mabTitle.textContent = isAr ? `أجواء اللحظة: ${prof.ar}` : `Atmosphere: ${prof.en}`;
+        if (mabDesc) mabDesc.textContent = isAr ? `نعرض لك العطور المختارة بعناية لترافق ${prof.ar}` : `Showcasing fragrances harmonized with ${prof.en}`;
+        if (portalSection) portalSection.style.borderColor = prof.auraColor;
+
+        if (isMoodAudioPlaying) {
+          homeAudio.playMoodAmbient(moodKey);
+        }
+      } else {
+        if (activeBanner) activeBanner.style.display = 'none';
+        if (resetBtn) resetBtn.style.display = 'none';
+        if (portalSection) portalSection.style.borderColor = '';
+        if (isMoodAudioPlaying) {
+          homeAudio.stopAmbient();
+          isMoodAudioPlaying = false;
+          if (soundToggle) soundToggle.classList.remove('playing');
+        }
+      }
+
+      renderProducts();
+    }
+
+    track.addEventListener('click', e => {
+      const card = e.target.closest('.mood-card');
+      if (!card) return;
+      const targetMood = card.dataset.mood;
+      if (activeMood === targetMood) {
+        applyMood(null);
+      } else {
+        applyMood(targetMood);
+      }
+    });
+
+    track.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const card = e.target.closest('.mood-card');
+        if (card) {
+          e.preventDefault();
+          const targetMood = card.dataset.mood;
+          applyMood(activeMood === targetMood ? null : targetMood);
+        }
+      }
+    });
+
+    resetBtn?.addEventListener('click', () => applyMood(null));
+    mabClose?.addEventListener('click', () => applyMood(null));
+
+    soundToggle?.addEventListener('click', () => {
+      isMoodAudioPlaying = !isMoodAudioPlaying;
+      const isAr = currentLang === 'ar';
+      if (isMoodAudioPlaying) {
+        soundToggle.classList.add('playing');
+        homeAudio.playMoodAmbient(activeMood || 'winter_cozy');
+        if (soundText) soundText.textContent = isAr ? 'همس الأجواء: شغال' : 'Audio: Playing';
+      } else {
+        soundToggle.classList.remove('playing');
+        homeAudio.stopAmbient();
+        if (soundText) soundText.textContent = isAr ? 'همس الأجواء' : 'Atmosphere Audio';
+      }
+    });
+  }
+
   function renderProducts() {
     const t = I18N[currentLang];
 
@@ -1526,16 +1940,25 @@
       return true;
     });
 
-    // Sorting
-    const sortMode = $('#collectionSort')?.value || 'featured';
-    if (sortMode === 'price-asc') {
-      visible.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
-    } else if (sortMode === 'price-desc') {
-      visible.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
-    } else if (sortMode === 'name') {
-      visible.sort((a, b) => (a.name || '').localeCompare(b.name || '', currentLang === 'ar' ? 'ar' : 'en'));
+    // Sorting & Mood Matching
+    if (activeMood) {
+      visible.sort((a, b) => {
+        const scoreB = getProductMoodScore(b, activeMood);
+        const scoreA = getProductMoodScore(a, activeMood);
+        if (scoreB !== scoreA) return scoreB - scoreA;
+        return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
+      });
     } else {
-      visible.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
+      const sortMode = $('#collectionSort')?.value || 'featured';
+      if (sortMode === 'price-asc') {
+        visible.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+      } else if (sortMode === 'price-desc') {
+        visible.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+      } else if (sortMode === 'name') {
+        visible.sort((a, b) => (a.name || '').localeCompare(b.name || '', currentLang === 'ar' ? 'ar' : 'en'));
+      } else {
+        visible.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
+      }
     }
 
     $('#productGrid').innerHTML = products.length
@@ -1566,6 +1989,13 @@
             }
           }
 
+          // Mood match indicator
+          const moodScore = activeMood ? getProductMoodScore(product, activeMood) : 0;
+          const moodProfile = activeMood ? MOOD_PROFILES[activeMood] : null;
+          const moodMatchPillHtml = (moodProfile && moodScore > 0)
+            ? `<div class="card-mood-match-pill"><span class="cmm-icon">${moodProfile.icon}</span> ${currentLang === 'ar' ? moodProfile.badgeAr : moodProfile.badgeEn}</div>`
+            : '';
+
           return `<article class="product-card" data-product-id="${product.id}">
             <div class="product-image">
               <a href="product.html?id=${product.id}" class="product-thumb-link" aria-label="${escapeHtml(prodName)}">
@@ -1582,6 +2012,7 @@
               </div>
               ${d.inspired_by ? `<div class="card-inspired-tag"><span class="ci-label">${currentLang === 'ar' ? 'مستوحى من' : 'Inspired by'}</span> <strong>${escapeHtml(d.inspired_by)}</strong></div>` : ''}
               ${notesPreview}
+              ${moodMatchPillHtml}
               <p class="product-desc">${escapeHtml(d.notes || '')}</p>
               ${d.accords ? `<div class="card-accords-row">${renderAccordPills(d.accords)}</div>` : ''}
               <div class="card-action-links">
