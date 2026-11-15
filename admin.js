@@ -937,22 +937,30 @@
   }
 
   const ADMIN_ACCORD_COLORS = {
-    sweet:    { color: '#EC407A', en: 'Sweet', ar: 'حلو وسكري' },
-    woody:    { color: '#8B5A2B', en: 'Woody', ar: 'خشبي دافئ' },
-    vanilla:  { color: '#D4A373', en: 'Vanilla', ar: 'فانيليا ناعمة' },
-    oriental: { color: '#8E24AA', en: 'Oriental', ar: 'شرقي فاخر' },
-    amber:    { color: '#C58F28', en: 'Amber', ar: 'عنبري دافئ' },
-    spicy:    { color: '#E65100', en: 'Spicy', ar: 'توابل دافئة' },
-    fresh:    { color: '#00ACC1', en: 'Fresh', ar: 'منعش ونقي' },
-    floral:   { color: '#E91E63', en: 'Floral', ar: 'زهري راقي' },
-    powdery:  { color: '#78909C', en: 'Powdery', ar: 'بودري مخملي' },
-    aromatic: { color: '#43A047', en: 'Aromatic', ar: 'أروماتك' },
-    citrus:   { color: '#FBC02D', en: 'Citrus', ar: 'حمضيات منعشة' },
-    leather:  { color: '#5D4037', en: 'Leather', ar: 'جلود فاخرة' },
-    musky:    { color: '#90A4AE', en: 'Musky', ar: 'مسكي ناعم' },
-    fruity:   { color: '#FB8C00', en: 'Fruity', ar: 'فاكهي جذاب' },
-    smoky:    { color: '#546E7A', en: 'Smoky', ar: 'دخاني وبخور' },
-    aquatic:  { color: '#0288D1', en: 'Aquatic', ar: 'مائي صيفي' },
+    sweet:        { color: '#EC407A', en: 'Sweet', ar: 'حلو وسكري' },
+    woody:        { color: '#8B5A2B', en: 'Woody', ar: 'خشبي دافئ' },
+    vanilla:      { color: '#D4A373', en: 'Vanilla', ar: 'فانيليا ناعمة' },
+    oriental:     { color: '#8E24AA', en: 'Oriental', ar: 'شرقي فاخر' },
+    amber:        { color: '#C58F28', en: 'Amber', ar: 'عنبري دافئ' },
+    spicy:        { color: '#E65100', en: 'Spicy', ar: 'توابل دافئة' },
+    'warm spicy': { color: '#E65100', en: 'Warm Spicy', ar: 'توابل دافئة' },
+    'fresh spicy':{ color: '#FF7043', en: 'Fresh Spicy', ar: 'توابل منعشة' },
+    fresh:        { color: '#00ACC1', en: 'Fresh', ar: 'منعش ونقي' },
+    floral:       { color: '#E91E63', en: 'Floral', ar: 'زهري راقي' },
+    'white floral':{ color: '#F06292', en: 'White Floral', ar: 'زهور بيضاء' },
+    powdery:      { color: '#78909C', en: 'Powdery', ar: 'بودري مخملي' },
+    aromatic:     { color: '#43A047', en: 'Aromatic', ar: 'أروماتك' },
+    citrus:       { color: '#FBC02D', en: 'Citrus', ar: 'حمضيات منعشة' },
+    leather:      { color: '#5D4037', en: 'Leather', ar: 'جلود فاخرة' },
+    musky:        { color: '#90A4AE', en: 'Musky', ar: 'مسكي ناعم' },
+    fruity:       { color: '#FB8C00', en: 'Fruity', ar: 'فاكهي جذاب' },
+    smoky:        { color: '#546E7A', en: 'Smoky', ar: 'دخاني وبخور' },
+    aquatic:      { color: '#0288D1', en: 'Aquatic', ar: 'مائي صيفي' },
+    oud:          { color: '#4A2C11', en: 'Oud', ar: 'عودي فاخر' },
+    tobacco:      { color: '#795548', en: 'Tobacco', ar: 'تبغ دافئ' },
+    earthy:       { color: '#6D4C41', en: 'Earthy', ar: 'ترابي وباتشولي' },
+    balsamic:     { color: '#8D6E63', en: 'Balsamic', ar: 'بلسمي وراتنج' },
+    caramel:      { color: '#FFA726', en: 'Caramel', ar: 'كراميل وعسل' },
   };
 
   function getAccordMeta(nameOrKey) {
@@ -974,18 +982,22 @@
     if (!container) return;
 
     if (!selectedAccords.length) {
-      container.innerHTML = '<small style="color:var(--muted); font-size:12px;">لم يتم اختيار نغمات عطرية بعد. اختر من القائمة أعلاه لإضافتها للبصمة العطرية.</small>';
+      container.innerHTML = '<small style="color:var(--muted); font-size:12px;">لم يتم تحديد نغمات عطرية بعد. اختر من القائمة أعلاه لإضافتها للبصمة العطرية.</small>';
       if (hidden) hidden.value = '';
       return;
     }
 
+    const currentMain = ($('#prodMainAccord')?.value || selectedAccords[0] || '').toLowerCase();
+
     container.innerHTML = selectedAccords.map((acc, idx) => {
       const meta = getAccordMeta(acc);
       const label = adminLang === 'ar' ? (meta.ar || acc) : (meta.en || acc);
+      const isMain = acc.toLowerCase() === currentMain;
       return `
-        <span class="admin-accord-chip">
+        <span class="admin-accord-chip ${isMain ? 'is-main' : ''}" style="${isMain ? 'border-color:var(--pink); background:rgba(245,165,173,0.22);' : ''}">
           <span class="accord-color-dot" style="background:${meta.color}"></span>
           <span>${escapeHtml(label)}</span>
+          ${isMain ? '<small style="font-size:10px; opacity:0.85; margin:0 3px; color:var(--pink);">★ رئيسية</small>' : ''}
           <button type="button" class="chip-remove-btn" data-remove-accord="${idx}" title="حذف النغمة">×</button>
         </span>
       `;
@@ -1101,15 +1113,12 @@
 
       // Scent DNA Accords & Main Accord
       let currentAccordsList = (details.accords || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
-      const chosenMain = details.main_accord || currentAccordsList[0] || 'Sweet';
+      const chosenMain = details.main_accord || currentAccordsList[0] || '';
       if ($('#prodMainAccord')) $('#prodMainAccord').value = chosenMain;
-      if (!currentAccordsList.length) {
-        currentAccordsList = [chosenMain];
-      }
       renderAdminAccordsChips(currentAccordsList);
 
       // Seasons & Occasions
-      const currentSeasons = (details.seasons || 'winter,fall').toLowerCase();
+      const currentSeasons = (details.seasons || '').toLowerCase();
       renderAdminSeasonsChips(currentSeasons);
 
       $('#saveProdBtn').innerHTML = 'حفظ التعديلات <span>←</span>';
@@ -1127,9 +1136,9 @@
       if (badgeInp) badgeInp.value = '';
       if (feedback) feedback.style.display = 'none';
 
-      if ($('#prodMainAccord')) $('#prodMainAccord').value = 'Sweet';
-      renderAdminAccordsChips(['Sweet', 'Vanilla', 'Floral']);
-      renderAdminSeasonsChips('winter,fall');
+      if ($('#prodMainAccord')) $('#prodMainAccord').value = '';
+      renderAdminAccordsChips([]);
+      renderAdminSeasonsChips('');
 
       $('#saveProdBtn').innerHTML = 'إضافة العطر <span>←</span>';
     }
@@ -1145,7 +1154,10 @@
   // Scent DNA & Seasons Interactive Pickers in Admin Modal
   $('#prodMainAccord')?.addEventListener('change', e => {
     const mainVal = e.target.value;
-    if (!mainVal) return;
+    if (!mainVal) {
+      renderAdminAccordsChips(selectedAccords);
+      return;
+    }
     const exists = selectedAccords.some(a => a.toLowerCase() === mainVal.toLowerCase());
     if (!exists) {
       selectedAccords.unshift(mainVal);
@@ -1161,6 +1173,9 @@
     const exists = selectedAccords.some(a => a.toLowerCase() === val.toLowerCase());
     if (!exists) {
       selectedAccords.push(val);
+      if (!selectedAccords.length || !$('#prodMainAccord')?.value) {
+        if ($('#prodMainAccord')) $('#prodMainAccord').value = val;
+      }
       renderAdminAccordsChips(selectedAccords);
     }
     e.target.value = '';
@@ -1171,7 +1186,11 @@
     if (removeBtn) {
       const idx = parseInt(removeBtn.dataset.removeAccord);
       if (!isNaN(idx)) {
+        const removed = selectedAccords[idx];
         selectedAccords.splice(idx, 1);
+        if ($('#prodMainAccord')?.value && $('#prodMainAccord').value.toLowerCase() === removed.toLowerCase()) {
+          if ($('#prodMainAccord')) $('#prodMainAccord').value = selectedAccords[0] || '';
+        }
         renderAdminAccordsChips(selectedAccords);
       }
     }

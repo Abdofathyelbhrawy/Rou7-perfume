@@ -337,22 +337,30 @@
 
   // ── Master Accords & Seasons Catalog ────────────────────────
   const MASTER_ACCORDS = [
-    { key: 'sweet',    nameEn: 'Sweet',    nameAr: 'حلو وسكري',     color: '#EC407A', keywords: ['sweet', 'حلو', 'سكر', 'كراميل', 'caramel', 'tonka', 'honey', 'عسل'], baseWeight: 90 },
-    { key: 'woody',    nameEn: 'Woody',    nameAr: 'خشبي دافئ',     color: '#8B5A2B', keywords: ['wood', 'خشب', 'صندل', 'أرز', 'عود', 'cedar', 'sandalwood', 'guaiac', 'oud'], baseWeight: 84 },
-    { key: 'vanilla',  nameEn: 'Vanilla',  nameAr: 'فانيليا ناعمة', color: '#D4A373', keywords: ['vanilla', 'فانيليا', 'بوربون'], baseWeight: 86 },
-    { key: 'oriental', nameEn: 'Oriental', nameAr: 'شرقي فاخر',     color: '#8E24AA', keywords: ['oriental', 'شرق', 'بخور', 'incense'], baseWeight: 82 },
-    { key: 'amber',    nameEn: 'Amber',    nameAr: 'عنبري دافئ',    color: '#C58F28', keywords: ['amber', 'عنبر'], baseWeight: 80 },
-    { key: 'spicy',    nameEn: 'Spicy',    nameAr: 'توابل دافئة',   color: '#E65100', keywords: ['spic', 'توابل', 'حار', 'زعفران', 'فلفل', 'هيل', 'saffron', 'pepper', 'cardamom', 'cinnamon'], baseWeight: 78 },
-    { key: 'fresh',    nameEn: 'Fresh',    nameAr: 'منعش ونقي',     color: '#00ACC1', keywords: ['fresh', 'منعش', 'نقي', 'انتعاش'], baseWeight: 75 },
-    { key: 'floral',   nameEn: 'Floral',   nameAr: 'زهري راقي',     color: '#E91E63', keywords: ['floral', 'زهر', 'ورد', 'ياسمين', 'rose', 'jasmine', 'blossom', 'neroli'], baseWeight: 76 },
-    { key: 'powdery',  nameEn: 'Powdery',  nameAr: 'بودري مخملي',   color: '#78909C', keywords: ['powder', 'بودر', 'كشميران', 'cashmeran', 'مسك', 'musk', 'iris'], baseWeight: 70 },
-    { key: 'aromatic', nameEn: 'Aromatic', nameAr: 'أروماتك',       color: '#43A047', keywords: ['aromatic', 'أروماتك', 'خزامى', 'لافندر', 'lavender', 'cypress'], baseWeight: 68 },
-    { key: 'citrus',   nameEn: 'Citrus',   nameAr: 'حمضيات منعشة', color: '#FBC02D', keywords: ['citrus', 'حمض', 'برغموت', 'ليمون', 'bergamot', 'grapefruit'], baseWeight: 72 },
-    { key: 'leather',  nameEn: 'Leather',  nameAr: 'جلود فاخرة',   color: '#5D4037', keywords: ['leather', 'جلود', 'جلد'], baseWeight: 66 },
-    { key: 'musky',    nameEn: 'Musky',    nameAr: 'مسكي ناعم',     color: '#90A4AE', keywords: ['musk', 'مسك', 'مسكي'], baseWeight: 65 },
-    { key: 'fruity',   nameEn: 'Fruity',   nameAr: 'فاكهي جذاب',    color: '#FB8C00', keywords: ['fruit', 'فاكه', 'توت', 'تفاح', 'apple', 'peach', 'berry'], baseWeight: 64 },
-    { key: 'smoky',    nameEn: 'Smoky',    nameAr: 'دخاني وبخور',   color: '#546E7A', keywords: ['smok', 'دخان', 'بخور', 'قطران', 'tobacco', 'تبغ'], baseWeight: 62 },
-    { key: 'aquatic',  nameEn: 'Aquatic',  nameAr: 'مائي صيفي',     color: '#0288D1', keywords: ['aquat', 'مائي', 'بحر', 'ocean', 'marine'], baseWeight: 60 }
+    { key: 'sweet',        nameEn: 'Sweet',        nameAr: 'حلو وسكري',     color: '#EC407A', keywords: ['sweet', 'حلو', 'سكر', 'كراميل', 'caramel', 'tonka', 'honey', 'عسل'], baseWeight: 90 },
+    { key: 'woody',        nameEn: 'Woody',        nameAr: 'خشبي دافئ',     color: '#8B5A2B', keywords: ['wood', 'خشب', 'صندل', 'أرز', 'عود', 'cedar', 'sandalwood', 'guaiac', 'oud'], baseWeight: 84 },
+    { key: 'vanilla',      nameEn: 'Vanilla',      nameAr: 'فانيليا ناعمة', color: '#D4A373', keywords: ['vanilla', 'فانيليا', 'بوربون'], baseWeight: 86 },
+    { key: 'oriental',     nameEn: 'Oriental',     nameAr: 'شرقي فاخر',     color: '#8E24AA', keywords: ['oriental', 'شرق', 'بخور', 'incense'], baseWeight: 82 },
+    { key: 'amber',        nameEn: 'Amber',        nameAr: 'عنبري دافئ',    color: '#C58F28', keywords: ['amber', 'عنبر'], baseWeight: 80 },
+    { key: 'spicy',        nameEn: 'Spicy',        nameAr: 'توابل دافئة',   color: '#E65100', keywords: ['spic', 'توابل', 'حار', 'زعفران', 'فلفل', 'هيل', 'saffron', 'pepper', 'cardamom', 'cinnamon'], baseWeight: 78 },
+    { key: 'warm-spicy',   nameEn: 'Warm Spicy',   nameAr: 'توابل دافئة',   color: '#E65100', keywords: ['warm spicy', 'قرفة', 'cinnamon', 'nutmeg', 'جوزة الطيب'], baseWeight: 80 },
+    { key: 'fresh-spicy',  nameEn: 'Fresh Spicy',  nameAr: 'توابل منعشة',   color: '#FF7043', keywords: ['fresh spicy', 'زنجبيل', 'ginger', 'pink pepper'], baseWeight: 74 },
+    { key: 'fresh',        nameEn: 'Fresh',        nameAr: 'منعش ونقي',     color: '#00ACC1', keywords: ['fresh', 'منعش', 'نقي', 'انتعاش'], baseWeight: 75 },
+    { key: 'floral',       nameEn: 'Floral',       nameAr: 'زهري راقي',     color: '#E91E63', keywords: ['floral', 'زهر', 'ورد', 'ياسمين', 'rose', 'jasmine', 'blossom', 'neroli'], baseWeight: 76 },
+    { key: 'white-floral', nameEn: 'White Floral', nameAr: 'زهور بيضاء',   color: '#F06292', keywords: ['white floral', 'فل', 'tuberose', 'gardenia', 'تيوب روز'], baseWeight: 77 },
+    { key: 'powdery',      nameEn: 'Powdery',      nameAr: 'بودري مخملي',   color: '#78909C', keywords: ['powder', 'بودر', 'كشميران', 'cashmeran', 'مسك', 'musk', 'iris'], baseWeight: 70 },
+    { key: 'aromatic',     nameEn: 'Aromatic',     nameAr: 'أروماتك',       color: '#43A047', keywords: ['aromatic', 'أروماتك', 'خزامى', 'لافندر', 'lavender', 'cypress'], baseWeight: 68 },
+    { key: 'citrus',       nameEn: 'Citrus',       nameAr: 'حمضيات منعشة', color: '#FBC02D', keywords: ['citrus', 'حمض', 'برغموت', 'ليمون', 'bergamot', 'grapefruit'], baseWeight: 72 },
+    { key: 'leather',      nameEn: 'Leather',      nameAr: 'جلود فاخرة',   color: '#5D4037', keywords: ['leather', 'جلود', 'جلد'], baseWeight: 66 },
+    { key: 'musky',        nameEn: 'Musky',        nameAr: 'مسكي ناعم',     color: '#90A4AE', keywords: ['musk', 'مسك', 'مسكي'], baseWeight: 65 },
+    { key: 'fruity',       nameEn: 'Fruity',       nameAr: 'فاكهي جذاب',    color: '#FB8C00', keywords: ['fruit', 'فاكه', 'توت', 'تفاح', 'apple', 'peach', 'berry'], baseWeight: 64 },
+    { key: 'smoky',        nameEn: 'Smoky',        nameAr: 'دخاني وبخور',   color: '#546E7A', keywords: ['smok', 'دخان', 'بخور', 'قطران'], baseWeight: 62 },
+    { key: 'aquatic',      nameEn: 'Aquatic',      nameAr: 'مائي صيفي',     color: '#0288D1', keywords: ['aquat', 'مائي', 'بحر', 'ocean', 'marine'], baseWeight: 60 },
+    { key: 'oud',          nameEn: 'Oud',          nameAr: 'عودي فاخر',     color: '#4A2C11', keywords: ['oud', 'عود', 'أغار'], baseWeight: 85 },
+    { key: 'tobacco',      nameEn: 'Tobacco',      nameAr: 'تبغ دافئ',     color: '#795548', keywords: ['tobacco', 'تبغ'], baseWeight: 78 },
+    { key: 'earthy',       nameEn: 'Earthy',       nameAr: 'ترابي وباتشولي',color: '#6D4C41', keywords: ['earthy', 'تراب', 'باتشولي', 'patchouli'], baseWeight: 70 },
+    { key: 'balsamic',     nameEn: 'Balsamic',     nameAr: 'بلسمي وراتنج',  color: '#8D6E63', keywords: ['balsamic', 'بلسم', 'راتنج', 'مر', 'benzoin'], baseWeight: 72 },
+    { key: 'caramel',      nameEn: 'Caramel',      nameAr: 'كراميل وعسل',   color: '#FFA726', keywords: ['caramel', 'كراميل', 'عسل', 'honey', 'gourmand'], baseWeight: 80 }
   ];
 
   const MASTER_SEASONS = [
@@ -383,28 +391,32 @@
     if (raw) {
       for (const s of MASTER_SEASONS) {
         if (raw.includes(s.key) || raw.includes(s.ar) || raw.includes(s.en.toLowerCase())) {
-          found.push(s);
+          if (!found.some(item => item.key === s.key)) {
+            found.push(s);
+          }
         }
       }
     }
 
     if (found.length) return found;
 
-    // Intelligent fallback based on accords if admin didn't specify seasons
+    // Intelligent fallback only if accords explicitly hint at seasons
     const accLow = String(accordsStr || '').toLowerCase();
     if (accLow.includes('fresh') || accLow.includes('citrus') || accLow.includes('aquatic') || accLow.includes('منعش') || accLow.includes('صيفي')) {
       return [
-        MASTER_SEASONS.find(s => s.key === 'spring'),
         MASTER_SEASONS.find(s => s.key === 'summer'),
-        MASTER_SEASONS.find(s => s.key === 'day')
+        MASTER_SEASONS.find(s => s.key === 'spring')
       ].filter(Boolean);
     }
 
-    return [
-      MASTER_SEASONS.find(s => s.key === 'winter'),
-      MASTER_SEASONS.find(s => s.key === 'fall'),
-      MASTER_SEASONS.find(s => s.key === 'night')
-    ].filter(Boolean);
+    if (accLow.includes('oud') || accLow.includes('leather') || accLow.includes('tobacco') || accLow.includes('spicy') || accLow.includes('دافئ')) {
+      return [
+        MASTER_SEASONS.find(s => s.key === 'winter'),
+        MASTER_SEASONS.find(s => s.key === 'night')
+      ].filter(Boolean);
+    }
+
+    return [];
   }
 
   // ── Intelligent Fragrance Accords Extractor ──────────────────
@@ -434,8 +446,8 @@
     // 2. If admin selected accords, append them in order
     if (d.accords) {
       const parts = String(d.accords).split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
-      const scores = [84, 72, 58, 44, 32];
-      let scoreIdx = 0;
+      const scores = [86, 74, 60, 46, 34, 25];
+      let scoreIdx = list.length;
       for (const part of parts) {
         const found = findMasterAccord(part);
         if (found) {
@@ -459,44 +471,41 @@
             scoreIdx++;
           }
         }
-        if (list.length >= 5) break;
       }
     }
 
-    // 3. If we still have fewer than 5 accords, scan descriptions and notes
-    if (list.length < 5) {
-      const textToScan = `${d.desc || ''} ${d.top_notes || ''} ${d.middle_notes || ''} ${d.base_notes || ''} ${d.inspired_by || ''}`.toLowerCase();
-      const matched = [];
-      for (const acc of MASTER_ACCORDS) {
-        if (usedKeys.has(acc.key)) continue;
-        let score = 0;
-        for (const kw of acc.keywords) {
-          if (textToScan.includes(kw)) score += 20;
-        }
-        if (score > 0) {
-          matched.push({ ...acc, score: Math.min(85, acc.baseWeight + score) });
-        }
-      }
-      matched.sort((a, b) => b.score - a.score);
-      for (const m of matched) {
-        list.push(m);
-        usedKeys.add(m.key);
-        if (list.length >= 5) break;
-      }
+    // CRITICAL: If the admin specified accords or main_accord, return ONLY what the admin specified!
+    if (list.length > 0) {
+      return list;
     }
 
-    // 4. Fallback if still fewer than 5 accords
-    if (list.length < 5) {
-      for (const acc of MASTER_ACCORDS) {
-        if (!usedKeys.has(acc.key)) {
-          list.push({ ...acc, score: acc.baseWeight });
-          usedKeys.add(acc.key);
-        }
-        if (list.length >= 5) break;
+    // 3. Fallback ONLY if the perfume has NO accords and NO main_accord at all:
+    const textToScan = `${d.desc || ''} ${d.top_notes || ''} ${d.middle_notes || ''} ${d.base_notes || ''} ${d.inspired_by || ''}`.toLowerCase();
+    const matched = [];
+    for (const acc of MASTER_ACCORDS) {
+      if (usedKeys.has(acc.key)) continue;
+      let score = 0;
+      for (const kw of acc.keywords) {
+        if (textToScan.includes(kw)) score += 20;
+      }
+      if (score > 0) {
+        matched.push({ ...acc, score: Math.min(85, acc.baseWeight + score) });
       }
     }
+    matched.sort((a, b) => b.score - a.score);
+    for (const m of matched) {
+      list.push(m);
+      usedKeys.add(m.key);
+      if (list.length >= 4) break;
+    }
 
-    return list.slice(0, 5);
+    if (list.length > 0) return list;
+
+    // Minimal fallback
+    return [
+      MASTER_ACCORDS.find(a => a.key === 'woody') || MASTER_ACCORDS[0],
+      MASTER_ACCORDS.find(a => a.key === 'amber') || MASTER_ACCORDS[1]
+    ];
   }
 
   // ── Render Product Page ──────────────────────────────────────
@@ -790,12 +799,12 @@
       donutSvg.innerHTML = circles;
     }
 
-    // Accords Progress Bars Render (Clean luxury descending bars without raw percentage numbers)
+    // Accords Progress Bars Render (Clean luxury descending bars based on admin selected accords)
     if (barsContainer) {
-      const barWidths = [88, 72, 56, 42, 28];
+      const count = accords.length;
       barsContainer.innerHTML = accords.map((acc, i) => {
         const label = currentLang === 'ar' ? acc.nameAr : acc.nameEn;
-        const width = barWidths[i] || 25;
+        const width = count <= 1 ? 92 : Math.round(92 - (i / Math.max(1, count - 1)) * 52);
         return `
           <div class="dna-bar-row">
             <span class="dna-bar-name" title="${escapeHtml(label)}">${escapeHtml(label)}</span>
@@ -850,10 +859,10 @@
 
     // Footer Chips: Accords + Seasons
     if (footerAccords) {
-      const rich = extractAccords(d, p).slice(0, 3);
+      const rich = extractAccords(d, p);
       const seasons = parseSeasons(d.seasons, d.accords);
 
-      const accordChips = rich.map(a => {
+      const accordChips = rich.slice(0, 4).map(a => {
         const label = currentLang === 'ar' ? a.nameAr : a.nameEn;
         return `
           <span class="accord-pill">

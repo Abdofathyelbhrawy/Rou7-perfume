@@ -778,7 +778,7 @@
       storyBottleWrap.href = `product.html?id=${encodeURIComponent(target.id)}`;
       storyBottleWrap.setAttribute('title', currentLang === 'ar' ? `عرض تفاصيل وتحليل عطر ${target.name}` : `View fragrance profile for ${target.latin || target.name}`);
       storyBottleWrap.onclick = (e) => {
-        if (!e.ctrlKey && !e.metaKey && e.button === 0) {
+        if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
           e.preventDefault();
           openProductDetails(target.id);
         }
@@ -887,26 +887,30 @@
 
     if (!storyArt || !storyBottleWrap) return;
 
-    storyArt.addEventListener('mousemove', e => {
-      const rect = storyArt.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) - 0.5;
-      const y = ((e.clientY - rect.top) / rect.height) - 0.5;
+    // Only run hover parallax on fine pointers (desktop mouse) to prevent canceling mobile touch taps
+    if (window.matchMedia && window.matchMedia('(pointer: fine)').matches) {
+      storyArt.addEventListener('mousemove', e => {
+        const rect = storyArt.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) - 0.5;
+        const y = ((e.clientY - rect.top) / rect.height) - 0.5;
 
-      storyBottleWrap.style.transform = `perspective(700px) rotateY(${x * 24}deg) rotateX(${-y * 24}deg) translateY(-8px) scale(1.05)`;
-      if (ring1) ring1.style.transform = `translate(${x * -20}px, ${y * -20}px)`;
-      if (ring2) ring2.style.transform = `translate(${x * 15}px, ${y * 15}px)`;
-    });
+        storyBottleWrap.style.transform = `perspective(700px) rotateY(${x * 24}deg) rotateX(${-y * 24}deg) translateY(-8px) scale(1.05)`;
+        if (ring1) ring1.style.transform = `translate(${x * -20}px, ${y * -20}px)`;
+        if (ring2) ring2.style.transform = `translate(${x * 15}px, ${y * 15}px)`;
+      });
 
-    storyArt.addEventListener('mouseleave', () => {
-      storyBottleWrap.style.transform = '';
-      if (ring1) ring1.style.transform = '';
-      if (ring2) ring2.style.transform = '';
-    });
+      storyArt.addEventListener('mouseleave', () => {
+        storyBottleWrap.style.transform = '';
+        if (ring1) ring1.style.transform = '';
+        if (ring2) ring2.style.transform = '';
+      });
+    }
 
     storyArt.addEventListener('click', e => {
       if (e.target.closest('#storyQuickAddBtn') || e.target.closest('#storyDetailsBtn') || e.target.closest('#btnStorySpray')) return;
-      if (currentSpotlightPerfume) {
-        openProductDetails(currentSpotlightPerfume.id);
+      const targetId = (currentSpotlightPerfume && currentSpotlightPerfume.id) || (products && products[0] && products[0].id);
+      if (targetId) {
+        openProductDetails(targetId);
       }
     });
   }
