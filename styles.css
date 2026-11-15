@@ -1838,3 +1838,238 @@ body.light .btn-card-quickview {
   color: var(--navy);
   transform: scale(1.1);
 }
+
+/* ==========================================================
+   DYNAMIC SPOTLIGHT / STORY SECTION ("عطر اليوم والعرض المميز")
+   ========================================================== */
+.story-art {
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.story-ring.ring-1 {
+  width: 280px;
+  height: 280px;
+  border: 1px dashed rgba(245, 165, 173, 0.35);
+  border-radius: 50%;
+  position: absolute;
+  pointer-events: none;
+  animation: spinRing 50s linear infinite;
+}
+
+.story-ring.ring-2 {
+  width: 400px;
+  height: 400px;
+  border: 1px solid rgba(245, 165, 173, 0.2);
+  border-radius: 50%;
+  position: absolute;
+  pointer-events: none;
+  box-shadow: 0 0 35px rgba(245, 165, 173, 0.08);
+}
+
+.story-ring.ring-3 {
+  width: 520px;
+  height: 520px;
+  border: 1px solid rgba(245, 165, 173, 0.1);
+  border-radius: 50%;
+  position: absolute;
+  pointer-events: none;
+}
+
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes badgeFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.story-bottle-wrapper {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.story-offer-badge {
+  position: absolute;
+  top: -16px;
+  background: linear-gradient(135deg, var(--pink), #e88d97);
+  color: var(--navy);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 18px rgba(245, 165, 173, 0.45);
+  white-space: nowrap;
+  z-index: 10;
+  animation: badgeFloat 3s ease-in-out infinite;
+}
+
+.story-real-bottle {
+  max-height: 290px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 35px rgba(0,0,0,0.45));
+  transition: transform 0.3s ease, filter 0.3s ease;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.story-art:hover .story-real-bottle {
+  transform: scale(1.05) translateY(-6px);
+  filter: drop-shadow(0 26px 48px rgba(245, 165, 173, 0.38));
+}
+
+.story-bottle-glow {
+  position: absolute;
+  bottom: -10px;
+  width: 140px;
+  height: 25px;
+  background: radial-gradient(ellipse at center, rgba(245, 165, 173, 0.45) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.story-spotlight-box {
+  margin: 22px 0 16px;
+  padding: 18px 22px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color .2s;
+}
+
+body.light .story-spotlight-box {
+  background: #ffffff;
+  border-color: rgba(25, 41, 64, 0.12);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+}
+
+.story-pricing-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.story-price-group {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.story-price-label {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.story-current-price {
+  font-size: 22px;
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', sans-serif;
+  font-weight: 700;
+  color: var(--pink);
+}
+
+body.light .story-current-price {
+  color: var(--burgundy);
+}
+
+.story-old-price {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.story-discount-tag {
+  background: rgba(129, 45, 53, 0.25);
+  color: var(--pink);
+  border: 1px solid rgba(245, 165, 173, 0.4);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+body.light .story-discount-tag {
+  background: #fbf2ec;
+  color: #92582b;
+  border-color: #ebd3c2;
+}
+
+.story-actions-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.story-quick-buy {
+  flex: 1;
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.story-details-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all .2s;
+}
+
+body.light .story-details-btn {
+  background: #f5f0eb;
+  border-color: rgba(25, 41, 64, 0.15);
+  color: var(--navy);
+}
+
+.story-details-btn:hover {
+  background: var(--pink);
+  color: var(--navy);
+  border-color: var(--pink);
+}
+
+@media (max-width: 600px) {
+  .story-real-bottle {
+    max-height: 220px;
+  }
+  .story-ring.ring-1 {
+    width: 220px;
+    height: 220px;
+  }
+  .story-ring.ring-2 {
+    width: 300px;
+    height: 300px;
+  }
+  .story-ring.ring-3 {
+    display: none;
+  }
+  .story-actions-row {
+    flex-direction: column;
+  }
+  .story-quick-buy,
+  .story-details-btn {
+    width: 100%;
+  }
+}

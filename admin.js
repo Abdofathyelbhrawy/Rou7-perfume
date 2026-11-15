@@ -120,7 +120,13 @@
     promo_details: '',
     promo_starts_at: '',
     promo_ends_at: '',
-    promo_active: true
+    promo_active: true,
+    spotlight_perfume_id: '',
+    spotlight_badge: '✨ عطر اليوم المميز',
+    spotlight_price: '',
+    spotlight_title: '',
+    spotlight_desc: '',
+    spotlight_active: true
   };
   const campaignForm = $('#campaignForm');
 
@@ -137,7 +143,13 @@
           promo_details: parsed.promo_details !== undefined ? parsed.promo_details : (parsed.details || ''),
           promo_starts_at: parsed.promo_starts_at || parsed.startsAt || '',
           promo_ends_at: parsed.promo_ends_at || parsed.endsAt || '',
-          promo_active: parsed.promo_active !== undefined ? parsed.promo_active : (parsed.active !== false)
+          promo_active: parsed.promo_active !== undefined ? parsed.promo_active : (parsed.active !== false),
+          spotlight_perfume_id: parsed.spotlight_perfume_id || '',
+          spotlight_badge: parsed.spotlight_badge !== undefined ? parsed.spotlight_badge : defaultCampaign.spotlight_badge,
+          spotlight_price: parsed.spotlight_price !== undefined ? parsed.spotlight_price : '',
+          spotlight_title: parsed.spotlight_title || '',
+          spotlight_desc: parsed.spotlight_desc || '',
+          spotlight_active: parsed.spotlight_active !== undefined ? parsed.spotlight_active : true
         };
       }
     } catch (_) {}
@@ -171,6 +183,54 @@
     if (previewCard && promoActiveInput) {
       previewCard.style.opacity = promoActiveInput.checked ? '1' : '0.4';
     }
+
+    // Spotlight Preview
+    const spotlightSel = $('#spotlightPerfumeSelect');
+    const spotlightBadgeInput = $('#spotlightBadgeInput');
+    const spotlightPriceInput = $('#spotlightPriceInput');
+    const spotlightActiveInput = $('#spotlightActiveInput');
+    const spotlightCard = $('#spotlightPreviewCard');
+    const spotlightNameEl = $('#spotlightPreviewName');
+    const spotlightBadgeEl = $('#spotlightPreviewBadge');
+    const spotlightPriceEl = $('#spotlightPreviewPrice');
+    const spotlightImgEl = $('#spotlightPreviewImg');
+
+    if (spotlightCard && typeof currentProducts !== 'undefined' && currentProducts && currentProducts.length) {
+      const chosenId = spotlightSel?.value;
+      const targetProd = (chosenId ? currentProducts.find(p => String(p.id) === String(chosenId)) : null) || currentProducts[0];
+      if (targetProd) {
+        if (spotlightNameEl) spotlightNameEl.textContent = targetProd.name;
+        if (spotlightBadgeEl) spotlightBadgeEl.textContent = spotlightBadgeInput?.value.trim() || '✨ عطر اليوم';
+        if (spotlightImgEl && targetProd.image_url) spotlightImgEl.src = targetProd.image_url;
+        if (spotlightPriceEl) {
+          const offerPrice = Number(spotlightPriceInput?.value);
+          if (offerPrice && offerPrice < targetProd.price) {
+            spotlightPriceEl.innerHTML = `<span style="color:var(--admin-accent); font-size:13px; font-weight:700;">${arabicNum(offerPrice)} ج.م</span> <del style="opacity:0.6; font-size:10px; margin-inline-start:4px;">${arabicNum(targetProd.price)} ج.م</del> (وفر ${arabicNum(targetProd.price - offerPrice)} ج.م)`;
+          } else {
+            spotlightPriceEl.textContent = `${arabicNum(targetProd.price)} ج.م`;
+          }
+        }
+      }
+      if (spotlightActiveInput) {
+        spotlightCard.style.opacity = spotlightActiveInput.checked ? '1' : '0.4';
+      }
+    }
+  }
+
+  function populateSpotlightSelect(prods) {
+    const select = $('#spotlightPerfumeSelect');
+    if (!select) return;
+    const currentVal = select.value;
+    const storedVal = readCampaignLocal().spotlight_perfume_id;
+    const selectedId = currentVal || storedVal || '';
+
+    const opts = ['<option value="">-- تلقائي (أول عطر متاح بالمتجر) --</option>'];
+    (prods || []).forEach(p => {
+      const isSel = String(p.id) === String(selectedId) ? 'selected' : '';
+      opts.push(`<option value="${p.id}" ${isSel}>${escapeHtml(p.name)} (${p.price} ج.م)</option>`);
+    });
+    select.innerHTML = opts.join('');
+    showCampaignPreview();
   }
 
   function populateCampaignInputs(data) {
@@ -181,6 +241,12 @@
     if ($('#promoStartInput')) $('#promoStartInput').value = data.promo_starts_at || '';
     if ($('#promoEndInput')) $('#promoEndInput').value = data.promo_ends_at || '';
     if ($('#promoActiveInput')) $('#promoActiveInput').checked = data.promo_active !== false;
+    if ($('#spotlightPerfumeSelect') && data.spotlight_perfume_id) $('#spotlightPerfumeSelect').value = data.spotlight_perfume_id;
+    if ($('#spotlightBadgeInput')) $('#spotlightBadgeInput').value = data.spotlight_badge || '';
+    if ($('#spotlightPriceInput')) $('#spotlightPriceInput').value = data.spotlight_price !== undefined ? data.spotlight_price : '';
+    if ($('#spotlightTitleInput')) $('#spotlightTitleInput').value = data.spotlight_title || '';
+    if ($('#spotlightDescInput')) $('#spotlightDescInput').value = data.spotlight_desc || '';
+    if ($('#spotlightActiveInput')) $('#spotlightActiveInput').checked = data.spotlight_active !== false;
     showCampaignPreview();
   }
 
@@ -213,6 +279,7 @@
 
   if (campaignForm) {
     campaignForm.addEventListener('input', showCampaignPreview);
+    campaignForm.addEventListener('change', showCampaignPreview);
     campaignForm.addEventListener('submit', async event => {
       event.preventDefault();
       const startsAt = $('#promoStartInput')?.value || '';
@@ -237,7 +304,13 @@
         promo_details: $('#promoDetailsInput')?.value.trim() || '',
         promo_starts_at: startsAt,
         promo_ends_at: endsAt,
-        promo_active: $('#promoActiveInput')?.checked !== false
+        promo_active: $('#promoActiveInput')?.checked !== false,
+        spotlight_perfume_id: $('#spotlightPerfumeSelect')?.value || '',
+        spotlight_badge: $('#spotlightBadgeInput')?.value.trim() || '✨ عطر اليوم المميز',
+        spotlight_price: $('#spotlightPriceInput')?.value ? Number($('#spotlightPriceInput').value) : '',
+        spotlight_title: $('#spotlightTitleInput')?.value.trim() || '',
+        spotlight_desc: $('#spotlightDescInput')?.value.trim() || '',
+        spotlight_active: $('#spotlightActiveInput')?.checked !== false
       };
 
       try {
@@ -263,7 +336,7 @@
         });
         if (status) {
           status.className = 'saved';
-          status.textContent = 'تم حفظ ونشر الإعلانات بنجاح في المتجر! ✓';
+          status.textContent = 'تم حفظ ونشر الإعلانات وعطر اليوم بنجاح في المتجر! ✓';
         }
       } catch (err) {
         console.error('Failed to save to Supabase:', err);
@@ -279,7 +352,7 @@
           });
           if (status) {
             status.className = 'saved';
-            status.textContent = 'تم حفظ ونشر الإعلانات بنجاح في المتجر! ✓';
+            status.textContent = 'تم حفظ ونشر الإعلانات وعطر اليوم بنجاح في المتجر! ✓';
           }
         } catch (e2) {
           if (status) {
@@ -420,6 +493,7 @@
     try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
     $('#statProducts').textContent = arabicNum(currentProducts.length);
     $('#prodBadge').textContent     = arabicNum(currentProducts.length);
+    populateSpotlightSelect(currentProducts);
 
     if (!currentProducts.length) {
       $('#productsTable').innerHTML = `<tr><td colspan="7" class="empty-table">${adminLang === 'ar' ? 'لا توجد عطور حالياً. اضغط "إضافة عطر جديد" لإضافة أول عطر لمجموعتك! ✳' : 'No fragrances yet. Click "Add New Fragrance" to get started! ✳'}</td></tr>`;

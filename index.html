@@ -174,17 +174,44 @@
     </section>
 
     <section class="story" id="story">
-      <div class="story-art">
-        <div class="story-ring"></div>
-        <div class="story-bottle"><i></i><b></b><span>رُوح</span></div>
-        <span class="story-caption">THE ART OF<br>BEING REMEMBERED</span>
+      <div class="story-art" id="storyArt">
+        <div class="story-ring ring-1"></div>
+        <div class="story-ring ring-2"></div>
+        <div class="story-ring ring-3"></div>
+        <div class="story-bottle-wrapper" id="storyBottleWrapper">
+          <span class="story-offer-badge" id="storyOfferBadge">✨ عطر اليوم المميز</span>
+          <img class="story-real-bottle" id="storyProductImage" src="assets/bottles/coral-orange.png" alt="عطر اليوم المميز">
+          <div class="story-bottle-glow"></div>
+        </div>
+        <span class="story-caption" id="storyCaption">THE ART OF<br>BEING REMEMBERED</span>
       </div>
-      <div class="story-copy">
-        <p class="eyebrow"><span></span> <span data-i18n="story_eyebrow">حكايتنا</span></p>
-        <h2 data-i18n-html="story_title">العطر لغةٌ<br>تسبق <em>الكلام</em></h2>
-        <p data-i18n="story_text">بدأت حكايتنا من إيمان بسيط: لكل شخص رائحة تشبه روحه. نمزج نفحات مختارة بعناية لنصنع عطوراً صادقة، قريبة منك، وتترك أثراً جميلاً أينما ذهبت.</p>
-        <p class="story-signature" data-i18n-html="story_signature">مع كل الحب، <span>فريق رُوح</span></p>
-        <a class="text-link" href="#collection"><span data-i18n="story_link">اكتشف فلسفة رُوح</span> <span class="arrow-icon">←</span></a>
+      <div class="story-copy" id="storyCopy">
+        <p class="eyebrow"><span class="eyebrow-line"></span> <span id="storyEyebrow" data-i18n="story_eyebrow">حكايتنا</span></p>
+        <h2 id="storyHeading" data-i18n-html="story_title">العطر لغةٌ<br>تسبق <em>الكلام</em></h2>
+        <p id="storyDescription" data-i18n="story_text">بدأت حكايتنا من إيمان بسيط: لكل شخص رائحة تشبه روحه. نمزج نفحات مختارة بعناية لنصنع عطوراً صادقة، قريبة منك، وتترك أثراً جميلاً أينما ذهبت.</p>
+        
+        <!-- Dynamic Spotlight Offer Card Box -->
+        <div class="story-spotlight-box" id="storySpotlightBox">
+          <div class="story-pricing-strip">
+            <div class="story-price-group">
+              <span class="story-price-label" id="storyPriceLabel" data-i18n="spotlight_price_label">السعر بالعرض:</span>
+              <strong class="story-current-price" id="storyCurrentPrice">١,٦٠٠ ج.م</strong>
+              <del class="story-old-price" id="storyOldPrice" style="display:none;"></del>
+            </div>
+            <span class="story-discount-tag" id="storyDiscountTag" style="display:none;"></span>
+          </div>
+          <div class="story-actions-row">
+            <button class="button button-primary story-quick-buy" id="storyQuickAddBtn" type="button">
+              <span id="storyQuickAddText" data-i18n="spotlight_quick_buy">أضف للسلة بالعرض</span> <span class="arrow-icon">←</span>
+            </button>
+            <button class="button story-details-btn" id="storyDetailsBtn" type="button">
+              <span data-i18n="spotlight_explore_notes">تحليل النوتات</span> <span style="font-size: 13px;">🔍</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="story-signature" id="storySignature" data-i18n-html="story_signature">مع كل الحب، <span>فريق رُوح</span></p>
+        <a class="text-link" id="storyLink" href="#collection"><span data-i18n="story_link">اكتشف فلسفة رُوح</span> <span class="arrow-icon">←</span></a>
       </div>
     </section>
 

@@ -85,6 +85,11 @@
       story_text: 'بدأت حكايتنا من إيمان بسيط: لكل شخص رائحة تشبه روحه. نمزج نفحات مختارة بعناية لنصنع عطوراً صادقة، قريبة منك، وتترك أثراً جميلاً أينما ذهبت.',
       story_signature: 'مع كل الحب، <span>فريق رُوح</span>',
       story_link: 'اكتشف فلسفة رُوح',
+      spotlight_badge_default: '✨ عطر اليوم المميز',
+      spotlight_price_label: 'السعر بالعرض:',
+      spotlight_quick_buy: 'أضف للسلة بالعرض',
+      spotlight_explore_notes: 'تحليل النوتات',
+      spotlight_save_prefix: 'وفر',
       quote_text: '“بعض الحكايات لا تُروى… <em>بل تُشمّ.</em>”',
       quote_caption: 'رُوح · عطر يلامس أعماقك',
       news_eyebrow: 'رسائل من رُوح',
@@ -182,6 +187,11 @@
       story_text: 'Our story began with a simple belief: everyone has a scent that mirrors their soul. We blend carefully chosen notes to craft authentic, intimate perfumes that leave a memorable trace wherever you go.',
       story_signature: 'With all love, <span>Rou7 Team</span>',
       story_link: 'Discover Rou7 Philosophy',
+      spotlight_badge_default: '✨ Scent of the Day',
+      spotlight_price_label: 'Special Deal:',
+      spotlight_quick_buy: 'Add to Bag with Offer',
+      spotlight_explore_notes: 'Scent Analysis',
+      spotlight_save_prefix: 'Save',
       quote_text: '“Some stories aren\'t told… <em>they are smelled.</em>”',
       quote_caption: 'Rou7 · A Scent Touching Your Depths',
       news_eyebrow: 'Letters from Rou7',
@@ -341,6 +351,7 @@
 
     renderProducts();
     renderHeroProduct();
+    renderStorySpotlight();
     updateCart();
   }
 
@@ -350,8 +361,155 @@
 
   // ── Announcements & Campaign Management ──────────────────────────────
   let promoTimer;
+  let currentAnnouncements = null;
+  let currentSpotlightPerfume = null;
+
+  function renderStorySpotlight() {
+    const storySection = $('#story');
+    if (!storySection) return;
+
+    const available = (products || []).filter(p => p.name !== '__system_announcements__' && p.in_stock !== false);
+    if (!available.length) return;
+
+    const data = currentAnnouncements || {};
+    let target = null;
+    if (data.spotlight_perfume_id) {
+      target = available.find(p => String(p.id) === String(data.spotlight_perfume_id));
+    }
+    if (!target) {
+      target = available[0];
+    }
+    currentSpotlightPerfume = target;
+
+    // Bottle Image
+    const bottleImg = $('#storyProductImage');
+    if (bottleImg && target.image_url) {
+      bottleImg.src = target.image_url;
+      bottleImg.alt = target.name;
+    }
+
+    // Badge
+    const badgeEl = $('#storyOfferBadge');
+    if (badgeEl) {
+      const badgeText = data.spotlight_badge || I18N[currentLang].spotlight_badge_default || '✨ عطر اليوم المميز';
+      badgeEl.textContent = badgeText;
+      badgeEl.style.display = data.spotlight_active !== false ? '' : 'none';
+    }
+
+    // Headings / Content
+    const headingEl = $('#storyHeading');
+    const descEl = $('#storyDescription');
+    const d = unpackProduct(target);
+    const prodName = currentLang === 'en' ? (target.latin || target.name) : target.name;
+
+    if (headingEl) {
+      if (data.spotlight_title && data.spotlight_active !== false) {
+        headingEl.innerHTML = escapeHtml(data.spotlight_title);
+      } else {
+        headingEl.innerHTML = currentLang === 'ar'
+          ? `العطر لغةٌ<br>تسبق <em>الكلام</em>`
+          : `Fragrance is a language<br>before <em>words</em>`;
+      }
+    }
+
+    if (descEl) {
+      if (data.spotlight_desc && data.spotlight_active !== false) {
+        descEl.textContent = data.spotlight_desc;
+      } else {
+        descEl.textContent = d.notes || I18N[currentLang].story_text;
+      }
+    }
+
+    // Spotlight Box & Pricing
+    const box = $('#storySpotlightBox');
+    const quickAddBtn = $('#storyQuickAddBtn');
+    const detailsBtn = $('#storyDetailsBtn');
+    const currentPriceEl = $('#storyCurrentPrice');
+    const oldPriceEl = $('#storyOldPrice');
+    const discountTag = $('#storyDiscountTag');
+
+    if (box) {
+      const isActive = data.spotlight_active !== false;
+      box.hidden = !isActive;
+      if (isActive) {
+        const specialPrice = Number(data.spotlight_price);
+        const hasDiscount = Boolean(specialPrice && specialPrice < target.price);
+        const activePrice = hasDiscount ? specialPrice : target.price;
+
+        if (currentPriceEl) currentPriceEl.textContent = money(activePrice);
+
+        if (oldPriceEl) {
+          if (hasDiscount) {
+            oldPriceEl.style.display = '';
+            oldPriceEl.textContent = money(target.price);
+          } else {
+            oldPriceEl.style.display = 'none';
+          }
+        }
+
+        if (discountTag) {
+          if (hasDiscount) {
+            discountTag.style.display = '';
+            const diff = target.price - specialPrice;
+            const prefix = I18N[currentLang].spotlight_save_prefix || 'وفر';
+            discountTag.textContent = `${prefix} ${money(diff)}`;
+          } else {
+            discountTag.style.display = 'none';
+          }
+        }
+
+        // Action Buttons
+        if (quickAddBtn) {
+          quickAddBtn.onclick = (e) => {
+            e.stopPropagation();
+            addToCart(target.id, quickAddBtn, hasDiscount ? specialPrice : null);
+          };
+        }
+        if (detailsBtn) {
+          detailsBtn.onclick = (e) => {
+            e.stopPropagation();
+            openProductDetails(target.id);
+          };
+        }
+      }
+    }
+  }
+
+  function initStoryParallax() {
+    const storyArt = $('#storyArt');
+    const storyBottleWrap = $('#storyBottleWrapper');
+    const ring1 = document.querySelector('.story-ring.ring-1');
+    const ring2 = document.querySelector('.story-ring.ring-2');
+
+    if (!storyArt || !storyBottleWrap) return;
+
+    storyArt.addEventListener('mousemove', e => {
+      const rect = storyArt.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) - 0.5;
+      const y = ((e.clientY - rect.top) / rect.height) - 0.5;
+
+      storyBottleWrap.style.transform = `perspective(700px) rotateY(${x * 24}deg) rotateX(${-y * 24}deg) translateY(-8px) scale(1.05)`;
+      if (ring1) ring1.style.transform = `translate(${x * -20}px, ${y * -20}px)`;
+      if (ring2) ring2.style.transform = `translate(${x * 15}px, ${y * 15}px)`;
+    });
+
+    storyArt.addEventListener('mouseleave', () => {
+      storyBottleWrap.style.transform = '';
+      if (ring1) ring1.style.transform = '';
+      if (ring2) ring2.style.transform = '';
+    });
+
+    storyArt.addEventListener('click', e => {
+      if (e.target.closest('#storyQuickAddBtn') || e.target.closest('#storyDetailsBtn')) return;
+      if (currentSpotlightPerfume) {
+        openProductDetails(currentSpotlightPerfume.id);
+      }
+    });
+  }
+
   function applyAnnouncements(data) {
     if (!data) return;
+    currentAnnouncements = data;
     clearTimeout(promoTimer);
 
     // 1. Top Announcement Bar
@@ -389,6 +547,9 @@
         promoTimer = setTimeout(() => applyAnnouncements(data), Math.min(nextChange - now + 50, 2147483647));
       }
     }
+
+    // 3. Dynamic Story Spotlight Fragrance
+    renderStorySpotlight();
   }
 
   function loadAnnouncements() {
@@ -403,7 +564,13 @@
           promo_details: parsed.promo_details !== undefined ? parsed.promo_details : parsed.details,
           promo_starts_at: parsed.promo_starts_at || parsed.startsAt,
           promo_ends_at: parsed.promo_ends_at || parsed.endsAt,
-          promo_active: parsed.promo_active !== undefined ? parsed.promo_active : (parsed.active !== false)
+          promo_active: parsed.promo_active !== undefined ? parsed.promo_active : (parsed.active !== false),
+          spotlight_perfume_id: parsed.spotlight_perfume_id,
+          spotlight_badge: parsed.spotlight_badge,
+          spotlight_price: parsed.spotlight_price,
+          spotlight_title: parsed.spotlight_title,
+          spotlight_desc: parsed.spotlight_desc,
+          spotlight_active: parsed.spotlight_active !== false
         });
       }
     } catch (_) {}
@@ -424,6 +591,7 @@
   }
 
   loadAnnouncements();
+  initStoryParallax();
   window.addEventListener('storage', event => {
     if (event.key && (event.key.includes('promo') || event.key.includes('announcement') || event.key.includes('campaign'))) {
       loadAnnouncements();
@@ -1000,6 +1168,7 @@
       try { localStorage.setItem('rooh-cached-products', JSON.stringify(products)); } catch (_) {}
       renderProducts();
       renderHeroProduct();
+      renderStorySpotlight();
       updateCart();
     }
   };
@@ -1008,6 +1177,7 @@
   if (products.length) {
     renderProducts();
     renderHeroProduct();
+    renderStorySpotlight();
   }
 
   // ── Load products from Supabase (Once on load + Realtime) ───────────────────
@@ -1106,11 +1276,15 @@
       const product = products.find(item => item.id === row.id);
       if (!product) return '';
       const prodName = currentLang === 'en' ? (product.latin || product.name) : product.name;
+      const unitPrice = row.customPrice || product.price;
+      const priceDisplay = row.customPrice && row.customPrice < product.price
+        ? `<span>${money(unitPrice)}</span> <del style="font-size:11px; opacity:0.6; margin-inline-start:4px;">${money(product.price)}</del>`
+        : money(unitPrice);
       return `<div class="cart-row">
         <div class="cart-thumb">${product.image_url ? `<img src="${product.image_url}" alt="" loading="lazy">` : ''}</div>
         <div>
           <h3>${escapeHtml(prodName)}</h3>
-          <p>${money(product.price)}</p>
+          <p>${priceDisplay}</p>
           <div class="qty">
             <button data-qty="${product.id}" data-step="-1" aria-label="تقليل">−</button>
             <span>${formatDigits(row.qty)}</span>
@@ -1121,7 +1295,7 @@
       </div>`;
     }).join('');
 
-    const total = cart.reduce((sum, row) => sum + (products.find(p => p.id === row.id)?.price || 0) * row.qty, 0);
+    const total = cart.reduce((sum, row) => sum + (row.customPrice || products.find(p => p.id === row.id)?.price || 0) * row.qty, 0);
     $('#cartTotal').textContent = money(total);
     $('#checkoutTotal').textContent = money(total);
 
@@ -1157,9 +1331,14 @@
     saveCart();
   }
 
-  function addToCart(id, originBtn = null) {
+  function addToCart(id, originBtn = null, customPrice = null) {
     const row = cart.find(item => item.id === id);
-    if (row) row.qty++; else cart.push({ id, qty: 1 });
+    if (row) {
+      row.qty++;
+      if (customPrice) row.customPrice = customPrice;
+    } else {
+      cart.push({ id, qty: 1, ...(customPrice ? { customPrice } : {}) });
+    }
     updateCart();
 
     // Visual button feedback & fly-to-cart animation
@@ -1482,9 +1661,10 @@
     const address = form.address.value.trim();
     const items   = cart.map(row => {
       const product = products.find(p => p.id === row.id);
-      return { id: row.id, name: product?.name, latin: product?.latin, price: product?.price, qty: row.qty };
+      const unitPrice = row.customPrice || product?.price || 0;
+      return { id: row.id, name: product?.name, latin: product?.latin, price: unitPrice, qty: row.qty };
     });
-    const total   = cart.reduce((sum, row) => sum + (products.find(p => p.id === row.id)?.price || 0) * row.qty, 0);
+    const total   = cart.reduce((sum, row) => sum + (row.customPrice || products.find(p => p.id === row.id)?.price || 0) * row.qty, 0);
 
     const submitBtn = form.querySelector('[type=submit]');
     submitBtn.disabled = true;
