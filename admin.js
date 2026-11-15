@@ -268,7 +268,11 @@
     spotlight_price: '',
     spotlight_title: '',
     spotlight_desc: '',
-    spotlight_active: true
+    spotlight_active: true,
+    storewide_discount_active: false,
+    storewide_discount_percent: '',
+    storewide_discount_scope: 'only_no_custom',
+    storewide_discount_badge: ''
   };
 
   function readCampaignLocal() {
@@ -290,7 +294,11 @@
           spotlight_price: parsed.spotlight_price !== undefined ? parsed.spotlight_price : '',
           spotlight_title: parsed.spotlight_title || '',
           spotlight_desc: parsed.spotlight_desc || '',
-          spotlight_active: parsed.spotlight_active !== undefined ? parsed.spotlight_active : true
+          spotlight_active: parsed.spotlight_active !== undefined ? parsed.spotlight_active : true,
+          storewide_discount_active: Boolean(parsed.storewide_discount_active),
+          storewide_discount_percent: parsed.storewide_discount_percent !== undefined ? parsed.storewide_discount_percent : '',
+          storewide_discount_scope: parsed.storewide_discount_scope || 'only_no_custom',
+          storewide_discount_badge: parsed.storewide_discount_badge || ''
         };
       }
     } catch (_) {}
@@ -429,6 +437,10 @@
     if ($('#spotlightTitleInput')) $('#spotlightTitleInput').value = data.spotlight_title || '';
     if ($('#spotlightDescInput')) $('#spotlightDescInput').value = data.spotlight_desc || '';
     if ($('#spotlightActiveInput')) $('#spotlightActiveInput').checked = data.spotlight_active !== false;
+    if ($('#storewideDiscountActive')) $('#storewideDiscountActive').checked = Boolean(data.storewide_discount_active);
+    if ($('#storewideDiscountPercent')) $('#storewideDiscountPercent').value = data.storewide_discount_percent !== undefined ? data.storewide_discount_percent : '';
+    if ($('#storewideDiscountScope')) $('#storewideDiscountScope').value = data.storewide_discount_scope || 'only_no_custom';
+    if ($('#storewideDiscountBadge')) $('#storewideDiscountBadge').value = data.storewide_discount_badge || '';
     showCampaignPreview();
   }
 
@@ -492,7 +504,11 @@
         spotlight_price: $('#spotlightPriceInput')?.value ? Number($('#spotlightPriceInput').value) : '',
         spotlight_title: $('#spotlightTitleInput')?.value.trim() || '',
         spotlight_desc: $('#spotlightDescInput')?.value.trim() || '',
-        spotlight_active: $('#spotlightActiveInput')?.checked !== false
+        spotlight_active: $('#spotlightActiveInput')?.checked !== false,
+        storewide_discount_active: $('#storewideDiscountActive')?.checked || false,
+        storewide_discount_percent: $('#storewideDiscountPercent')?.value ? Number($('#storewideDiscountPercent').value) : '',
+        storewide_discount_scope: $('#storewideDiscountScope')?.value || 'only_no_custom',
+        storewide_discount_badge: $('#storewideDiscountBadge')?.value.trim() || ''
       };
 
       try {
@@ -755,6 +771,19 @@
         displayNotes = `${adminLang === 'ar' ? 'مستوحى من' : 'Inspired by'}: ${d.inspired_by} · ${displayNotes}`;
       }
 
+      const saleVal = Number(p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : d.sale_price);
+      let priceCellHtml = `<strong>${money(p.price)}</strong>`;
+      if (saleVal && saleVal > 0 && saleVal < p.price) {
+        const pct = Math.round(((p.price - saleVal) / p.price) * 100);
+        priceCellHtml = `
+          <div class="admin-price-box">
+            <strong class="admin-sale-price">${money(saleVal)}</strong>
+            <del class="admin-old-price">${money(p.price)}</del>
+            <span class="admin-discount-badge">${d.discount_badge || `-${pct}%`}</span>
+          </div>
+        `;
+      }
+
       return `<tr>
         <td>${imgHtml}</td>
         <td class="prod-title-cell">
@@ -763,7 +792,7 @@
         </td>
         <td><span class="brand-pill">${escapeHtml(prodBrand)}</span></td>
         <td><span class="cat-pill ${cat.class}">${cat.text}</span></td>
-        <td><strong>${money(p.price)}</strong></td>
+        <td>${priceCellHtml}</td>
         <td><span style="font-size:10px;color:var(--muted);">${escapeHtml(displayNotes)}</span></td>
         <td>
           <span class="stock-tag ${p.in_stock !== false ? 'in' : 'out'}">${p.in_stock !== false ? (adminLang === 'ar' ? 'متوفر ✓' : 'In Stock ✓') : (adminLang === 'ar' ? 'غير متوفر' : 'Out of Stock')}</span>
@@ -1000,7 +1029,33 @@
       accords:      p.accords || meta.accords || '',
       main_accord:  p.main_accord || meta.main_accord || '',
       seasons:      p.seasons || meta.seasons || '',
+      sale_price:   p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : (meta.sale_price !== undefined ? meta.sale_price : ''),
+      discount_percent: p.discount_percent || meta.discount_percent || '',
+      discount_badge:   p.discount_badge || meta.discount_badge || ''
     };
+  }
+
+  function syncDiscountFeedback() {
+    const priceVal = parseFloat($('#prodPrice')?.value) || 0;
+    const saleVal = parseFloat($('#prodSalePrice')?.value);
+    const pctInp = $('#prodDiscountPercent');
+    const feedback = $('#prodDiscountFeedback');
+
+    if (priceVal > 0 && !isNaN(saleVal) && saleVal > 0 && saleVal < priceVal) {
+      const saved = priceVal - saleVal;
+      const pct = Math.round((saved / priceVal) * 100);
+      if (pctInp && document.activeElement !== pctInp) pctInp.value = pct;
+      if (feedback) {
+        feedback.style.display = 'block';
+        feedback.innerHTML = `✓ السعر للعميل: <strong>${money(saleVal)}</strong> بدلاً من <del style="opacity:0.7;">${money(priceVal)}</del> (توفير <strong>${money(saved)}</strong> — خصم <strong>${pct}%</strong>)`;
+      }
+    } else {
+      if (pctInp && document.activeElement !== pctInp) pctInp.value = '';
+      if (feedback) {
+        feedback.style.display = 'none';
+        feedback.textContent = '';
+      }
+    }
   }
 
   function openProductModal(product = null) {
@@ -1008,6 +1063,11 @@
     formStatus.textContent = '';
     formStatus.className   = '';
     clearImagePreview();
+
+    const saleInp = $('#prodSalePrice');
+    const badgeInp = $('#prodDiscountBadge');
+    const pctInp = $('#prodDiscountPercent');
+    const feedback = $('#prodDiscountFeedback');
 
     if (product) {
       const details = unpackProductDetails(product);
@@ -1034,6 +1094,11 @@
       $('#prodFeatured').checked  = Boolean(product.is_featured);
       $('#prodInStock').checked   = product.in_stock !== false;
 
+      // Discount inputs
+      if (saleInp) saleInp.value = details.sale_price || '';
+      if (badgeInp) badgeInp.value = details.discount_badge || '';
+      syncDiscountFeedback();
+
       // Scent DNA Accords & Main Accord
       let currentAccordsList = (details.accords || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
       const chosenMain = details.main_accord || currentAccordsList[0] || 'Sweet';
@@ -1056,6 +1121,11 @@
       $('#prodLongevity').value = '3';
       $('#prodSillage').value   = '2';
       $('#prodInStock').checked  = true;
+
+      if (saleInp) saleInp.value = '';
+      if (pctInp) pctInp.value = '';
+      if (badgeInp) badgeInp.value = '';
+      if (feedback) feedback.style.display = 'none';
 
       if ($('#prodMainAccord')) $('#prodMainAccord').value = 'Sweet';
       renderAdminAccordsChips(['Sweet', 'Vanilla', 'Floral']);
@@ -1123,6 +1193,148 @@
   $('#productModalClose')?.addEventListener('click', closeProductModal);
   $('#cancelProdBtn')?.addEventListener('click', closeProductModal);
   prodModal?.addEventListener('click', e => { if (e.target === prodModal) closeProductModal(); });
+
+  // Live sync between Price, Sale Price, and Discount Percent in product modal
+  $('#prodSalePrice')?.addEventListener('input', () => syncDiscountFeedback());
+  $('#prodPrice')?.addEventListener('input', () => {
+    if ($('#prodSalePrice')?.value) syncDiscountFeedback();
+  });
+  $('#prodDiscountPercent')?.addEventListener('input', () => {
+    const pPrice = parseFloat($('#prodPrice')?.value) || 0;
+    const pct = parseFloat($('#prodDiscountPercent')?.value);
+    const saleInp = $('#prodSalePrice');
+    if (pPrice > 0 && !isNaN(pct) && pct > 0 && pct < 100) {
+      const sPrice = Math.round(pPrice * (1 - pct / 100));
+      if (saleInp) saleInp.value = sPrice;
+      syncDiscountFeedback();
+    } else if (!pct) {
+      if (saleInp) saleInp.value = '';
+      syncDiscountFeedback();
+    }
+  });
+
+  // Bulk Discount Handlers (Storewide)
+  $('#btnApplyBulkDiscount')?.addEventListener('click', async () => {
+    const rawPct = $('#storewideDiscountPercent')?.value;
+    const pct = parseInt(rawPct) || 20;
+    const targetProds = currentProducts.filter(p => p.name !== '__system_announcements__');
+    if (!targetProds.length) {
+      alert('لا توجد عطور حالياً لتطبيق الخصم عليها.');
+      return;
+    }
+
+    if (!confirm(`هل أنت متأكد من تطبيق خصم ${pct}% على أسعار جميع العطور الـ (${targetProds.length}) في المتجر فورياً؟`)) {
+      return;
+    }
+
+    const btn = $('#btnApplyBulkDiscount');
+    const prevText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'جاري تطبيق الخصم...';
+
+    try {
+      for (const p of targetProds) {
+        const d = unpackProductDetails(p);
+        const original = Number(p.price || 0);
+        if (!original) continue;
+        const salePrice = Math.round(original * (1 - pct / 100));
+        const badge = `خصم ${pct}%`;
+
+        p.sale_price = salePrice;
+        p.discount_percent = pct;
+        p.discount_badge = badge;
+
+        const notesObj = {
+          ...d,
+          sale_price: salePrice,
+          discount_percent: pct,
+          discount_badge: badge
+        };
+
+        try {
+          await supaFetch('products', {
+            method: 'PATCH',
+            filters: `&id=eq.${encodeURIComponent(p.id)}`,
+            body: {
+              sale_price: salePrice,
+              discount_percent: pct,
+              discount_badge: badge,
+              notes: JSON.stringify(notesObj)
+            }
+          });
+        } catch (_) {
+          await supaFetch('products', {
+            method: 'PATCH',
+            filters: `&id=eq.${encodeURIComponent(p.id)}`,
+            body: { notes: JSON.stringify(notesObj) }
+          }).catch(() => {});
+        }
+      }
+
+      localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts));
+      renderProductsTable(currentProducts);
+      alert(`تم تطبيق خصم ${pct}% بنجاح على جميع عطور المتجر!`);
+    } catch (err) {
+      alert('حدث خطأ أثناء تطبيق الخصم: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = prevText;
+    }
+  });
+
+  $('#btnRemoveBulkDiscounts')?.addEventListener('click', async () => {
+    const targetProds = currentProducts.filter(p => p.name !== '__system_announcements__');
+    if (!confirm('هل أنت متأكد من إزالة جميع الخصومات من كافة العطور واستعادة أسعارها الأصلية؟')) {
+      return;
+    }
+
+    const btn = $('#btnRemoveBulkDiscounts');
+    const prevText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'جاري إزالة الخصومات...';
+
+    try {
+      for (const p of targetProds) {
+        const d = unpackProductDetails(p);
+        p.sale_price = null;
+        p.discount_percent = null;
+        p.discount_badge = null;
+
+        const notesObj = { ...d };
+        delete notesObj.sale_price;
+        delete notesObj.discount_percent;
+        delete notesObj.discount_badge;
+
+        try {
+          await supaFetch('products', {
+            method: 'PATCH',
+            filters: `&id=eq.${encodeURIComponent(p.id)}`,
+            body: {
+              sale_price: null,
+              discount_percent: null,
+              discount_badge: null,
+              notes: JSON.stringify(notesObj)
+            }
+          });
+        } catch (_) {
+          await supaFetch('products', {
+            method: 'PATCH',
+            filters: `&id=eq.${encodeURIComponent(p.id)}`,
+            body: { notes: JSON.stringify(notesObj) }
+          }).catch(() => {});
+        }
+      }
+
+      localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts));
+      renderProductsTable(currentProducts);
+      alert('تمت إزالة جميع الخصومات بنجاح واستعادة الأسعار الأصلية لكافة العطور!');
+    } catch (err) {
+      alert('حدث خطأ أثناء إزالة الخصومات: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = prevText;
+    }
+  });
 
   // Handle Edit & Delete button clicks inside table
   $('#productsTable')?.addEventListener('click', async event => {
@@ -1238,11 +1450,20 @@
       }
     }
 
+    const rawPrice = parseFloat($('#prodPrice').value) || 0;
+    const rawSale = parseFloat($('#prodSalePrice')?.value);
+    const validSalePrice = (!isNaN(rawSale) && rawSale > 0 && rawSale < rawPrice) ? rawSale : null;
+    const validBadge = $('#prodDiscountBadge')?.value.trim() || null;
+    const validPercent = validSalePrice ? Math.round(((rawPrice - validSalePrice) / rawPrice) * 100) : null;
+
     const payload = {
       name:        $('#prodName').value.trim(),
       latin:       $('#prodLatin').value.trim() || null,
       brand:       $('#prodBrand')?.value.trim() || null,
-      price:       parseFloat($('#prodPrice').value) || 0,
+      price:       rawPrice,
+      sale_price:  validSalePrice,
+      discount_percent: validPercent,
+      discount_badge:   validBadge,
       category:    $('#prodCategory').value,
       notes:       $('#prodNotes').value.trim() || null,
       image_url:   imageUrl,
@@ -1279,7 +1500,7 @@
       } catch (colErr) {
         // إذا لم تكن الأعمدة الجديدة مضافة في Supabase بعد، نحفظها كـ JSON داخل notes تلقائياً
         const errMsg = String(colErr?.message || '');
-        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('top_notes') || errMsg.includes('brand') || errMsg.includes('main_accord') || errMsg.includes('seasons')) {
+        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('top_notes') || errMsg.includes('brand') || errMsg.includes('main_accord') || errMsg.includes('seasons') || errMsg.includes('sale_price') || errMsg.includes('discount')) {
           console.warn('Columns not yet in Supabase schema, falling back to JSON notes:', colErr);
           const fallbackPayload = {
             name:        payload.name,
@@ -1301,7 +1522,10 @@
               sillage:      payload.sillage,
               accords:      payload.accords,
               main_accord:  payload.main_accord,
-              seasons:      payload.seasons
+              seasons:      payload.seasons,
+              sale_price:   payload.sale_price,
+              discount_percent: payload.discount_percent,
+              discount_badge: payload.discount_badge
             }),
           };
           if (id) {

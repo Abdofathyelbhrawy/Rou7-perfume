@@ -1394,3 +1394,38 @@ body.light .sync-status-badge {
   background: rgba(129, 45, 53, 0.1);
   color: var(--burgundy);
 }
+
+/* ── Discount Styling in Admin Table & Form ────────────────── */
+.admin-price-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.admin-sale-price {
+  color: var(--pink);
+  font-weight: 700;
+  font-size: 13px;
+}
+body.light .admin-sale-price {
+  color: var(--burgundy);
+}
+.admin-old-price {
+  font-size: 10px;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.admin-discount-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(236, 64, 122, 0.18);
+  color: #ff80ab;
+  font-size: 9.5px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+body.light .admin-discount-badge {
+  background: rgba(129, 45, 53, 0.12);
+  color: var(--burgundy);
+}

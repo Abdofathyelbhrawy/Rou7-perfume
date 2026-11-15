@@ -2627,3 +2627,54 @@ body.light .card-brand-badge {
   border-color: rgba(129, 45, 53, 0.18);
   color: var(--burgundy);
 }
+
+/* ── Discount & Sale System Styling ────────────────────────── */
+.product-price-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.product-price-val.price-sale {
+  color: #ff8da1;
+  font-weight: 700;
+}
+body.light .product-price-val.price-sale {
+  color: var(--burgundy);
+}
+
+.product-old-price {
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: line-through;
+  opacity: 0.65;
+}
+
+.product-tag.tag-discount {
+  background: linear-gradient(135deg, #e91e63, #c2185b);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.live-price-group {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.live-old-price {
+  font-size: 10px;
+  color: var(--muted);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+.live-discount-tag {
+  font-size: 9px;
+  background: rgba(233, 30, 99, 0.15);
+  color: #ff80ab;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-weight: 700;
+}

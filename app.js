@@ -708,8 +708,9 @@
       }
     }
 
-    // 3. Dynamic Story Spotlight Fragrance
+    // 3. Dynamic Story Spotlight Fragrance & Storewide Discount Re-render
     renderStorySpotlight();
+    renderProducts();
   }
 
   function loadAnnouncements() {
@@ -730,7 +731,11 @@
           spotlight_price: parsed.spotlight_price,
           spotlight_title: parsed.spotlight_title,
           spotlight_desc: parsed.spotlight_desc,
-          spotlight_active: parsed.spotlight_active !== false
+          spotlight_active: parsed.spotlight_active !== false,
+          storewide_discount_active: parsed.storewide_discount_active || false,
+          storewide_discount_percent: parsed.storewide_discount_percent || '',
+          storewide_discount_scope: parsed.storewide_discount_scope || 'only_no_custom',
+          storewide_discount_badge: parsed.storewide_discount_badge || ''
         });
       }
     } catch (_) {}
@@ -783,6 +788,7 @@
     }
 
     const currentProduct = candidates[heroCurrentIndex];
+    const heroPricing = computeProductPrice(currentProduct);
     const d = unpackProduct(currentProduct);
     const nameToDisplay = currentLang === 'en' ? (currentProduct.latin || currentProduct.name) : (currentProduct.name || currentProduct.latin);
     const safeName = escapeHtml(nameToDisplay || 'Rou7');
@@ -914,7 +920,7 @@
         </div>
 
         <div class="hero-product-caption">
-          <span class="hero-caption-kicker">${t.hero_featured_tag}</span>
+          <span class="hero-caption-kicker">${heroPricing.hasDiscount ? `<strong style="color:var(--pink);">${escapeHtml(heroPricing.discountBadge)}</strong> · ` : ''}${t.hero_featured_tag}</span>
           <h2 class="hero-caption-title">${safeName}</h2>
           ${cleanDesc ? `<p class="hero-caption-desc">${cleanDesc}</p>` : ''}
           <div class="hero-caption-footer">
@@ -922,7 +928,7 @@
               <span>✦</span> ${currentLang === 'ar' ? 'استكشف هرم النوتات والتحليل' : 'Explore Scent DNA & Notes'}
             </a>
             <button class="btn-hero-quickadd" data-add="${currentProduct.id}" type="button">
-              <span>＋</span> ${t.quick_add} · ${money(currentProduct.price)}
+              <span>＋</span> ${t.quick_add} · ${money(heroPricing.price)} ${heroPricing.hasDiscount ? `<del style="opacity:0.6; font-size:11px; margin-inline-start:4px;">${money(heroPricing.originalPrice)}</del>` : ''}
             </button>
           </div>
           ${dotsHtml}
@@ -1042,6 +1048,68 @@
       accords:      p.accords || meta.accords || '',
       main_accord:  p.main_accord || meta.main_accord || '',
       seasons:      p.seasons || meta.seasons || '',
+      sale_price:   p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : (meta.sale_price !== undefined ? meta.sale_price : ''),
+      discount_percent: p.discount_percent || meta.discount_percent || '',
+      discount_badge:   p.discount_badge || meta.discount_badge || ''
+    };
+  }
+
+  function computeProductPrice(p, campaignData = currentAnnouncements) {
+    if (!p) return { price: 0, originalPrice: 0, hasDiscount: false, discountPercent: 0, discountBadge: '', savedAmount: 0 };
+
+    const originalPrice = Number(p.price || 0);
+    const d = unpackProduct(p);
+
+    const rawSale = Number(p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : d.sale_price);
+    const hasCustomSale = Boolean(rawSale && rawSale > 0 && rawSale < originalPrice);
+
+    const camp = campaignData || currentAnnouncements || {};
+    const isGlobalActive = Boolean(camp.storewide_discount_active);
+    const globalPct = Number(camp.storewide_discount_percent) || 0;
+    const globalScope = camp.storewide_discount_scope || 'only_no_custom';
+    const globalBadge = camp.storewide_discount_badge || (globalPct ? (currentLang === 'ar' ? `خصم ${globalPct}%` : `${globalPct}% OFF`) : '');
+
+    let activePrice = originalPrice;
+    let hasDiscount = false;
+    let discountPercent = 0;
+    let discountBadge = '';
+
+    if (hasCustomSale) {
+      if (isGlobalActive && globalPct > 0 && globalScope === 'all') {
+        const globalCalc = Math.round(originalPrice * (1 - globalPct / 100));
+        if (globalCalc < rawSale) {
+          activePrice = globalCalc;
+          hasDiscount = true;
+          discountPercent = globalPct;
+          discountBadge = globalBadge;
+        } else {
+          activePrice = rawSale;
+          hasDiscount = true;
+          discountPercent = Math.round(((originalPrice - rawSale) / originalPrice) * 100);
+          discountBadge = d.discount_badge || (currentLang === 'ar' ? `خصم ${discountPercent}%` : `${discountPercent}% OFF`);
+        }
+      } else {
+        activePrice = rawSale;
+        hasDiscount = true;
+        discountPercent = Math.round(((originalPrice - rawSale) / originalPrice) * 100);
+        discountBadge = d.discount_badge || (currentLang === 'ar' ? `خصم ${discountPercent}%` : `${discountPercent}% OFF`);
+      }
+    } else if (isGlobalActive && globalPct > 0) {
+      activePrice = Math.round(originalPrice * (1 - globalPct / 100));
+      hasDiscount = true;
+      discountPercent = globalPct;
+      discountBadge = globalBadge;
+    }
+
+    const savedAmount = hasDiscount ? (originalPrice - activePrice) : 0;
+
+    return {
+      price: activePrice,
+      originalPrice,
+      hasDiscount,
+      discountPercent,
+      discountBadge,
+      savedAmount
     };
   }
 
@@ -1285,7 +1353,17 @@
           const pSub  = isAr ? (p.latin || '') : (p.latin ? p.name : '');
           const pBrand = d.brand || 'رُوح';
           const pImg = p.image_url || 'assets/branding/logo-dark.png';
-          const pPrice = money(p.price);
+          const pricing = computeProductPrice(p);
+
+          const priceHtml = pricing.hasDiscount
+            ? `
+              <div class="live-price-group">
+                <span class="search-item-price price-sale">${money(pricing.price)}</span>
+                <del class="live-old-price">${money(pricing.originalPrice)}</del>
+                <span class="live-discount-tag">${escapeHtml(pricing.discountBadge || `-${pricing.discountPercent}%`)}</span>
+              </div>
+            `
+            : `<span class="search-item-price">${money(pricing.price)}</span>`;
 
           return `
             <div class="search-live-item" data-id="${p.id}" tabindex="0">
@@ -1298,7 +1376,7 @@
                 ${pSub ? `<span class="search-item-latin">${escapeHtml(pSub)}</span>` : ''}
               </div>
               <div class="search-item-price-col">
-                <span class="search-item-price">${pPrice}</span>
+                ${priceHtml}
                 <button type="button" class="search-item-btn live-add-btn" data-add-id="${p.id}">
                   ${isAr ? '＋ أضف للسلة' : '＋ Add'}
                 </button>
@@ -1319,22 +1397,7 @@
           btn.addEventListener('click', e => {
             e.stopPropagation();
             const id = btn.dataset.addId;
-            const targetProd = products.find(p => String(p.id) === String(id));
-            if (targetProd) {
-              const inCart = cart.find(it => String(it.id) === String(id));
-              if (inCart) {
-                inCart.quantity += 1;
-              } else {
-                cart.push({ ...targetProd, quantity: 1 });
-              }
-              saveCart();
-              renderCart();
-              showToast(isAr ? 'تمت إضافة العطر إلى السلة ✳' : 'Added to shopping bag ✳');
-              btn.textContent = isAr ? '✓ تم' : '✓ Added';
-              setTimeout(() => {
-                btn.textContent = isAr ? '＋ أضف للسلة' : '＋ Add';
-              }, 1600);
-            }
+            addToCart(id, btn);
           });
         });
       }
@@ -1478,9 +1541,21 @@
     $('#productGrid').innerHTML = products.length
       ? visible.map(product => {
           const d = unpackProduct(product);
+          const pricing = computeProductPrice(product);
           const prodName = currentLang === 'en' ? (product.latin || product.name) : product.name;
           const prodSub  = currentLang === 'en' ? (product.latin ? product.name : '') : (product.latin || '');
           const prodBrand = d.brand || 'رُوح';
+
+          const tagHtml = pricing.hasDiscount
+            ? `<span class="product-tag tag-discount">${escapeHtml(pricing.discountBadge)}</span>`
+            : (product.tag ? `<span class="product-tag">${escapeHtml(product.tag)}</span>` : '');
+
+          const priceHtml = pricing.hasDiscount
+            ? `<div class="product-price-wrap">
+                <span class="product-price-val price-sale">${money(pricing.price)}</span>
+                <del class="product-old-price">${money(pricing.originalPrice)}</del>
+               </div>`
+            : `<span class="product-price-val">${money(pricing.price)}</span>`;
 
           // Key notes preview
           let notesPreview = '';
@@ -1496,14 +1571,14 @@
               <a href="product.html?id=${product.id}" class="product-thumb-link" aria-label="${escapeHtml(prodName)}">
                 ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}" loading="lazy">` : ''}
               </a>
-              ${product.tag ? `<span class="product-tag">${escapeHtml(product.tag)}</span>` : ''}
+              ${tagHtml}
               <button class="quick-add" data-add="${product.id}" type="button">${t.quick_add} <span>＋</span></button>
             </div>
             <div class="product-info">
               <span class="card-brand-badge" data-brand-filter="${escapeHtml(prodBrand)}">${escapeHtml(prodBrand)}</span>
               <div class="product-meta">
                 <h3><a href="product.html?id=${product.id}" class="prod-title-link">${escapeHtml(prodName)}</a> ${prodSub ? `<small style="font-size:10px;opacity:.7;display:block;">${escapeHtml(prodSub)}</small>` : ''}</h3>
-                <span class="product-price-val">${money(product.price)}</span>
+                ${priceHtml}
               </div>
               ${d.inspired_by ? `<div class="card-inspired-tag"><span class="ci-label">${currentLang === 'ar' ? 'مستوحى من' : 'Inspired by'}</span> <strong>${escapeHtml(d.inspired_by)}</strong></div>` : ''}
               ${notesPreview}
@@ -1792,12 +1867,16 @@
   }
 
   function addToCart(id, originBtn = null, customPrice = null) {
-    const row = cart.find(item => item.id === id);
+    const product = products.find(p => String(p.id) === String(id));
+    const pricing = product ? computeProductPrice(product) : null;
+    const finalPrice = customPrice !== null ? customPrice : (pricing && pricing.hasDiscount ? pricing.price : null);
+
+    const row = cart.find(item => String(item.id) === String(id));
     if (row) {
       row.qty++;
-      if (customPrice) row.customPrice = customPrice;
+      if (finalPrice) row.customPrice = finalPrice;
     } else {
-      cart.push({ id, qty: 1, ...(customPrice ? { customPrice } : {}) });
+      cart.push({ id: String(id), qty: 1, ...(finalPrice ? { customPrice: finalPrice } : {}) });
     }
     updateCart();
 

@@ -162,6 +162,7 @@
   let currentProduct = null;
   let cart = [];
   let currentQty = 1;
+  let campaignSettings = null;
 
   const DEFAULT_FALLBACK_PRODUCT = {
     id: 'd6973def-50dd-4e75-8005-8ee22eb23872',
@@ -234,7 +235,70 @@
       accords:      p.accords || meta.accords || '',
       main_accord:  p.main_accord || meta.main_accord || '',
       seasons:      p.seasons || meta.seasons || '',
+      sale_price:   p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : (meta.sale_price !== undefined ? meta.sale_price : ''),
+      discount_percent: p.discount_percent || meta.discount_percent || '',
+      discount_badge:   p.discount_badge || meta.discount_badge || '',
       brand:        p.brand || meta.brand || ''
+    };
+  }
+
+  // ── Pricing & Discount Engine ────────────────────────────────
+  function computeProductPrice(p, campaignData = campaignSettings) {
+    if (!p) return { price: 0, originalPrice: 0, hasDiscount: false, discountPercent: 0, discountBadge: '', savedAmount: 0 };
+
+    const originalPrice = Number(p.price || 0);
+    const d = unpackProduct(p);
+
+    const rawSale = Number(p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : d.sale_price);
+    const hasCustomSale = Boolean(rawSale && rawSale > 0 && rawSale < originalPrice);
+
+    const camp = campaignData || campaignSettings || {};
+    const isGlobalActive = Boolean(camp.storewide_discount_active);
+    const globalPct = Number(camp.storewide_discount_percent) || 0;
+    const globalScope = camp.storewide_discount_scope || 'only_no_custom';
+    const globalBadge = camp.storewide_discount_badge || (globalPct ? (currentLang === 'ar' ? `خصم ${globalPct}%` : `${globalPct}% OFF`) : '');
+
+    let activePrice = originalPrice;
+    let hasDiscount = false;
+    let discountPercent = 0;
+    let discountBadge = '';
+
+    if (hasCustomSale) {
+      if (isGlobalActive && globalPct > 0 && globalScope === 'all') {
+        const globalCalc = Math.round(originalPrice * (1 - globalPct / 100));
+        if (globalCalc < rawSale) {
+          activePrice = globalCalc;
+          hasDiscount = true;
+          discountPercent = globalPct;
+          discountBadge = globalBadge;
+        } else {
+          activePrice = rawSale;
+          hasDiscount = true;
+          discountPercent = Math.round(((originalPrice - rawSale) / originalPrice) * 100);
+          discountBadge = d.discount_badge || (currentLang === 'ar' ? `خصم ${discountPercent}%` : `${discountPercent}% OFF`);
+        }
+      } else {
+        activePrice = rawSale;
+        hasDiscount = true;
+        discountPercent = Math.round(((originalPrice - rawSale) / originalPrice) * 100);
+        discountBadge = d.discount_badge || (currentLang === 'ar' ? `خصم ${discountPercent}%` : `${discountPercent}% OFF`);
+      }
+    } else if (isGlobalActive && globalPct > 0) {
+      activePrice = Math.round(originalPrice * (1 - globalPct / 100));
+      hasDiscount = true;
+      discountPercent = globalPct;
+      discountBadge = globalBadge;
+    }
+
+    const savedAmount = hasDiscount ? (originalPrice - activePrice) : 0;
+
+    return {
+      price: activePrice,
+      originalPrice,
+      hasDiscount,
+      discountPercent,
+      discountBadge,
+      savedAmount
     };
   }
 
@@ -457,9 +521,30 @@
         brandPill.hidden = true;
       }
     }
+    const pricing = computeProductPrice(p, campaignSettings);
     $('#prodMainTitle').textContent = prodName;
     $('#prodLatinTitle').textContent = prodSub;
-    $('#prodPriceTag').textContent = money(p.price);
+
+    const prodPriceTag = $('#prodPriceTag');
+    const prodOldPrice = $('#prodOldPrice');
+    const prodDiscountPill = $('#prodDiscountPill');
+
+    if (prodPriceTag) prodPriceTag.textContent = money(pricing.price);
+
+    if (pricing.hasDiscount) {
+      if (prodOldPrice) {
+        prodOldPrice.textContent = money(pricing.originalPrice);
+        prodOldPrice.style.display = 'inline-block';
+      }
+      if (prodDiscountPill) {
+        prodDiscountPill.textContent = currentLang === 'ar' ? `وفر ${money(pricing.savedAmount)} (${pricing.discountBadge})` : `Save ${money(pricing.savedAmount)} (${pricing.discountBadge})`;
+        prodDiscountPill.style.display = 'inline-flex';
+      }
+    } else {
+      if (prodOldPrice) prodOldPrice.style.display = 'none';
+      if (prodDiscountPill) prodDiscountPill.style.display = 'none';
+    }
+
     $('#prodStockBadge').textContent = (p.in_stock !== false) ? t.stock_in : t.stock_out;
 
     // Inspired By Card
@@ -486,7 +571,11 @@
     const smPrice = $('#smPrice');
     if (smThumb) smThumb.src = p.image_url || 'assets/branding/logo-dark.png';
     if (smTitle) smTitle.textContent = prodName;
-    if (smPrice) smPrice.textContent = money(p.price);
+    if (smPrice) {
+      smPrice.innerHTML = pricing.hasDiscount
+        ? `<span class="sm-sale">${money(pricing.price)}</span> <del class="sm-old">${money(pricing.originalPrice)}</del>`
+        : money(pricing.price);
+    }
 
     // Scent Pyramid Card
     renderScentPyramid(d);
@@ -820,6 +909,10 @@
     grid.innerHTML = related.map(p => {
       const name = currentLang === 'en' ? (p.latin || p.name) : p.name;
       const sub  = currentLang === 'en' ? (p.latin ? p.name : '') : (p.latin || '');
+      const relPricing = computeProductPrice(p, campaignSettings);
+      const relPriceHtml = relPricing.hasDiscount
+        ? `<div class="live-price-group"><span class="rel-price" style="color:var(--pink);">${money(relPricing.price)}</span> <del class="live-old-price">${money(relPricing.originalPrice)}</del></div>`
+        : `<span class="rel-price">${money(relPricing.price)}</span>`;
       return `
         <article class="related-card">
           <div class="related-img-wrap">
@@ -828,7 +921,7 @@
           <div class="related-body">
             <h4>${escapeHtml(name)}</h4>
             ${sub ? `<span class="rel-sub">${escapeHtml(sub)}</span>` : ''}
-            <span class="rel-price">${money(p.price)}</span>
+            ${relPriceHtml}
             <a href="product.html?id=${p.id}" class="btn-view-prod">
               <span>${I18N[currentLang].view_fragrance}</span>
               <span>←</span>
@@ -843,8 +936,9 @@
   function updateWaOrderLink() {
     const waBtn = $('#pdpWaBtn');
     if (!waBtn || !currentProduct) return;
+    const pricing = computeProductPrice(currentProduct, campaignSettings);
     const prodName = currentLang === 'en' ? (currentProduct.latin || currentProduct.name) : currentProduct.name;
-    const totalPrice = (Number(currentProduct.price || 0) * currentQty);
+    const totalPrice = (pricing.price * currentQty);
     const text = I18N[currentLang].wa_order_template(prodName, currentQty, totalPrice);
     waBtn.href = `${WHATSAPP_BASE_URL}&text=${encodeURIComponent(text)}`;
   }
@@ -867,15 +961,19 @@
   function addToCart(p, qty = 1) {
     if (!p) return;
     readCart();
+    const pricing = computeProductPrice(p, campaignSettings);
     const existing = cart.find(item => String(item.id) === String(p.id));
     if (existing) {
       existing.qty += qty;
+      existing.price = pricing.price;
+      existing.customPrice = pricing.hasDiscount ? pricing.price : null;
     } else {
       cart.push({
         id: String(p.id),
         name: p.name,
         latin: p.latin || '',
-        price: Number(p.price || 0),
+        price: pricing.price,
+        customPrice: pricing.hasDiscount ? pricing.price : null,
         image_url: p.image_url || '',
         qty: qty
       });
@@ -996,6 +1094,7 @@
     // 1.1 Load top announcement bar settings
     function applyAnnouncements(data) {
       if (!data) return;
+      campaignSettings = data;
       const topBar = document.querySelector('.announcement');
       if (topBar) {
         if (data.top_bar_active === false) {
@@ -1008,6 +1107,7 @@
           }
         }
       }
+      if (currentProduct) renderProductDetails(currentProduct);
     }
     try {
       const stored = localStorage.getItem('rooh-announcements') || localStorage.getItem('rooh-campaign-settings');
