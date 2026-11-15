@@ -687,13 +687,40 @@ html[dir="ltr"] #trackingForm label {
 
 
 /* ==========================================================
-   CREATIVE HERO SHOWCASE & FLOATING SCENT NOTES
+   CREATIVE HERO SHOWCASE & FLOATING SCENT NOTES (FULL-WIDTH LUXURY)
    ========================================================== */
+.hero {
+  max-width: 1440px;
+  min-height: calc(100vh - 100px) !important;
+  margin: auto;
+  padding: 30px 24px 60px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-copy {
+  display: none !important;
+}
+
 .hero-art {
-  height: auto !important;
-  min-height: 520px;
+  width: 100% !important;
+  max-width: 1150px !important;
+  min-height: 560px !important;
   position: relative;
   display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto !important;
+}
+
+.hero-slide-content {
+  width: 100%;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -702,17 +729,19 @@ html[dir="ltr"] #trackingForm label {
 .hero-creative-showcase {
   position: relative;
   width: 100%;
-  height: 340px;
+  max-width: 920px;
+  height: 410px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
 }
 
 .hero-bottle-center {
   position: relative;
   z-index: 2;
-  height: 310px;
-  max-width: 220px;
+  height: 360px;
+  max-width: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -721,29 +750,68 @@ html[dir="ltr"] #trackingForm label {
 .hero-featured-image {
   position: relative;
   z-index: 2;
-  max-height: 290px !important;
-  max-width: 190px !important;
+  max-height: 335px !important;
+  max-width: 230px !important;
   width: auto;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 20px 28px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 26px 42px rgba(0, 0, 0, 0.48));
   animation: floatBottleGently 6s ease-in-out infinite;
   transition: transform .4s ease, filter .4s ease;
 }
 .hero-featured-image:hover {
   transform: scale(1.05) translateY(-5px);
-  filter: drop-shadow(0 25px 35px rgba(245, 165, 173, 0.35));
+  filter: drop-shadow(0 30px 48px rgba(245, 165, 173, 0.38));
 }
 
 .hero-bottle-halo {
   position: absolute;
-  width: 280px;
-  height: 280px;
+  width: 380px;
+  height: 380px;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
   background: radial-gradient(circle, rgba(245, 165, 173, 0.22), transparent 70%);
   pointer-events: none;
   z-index: 1;
   animation: pulseHalo 4s ease-in-out infinite alternate;
+}
+
+.hero-orbit {
+  position: absolute;
+  border: 1px solid rgba(245, 165, 173, 0.23);
+  border-radius: 50%;
+  left: 50% !important;
+  top: 48% !important;
+  margin: 0 !important;
+  pointer-events: none;
+}
+.orbit-one {
+  width: 440px !important;
+  height: 440px !important;
+  transform: translate(-50%, -50%) rotate(-24deg) !important;
+}
+.orbit-two {
+  width: 340px !important;
+  height: 340px !important;
+  transform: translate(-50%, -50%) rotate(24deg) !important;
+}
+
+.hero-spark {
+  position: absolute;
+  color: var(--pink);
+  pointer-events: none;
+  font-size: 20px;
+  opacity: 0.6;
+}
+.hero-spark.spark-one {
+  top: 15%;
+  right: 18%;
+}
+.hero-spark.spark-two {
+  bottom: 25%;
+  left: 18%;
 }
 
 @keyframes floatBottleGently {
@@ -801,23 +869,23 @@ html[dir="ltr"] #trackingForm label {
 }
 
 .fn-pos-1 {
-  top: 15px;
-  inset-inline-start: 2%;
+  top: 25px;
+  inset-inline-start: 5%;
   animation: floatNote1 5.4s ease-in-out infinite;
 }
 .fn-pos-2 {
-  top: 30px;
-  inset-inline-end: 2%;
+  top: 40px;
+  inset-inline-end: 5%;
   animation: floatNote2 6.1s ease-in-out infinite 0.5s;
 }
 .fn-pos-3 {
-  bottom: 35px;
-  inset-inline-start: 1%;
+  bottom: 40px;
+  inset-inline-start: 7%;
   animation: floatNote3 6.6s ease-in-out infinite 1.2s;
 }
 .fn-pos-4 {
   bottom: 25px;
-  inset-inline-end: 1%;
+  inset-inline-end: 7%;
   animation: floatNote4 5.8s ease-in-out infinite 1.8s;
 }
 
@@ -871,15 +939,15 @@ html[dir="ltr"] #trackingForm label {
   left: auto !important;
   transform: none !important;
   z-index: 5;
-  width: min(390px, 94%);
-  margin: 12px auto 0;
+  width: min(560px, 94%) !important;
+  margin: 18px auto 0 !important;
   text-align: center;
   background: color-mix(in srgb, var(--surface) 86%, transparent) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 14px 20px;
+  border-radius: 18px;
+  padding: 18px 26px !important;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
 }
 .light .hero-product-caption {
@@ -956,15 +1024,20 @@ html[dir="ltr"] #trackingForm label {
 }
 
 @media (max-width: 650px) {
+  .hero {
+    padding: 24px 12px 48px !important;
+    min-height: auto !important;
+  }
   .hero-art {
     min-height: 480px;
+    width: 100% !important;
   }
   .hero-creative-showcase {
-    height: 300px;
+    height: 310px;
   }
   .hero-featured-image {
-    max-height: 240px !important;
-    max-width: 155px !important;
+    max-height: 250px !important;
+    max-width: 165px !important;
   }
   .floating-note-badge {
     padding: 6px 10px;
@@ -982,6 +1055,10 @@ html[dir="ltr"] #trackingForm label {
   .fn-pos-2 { top: 18px; inset-inline-end: 1%; }
   .fn-pos-3 { bottom: 18px; inset-inline-start: 1%; }
   .fn-pos-4 { bottom: 8px; inset-inline-end: 1%; }
+  .hero-product-caption {
+    width: 100% !important;
+    padding: 14px 16px !important;
+  }
 }
 
 /* Product Card Link Enhancements */
@@ -1157,11 +1234,11 @@ body.light .hero-nav-arrow {
 }
 
 .hero-prev {
-  inset-inline-start: -8px;
+  inset-inline-start: 12px;
 }
 
 .hero-next {
-  inset-inline-end: -8px;
+  inset-inline-end: 12px;
 }
 
 @media (max-width: 600px) {
