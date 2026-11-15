@@ -1550,15 +1550,6 @@
   $('#openQuizBtn')?.addEventListener('click', openScentQuiz);
   $('#quizModalClose')?.addEventListener('click', closeScentQuiz);
 
-  // Reviews track arrows
-  const reviewsTrack = $('#reviewsTrack');
-  $('#reviewsPrevBtn')?.addEventListener('click', () => {
-    if (reviewsTrack) reviewsTrack.scrollBy({ left: document.dir === 'rtl' ? 300 : -300, behavior: 'smooth' });
-  });
-  $('#reviewsNextBtn')?.addEventListener('click', () => {
-    if (reviewsTrack) reviewsTrack.scrollBy({ left: document.dir === 'rtl' ? -300 : 300, behavior: 'smooth' });
-  });
-
   $('#cartItems').addEventListener('click', event => {
     const qty = event.target.closest('[data-qty]');
     const remove = event.target.closest('[data-remove]');
