@@ -292,9 +292,72 @@
               </select>
             </label>
           </div>
-          <label>الطابع العطري — Accords
-            <input id="prodAccords" name="accords" placeholder="مثال: حلو، خشبي، حار، شتوي، خريفي (افصل بفاصلة)">
-          </label>
+          <div class="form-section-title">🧬 البصمة العطرية ومخطط Scent DNA</div>
+          <div class="form-row">
+            <label>العنصر الأساسي في البصمة العطرية — Main Accord *
+              <select id="prodMainAccord" name="main_accord">
+                <option value="Sweet">حلو وسكري — Sweet</option>
+                <option value="Woody">خشبي دافئ — Woody</option>
+                <option value="Vanilla">فانيليا ناعمة — Vanilla</option>
+                <option value="Oriental">شرقي فاخر — Oriental</option>
+                <option value="Amber">عنبري دافئ — Amber</option>
+                <option value="Spicy">توابل دافئة — Spicy</option>
+                <option value="Fresh">منعش ونقي — Fresh</option>
+                <option value="Floral">زهري راقي — Floral</option>
+                <option value="Powdery">بودري مخملي — Powdery</option>
+                <option value="Aromatic">أروماتك — Aromatic</option>
+                <option value="Citrus">حمضيات منعشة — Citrus</option>
+                <option value="Leather">جلود فاخرة — Leather</option>
+                <option value="Musky">مسكي ناعم — Musky</option>
+                <option value="Fruity">فاكهي جذاب — Fruity</option>
+                <option value="Smoky">دخاني وبخور — Smoky</option>
+                <option value="Aquatic">مائي صيفي — Aquatic</option>
+              </select>
+            </label>
+
+            <label>قائمة النغمات العطرية — اختر لإضافة نغمة (Scent Profile)
+              <select id="prodAccordPicker">
+                <option value="">+ اختر نغمة عطرية لإضافتها للبصمة...</option>
+                <option value="Sweet">حلو وسكري (Sweet)</option>
+                <option value="Woody">خشبي دافئ (Woody)</option>
+                <option value="Vanilla">فانيليا ناعمة (Vanilla)</option>
+                <option value="Oriental">شرقي فاخر (Oriental)</option>
+                <option value="Amber">عنبري دافئ (Amber)</option>
+                <option value="Spicy">توابل دافئة (Spicy)</option>
+                <option value="Fresh">منعش ونقي (Fresh)</option>
+                <option value="Floral">زهري راقي (Floral)</option>
+                <option value="Powdery">بودري مخملي (Powdery)</option>
+                <option value="Aromatic">أروماتك (Aromatic)</option>
+                <option value="Citrus">حمضيات منعشة (Citrus)</option>
+                <option value="Leather">جلود فاخرة (Leather)</option>
+                <option value="Musky">مسكي ناعم (Musky)</option>
+                <option value="Fruity">فاكهي جذاب (Fruity)</option>
+                <option value="Smoky">دخاني وبخور (Smoky)</option>
+                <option value="Aquatic">مائي صيفي (Aquatic)</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label style="display:block; margin-bottom: 6px;">الأكوردات المختارة للبصمة العطرية (تتحكم في مخطط Scent DNA والأشرطة):</label>
+            <div class="admin-chips-selector" id="adminAccordsChips"></div>
+            <input type="hidden" id="prodAccords" name="accords">
+          </div>
+
+          <div class="form-section-title">❄️ فصول ومواسم الاستخدام (Seasons & Occasions)</div>
+          <div class="form-group">
+            <label style="display:block; margin-bottom: 6px;">حدد الفصول والمناسبات الملائمة لهذا العطر (انقر للاختيار):</label>
+            <div class="admin-chips-selector" id="adminSeasonsChips">
+              <button type="button" class="admin-chip-btn" data-season="winter">❄️ شتاء (Winter)</button>
+              <button type="button" class="admin-chip-btn" data-season="fall">🍂 خريف (Fall)</button>
+              <button type="button" class="admin-chip-btn" data-season="spring">🌸 ربيع (Spring)</button>
+              <button type="button" class="admin-chip-btn" data-season="summer">☀️ صيف (Summer)</button>
+              <button type="button" class="admin-chip-btn" data-season="night">🌙 ليلي / سهرات (Night)</button>
+              <button type="button" class="admin-chip-btn" data-season="day">☀️ نهاري / يومي (Day)</button>
+            </div>
+            <input type="hidden" id="prodSeasons" name="seasons">
+          </div>
+
           <label>مستوحى من — Inspired By
             <input id="prodInspiredBy" name="inspired_by" placeholder="مثال: Drunk Lovers">
           </label>

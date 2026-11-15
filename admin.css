@@ -1234,6 +1234,99 @@ html[dir="ltr"] .invoice-meta {
   border-top: 1px solid var(--line);
 }
 
+/* ── Scent DNA & Seasons Chips Selectors in Admin ────────────── */
+.admin-chips-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+  min-height: 38px;
+  align-items: center;
+}
+
+.admin-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(245, 240, 235, 0.05);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all .2s ease;
+  user-select: none;
+}
+
+.admin-chip-btn:hover {
+  border-color: var(--pink);
+  background: rgba(245, 165, 173, 0.12);
+  transform: translateY(-1px);
+}
+
+.admin-chip-btn.active {
+  background: var(--pink);
+  color: var(--navy);
+  border-color: var(--pink);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(245, 165, 173, 0.28);
+}
+
+body.light .admin-chip-btn {
+  background: rgba(25, 41, 64, 0.04);
+  border-color: rgba(25, 41, 64, 0.15);
+  color: var(--navy);
+}
+
+body.light .admin-chip-btn:hover {
+  border-color: var(--burgundy);
+  background: rgba(129, 45, 53, 0.1);
+}
+
+body.light .admin-chip-btn.active {
+  background: var(--burgundy);
+  color: #ffffff;
+  border-color: var(--burgundy);
+  box-shadow: 0 4px 12px rgba(129, 45, 53, 0.25);
+}
+
+.admin-accord-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(245, 165, 173, 0.12);
+  border: 1px solid rgba(245, 165, 173, 0.3);
+  color: var(--ink);
+}
+
+.admin-accord-chip .chip-remove-btn {
+  background: none;
+  border: 0;
+  color: var(--pink);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.admin-accord-chip .chip-remove-btn:hover {
+  color: #ff4757;
+}
+
+.accord-color-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
 /* ── Brand Badges & Admin Table Filters ──────────────────────── */
 .brand-pill {
   display: inline-block;

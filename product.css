@@ -900,6 +900,24 @@ body.light .accord-pill {
   flex-shrink: 0;
 }
 
+.accord-pill.season-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  gap: 5px;
+}
+
+body.light .accord-pill.season-pill {
+  background: rgba(25, 41, 64, 0.05);
+  border-color: rgba(25, 41, 64, 0.12);
+}
+
+.season-pill-icon {
+  font-size: 13px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
 /* ==========================================================
    RELATED FRAGRANCES SECTION
    ========================================================== */

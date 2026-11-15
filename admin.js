@@ -83,7 +83,9 @@
         inspired_by: 'Vanilla Powder - Matière Première',
         longevity: 4,
         sillage: 4,
-        accords: 'creamy-sweet oriental fragrance'
+        accords: 'Vanilla, Sweet, Oriental, Powdery, Amber',
+        main_accord: 'Vanilla',
+        seasons: 'winter,fall,night'
       })
     },
     {
@@ -107,7 +109,9 @@
         inspired_by: 'عطر فخم ومميز',
         longevity: 5,
         sillage: 4,
-        accords: 'Woody, Spicy, Oriental'
+        accords: 'Woody, Spicy, Oriental, Amber, Leather',
+        main_accord: 'Woody',
+        seasons: 'winter,fall,night'
       })
     },
     {
@@ -131,7 +135,9 @@
         inspired_by: 'عطور النخبة الشرقية',
         longevity: 5,
         sillage: 4,
-        accords: 'Woody, Smoky, Amber'
+        accords: 'Oriental, Smoky, Woody, Amber, Spicy',
+        main_accord: 'Oriental',
+        seasons: 'winter,fall,night'
       })
     },
     {
@@ -155,7 +161,9 @@
         inspired_by: 'زهري شرقي آسر',
         longevity: 4,
         sillage: 3,
-        accords: 'Floral, Sweet, Vanilla'
+        accords: 'Floral, Sweet, Vanilla, Powdery, Fruity',
+        main_accord: 'Floral',
+        seasons: 'fall,spring,night'
       })
     },
     {
@@ -179,7 +187,9 @@
         inspired_by: 'عبير النقاء الصباحي',
         longevity: 3,
         sillage: 3,
-        accords: 'Fresh, Floral, Musky'
+        accords: 'Fresh, Floral, Citrus, Musky, Aquatic',
+        main_accord: 'Fresh',
+        seasons: 'spring,summer,day'
       })
     }
   ];
@@ -897,6 +907,81 @@
       .trim();
   }
 
+  const ADMIN_ACCORD_COLORS = {
+    sweet:    { color: '#EC407A', en: 'Sweet', ar: 'حلو وسكري' },
+    woody:    { color: '#8B5A2B', en: 'Woody', ar: 'خشبي دافئ' },
+    vanilla:  { color: '#D4A373', en: 'Vanilla', ar: 'فانيليا ناعمة' },
+    oriental: { color: '#8E24AA', en: 'Oriental', ar: 'شرقي فاخر' },
+    amber:    { color: '#C58F28', en: 'Amber', ar: 'عنبري دافئ' },
+    spicy:    { color: '#E65100', en: 'Spicy', ar: 'توابل دافئة' },
+    fresh:    { color: '#00ACC1', en: 'Fresh', ar: 'منعش ونقي' },
+    floral:   { color: '#E91E63', en: 'Floral', ar: 'زهري راقي' },
+    powdery:  { color: '#78909C', en: 'Powdery', ar: 'بودري مخملي' },
+    aromatic: { color: '#43A047', en: 'Aromatic', ar: 'أروماتك' },
+    citrus:   { color: '#FBC02D', en: 'Citrus', ar: 'حمضيات منعشة' },
+    leather:  { color: '#5D4037', en: 'Leather', ar: 'جلود فاخرة' },
+    musky:    { color: '#90A4AE', en: 'Musky', ar: 'مسكي ناعم' },
+    fruity:   { color: '#FB8C00', en: 'Fruity', ar: 'فاكهي جذاب' },
+    smoky:    { color: '#546E7A', en: 'Smoky', ar: 'دخاني وبخور' },
+    aquatic:  { color: '#0288D1', en: 'Aquatic', ar: 'مائي صيفي' },
+  };
+
+  function getAccordMeta(nameOrKey) {
+    if (!nameOrKey) return { color: '#D4A373', en: '', ar: '' };
+    const raw = String(nameOrKey).toLowerCase().trim();
+    for (const k of Object.keys(ADMIN_ACCORD_COLORS)) {
+      if (raw.includes(k) || ADMIN_ACCORD_COLORS[k].ar.includes(raw) || ADMIN_ACCORD_COLORS[k].en.toLowerCase().includes(raw)) {
+        return ADMIN_ACCORD_COLORS[k];
+      }
+    }
+    return { color: '#D4A373', en: nameOrKey, ar: nameOrKey };
+  }
+
+  let selectedAccords = [];
+  function renderAdminAccordsChips(accords) {
+    selectedAccords = Array.isArray(accords) ? [...accords] : [];
+    const container = $('#adminAccordsChips');
+    const hidden = $('#prodAccords');
+    if (!container) return;
+
+    if (!selectedAccords.length) {
+      container.innerHTML = '<small style="color:var(--muted); font-size:12px;">لم يتم اختيار نغمات عطرية بعد. اختر من القائمة أعلاه لإضافتها للبصمة العطرية.</small>';
+      if (hidden) hidden.value = '';
+      return;
+    }
+
+    container.innerHTML = selectedAccords.map((acc, idx) => {
+      const meta = getAccordMeta(acc);
+      const label = adminLang === 'ar' ? (meta.ar || acc) : (meta.en || acc);
+      return `
+        <span class="admin-accord-chip">
+          <span class="accord-color-dot" style="background:${meta.color}"></span>
+          <span>${escapeHtml(label)}</span>
+          <button type="button" class="chip-remove-btn" data-remove-accord="${idx}" title="حذف النغمة">×</button>
+        </span>
+      `;
+    }).join('');
+
+    if (hidden) hidden.value = selectedAccords.join(', ');
+  }
+
+  function renderAdminSeasonsChips(seasonsStr) {
+    const raw = String(seasonsStr || '').toLowerCase();
+    const container = $('#adminSeasonsChips');
+    const hidden = $('#prodSeasons');
+    if (!container) return;
+
+    const activeList = [];
+    container.querySelectorAll('.admin-chip-btn').forEach(btn => {
+      const sKey = btn.dataset.season;
+      const isAct = raw.includes(sKey);
+      btn.classList.toggle('active', isAct);
+      if (isAct) activeList.push(sKey);
+    });
+
+    if (hidden) hidden.value = activeList.join(',');
+  }
+
   function unpackProductDetails(p) {
     if (!p) return {};
     let meta = {};
@@ -913,6 +998,8 @@
       longevity:    p.longevity || meta.longevity || '3',
       sillage:      p.sillage || meta.sillage || '2',
       accords:      p.accords || meta.accords || '',
+      main_accord:  p.main_accord || meta.main_accord || '',
+      seasons:      p.seasons || meta.seasons || '',
     };
   }
 
@@ -944,9 +1031,22 @@
       $('#prodInspiredBy').value  = details.inspired_by;
       $('#prodLongevity').value   = details.longevity;
       $('#prodSillage').value     = details.sillage;
-      $('#prodAccords').value     = details.accords;
       $('#prodFeatured').checked  = Boolean(product.is_featured);
       $('#prodInStock').checked   = product.in_stock !== false;
+
+      // Scent DNA Accords & Main Accord
+      let currentAccordsList = (details.accords || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
+      const chosenMain = details.main_accord || currentAccordsList[0] || 'Sweet';
+      if ($('#prodMainAccord')) $('#prodMainAccord').value = chosenMain;
+      if (!currentAccordsList.length) {
+        currentAccordsList = [chosenMain];
+      }
+      renderAdminAccordsChips(currentAccordsList);
+
+      // Seasons & Occasions
+      const currentSeasons = (details.seasons || 'winter,fall').toLowerCase();
+      renderAdminSeasonsChips(currentSeasons);
+
       $('#saveProdBtn').innerHTML = 'حفظ التعديلات <span>←</span>';
     } else {
       modalTitle.innerHTML = 'إضافة <em>عطر جديد</em>';
@@ -956,6 +1056,11 @@
       $('#prodLongevity').value = '3';
       $('#prodSillage').value   = '2';
       $('#prodInStock').checked  = true;
+
+      if ($('#prodMainAccord')) $('#prodMainAccord').value = 'Sweet';
+      renderAdminAccordsChips(['Sweet', 'Vanilla', 'Floral']);
+      renderAdminSeasonsChips('winter,fall');
+
       $('#saveProdBtn').innerHTML = 'إضافة العطر <span>←</span>';
     }
 
@@ -966,6 +1071,53 @@
     prodModal.classList.remove('open');
     clearImagePreview();
   }
+
+  // Scent DNA & Seasons Interactive Pickers in Admin Modal
+  $('#prodMainAccord')?.addEventListener('change', e => {
+    const mainVal = e.target.value;
+    if (!mainVal) return;
+    const exists = selectedAccords.some(a => a.toLowerCase() === mainVal.toLowerCase());
+    if (!exists) {
+      selectedAccords.unshift(mainVal);
+    } else {
+      selectedAccords = [mainVal, ...selectedAccords.filter(a => a.toLowerCase() !== mainVal.toLowerCase())];
+    }
+    renderAdminAccordsChips(selectedAccords);
+  });
+
+  $('#prodAccordPicker')?.addEventListener('change', e => {
+    const val = e.target.value;
+    if (!val) return;
+    const exists = selectedAccords.some(a => a.toLowerCase() === val.toLowerCase());
+    if (!exists) {
+      selectedAccords.push(val);
+      renderAdminAccordsChips(selectedAccords);
+    }
+    e.target.value = '';
+  });
+
+  $('#adminAccordsChips')?.addEventListener('click', e => {
+    const removeBtn = e.target.closest('[data-remove-accord]');
+    if (removeBtn) {
+      const idx = parseInt(removeBtn.dataset.removeAccord);
+      if (!isNaN(idx)) {
+        selectedAccords.splice(idx, 1);
+        renderAdminAccordsChips(selectedAccords);
+      }
+    }
+  });
+
+  $('#adminSeasonsChips')?.addEventListener('click', e => {
+    const btn = e.target.closest('.admin-chip-btn');
+    if (btn) {
+      btn.classList.toggle('active');
+      const activeList = [];
+      $('#adminSeasonsChips').querySelectorAll('.admin-chip-btn.active').forEach(b => {
+        activeList.push(b.dataset.season);
+      });
+      if ($('#prodSeasons')) $('#prodSeasons').value = activeList.join(',');
+    }
+  });
 
   $('#openAddProduct')?.addEventListener('click', () => openProductModal());
   $('#productModalClose')?.addEventListener('click', closeProductModal);
@@ -1101,7 +1253,9 @@
       inspired_by: $('#prodInspiredBy').value.trim() || null,
       longevity:   parseInt($('#prodLongevity').value) || 3,
       sillage:     parseInt($('#prodSillage').value) || 2,
-      accords:     $('#prodAccords').value.trim() || null,
+      accords:     $('#prodAccords')?.value.trim() || null,
+      main_accord: $('#prodMainAccord')?.value || null,
+      seasons:     $('#prodSeasons')?.value || null,
       is_featured: $('#prodFeatured').checked,
       in_stock:    $('#prodInStock').checked,
     };
@@ -1125,7 +1279,7 @@
       } catch (colErr) {
         // إذا لم تكن الأعمدة الجديدة مضافة في Supabase بعد، نحفظها كـ JSON داخل notes تلقائياً
         const errMsg = String(colErr?.message || '');
-        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('top_notes') || errMsg.includes('brand')) {
+        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('top_notes') || errMsg.includes('brand') || errMsg.includes('main_accord') || errMsg.includes('seasons')) {
           console.warn('Columns not yet in Supabase schema, falling back to JSON notes:', colErr);
           const fallbackPayload = {
             name:        payload.name,
@@ -1146,6 +1300,8 @@
               longevity:    payload.longevity,
               sillage:      payload.sillage,
               accords:      payload.accords,
+              main_accord:  payload.main_accord,
+              seasons:      payload.seasons
             }),
           };
           if (id) {

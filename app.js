@@ -266,6 +266,7 @@
       sort_order: 0,
       notes: JSON.stringify({
         brand: 'Matière Première',
+        brand_ar: 'ماتيير بريمير ماتير premiere',
         desc: 'Nude Coral Diamond takes center stage as the luminous note of a sunset’s symphony. Bergamot dances with saffron, joined by orange blossom and coconut, while the warmth of cashmeran and vanilla completes the aromatic masterpiece.',
         top_notes: 'Bergamot, Apple, Saffron',
         middle_notes: 'Orange Blossom, Coconut, Guaiac Wood',
@@ -273,7 +274,9 @@
         inspired_by: 'Vanilla Powder - Matière Première',
         longevity: 4,
         sillage: 4,
-        accords: 'creamy-sweet oriental fragrance'
+        accords: 'Vanilla, Sweet, Oriental, Powdery, Amber',
+        main_accord: 'Vanilla',
+        seasons: 'winter,fall,night'
       })
     },
     {
@@ -290,6 +293,7 @@
       sort_order: 1,
       notes: JSON.stringify({
         brand: 'إبراق',
+        brand_ar: 'ابراق إبراق ibraq',
         desc: 'عطر رجالي فاخر يجمع بين دفء التوابل الشرقية وأناقة الأخشاب العطرية، ليعبر عن حضور مهيب ولا يُنسى.',
         top_notes: 'الهيل، الزعفران، جوزة الطيب',
         middle_notes: 'العود، اللبان، الجلود',
@@ -297,7 +301,9 @@
         inspired_by: 'عطر فخم ومميز',
         longevity: 5,
         sillage: 4,
-        accords: 'Woody, Spicy, Oriental'
+        accords: 'Woody, Spicy, Oriental, Amber, Leather',
+        main_accord: 'Woody',
+        seasons: 'winter,fall,night'
       })
     },
     {
@@ -314,6 +320,7 @@
       sort_order: 2,
       notes: JSON.stringify({
         brand: 'رُوح',
+        brand_ar: 'روح رُوح rou7',
         desc: 'تجسيد حقيقي للهيبة الشرقية؛ عبير العود الفاخر والجلود والبخور المعتّق يترك أثراً ملكياً يلفت الأنظار.',
         top_notes: 'برغموت مدخن، بخور، زنجبيل',
         middle_notes: 'خشب الغاياك، عنبر فاخر، قرفة',
@@ -321,7 +328,9 @@
         inspired_by: 'عطور النخبة الشرقية',
         longevity: 5,
         sillage: 4,
-        accords: 'Woody, Smoky, Amber'
+        accords: 'Oriental, Smoky, Woody, Amber, Spicy',
+        main_accord: 'Oriental',
+        seasons: 'winter,fall,night'
       })
     },
     {
@@ -338,6 +347,7 @@
       sort_order: 3,
       notes: JSON.stringify({
         brand: 'رُوح',
+        brand_ar: 'روح رُوح rou7',
         desc: 'عطر أنثوي غامض وجذاب مستوحى من سحر ليالي الشرق، نغمات الزهور البيضاء الناعمة تمتزج مع الفانيليا.',
         top_notes: 'توت بري، كمثرى، زهر البرتقال',
         middle_notes: 'ياسمين، فانيليا ناعمة، مسك الروم',
@@ -345,7 +355,9 @@
         inspired_by: 'زهري شرقي آسر',
         longevity: 4,
         sillage: 3,
-        accords: 'Floral, Sweet, Vanilla'
+        accords: 'Floral, Sweet, Vanilla, Powdery, Fruity',
+        main_accord: 'Floral',
+        seasons: 'fall,spring,night'
       })
     },
     {
@@ -362,6 +374,7 @@
       sort_order: 4,
       notes: JSON.stringify({
         brand: 'رُوح',
+        brand_ar: 'روح رُوح rou7',
         desc: 'انتعاش نقي كأول خيوط الصباح الباكر، باقة ورد ندية مع لمسة حمضيات ومسك أبيض ناعم.',
         top_notes: 'زهر الليمون، تفاح أخضر، ندى الصباح',
         middle_notes: 'ورد دمشقي، زنبق الوادي، فريزيا',
@@ -369,7 +382,9 @@
         inspired_by: 'عبير النقاء الصباحي',
         longevity: 3,
         sillage: 3,
-        accords: 'Fresh, Floral, Musky'
+        accords: 'Fresh, Floral, Citrus, Musky, Aquatic',
+        main_accord: 'Fresh',
+        seasons: 'spring,summer,day'
       })
     }
   ];
@@ -1007,6 +1022,8 @@
       longevity:    parseInt(p.longevity || meta.longevity) || 3,
       sillage:      parseInt(p.sillage || meta.sillage) || 2,
       accords:      p.accords || meta.accords || '',
+      main_accord:  p.main_accord || meta.main_accord || '',
+      seasons:      p.seasons || meta.seasons || '',
     };
   }
 
