@@ -1133,32 +1133,14 @@
   }
 
   $('#detailModalClose')?.addEventListener('click', closeProductDetailModal);
-  detailModal?.addEventListener('click', e => { if (e.target === detailModal) closeProductDetailModal(); });
-
-  $('#productGrid')?.addEventListener('click', event => {
-    const exploreBtn = event.target.closest('[data-explore]');
-    if (exploreBtn) {
-      event.preventDefault();
-      event.stopPropagation();
-      openProductDetailModal(exploreBtn.dataset.explore);
+  detailModal?.addEventListener('click', e => {
+    if (e.target === detailModal) {
+      closeProductDetailModal();
       return;
     }
-  });
-
-  $('#heroProduct')?.addEventListener('click', event => {
-    const exploreBtn = event.target.closest('[data-explore]');
-    if (exploreBtn) {
-      event.preventDefault();
-      event.stopPropagation();
-      openProductDetailModal(exploreBtn.dataset.explore);
-      return;
-    }
-    const addBtn = event.target.closest('[data-add]');
+    const addBtn = e.target.closest('[data-add]');
     if (addBtn) {
-      event.preventDefault();
-      event.stopPropagation();
-      addToCart(addBtn.dataset.add);
-      return;
+      addToCart(addBtn.dataset.add, addBtn);
     }
   });
 
@@ -1364,11 +1346,11 @@
   }));
 
   $('#productGrid').addEventListener('click', event => {
-    const qvBtn = event.target.closest('[data-quickview]');
+    const qvBtn = event.target.closest('[data-quickview], [data-explore]');
     if (qvBtn) {
       event.preventDefault();
       event.stopPropagation();
-      openProductDetailModal(qvBtn.dataset.quickview);
+      openProductDetailModal(qvBtn.dataset.quickview || qvBtn.dataset.explore);
       return;
     }
     const button = event.target.closest('[data-add]');
