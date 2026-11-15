@@ -998,6 +998,7 @@
     }
     return {
       brand:        p.brand || meta.brand || 'رُوح',
+      brand_ar:     meta.brand_ar || '',
       notes:        meta.desc !== undefined ? meta.desc : (p.notes || ''),
       top_notes:    p.top_notes || meta.top_notes || '',
       middle_notes: p.middle_notes || meta.middle_notes || '',
@@ -1137,6 +1138,242 @@
     </div>`;
   }
 
+  // ── Advanced Arabic & Multilingual Search Normalizer ───────────────────────
+  function normalizeSearchText(str) {
+    if (!str) return '';
+    return String(str)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // remove latin diacritics/accents: è -> e
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/[\u064B-\u065F]/g, '') // remove arabic tashkeel / harakat
+      .replace(/[^a-z0-9\u0621-\u064A\s]/gi, ' ')
+      .trim();
+  }
+
+  const SEARCH_STOPWORDS = new Set(['عطر', 'عطور', 'براند', 'ماركه', 'ماركة', 'عطرين', 'perfume', 'scent', 'brand', 'fragrance']);
+
+  const BRAND_SEARCH_ALIASES = {
+    'matiere premiere': 'ماتيير بريمير ماتير premiere matiere',
+    'matière première': 'ماتيير بريمير ماتير premiere matiere',
+    'ibraq': 'ابراق إبراق ibraq',
+    'إبراق': 'ابراق إبراق ibraq',
+    'rou7': 'روح رُوح rou7 perfume',
+    'رُوح': 'روح رُوح rou7 perfume'
+  };
+
+  const CATEGORY_SEARCH_ALIASES = {
+    women: 'women نسائي حريمي بناتي بنات ستات for her',
+    men: 'men رجالي شبابي رجال شباب for him',
+    unisex: 'unisex للجميع مشترك للجنسين الكل unisex'
+  };
+
+  function productMatchesQuery(product, queryText) {
+    if (!queryText) return true;
+    const qNorm = normalizeSearchText(queryText);
+    if (!qNorm) return true;
+
+    const d = unpackProduct(product);
+    const pCat = (product.category || 'unisex').toLowerCase();
+    const normCat = (pCat === 'women' || pCat.includes('نسائ') || pCat.includes('her')) ? 'women'
+      : (pCat === 'men' || pCat.includes('رجال') || pCat.includes('him')) ? 'men' : 'unisex';
+
+    // Fast-path gender check
+    if (qNorm === 'نسائي' || qNorm === 'حريمي' || qNorm === 'بناتي' || qNorm === 'women' || qNorm === 'for her') {
+      return normCat === 'women';
+    }
+    if (qNorm === 'رجالي' || qNorm === 'شبابي' || qNorm === 'men' || qNorm === 'for him') {
+      return normCat === 'men';
+    }
+    if (qNorm === 'للجميع' || qNorm === 'مشترك' || qNorm === 'للجنسين' || qNorm === 'unisex') {
+      return normCat === 'unisex';
+    }
+
+    const prodBrand = (d.brand || product.brand || 'رُوح');
+    const brandAlias = BRAND_SEARCH_ALIASES[prodBrand.toLowerCase()] || BRAND_SEARCH_ALIASES[prodBrand] || '';
+    const catAlias = CATEGORY_SEARCH_ALIASES[normCat] || '';
+
+    const haystack = normalizeSearchText(
+      `${product.name} ${product.latin || ''} ${prodBrand} ${brandAlias} ${d.brand_ar || ''} ${catAlias} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.inspired_by} ${d.accords}`
+    );
+
+    if (haystack.includes(qNorm)) return true;
+
+    const rawTokens = qNorm.split(/\s+/).filter(Boolean);
+    const tokens = rawTokens.filter(t => !SEARCH_STOPWORDS.has(t));
+    const toCheck = tokens.length > 0 ? tokens : rawTokens;
+
+    return toCheck.every(tok => haystack.includes(tok));
+  }
+
+  // ── Live Instant Search Dropdown Renderer ─────────────────────────────────
+  function renderSearchDropdown(queryText) {
+    const dropdown = $('#searchLiveDropdown');
+    const header = $('#searchLiveHeader');
+    const list = $('#searchLiveList');
+    const footer = $('#searchLiveFooter');
+    const clearBtn = $('#searchClearBtn');
+    if (!dropdown) return;
+
+    const trimmed = (queryText || '').trim();
+    if (!trimmed) {
+      dropdown.hidden = true;
+      if (clearBtn) clearBtn.hidden = true;
+      return;
+    }
+
+    if (clearBtn) clearBtn.hidden = false;
+
+    const matches = products.filter(p => {
+      if (p.name === '__system_announcements__' || p.in_stock === false) return false;
+      return productMatchesQuery(p, trimmed);
+    });
+
+    dropdown.hidden = false;
+
+    const isAr = currentLang === 'ar';
+
+    if (matches.length > 0) {
+      if (header) {
+        header.innerHTML = `
+          <span>${isAr ? 'عطور مطابقة لبحثك' : 'Matching Fragrances'}</span>
+          <span class="badge">${isAr ? `${matches.length} عطور` : `${matches.length} results`}</span>
+        `;
+      }
+
+      if (list) {
+        list.innerHTML = matches.map(p => {
+          const d = unpackProduct(p);
+          const pName = isAr ? p.name : (p.latin || p.name);
+          const pSub  = isAr ? (p.latin || '') : (p.latin ? p.name : '');
+          const pBrand = d.brand || 'رُوح';
+          const pImg = p.image_url || 'assets/branding/logo-dark.png';
+          const pPrice = money(p.price);
+
+          return `
+            <div class="search-live-item" data-id="${p.id}" tabindex="0">
+              <div class="search-item-thumb">
+                <img src="${escapeHtml(pImg)}" alt="${escapeHtml(pName)}" loading="lazy">
+              </div>
+              <div class="search-item-info">
+                <span class="search-item-brand">${escapeHtml(pBrand)}</span>
+                <h4 class="search-item-name">${escapeHtml(pName)}</h4>
+                ${pSub ? `<span class="search-item-latin">${escapeHtml(pSub)}</span>` : ''}
+              </div>
+              <div class="search-item-price-col">
+                <span class="search-item-price">${pPrice}</span>
+                <button type="button" class="search-item-btn live-add-btn" data-add-id="${p.id}">
+                  ${isAr ? '＋ أضف للسلة' : '＋ Add'}
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        list.querySelectorAll('.search-live-item').forEach(item => {
+          item.addEventListener('click', e => {
+            if (e.target.closest('.live-add-btn')) return;
+            const id = item.dataset.id;
+            window.location.href = `product.html?id=${encodeURIComponent(id)}`;
+          });
+        });
+
+        list.querySelectorAll('.live-add-btn').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            const id = btn.dataset.addId;
+            const targetProd = products.find(p => String(p.id) === String(id));
+            if (targetProd) {
+              const inCart = cart.find(it => String(it.id) === String(id));
+              if (inCart) {
+                inCart.quantity += 1;
+              } else {
+                cart.push({ ...targetProd, quantity: 1 });
+              }
+              saveCart();
+              renderCart();
+              showToast(isAr ? 'تمت إضافة العطر إلى السلة ✳' : 'Added to shopping bag ✳');
+              btn.textContent = isAr ? '✓ تم' : '✓ Added';
+              setTimeout(() => {
+                btn.textContent = isAr ? '＋ أضف للسلة' : '＋ Add';
+              }, 1600);
+            }
+          });
+        });
+      }
+
+      if (footer) {
+        footer.innerHTML = `
+          <button type="button" class="search-footer-btn" id="searchShowInCollectionBtn">
+            <span>${isAr ? `تصفح كل النتائج في المتجر (${matches.length})` : `View all results in store (${matches.length})`}</span>
+            <span>←</span>
+          </button>
+        `;
+        $('#searchShowInCollectionBtn')?.addEventListener('click', () => {
+          dropdown.hidden = true;
+          $('#searchBar')?.classList.remove('open');
+          query = trimmed;
+          renderProducts();
+          document.querySelector('#collection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+    } else {
+      if (header) {
+        header.innerHTML = `<span>${isAr ? 'نتائج البحث' : 'Search Results'}</span><span class="badge">0</span>`;
+      }
+      if (list) {
+        const topSugg = products.filter(p => p.name !== '__system_announcements__' && p.in_stock !== false).slice(0, 5);
+        list.innerHTML = `
+          <div class="search-empty-state">
+            <span class="search-empty-icon">🔍</span>
+            <h4 class="search-empty-title">${isAr ? `لم نجد عطراً يطابق "${escapeHtml(trimmed)}"` : `No perfumes match "${escapeHtml(trimmed)}"`}</h4>
+            <p class="search-empty-desc">${isAr ? 'تأكد من كتابة الاسم بشكل صحيح، أو جرّب البحث باسم البراند أو مكونات العطر.' : 'Check the spelling, or try searching by brand or notes.'}</p>
+            <div class="search-suggestions-title">${isAr ? 'عطور مميزة قد تناسبك:' : 'Suggested perfumes:'}</div>
+            <div class="search-suggestions-chips">
+              ${topSugg.map(sp => `
+                <button type="button" class="search-sugg-chip" data-search-term="${escapeHtml(sp.name)}">
+                  ${escapeHtml(sp.name)}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        list.querySelectorAll('.search-sugg-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            const term = chip.dataset.searchTerm;
+            const input = $('#searchInput');
+            if (input) {
+              input.value = term;
+              input.dispatchEvent(new Event('input'));
+              input.focus();
+            }
+          });
+        });
+      }
+
+      if (footer) {
+        footer.innerHTML = `
+          <button type="button" class="search-footer-btn" id="searchResetViewBtn">
+            <span>${isAr ? 'عرض كل العطور' : 'Browse All Fragrances'}</span>
+            <span>←</span>
+          </button>
+        `;
+        $('#searchResetViewBtn')?.addEventListener('click', () => {
+          dropdown.hidden = true;
+          $('#searchBar')?.classList.remove('open');
+          const input = $('#searchInput');
+          if (input) input.value = '';
+          query = '';
+          renderProducts();
+          document.querySelector('#collection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+    }
+  }
+
   function renderProducts() {
     const t = I18N[currentLang];
 
@@ -1183,25 +1420,9 @@
         if (prodBrand !== activeBrand.toLowerCase()) return false;
       }
 
-      // 3. Search Query (Name, Latin, Brand, Gender words, Notes, Accords, Inspired By)
+      // 3. Search Query (Normalized multilingual name, latin, brand, notes, accords, etc.)
       if (query) {
-        const q = query.toLowerCase().trim();
-        // Check for gender keywords in query
-        if (q === 'نسائي' || q === 'حريمي' || q === 'بناتي' || q === 'women' || q === 'for her') {
-          if (normCat !== 'women') return false;
-          return true;
-        }
-        if (q === 'رجالي' || q === 'شبابي' || q === 'men' || q === 'for him') {
-          if (normCat !== 'men') return false;
-          return true;
-        }
-        if (q === 'للجميع' || q === 'مشترك' || q === 'للجنسين' || q === 'unisex') {
-          if (normCat !== 'unisex') return false;
-          return true;
-        }
-
-        const combined = `${product.name} ${product.latin || ''} ${d.brand || ''} ${pCat} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.inspired_by} ${d.accords}`.toLowerCase();
-        if (!combined.includes(q)) return false;
+        if (!productMatchesQuery(product, query)) return false;
       }
 
       return true;
@@ -1261,7 +1482,12 @@
               </div>
             </div>
           </article>`;
-        }).join('') || `<p class="no-results">${t.no_results}</p>`
+        }).join('') || `<div class="search-no-results-box" style="grid-column: 1 / -1; text-align: center; padding: 48px 20px;">
+          <span style="font-size: 38px; display: block; margin-bottom: 12px; opacity: .8;">🔍</span>
+          <h3 style="font-size: 18px; margin: 0 0 8px; color: var(--ink); font-weight: 500;">${currentLang === 'ar' ? 'لم نجد أي عطر يطابق بحثك' : 'No Fragrances Found'}</h3>
+          <p style="font-size: 13px; color: var(--muted); margin: 0 0 20px;">${currentLang === 'ar' ? 'جرّب البحث بكلمة أخرى، أو باسم البراند، أو تصفح كل العطور.' : 'Try a different keyword or browse all fragrances.'}</p>
+          <button type="button" class="button button-primary" id="btnResetSearchGrid" style="border-radius: 999px;">${currentLang === 'ar' ? 'عرض كل العطور' : 'View All Fragrances'}</button>
+        </div>`
       : `<div class="catalog-empty"><span>✳</span><h3>${currentLang === 'ar' ? 'قريباً، عطور رُوح هنا' : 'Rou7 Fragrances Coming Soon'}</h3></div>`;
 
     const countText = currentLang === 'ar'
@@ -1794,22 +2020,105 @@
   $('#menuToggle').addEventListener('click', () => $('#mobileMenu').classList.toggle('open'));
   $$('#mobileMenu a').forEach(link => link.addEventListener('click', () => $('#mobileMenu').classList.remove('open')));
 
-  $('#searchToggle').addEventListener('click', () => {
-    $('#searchBar').classList.add('open');
-    $('#searchInput').focus();
+  // ── Search Bar & Live Dropdown Event Handlers ─────────────────────────────
+  $('#searchToggle')?.addEventListener('click', () => {
+    const sb = $('#searchBar');
+    sb?.classList.toggle('open');
+    if (sb?.classList.contains('open')) {
+      const input = $('#searchInput');
+      input?.focus();
+      if (input && input.value.trim()) {
+        renderSearchDropdown(input.value.trim());
+      }
+    } else {
+      const dropdown = $('#searchLiveDropdown');
+      if (dropdown) dropdown.hidden = true;
+    }
   });
-  $('#searchClose').addEventListener('click', () => {
-    $('#searchBar').classList.remove('open');
-    $('#searchInput').value = '';
+
+  $('#searchClose')?.addEventListener('click', () => {
+    $('#searchBar')?.classList.remove('open');
+    const dropdown = $('#searchLiveDropdown');
+    if (dropdown) dropdown.hidden = true;
+    const input = $('#searchInput');
+    if (input) input.value = '';
+    const clearBtn = $('#searchClearBtn');
+    if (clearBtn) clearBtn.hidden = true;
     query = '';
     renderProducts();
   });
-  $('#searchInput').addEventListener('input', event => {
-    query = event.target.value.trim();
-    activeFilter = 'all';
-    $$('.filter').forEach(button => button.classList.toggle('active', button.dataset.filter === 'all'));
+
+  $('#searchClearBtn')?.addEventListener('click', () => {
+    const input = $('#searchInput');
+    if (input) input.value = '';
+    query = '';
+    renderSearchDropdown('');
     renderProducts();
-    document.querySelector('#collection').scrollIntoView({behavior:'smooth', block:'start'});
+    input?.focus();
+  });
+
+  $('#searchInput')?.addEventListener('input', event => {
+    const val = event.target.value.trim();
+    query = val;
+    activeFilter = 'all';
+    activeBrand = 'all';
+    $$('.filter').forEach(button => button.classList.toggle('active', button.dataset.filter === 'all'));
+    const brandSel = $('#collectionBrandFilter');
+    if (brandSel) brandSel.value = 'all';
+    const chipsBar = $('#brandChipsBar');
+    if (chipsBar) {
+      chipsBar.querySelectorAll('.brand-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.brandChip === 'all');
+      });
+    }
+
+    renderSearchDropdown(val);
+    renderProducts();
+  });
+
+  $('#searchInput')?.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const dropdown = $('#searchLiveDropdown');
+      if (dropdown) dropdown.hidden = true;
+      $('#searchBar')?.classList.remove('open');
+      renderProducts();
+      document.querySelector('#collection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (event.key === 'Escape') {
+      $('#searchBar')?.classList.remove('open');
+      const dropdown = $('#searchLiveDropdown');
+      if (dropdown) dropdown.hidden = true;
+    }
+  });
+
+  // Close search bar & live dropdown on click outside
+  document.addEventListener('click', event => {
+    const searchBar = $('#searchBar');
+    const searchToggle = $('#searchToggle');
+    if (searchBar?.classList.contains('open')) {
+      if (!searchBar.contains(event.target) && !searchToggle?.contains(event.target)) {
+        searchBar.classList.remove('open');
+        const dropdown = $('#searchLiveDropdown');
+        if (dropdown) dropdown.hidden = true;
+      }
+    }
+  });
+
+  // Reset search button listener in product grid
+  $('#productGrid')?.addEventListener('click', e => {
+    if (e.target.closest('#btnResetSearchGrid')) {
+      const input = $('#searchInput');
+      if (input) input.value = '';
+      const clearBtn = $('#searchClearBtn');
+      if (clearBtn) clearBtn.hidden = true;
+      query = '';
+      activeFilter = 'all';
+      activeBrand = 'all';
+      $$('.filter').forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
+      const brandSel = $('#collectionBrandFilter');
+      if (brandSel) brandSel.value = 'all';
+      renderProducts();
+    }
   });
 
   $('#newsletterForm').addEventListener('submit', async event => {

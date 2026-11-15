@@ -704,8 +704,12 @@
 
       // Search query matching (name, latin, brand, category, notes, accords, inspired_by)
       if (searchQuery) {
-        const hay = `${p.name} ${p.latin || ''} ${brandName} ${pCat} ${d.notes} ${d.inspired_by} ${d.accords}`.toLowerCase();
-        if (!hay.includes(searchQuery)) return false;
+        const qNorm = normalizeSearchText(searchQuery);
+        const hay = normalizeSearchText(`${p.name} ${p.latin || ''} ${brandName} ${pCat} ${d.notes} ${d.inspired_by} ${d.accords}`);
+        if (!hay.includes(qNorm)) {
+          const tokens = qNorm.split(/\s+/).filter(Boolean);
+          if (!tokens.every(t => hay.includes(t))) return false;
+        }
       }
       return true;
     });
@@ -878,6 +882,20 @@
       clearImagePreview();
     }
   });
+
+  function normalizeSearchText(str) {
+    if (!str) return '';
+    return String(str)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/[\u064B-\u065F]/g, '')
+      .replace(/[^a-z0-9\u0621-\u064A\s]/gi, ' ')
+      .trim();
+  }
 
   function unpackProductDetails(p) {
     if (!p) return {};

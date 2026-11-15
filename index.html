@@ -42,7 +42,21 @@
       <button id="mobileLangToggle" class="mobile-lang-btn">🌐 <span id="mobileLangText">English</span></button>
       <button id="mobileThemeToggle" data-i18n="theme_toggle_mobile">تغيير المظهر</button>
     </div>
-    <div class="search-bar" id="searchBar"><input id="searchInput" type="search" placeholder="ابحث عن عطرك المفضل…" aria-label="ابحث عن عطر" data-i18n-ph="search_placeholder"><button id="searchClose" aria-label="إغلاق البحث">×</button></div>
+    <div class="search-bar" id="searchBar">
+      <div class="search-bar-inner">
+        <div class="search-input-wrap">
+          <svg class="search-input-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/></svg>
+          <input id="searchInput" type="search" placeholder="ابحث عن عطرك المفضل…" aria-label="ابحث عن عطر" data-i18n-ph="search_placeholder" autocomplete="off">
+          <button type="button" id="searchClearBtn" class="search-clear-btn" aria-label="مسح البحث" hidden>×</button>
+        </div>
+        <button type="button" id="searchClose" class="search-close-btn" aria-label="إغلاق البحث">×</button>
+      </div>
+      <div class="search-live-dropdown" id="searchLiveDropdown" hidden>
+        <div class="search-live-header" id="searchLiveHeader"></div>
+        <div class="search-live-list" id="searchLiveList"></div>
+        <div class="search-live-footer" id="searchLiveFooter"></div>
+      </div>
+    </div>
   </header>
 
   <main>
