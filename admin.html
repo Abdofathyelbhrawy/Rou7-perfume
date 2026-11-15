@@ -33,12 +33,25 @@
           <button class="button button-primary" id="openAddProduct"><span>＋</span> إضافة عطر جديد</button>
         </div>
       </div>
+      <div class="admin-table-filters">
+        <input type="search" id="adminProdSearch" class="admin-search-input" placeholder="🔍 بحث في العطور بالاسم، البراند، أو التصنيف...">
+        <select id="adminCatFilter" class="admin-filter-select" aria-label="تصنيف العطور">
+          <option value="all">كل الأصناف (نسائي / رجالي / للجميع)</option>
+          <option value="women">نسائي</option>
+          <option value="men">رجالي</option>
+          <option value="unisex">للجميع</option>
+        </select>
+        <select id="adminBrandFilter" class="admin-filter-select" aria-label="تصفية البراند">
+          <option value="all">كل البراندات</option>
+        </select>
+      </div>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
               <th>الصورة</th>
               <th>اسم العطر</th>
+              <th>البراند</th>
               <th>الصنف</th>
               <th>السعر</th>
               <th>الوصف والنوتات</th>
@@ -47,7 +60,7 @@
             </tr>
           </thead>
           <tbody id="productsTable">
-            <tr><td colspan="7" class="empty-table">جاري تحميل العطور…</td></tr>
+            <tr><td colspan="8" class="empty-table">جاري تحميل العطور…</td></tr>
           </tbody>
         </table>
       </div>
@@ -239,6 +252,9 @@
                 <option value="unisex">للجميع (Unisex)</option>
               </select>
             </label>
+            <label>البراند / الماركة (Brand)
+              <input id="prodBrand" name="brand" placeholder="مثال: Matière Première، رُوح، إبراق...">
+            </label>
           </div>
           <label>الوصف العام للعطر
             <textarea id="prodNotes" name="notes" rows="2" placeholder="مثال: عطر خشبي حلو، نوتات صالحة للأكل كالفانيليا والتونكا والكراميل. دافئ وإدماني."></textarea>
@@ -389,7 +405,7 @@
     </div>
   </div>
 
-  <script src="admin.js" defer></script>
+  <script src="admin.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
 </body>
 </html>

@@ -162,9 +162,10 @@
   let currentQty = 1;
 
   const DEFAULT_FALLBACK_PRODUCT = {
-    id: 'demo-1',
+    id: 'd6973def-50dd-4e75-8005-8ee22eb23872',
     name: 'نود كورال دايموند',
     latin: 'Nude Coral Diamond',
+    brand: 'Matière Première',
     price: 1600,
     tag: 'الأكثر طلباً · Best Seller',
     category: 'عطور شرقية',
@@ -226,7 +227,8 @@
       inspired_by:  p.inspired_by || meta.inspired_by || '',
       longevity:    parseInt(p.longevity || meta.longevity) || 4,
       sillage:      parseInt(p.sillage || meta.sillage) || 3,
-      accords:      p.accords || meta.accords || ''
+      accords:      p.accords || meta.accords || '',
+      brand:        p.brand || meta.brand || ''
     };
   }
 
@@ -326,6 +328,16 @@
 
     // Info Column
     $('#prodCategoryPill').textContent = p.category ? `${p.category} · ${t.cat_default}` : t.cat_default;
+    const brandPill = $('#prodBrandPill');
+    if (brandPill) {
+      const bName = d.brand || p.brand;
+      if (bName && bName.trim()) {
+        brandPill.textContent = bName.trim();
+        brandPill.hidden = false;
+      } else {
+        brandPill.hidden = true;
+      }
+    }
     $('#prodMainTitle').textContent = prodName;
     $('#prodLatinTitle').textContent = prodSub;
     $('#prodPriceTag').textContent = money(p.price);

@@ -7,7 +7,7 @@
 
   async function supaFetch(table, { method = 'GET', filters = '', body = null, select = '*' } = {}) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
     try {
       const url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
       const res = await fetch(url, {
@@ -61,17 +61,231 @@
     return adminLang === 'ar' ? `${n.toLocaleString('ar-EG')} ج.م` : `${n.toLocaleString('en-US')} EGP`;
   };
 
+  const DEFAULT_PRODUCTS = [
+    {
+      id: 'd6973def-50dd-4e75-8005-8ee22eb23872',
+      name: 'نود كورال دايموند',
+      latin: 'Nude Coral Diamond',
+      brand: 'Matière Première',
+      price: 1600,
+      category: 'unisex',
+      tag: 'Best Seller',
+      image_url: 'https://oyslbombgdvcoyqotyao.supabase.co/storage/v1/object/public/products/rooh_1794685786337_Nude_Coral_Diam.png',
+      is_featured: true,
+      in_stock: true,
+      sort_order: 0,
+      notes: JSON.stringify({
+        brand: 'Matière Première',
+        desc: 'Nude Coral Diamond takes center stage as the luminous note of a sunset’s symphony. Bergamot dances with saffron, joined by orange blossom and coconut, while the warmth of cashmeran and vanilla completes the aromatic masterpiece.',
+        top_notes: 'Bergamot, Apple, Saffron',
+        middle_notes: 'Orange Blossom, Coconut, Guaiac Wood',
+        base_notes: 'Vanilla, Amber, Cashmeran',
+        inspired_by: 'Vanilla Powder - Matière Première',
+        longevity: 4,
+        sillage: 4,
+        accords: 'creamy-sweet oriental fragrance'
+      })
+    },
+    {
+      id: 'c34eb21c-4eeb-434e-b3e7-5383fa774137',
+      name: 'إبراق',
+      latin: 'Ibraq',
+      brand: 'إبراق',
+      price: 1500,
+      category: 'men',
+      tag: 'الأكثر مبيعاً',
+      image_url: '',
+      is_featured: false,
+      in_stock: true,
+      sort_order: 1,
+      notes: JSON.stringify({
+        brand: 'إبراق',
+        desc: 'عطر رجالي فاخر يجمع بين دفء التوابل الشرقية وأناقة الأخشاب العطرية، ليعبر عن حضور مهيب ولا يُنسى.',
+        top_notes: 'الهيل، الزعفران، جوزة الطيب',
+        middle_notes: 'العود، اللبان، الجلود',
+        base_notes: 'الباتشولي، العنبر، خشب الصندل',
+        inspired_by: 'عطر فخم ومميز',
+        longevity: 5,
+        sillage: 4,
+        accords: 'Woody, Spicy, Oriental'
+      })
+    },
+    {
+      id: '1143fdb0-4584-4722-a0ca-4cca23c11b61',
+      name: 'ملك الشرق',
+      latin: 'Malek Al Sharq',
+      brand: 'رُوح',
+      price: 389,
+      category: 'men',
+      tag: 'عطر مميز',
+      image_url: '',
+      is_featured: false,
+      in_stock: true,
+      sort_order: 2,
+      notes: JSON.stringify({
+        brand: 'رُوح',
+        desc: 'تجسيد حقيقي للهيبة الشرقية؛ عبير العود الفاخر والجلود والبخور المعتّق يترك أثراً ملكياً يلفت الأنظار.',
+        top_notes: 'برغموت مدخن، بخور، زنجبيل',
+        middle_notes: 'خشب الغاياك، عنبر فاخر، قرفة',
+        base_notes: 'جلد أسود، مسك داكن، نجيل الهند',
+        inspired_by: 'عطور النخبة الشرقية',
+        longevity: 5,
+        sillage: 4,
+        accords: 'Woody, Smoky, Amber'
+      })
+    },
+    {
+      id: '4bc56b5e-839a-4959-a231-1639882828f5',
+      name: 'نجمة الليل',
+      latin: 'Najmet Al Lail',
+      brand: 'رُوح',
+      price: 349,
+      category: 'women',
+      tag: 'جديد',
+      image_url: '',
+      is_featured: false,
+      in_stock: true,
+      sort_order: 3,
+      notes: JSON.stringify({
+        brand: 'رُوح',
+        desc: 'عطر أنثوي غامض وجذاب مستوحى من سحر ليالي الشرق، نغمات الزهور البيضاء الناعمة تمتزج مع الفانيليا.',
+        top_notes: 'توت بري، كمثرى، زهر البرتقال',
+        middle_notes: 'ياسمين، فانيليا ناعمة، مسك الروم',
+        base_notes: 'حبوب التونكا، كشميران، خشب الأرز',
+        inspired_by: 'زهري شرقي آسر',
+        longevity: 4,
+        sillage: 3,
+        accords: 'Floral, Sweet, Vanilla'
+      })
+    },
+    {
+      id: '61fc4566-5935-442d-9099-31322bb39609',
+      name: 'نسمة الفجر',
+      latin: 'Nasmet Al Fajr',
+      brand: 'رُوح',
+      price: 269,
+      category: 'women',
+      tag: 'انتعاش يومي',
+      image_url: '',
+      is_featured: false,
+      in_stock: true,
+      sort_order: 4,
+      notes: JSON.stringify({
+        brand: 'رُوح',
+        desc: 'انتعاش نقي كأول خيوط الصباح الباكر، باقة ورد ندية مع لمسة حمضيات ومسك أبيض ناعم.',
+        top_notes: 'زهر الليمون، تفاح أخضر، ندى الصباح',
+        middle_notes: 'ورد دمشقي، زنبق الوادي، فريزيا',
+        base_notes: 'مسك أبيض شفاف، أخشاب بيضاء',
+        inspired_by: 'عبير النقاء الصباحي',
+        longevity: 3,
+        sillage: 3,
+        accords: 'Fresh, Floral, Musky'
+      })
+    }
+  ];
+
+  const DEFAULT_ORDERS = [
+    {
+      id: '3886968f-57db-48a5-8cc8-cc5b871a2b06',
+      order_number: 'RO-SB5Y68',
+      customer_name: 'عبدالرحمن فتحي عواد البحراوي',
+      phone: '01025272333',
+      address: 'الجعفريه',
+      items: [{ id: 'c34eb21c-4eeb-434e-b3e7-5383fa774137', name: 'ابراق', qty: 1, price: 1500 }],
+      total: 1500.0,
+      status: 'pending',
+      created_at: '2026-11-14T18:35:33.583427+00:00'
+    },
+    {
+      id: 'b2a9d1c4-3ff3-47ca-b4b9-9a3acab995ac',
+      order_number: 'RO-C98Q5K',
+      customer_name: 'عبدالرحمن',
+      phone: '01025272333',
+      address: 'الجعفريه',
+      items: [{ id: 'c34eb21c-4eeb-434e-b3e7-5383fa774137', name: 'ابراق', qty: 1, price: 1500 }],
+      total: 1500.0,
+      status: 'pending',
+      created_at: '2026-11-13T17:56:25.067562+00:00'
+    },
+    {
+      id: 'e313e9af-7997-4471-9128-ef16dc5c6038',
+      order_number: 'RO-R4UQW2',
+      customer_name: 'عبدالرحمن',
+      phone: '01025272333',
+      address: 'الجعفريه',
+      items: [{ id: 'c34eb21c-4eeb-434e-b3e7-5383fa774137', name: 'ابراق', qty: 1, price: 1500 }],
+      total: 1500.0,
+      status: 'pending',
+      created_at: '2026-11-13T17:51:45.633324+00:00'
+    }
+  ];
+
   let currentProducts = [];
   try {
     const cachedP = localStorage.getItem('rooh-cached-products');
-    if (cachedP) currentProducts = JSON.parse(cachedP) || [];
+    if (cachedP) {
+      const parsed = JSON.parse(cachedP);
+      if (Array.isArray(parsed) && parsed.length) currentProducts = parsed;
+    }
   } catch (_) {}
+  if (!currentProducts.length) {
+    currentProducts = [...DEFAULT_PRODUCTS];
+  }
 
   let currentOrders = [];
   try {
     const cachedO = localStorage.getItem('rooh-cached-orders');
-    if (cachedO) currentOrders = JSON.parse(cachedO) || [];
+    if (cachedO) {
+      const parsed = JSON.parse(cachedO);
+      if (Array.isArray(parsed) && parsed.length) currentOrders = parsed;
+    }
   } catch (_) {}
+  if (!currentOrders.length) {
+    currentOrders = [...DEFAULT_ORDERS];
+  }
+
+  const campaignKey = 'rooh-campaign-settings';
+  const defaultCampaign = {
+    top_bar: 'شحن لجميع المحافظات · دفع عند الاستلام · ضمان الثبات والفوحان',
+    top_bar_active: true,
+    promo_title: 'شحن مجاني للطلبات فوق ١٥٠٠ جنيه',
+    promo_details: '',
+    promo_starts_at: '',
+    promo_ends_at: '',
+    promo_active: true,
+    spotlight_perfume_id: '',
+    spotlight_badge: '✨ عطر اليوم المميز',
+    spotlight_price: '',
+    spotlight_title: '',
+    spotlight_desc: '',
+    spotlight_active: true
+  };
+
+  function readCampaignLocal() {
+    try {
+      const stored = localStorage.getItem(campaignKey) || localStorage.getItem('rooh-announcements') || localStorage.getItem('rooh-promo');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return {
+          ...defaultCampaign,
+          top_bar: parsed.top_bar !== undefined ? parsed.top_bar : defaultCampaign.top_bar,
+          top_bar_active: parsed.top_bar_active !== undefined ? parsed.top_bar_active : true,
+          promo_title: parsed.promo_title || parsed.title || defaultCampaign.promo_title,
+          promo_details: parsed.promo_details !== undefined ? parsed.promo_details : (parsed.details || ''),
+          promo_starts_at: parsed.promo_starts_at || parsed.startsAt || '',
+          promo_ends_at: parsed.promo_ends_at || parsed.endsAt || '',
+          promo_active: parsed.promo_active !== undefined ? parsed.promo_active : (parsed.active !== false),
+          spotlight_perfume_id: parsed.spotlight_perfume_id || '',
+          spotlight_badge: parsed.spotlight_badge !== undefined ? parsed.spotlight_badge : defaultCampaign.spotlight_badge,
+          spotlight_price: parsed.spotlight_price !== undefined ? parsed.spotlight_price : '',
+          spotlight_title: parsed.spotlight_title || '',
+          spotlight_desc: parsed.spotlight_desc || '',
+          spotlight_active: parsed.spotlight_active !== undefined ? parsed.spotlight_active : true
+        };
+      }
+    } catch (_) {}
+    return defaultCampaign;
+  }
 
   function updateAdminDate() {
     const locale = adminLang === 'ar' ? 'ar-EG' : 'en-US';
@@ -112,49 +326,7 @@
 
   setAdminLanguage(adminLang, false);
 
-  const campaignKey = 'rooh-campaign-settings';
-  const defaultCampaign = {
-    top_bar: 'شحن لجميع المحافظات · دفع عند الاستلام · ضمان الثبات والفوحان',
-    top_bar_active: true,
-    promo_title: 'شحن مجاني للطلبات فوق ١٥٠٠ جنيه',
-    promo_details: '',
-    promo_starts_at: '',
-    promo_ends_at: '',
-    promo_active: true,
-    spotlight_perfume_id: '',
-    spotlight_badge: '✨ عطر اليوم المميز',
-    spotlight_price: '',
-    spotlight_title: '',
-    spotlight_desc: '',
-    spotlight_active: true
-  };
   const campaignForm = $('#campaignForm');
-
-  function readCampaignLocal() {
-    try {
-      const stored = localStorage.getItem(campaignKey) || localStorage.getItem('rooh-announcements') || localStorage.getItem('rooh-promo');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return {
-          ...defaultCampaign,
-          top_bar: parsed.top_bar !== undefined ? parsed.top_bar : defaultCampaign.top_bar,
-          top_bar_active: parsed.top_bar_active !== undefined ? parsed.top_bar_active : true,
-          promo_title: parsed.promo_title || parsed.title || defaultCampaign.promo_title,
-          promo_details: parsed.promo_details !== undefined ? parsed.promo_details : (parsed.details || ''),
-          promo_starts_at: parsed.promo_starts_at || parsed.startsAt || '',
-          promo_ends_at: parsed.promo_ends_at || parsed.endsAt || '',
-          promo_active: parsed.promo_active !== undefined ? parsed.promo_active : (parsed.active !== false),
-          spotlight_perfume_id: parsed.spotlight_perfume_id || '',
-          spotlight_badge: parsed.spotlight_badge !== undefined ? parsed.spotlight_badge : defaultCampaign.spotlight_badge,
-          spotlight_price: parsed.spotlight_price !== undefined ? parsed.spotlight_price : '',
-          spotlight_title: parsed.spotlight_title || '',
-          spotlight_desc: parsed.spotlight_desc || '',
-          spotlight_active: parsed.spotlight_active !== undefined ? parsed.spotlight_active : true
-        };
-      }
-    } catch (_) {}
-    return defaultCampaign;
-  }
 
   function showCampaignPreview() {
     const topBarInput = $('#topBarTextInput');
@@ -489,14 +661,57 @@
   }
 
   function renderProductsTable(products) {
-    currentProducts = (products || []).filter(p => p.name !== '__system_announcements__');
-    try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
+    if (products) {
+      currentProducts = (products || []).filter(p => p.name !== '__system_announcements__');
+      try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
+    }
     $('#statProducts').textContent = arabicNum(currentProducts.length);
     $('#prodBadge').textContent     = arabicNum(currentProducts.length);
     populateSpotlightSelect(currentProducts);
 
-    if (!currentProducts.length) {
-      $('#productsTable').innerHTML = `<tr><td colspan="7" class="empty-table">${adminLang === 'ar' ? 'لا توجد عطور حالياً. اضغط "إضافة عطر جديد" لإضافة أول عطر لمجموعتك! ✳' : 'No fragrances yet. Click "Add New Fragrance" to get started! ✳'}</td></tr>`;
+    // Update Brand Filter dropdown options
+    const brandFilterSel = $('#adminBrandFilter');
+    if (brandFilterSel) {
+      const prevBrandVal = brandFilterSel.value || 'all';
+      const allBrands = Array.from(new Set(currentProducts.map(p => {
+        const d = unpackProductDetails(p);
+        return (p.brand || d.brand || 'رُوح').trim();
+      }).filter(Boolean))).sort();
+      brandFilterSel.innerHTML = `<option value="all">${adminLang === 'ar' ? 'كل البراندات' : 'All Brands'}</option>` +
+        allBrands.map(b => `<option value="${escapeHtml(b)}" ${b === prevBrandVal ? 'selected' : ''}>${escapeHtml(b)}</option>`).join('');
+    }
+
+    const searchQuery = ($('#adminProdSearch')?.value || '').trim().toLowerCase();
+    const catFilterVal = $('#adminCatFilter')?.value || 'all';
+    const brandFilterVal = $('#adminBrandFilter')?.value || 'all';
+
+    const filtered = currentProducts.filter(p => {
+      const d = unpackProductDetails(p);
+      const brandName = (p.brand || d.brand || 'رُوح').toLowerCase();
+      const pCat = (p.category || 'unisex').toLowerCase();
+
+      // Category matching
+      if (catFilterVal !== 'all') {
+        const normCat = (pCat === 'women' || pCat.includes('نسائ')) ? 'women'
+          : (pCat === 'men' || pCat.includes('رجال')) ? 'men' : 'unisex';
+        if (normCat !== catFilterVal) return false;
+      }
+
+      // Brand matching
+      if (brandFilterVal !== 'all') {
+        if (brandName !== brandFilterVal.toLowerCase()) return false;
+      }
+
+      // Search query matching (name, latin, brand, category, notes, accords, inspired_by)
+      if (searchQuery) {
+        const hay = `${p.name} ${p.latin || ''} ${brandName} ${pCat} ${d.notes} ${d.inspired_by} ${d.accords}`.toLowerCase();
+        if (!hay.includes(searchQuery)) return false;
+      }
+      return true;
+    });
+
+    if (!filtered.length) {
+      $('#productsTable').innerHTML = `<tr><td colspan="8" class="empty-table">${adminLang === 'ar' ? 'لا توجد نتائج مطابقة لبحثك أو لا توجد عطور حالياً.' : 'No fragrances match your search.'}</td></tr>`;
       return;
     }
 
@@ -506,8 +721,14 @@
       unisex: { text: adminLang === 'ar' ? 'للجميع' : 'Unisex', class: 'unisex' },
     };
 
-    $('#productsTable').innerHTML = currentProducts.map(p => {
-      const cat = catLabels[p.category] || { text: p.category || (adminLang === 'ar' ? 'للجميع' : 'Unisex'), class: 'unisex' };
+    $('#productsTable').innerHTML = filtered.map(p => {
+      const pCat = (p.category || 'unisex').toLowerCase();
+      const normCatKey = (pCat === 'women' || pCat.includes('نسائ')) ? 'women'
+        : (pCat === 'men' || pCat.includes('رجال')) ? 'men' : 'unisex';
+      const cat = catLabels[normCatKey] || { text: p.category || (adminLang === 'ar' ? 'للجميع' : 'Unisex'), class: 'unisex' };
+      const d = unpackProductDetails(p);
+      const prodBrand = p.brand || d.brand || 'رُوح';
+
       const imgHtml = p.image_url
         ? `<div class="prod-thumb"><img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name)}"></div>`
         : `<div class="prod-thumb"><span class="thumb-empty">🧴</span></div>`;
@@ -515,12 +736,9 @@
       const titlePrimary = adminLang === 'en' ? (p.latin || p.name) : p.name;
       const titleSub = adminLang === 'en' ? (p.latin ? p.name : '') : (p.latin || '');
 
-      let displayNotes = p.notes || '—';
-      if (typeof displayNotes === 'string' && (displayNotes.trim().startsWith('{') || displayNotes.trim().startsWith('['))) {
-        try {
-          const meta = JSON.parse(displayNotes);
-          displayNotes = meta.desc || meta.top_notes || (meta.inspired_by ? (`${adminLang === 'ar' ? 'مستوحى من' : 'Inspired by'}: ${meta.inspired_by}`) : displayNotes);
-        } catch (_) {}
+      let displayNotes = d.notes || p.notes || '—';
+      if (d.inspired_by) {
+        displayNotes = `${adminLang === 'ar' ? 'مستوحى من' : 'Inspired by'}: ${d.inspired_by} · ${displayNotes}`;
       }
 
       return `<tr>
@@ -529,6 +747,7 @@
           <strong>${escapeHtml(titlePrimary)}</strong>
           ${titleSub ? `<small>${escapeHtml(titleSub)}</small>` : ''}
         </td>
+        <td><span class="brand-pill">${escapeHtml(prodBrand)}</span></td>
         <td><span class="cat-pill ${cat.class}">${cat.text}</span></td>
         <td><strong>${money(p.price)}</strong></td>
         <td><span style="font-size:10px;color:var(--muted);">${escapeHtml(displayNotes)}</span></td>
@@ -551,12 +770,16 @@
     const refreshBtn = $('#refreshProdsBtn');
     if (refreshBtn && isManual) refreshBtn.classList.add('spinning');
     supaFetch('products', { filters: '&order=sort_order.asc,created_at.desc' })
-      .then(renderProductsTable)
-      .catch(err => {
-        console.error('Admin products:', err);
-        if (!currentProducts.length) {
-          $('#productsTable').innerHTML = `<tr><td colspan="7" class="empty-table error">${adminLang === 'ar' ? 'تعذر تحميل العطور. تحقق من الاتصال.' : 'Failed to load fragrances. Check connection.'}</td></tr>`;
+      .then(rows => {
+        if (Array.isArray(rows) && rows.length) {
+          const fetchedIds = new Set(rows.map(r => String(r.id)));
+          const remainingLocal = currentProducts.filter(p => !fetchedIds.has(String(p.id)));
+          renderProductsTable([...rows, ...remainingLocal]);
         }
+      })
+      .catch(err => {
+        console.warn('Admin products fetch notice:', err);
+        // Table remains populated with instant local data
       })
       .finally(() => {
         if (refreshBtn) refreshBtn.classList.remove('spinning');
@@ -663,6 +886,7 @@
       try { meta = JSON.parse(p.notes); } catch (_) {}
     }
     return {
+      brand:        p.brand || meta.brand || '',
       notes:        meta.desc !== undefined ? meta.desc : (p.notes || ''),
       top_notes:    p.top_notes || meta.top_notes || '',
       middle_notes: p.middle_notes || meta.middle_notes || '',
@@ -686,6 +910,7 @@
       $('#productId').value       = product.id;
       $('#prodName').value        = product.name || '';
       $('#prodLatin').value       = product.latin || '';
+      if ($('#prodBrand')) $('#prodBrand').value = details.brand || product.brand || '';
       $('#prodPrice').value       = product.price || '';
       $('#prodCategory').value    = product.category || 'unisex';
       $('#prodNotes').value       = details.notes;
@@ -708,6 +933,7 @@
     } else {
       modalTitle.innerHTML = 'إضافة <em>عطر جديد</em>';
       $('#productId').value     = '';
+      if ($('#prodBrand')) $('#prodBrand').value = '';
       $('#prodCategory').value  = 'unisex';
       $('#prodLongevity').value = '3';
       $('#prodSillage').value   = '2';
@@ -845,6 +1071,7 @@
     const payload = {
       name:        $('#prodName').value.trim(),
       latin:       $('#prodLatin').value.trim() || null,
+      brand:       $('#prodBrand')?.value.trim() || null,
       price:       parseFloat($('#prodPrice').value) || 0,
       category:    $('#prodCategory').value,
       notes:       $('#prodNotes').value.trim() || null,
@@ -880,7 +1107,7 @@
       } catch (colErr) {
         // إذا لم تكن الأعمدة الجديدة مضافة في Supabase بعد، نحفظها كـ JSON داخل notes تلقائياً
         const errMsg = String(colErr?.message || '');
-        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('top_notes')) {
+        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('top_notes') || errMsg.includes('brand')) {
           console.warn('Columns not yet in Supabase schema, falling back to JSON notes:', colErr);
           const fallbackPayload = {
             name:        payload.name,
@@ -892,6 +1119,7 @@
             is_featured: payload.is_featured,
             in_stock:    payload.in_stock,
             notes:       JSON.stringify({
+              brand:        payload.brand,
               desc:         payload.notes || '',
               top_notes:    payload.top_notes,
               middle_notes: payload.middle_notes,
@@ -1050,9 +1278,12 @@
     }
   });
 
-  // ── Manual Refresh Buttons ───────────────────────────────────────────────
+  // ── Manual Refresh & Search / Filter Listeners ───────────────────────────
   $('#refreshProdsBtn')?.addEventListener('click', () => loadProducts(true));
   $('#refreshOrdersBtn')?.addEventListener('click', () => loadOrders(true));
+  $('#adminProdSearch')?.addEventListener('input', () => renderProductsTable());
+  $('#adminCatFilter')?.addEventListener('change', () => renderProductsTable());
+  $('#adminBrandFilter')?.addEventListener('change', () => renderProductsTable());
 
   // ── Immediate Cache Render (0ms Instant Load) ─────────────────────────────
   if (currentProducts.length) renderProductsTable(currentProducts);

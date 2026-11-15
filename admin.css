@@ -1233,3 +1233,71 @@ html[dir="ltr"] .invoice-meta {
   padding-top: 14px;
   border-top: 1px solid var(--line);
 }
+
+/* ── Brand Badges & Admin Table Filters ──────────────────────── */
+.brand-pill {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: rgba(245, 165, 173, 0.12);
+  color: var(--pink);
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid rgba(245, 165, 173, 0.25);
+  white-space: nowrap;
+}
+body.light .brand-pill {
+  background: rgba(129, 45, 53, 0.08);
+  color: var(--burgundy);
+  border-color: rgba(129, 45, 53, 0.2);
+}
+
+.admin-table-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.admin-search-input {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 12px;
+  outline: none;
+  transition: border-color .2s;
+}
+.admin-search-input:focus {
+  border-color: var(--pink);
+}
+body.light .admin-search-input:focus {
+  border-color: var(--burgundy);
+}
+.admin-filter-select {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 12px;
+  cursor: pointer;
+  outline: none;
+}
+.sync-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(245, 165, 173, 0.15);
+  color: var(--pink);
+}
+body.light .sync-status-badge {
+  background: rgba(129, 45, 53, 0.1);
+  color: var(--burgundy);
+}

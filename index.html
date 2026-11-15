@@ -92,6 +92,11 @@
           <button class="filter" data-filter="unisex" data-i18n="filter_unisex">للجميع</button>
         </div>
         <div class="collection-actions">
+          <div class="collection-brand-wrap">
+            <select id="collectionBrandFilter" class="collection-brand-select" aria-label="تصفية حسب البراند">
+              <option value="all">كل البراندات (All Brands)</option>
+            </select>
+          </div>
           <div class="collection-sort-wrap">
             <select id="collectionSort" class="collection-sort-select" aria-label="ترتيب العطور">
               <option value="featured" data-i18n="sort_featured">الأكثر تميزاً ⭐</option>
@@ -103,6 +108,8 @@
           <span class="result-count" id="resultCount">٠ عطور</span>
         </div>
       </div>
+      <!-- Brand Quick Filter Chips -->
+      <div class="brand-chips-bar" id="brandChipsBar" aria-label="تصفية سريعة بالبراندات"></div>
       <div class="product-grid" id="productGrid"></div>
     </section>
 

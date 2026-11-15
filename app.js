@@ -251,6 +251,129 @@
   let currentLang = 'ar';
   try { currentLang = localStorage.getItem('rooh-lang') || 'ar'; } catch (_) {}
 
+  const DEFAULT_PRODUCTS = [
+    {
+      id: 'd6973def-50dd-4e75-8005-8ee22eb23872',
+      name: 'نود كورال دايموند',
+      latin: 'Nude Coral Diamond',
+      brand: 'Matière Première',
+      price: 1600,
+      category: 'unisex',
+      tag: 'Best Seller',
+      image_url: 'https://oyslbombgdvcoyqotyao.supabase.co/storage/v1/object/public/products/rooh_1794685786337_Nude_Coral_Diam.png',
+      is_featured: true,
+      in_stock: true,
+      sort_order: 0,
+      notes: JSON.stringify({
+        brand: 'Matière Première',
+        desc: 'Nude Coral Diamond takes center stage as the luminous note of a sunset’s symphony. Bergamot dances with saffron, joined by orange blossom and coconut, while the warmth of cashmeran and vanilla completes the aromatic masterpiece.',
+        top_notes: 'Bergamot, Apple, Saffron',
+        middle_notes: 'Orange Blossom, Coconut, Guaiac Wood',
+        base_notes: 'Vanilla, Amber, Cashmeran',
+        inspired_by: 'Vanilla Powder - Matière Première',
+        longevity: 4,
+        sillage: 4,
+        accords: 'creamy-sweet oriental fragrance'
+      })
+    },
+    {
+      id: 'c34eb21c-4eeb-434e-b3e7-5383fa774137',
+      name: 'إبراق',
+      latin: 'Ibraq',
+      brand: 'إبراق',
+      price: 1500,
+      category: 'men',
+      tag: 'الأكثر مبيعاً',
+      image_url: '',
+      is_featured: false,
+      in_stock: true,
+      sort_order: 1,
+      notes: JSON.stringify({
+        brand: 'إبراق',
+        desc: 'عطر رجالي فاخر يجمع بين دفء التوابل الشرقية وأناقة الأخشاب العطرية، ليعبر عن حضور مهيب ولا يُنسى.',
+        top_notes: 'الهيل، الزعفران، جوزة الطيب',
+        middle_notes: 'العود، اللبان، الجلود',
+        base_notes: 'الباتشولي، العنبر، خشب الصندل',
+        inspired_by: 'عطر فخم ومميز',
+        longevity: 5,
+        sillage: 4,
+        accords: 'Woody, Spicy, Oriental'
+      })
+    },
+    {
+      id: '1143fdb0-4584-4722-a0ca-4cca23c11b61',
+      name: 'ملك الشرق',
+      latin: 'Malek Al Sharq',
+      brand: 'رُوح',
+      price: 389,
+      category: 'men',
+      tag: 'عطر مميز',
+      image_url: '',
+      is_featured: false,
+      in_stock: true,
+      sort_order: 2,
+      notes: JSON.stringify({
+        brand: 'رُوح',
+        desc: 'تجسيد حقيقي للهيبة الشرقية؛ عبير العود الفاخر والجلود والبخور المعتّق يترك أثراً ملكياً يلفت الأنظار.',
+        top_notes: 'برغموت مدخن، بخور، زنجبيل',
+        middle_notes: 'خشب الغاياك، عنبر فاخر، قرفة',
+        base_notes: 'جلد أسود، مسك داكن، نجيل الهند',
+        inspired_by: 'عطور النخبة الشرقية',
+        longevity: 5,
+        sillage: 4,
+        accords: 'Woody, Smoky, Amber'
+      })
+    },
+    {
+      id: '4bc56b5e-839a-4959-a231-1639882828f5',
+      name: 'نجمة الليل',
+      latin: 'Najmet Al Lail',
+      brand: 'رُوح',
+      price: 349,
+      category: 'women',
+      tag: 'جديد',
+      image_url: '',
+      is_featured: false,
+      in_stock: true,
+      sort_order: 3,
+      notes: JSON.stringify({
+        brand: 'رُوح',
+        desc: 'عطر أنثوي غامض وجذاب مستوحى من سحر ليالي الشرق، نغمات الزهور البيضاء الناعمة تمتزج مع الفانيليا.',
+        top_notes: 'توت بري، كمثرى، زهر البرتقال',
+        middle_notes: 'ياسمين، فانيليا ناعمة، مسك الروم',
+        base_notes: 'حبوب التونكا، كشميران، خشب الأرز',
+        inspired_by: 'زهري شرقي آسر',
+        longevity: 4,
+        sillage: 3,
+        accords: 'Floral, Sweet, Vanilla'
+      })
+    },
+    {
+      id: '61fc4566-5935-442d-9099-31322bb39609',
+      name: 'نسمة الفجر',
+      latin: 'Nasmet Al Fajr',
+      brand: 'رُوح',
+      price: 269,
+      category: 'women',
+      tag: 'انتعاش يومي',
+      image_url: '',
+      is_featured: false,
+      in_stock: true,
+      sort_order: 4,
+      notes: JSON.stringify({
+        brand: 'رُوح',
+        desc: 'انتعاش نقي كأول خيوط الصباح الباكر، باقة ورد ندية مع لمسة حمضيات ومسك أبيض ناعم.',
+        top_notes: 'زهر الليمون، تفاح أخضر، ندى الصباح',
+        middle_notes: 'ورد دمشقي، زنبق الوادي، فريزيا',
+        base_notes: 'مسك أبيض شفاف، أخشاب بيضاء',
+        inspired_by: 'عبير النقاء الصباحي',
+        longevity: 3,
+        sillage: 3,
+        accords: 'Fresh, Floral, Musky'
+      })
+    }
+  ];
+
   let products = [];
   try {
     const cachedP = localStorage.getItem('rooh-cached-products');
@@ -259,6 +382,9 @@
       if (Array.isArray(parsed) && parsed.length) products = parsed;
     }
   } catch (_) {}
+  if (!products.length) {
+    products = [...DEFAULT_PRODUCTS];
+  }
   const PROMO_KEY = 'rooh-promo';
   const defaultPromo = { title: 'شحن مجاني للطلبات فوق ١٥٠٠ جنيه', details: '', startsAt: '', endsAt: '', active: true };
   const arabicDigits = value => String(value).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
@@ -274,6 +400,7 @@
   let cart = [];
   try { cart = JSON.parse(localStorage.getItem('rooh-cart') || '[]'); } catch (_) {}
   let activeFilter = 'all';
+  let activeBrand  = 'all';
   let query = '';
   let toastTimer;
 
@@ -870,6 +997,7 @@
       try { meta = JSON.parse(p.notes); } catch (_) {}
     }
     return {
+      brand:        p.brand || meta.brand || 'رُوح',
       notes:        meta.desc !== undefined ? meta.desc : (p.notes || ''),
       top_notes:    p.top_notes || meta.top_notes || '',
       middle_notes: p.middle_notes || meta.middle_notes || '',
@@ -1011,11 +1139,72 @@
 
   function renderProducts() {
     const t = I18N[currentLang];
+
+    // Update Brand Filter Dropdown & Chips
+    const brandSel = $('#collectionBrandFilter');
+    const brandChipsBar = $('#brandChipsBar');
+    const allBrands = Array.from(new Set(products.map(p => {
+      if (p.name === '__system_announcements__' || p.in_stock === false) return null;
+      const d = unpackProduct(p);
+      return (d.brand || 'رُوح').trim();
+    }).filter(Boolean))).sort();
+
+    if (brandSel) {
+      const prevBrandVal = brandSel.value || activeBrand || 'all';
+      brandSel.innerHTML = `<option value="all">${currentLang === 'ar' ? 'كل البراندات (All Brands)' : 'All Brands'}</option>` +
+        allBrands.map(b => `<option value="${escapeHtml(b)}" ${b.toLowerCase() === prevBrandVal.toLowerCase() ? 'selected' : ''}>${escapeHtml(b)}</option>`).join('');
+    }
+
+    if (brandChipsBar) {
+      const isAllActive = activeBrand === 'all' ? 'active' : '';
+      let chipsHtml = `<button type="button" class="brand-chip ${isAllActive}" data-brand-chip="all">${currentLang === 'ar' ? '✨ كل البراندات' : '✨ All Brands'}</button>`;
+      allBrands.forEach(b => {
+        const isAct = activeBrand.toLowerCase() === b.toLowerCase() ? 'active' : '';
+        chipsHtml += `<button type="button" class="brand-chip ${isAct}" data-brand-chip="${escapeHtml(b)}">${escapeHtml(b)}</button>`;
+      });
+      brandChipsBar.innerHTML = chipsHtml;
+    }
+
     const visible = products.filter(product => {
       if (product.name === '__system_announcements__' || product.in_stock === false) return false;
       const d = unpackProduct(product);
-      const combined = `${product.name} ${product.latin || ''} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.inspired_by} ${d.accords}`.toLowerCase();
-      return (activeFilter === 'all' || product.category === activeFilter) && (!query || combined.includes(query.toLowerCase()));
+      const prodBrand = (d.brand || 'رُوح').toLowerCase();
+      const pCat = (product.category || 'unisex').toLowerCase();
+      const normCat = (pCat === 'women' || pCat.includes('نسائ') || pCat.includes('her')) ? 'women'
+        : (pCat === 'men' || pCat.includes('رجال') || pCat.includes('him')) ? 'men' : 'unisex';
+
+      // 1. Gender Filter: 'all', 'women', 'men', 'unisex'
+      if (activeFilter !== 'all') {
+        if (normCat !== activeFilter) return false;
+      }
+
+      // 2. Brand Filter: 'all' or specific brand
+      if (activeBrand !== 'all') {
+        if (prodBrand !== activeBrand.toLowerCase()) return false;
+      }
+
+      // 3. Search Query (Name, Latin, Brand, Gender words, Notes, Accords, Inspired By)
+      if (query) {
+        const q = query.toLowerCase().trim();
+        // Check for gender keywords in query
+        if (q === 'نسائي' || q === 'حريمي' || q === 'بناتي' || q === 'women' || q === 'for her') {
+          if (normCat !== 'women') return false;
+          return true;
+        }
+        if (q === 'رجالي' || q === 'شبابي' || q === 'men' || q === 'for him') {
+          if (normCat !== 'men') return false;
+          return true;
+        }
+        if (q === 'للجميع' || q === 'مشترك' || q === 'للجنسين' || q === 'unisex') {
+          if (normCat !== 'unisex') return false;
+          return true;
+        }
+
+        const combined = `${product.name} ${product.latin || ''} ${d.brand || ''} ${pCat} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.inspired_by} ${d.accords}`.toLowerCase();
+        if (!combined.includes(q)) return false;
+      }
+
+      return true;
     });
 
     // Sorting
@@ -1035,6 +1224,7 @@
           const d = unpackProduct(product);
           const prodName = currentLang === 'en' ? (product.latin || product.name) : product.name;
           const prodSub  = currentLang === 'en' ? (product.latin ? product.name : '') : (product.latin || '');
+          const prodBrand = d.brand || 'رُوح';
 
           // Key notes preview
           let notesPreview = '';
@@ -1054,6 +1244,7 @@
               <button class="quick-add" data-add="${product.id}" type="button">${t.quick_add} <span>＋</span></button>
             </div>
             <div class="product-info">
+              <span class="card-brand-badge" data-brand-filter="${escapeHtml(prodBrand)}">${escapeHtml(prodBrand)}</span>
               <div class="product-meta">
                 <h3><a href="product.html?id=${product.id}" class="prod-title-link">${escapeHtml(prodName)}</a> ${prodSub ? `<small style="font-size:10px;opacity:.7;display:block;">${escapeHtml(prodSub)}</small>` : ''}</h3>
                 <span class="product-price-val">${money(product.price)}</span>
@@ -1082,6 +1273,32 @@
   // Collection sort listener
   $('#collectionSort')?.addEventListener('change', () => {
     renderProducts();
+  });
+
+  // Collection Brand Filter listeners
+  $('#collectionBrandFilter')?.addEventListener('change', e => {
+    activeBrand = e.target.value;
+    renderProducts();
+  });
+
+  $('#brandChipsBar')?.addEventListener('click', e => {
+    const chip = e.target.closest('[data-brand-chip]');
+    if (chip) {
+      activeBrand = chip.dataset.brandChip;
+      if ($('#collectionBrandFilter')) $('#collectionBrandFilter').value = activeBrand;
+      renderProducts();
+    }
+  });
+
+  // Card Brand Badge click listener (filter by clicked brand)
+  $('#productGrid')?.addEventListener('click', e => {
+    const brandBadge = e.target.closest('[data-brand-filter]');
+    if (brandBadge) {
+      activeBrand = brandBadge.dataset.brandFilter;
+      if ($('#collectionBrandFilter')) $('#collectionBrandFilter').value = activeBrand;
+      renderProducts();
+      document.querySelector('#collection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   });
 
   // ── Product Details Modal Handler ─────────────────────────────────────────
