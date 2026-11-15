@@ -2347,6 +2347,8 @@ body.light .btn-card-quickview {
   transform-style: preserve-3d;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .story-offer-badge {
@@ -2363,6 +2365,8 @@ body.light .btn-card-quickview {
   white-space: nowrap;
   z-index: 10;
   animation: badgeFloat 3s ease-in-out infinite;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .story-real-bottle {
@@ -2374,6 +2378,7 @@ body.light .btn-card-quickview {
   transition: transform 0.3s ease, filter 0.3s ease;
   user-select: none;
   -webkit-user-drag: none;
+  cursor: pointer;
 }
 
 .story-art:hover .story-real-bottle {

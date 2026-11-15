@@ -501,6 +501,11 @@
     return String(value || '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
   }
 
+  function openProductDetails(id) {
+    if (!id) return;
+    window.location.href = `product.html?id=${encodeURIComponent(id)}`;
+  }
+
   // ── Announcements & Campaign Management ──────────────────────────────
   let promoTimer;
   let currentAnnouncements = null;
@@ -522,6 +527,19 @@
       target = available[0];
     }
     currentSpotlightPerfume = target;
+
+    // Bottle Wrapper & Image Links
+    const storyBottleWrap = $('#storyBottleWrapper');
+    if (storyBottleWrap && target) {
+      storyBottleWrap.href = `product.html?id=${encodeURIComponent(target.id)}`;
+      storyBottleWrap.setAttribute('title', currentLang === 'ar' ? `عرض تفاصيل وتحليل عطر ${target.name}` : `View fragrance profile for ${target.latin || target.name}`);
+      storyBottleWrap.onclick = (e) => {
+        if (!e.ctrlKey && !e.metaKey && e.button === 0) {
+          e.preventDefault();
+          openProductDetails(target.id);
+        }
+      };
+    }
 
     // Bottle Image
     const bottleImg = $('#storyProductImage');
