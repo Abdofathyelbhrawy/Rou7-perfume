@@ -183,6 +183,26 @@
   let cart = [];
   let currentQty = 1;
   let campaignSettings = null;
+  let brands = [];
+  try {
+    const cachedB = localStorage.getItem('rooh-cached-brands');
+    if (cachedB) {
+      const parsed = JSON.parse(cachedB);
+      if (Array.isArray(parsed) && parsed.length) brands = parsed;
+    }
+  } catch (_) {}
+
+  function findBrand(val) {
+    if (!val) return null;
+    const s = String(val).toLowerCase().trim();
+    return brands.find(b =>
+      (b.id && b.id.toLowerCase() === s) ||
+      (b.name_en && b.name_en.toLowerCase().trim() === s) ||
+      (b.name_ar && b.name_ar.toLowerCase().trim() === s) ||
+      (b.name_ar && s.includes(b.name_ar.toLowerCase().trim())) ||
+      (b.name_en && s.includes(b.name_en.toLowerCase().trim()))
+    );
+  }
 
   const DEFAULT_FALLBACK_PRODUCT = {
     id: 'd6973def-50dd-4e75-8005-8ee22eb23872',
@@ -543,9 +563,13 @@
     $('#prodCategoryPill').textContent = p.category ? `${p.category} · ${t.cat_default}` : t.cat_default;
     const brandPill = $('#prodBrandPill');
     if (brandPill) {
-      const bName = d.brand || p.brand;
-      if (bName && bName.trim()) {
-        brandPill.textContent = bName.trim();
+      const bObj = findBrand(d.brand || p.brand);
+      const bDisplay = bObj ? (currentLang === 'en' ? (bObj.name_en || bObj.name_ar) : (bObj.name_ar || bObj.name_en)) : (d.brand || p.brand);
+      if (bDisplay && bDisplay.trim()) {
+        const logoHtml = bObj && bObj.logo_url
+          ? `<img src="${escapeHtml(bObj.logo_url)}" alt="" class="brand-pill-logo" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;margin-inline-end:5px;border-radius:2px;">`
+          : '';
+        brandPill.innerHTML = `${logoHtml}<span>${escapeHtml(bDisplay.trim())}</span>`;
         brandPill.hidden = false;
       } else {
         brandPill.hidden = true;
@@ -1224,11 +1248,26 @@
       })
       .catch(() => {});
 
+    supaFetch('products', { filters: '&name=eq.__system_brands__' })
+      .then(rows => {
+        if (rows && rows.length && rows[0].notes) {
+          try {
+            const data = JSON.parse(rows[0].notes);
+            if (Array.isArray(data) && data.length) {
+              brands = data;
+              try { localStorage.setItem('rooh-cached-brands', JSON.stringify(data)); } catch (_) {}
+              if (currentProduct) renderProductDetails(currentProduct);
+            }
+          } catch (_) {}
+        }
+      })
+      .catch(() => {});
+
     // 2. Read Cached Products first
     try {
       const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
       if (Array.isArray(cached) && cached.length) {
-        allProducts = cached;
+        allProducts = cached.filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__');
       }
     } catch (_) {}
 
@@ -1243,7 +1282,7 @@
     try {
       const liveProducts = await supaFetch('products', { filters: '&in_stock=eq.true&order=sort_order.asc,created_at.desc' });
       if (Array.isArray(liveProducts) && liveProducts.length) {
-        allProducts = liveProducts;
+        allProducts = liveProducts.filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__');
         localStorage.setItem(CACHE_KEY, JSON.stringify(liveProducts));
         const match = allProducts.find(p => String(p.id) === String(targetId)) || allProducts[0] || DEFAULT_FALLBACK_PRODUCT;
         renderProductDetails(match);

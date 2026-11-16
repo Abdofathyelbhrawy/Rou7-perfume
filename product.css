@@ -228,6 +228,15 @@ body.light .p-float-badge {
   font-weight: 700;
   letter-spacing: .05em;
 }
+.brand-pill-logo {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 3px;
+  margin-inline-end: 6px;
+}
 
 .prod-main-title {
   font-size: clamp(32px, 3.8vw, 48px);

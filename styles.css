@@ -2612,18 +2612,34 @@ body.light .brand-chip.active {
 }
 
 .card-brand-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 9px;
   letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--accent);
   background: rgba(245, 165, 173, 0.12);
   border: 1px solid rgba(245, 165, 173, 0.22);
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 4px;
   margin-bottom: 5px;
   cursor: pointer;
   transition: opacity .2s;
+}
+.brand-badge-logo {
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
+  border-radius: 2px;
+  display: inline-block;
+}
+.chip-brand-logo {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  border-radius: 2px;
+  display: inline-block;
 }
 .card-brand-badge:hover {
   opacity: .8;

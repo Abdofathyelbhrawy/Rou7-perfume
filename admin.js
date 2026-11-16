@@ -254,6 +254,43 @@
     currentOrders = [...DEFAULT_ORDERS];
   }
 
+  // ── Brands Registry Setup ────────────────────────────────────────────────
+  const DEFAULT_BRANDS = [
+    {
+      id: 'ibraq',
+      name_ar: 'إبراق',
+      name_en: 'Ibraq',
+      logo_url: 'assets/branding/logo-dark.png',
+      description: 'دار عطور فاخرة تمزج بين الأصالة الشرقية والحداثة.'
+    },
+    {
+      id: 'rooh',
+      name_ar: 'رُوح',
+      name_en: 'Rou7 Perfume',
+      logo_url: 'assets/branding/logo-dark.png',
+      description: 'العلامة الرسمية لمتجر رُوح - عطر يلامس أعماقك.'
+    },
+    {
+      id: 'matiere-premiere',
+      name_ar: 'ماتيير بريمير',
+      name_en: 'Matière Première',
+      logo_url: '',
+      description: 'دار العطور الفرنسية الفاخرة المعتمدة على المكونات الطبيعية النقية.'
+    }
+  ];
+
+  let currentBrands = [];
+  try {
+    const cachedB = localStorage.getItem('rooh-cached-brands');
+    if (cachedB) {
+      const parsed = JSON.parse(cachedB);
+      if (Array.isArray(parsed) && parsed.length) currentBrands = parsed;
+    }
+  } catch (_) {}
+  if (!currentBrands.length) {
+    currentBrands = [...DEFAULT_BRANDS];
+  }
+
   const campaignKey = 'rooh-campaign-settings';
   const defaultCampaign = {
     top_bar: 'شحن لجميع المحافظات · دفع عند الاستلام · ضمان الثبات والفوحان',
@@ -335,6 +372,10 @@
     }
     if (typeof renderOrders === 'function' && currentOrders && currentOrders.length) {
       renderOrders(currentOrders);
+    }
+    if (typeof renderBrandsTable === 'function') {
+      renderBrandsTable();
+      populateBrandSelects();
     }
   }
 
@@ -539,6 +580,7 @@
             body: {
               name: '__system_announcements__',
               category: 'unisex',
+              price: 0,
               in_stock: false,
               notes: JSON.stringify(updatedCampaign)
             }
@@ -556,6 +598,7 @@
             body: {
               name: '__system_announcements__',
               category: 'unisex',
+              price: 0,
               in_stock: false,
               notes: JSON.stringify(updatedCampaign)
             }
@@ -700,7 +743,7 @@
 
   function renderProductsTable(products) {
     if (products) {
-      currentProducts = (products || []).filter(p => p.name !== '__system_announcements__');
+      currentProducts = (products || []).filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__');
       try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
     }
     $('#statProducts').textContent = arabicNum(currentProducts.length);
@@ -708,16 +751,7 @@
     populateSpotlightSelect(currentProducts);
 
     // Update Brand Filter dropdown options
-    const brandFilterSel = $('#adminBrandFilter');
-    if (brandFilterSel) {
-      const prevBrandVal = brandFilterSel.value || 'all';
-      const allBrands = Array.from(new Set(currentProducts.map(p => {
-        const d = unpackProductDetails(p);
-        return (p.brand || d.brand || 'رُوح').trim();
-      }).filter(Boolean))).sort();
-      brandFilterSel.innerHTML = `<option value="all">${adminLang === 'ar' ? 'كل البراندات' : 'All Brands'}</option>` +
-        allBrands.map(b => `<option value="${escapeHtml(b)}" ${b === prevBrandVal ? 'selected' : ''}>${escapeHtml(b)}</option>`).join('');
-    }
+    populateBrandSelects();
 
     const searchQuery = ($('#adminProdSearch')?.value || '').trim().toLowerCase();
     const catFilterVal = $('#adminCatFilter')?.value || 'all';
@@ -725,6 +759,7 @@
 
     const filtered = currentProducts.filter(p => {
       const d = unpackProductDetails(p);
+      const bObj = findBrandObject(p.brand || d.brand);
       const brandName = (p.brand || d.brand || 'رُوح').toLowerCase();
       const pCat = (p.category || 'unisex').toLowerCase();
 
@@ -737,13 +772,17 @@
 
       // Brand matching
       if (brandFilterVal !== 'all') {
-        if (brandName !== brandFilterVal.toLowerCase()) return false;
+        const bfLow = brandFilterVal.toLowerCase();
+        const matchesBrand = brandName === bfLow ||
+          (bObj && (bObj.name_en.toLowerCase() === bfLow || bObj.name_ar.toLowerCase() === bfLow || bObj.id.toLowerCase() === bfLow));
+        if (!matchesBrand) return false;
       }
 
       // Search query matching (name, latin, brand, category, notes, accords, inspired_by)
       if (searchQuery) {
         const qNorm = normalizeSearchText(searchQuery);
-        const hay = normalizeSearchText(`${p.name} ${p.latin || ''} ${brandName} ${pCat} ${d.notes} ${d.inspired_by} ${d.accords}`);
+        const bExtra = bObj ? `${bObj.name_ar} ${bObj.name_en}` : '';
+        const hay = normalizeSearchText(`${p.name} ${p.latin || ''} ${brandName} ${bExtra} ${pCat} ${d.notes} ${d.inspired_by} ${d.accords}`);
         if (!hay.includes(qNorm)) {
           const tokens = qNorm.split(/\s+/).filter(Boolean);
           if (!tokens.every(t => hay.includes(t))) return false;
@@ -770,6 +809,11 @@
       const cat = catLabels[normCatKey] || { text: p.category || (adminLang === 'ar' ? 'للجميع' : 'Unisex'), class: 'unisex' };
       const d = unpackProductDetails(p);
       const prodBrand = p.brand || d.brand || 'رُوح';
+      const bObj = findBrandObject(prodBrand);
+      const brandLogoHtml = bObj && bObj.logo_url
+        ? `<img src="${escapeHtml(bObj.logo_url)}" alt="" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-inline-end:5px;border-radius:3px;background:rgba(255,255,255,0.06);padding:2px;">`
+        : '';
+      const brandDisplay = bObj ? (adminLang === 'en' ? (bObj.name_en || bObj.name_ar) : (bObj.name_ar || bObj.name_en)) : prodBrand;
 
       const imgHtml = p.image_url
         ? `<div class="prod-thumb"><img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name)}"></div>`
@@ -802,7 +846,7 @@
           <strong>${escapeHtml(titlePrimary)}</strong>
           ${titleSub ? `<small>${escapeHtml(titleSub)}</small>` : ''}
         </td>
-        <td><span class="brand-pill">${escapeHtml(prodBrand)}</span></td>
+        <td><span class="brand-pill" style="display:inline-flex;align-items:center;">${brandLogoHtml}${escapeHtml(brandDisplay)}</span></td>
         <td><span class="cat-pill ${cat.class}">${cat.text}</span></td>
         <td>${priceCellHtml}</td>
         <td><span style="font-size:10px;color:var(--muted);">${escapeHtml(displayNotes)}</span></td>
@@ -1106,7 +1150,7 @@
       $('#productId').value       = product.id;
       $('#prodName').value        = product.name || '';
       $('#prodLatin').value       = product.latin || '';
-      if ($('#prodBrand')) $('#prodBrand').value = details.brand || product.brand || '';
+      populateBrandSelects(details.brand || product.brand || '');
       $('#prodPrice').value       = product.price || '';
       $('#prodCategory').value    = product.category || 'unisex';
       $('#prodNotes').value       = details.notes;
@@ -1147,7 +1191,7 @@
     } else {
       modalTitle.innerHTML = 'إضافة <em>عطر جديد</em>';
       $('#productId').value     = '';
-      if ($('#prodBrand')) $('#prodBrand').value = '';
+      populateBrandSelects('');
       $('#prodCategory').value  = 'unisex';
       $('#prodLongevity').value = '3';
       $('#prodSillage').value   = '2';
@@ -1271,7 +1315,7 @@
   $('#btnApplyBulkDiscount')?.addEventListener('click', async () => {
     const rawPct = $('#storewideDiscountPercent')?.value;
     const pct = parseInt(rawPct) || 20;
-    const targetProds = currentProducts.filter(p => p.name !== '__system_announcements__');
+    const targetProds = currentProducts.filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__');
     if (!targetProds.length) {
       alert('لا توجد عطور حالياً لتطبيق الخصم عليها.');
       return;
@@ -1337,7 +1381,7 @@
   });
 
   $('#btnRemoveBulkDiscounts')?.addEventListener('click', async () => {
-    const targetProds = currentProducts.filter(p => p.name !== '__system_announcements__');
+    const targetProds = currentProducts.filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__');
     if (!confirm('هل أنت متأكد من إزالة جميع الخصومات من كافة العطور واستعادة أسعارها الأصلية؟')) {
       return;
     }
@@ -1735,6 +1779,343 @@
     }
   });
 
+  // ── Brand Management Module ──────────────────────────────────────────────
+  const brandModal = $('#brandModal');
+  const brandForm = $('#brandForm');
+  const modalBrandTitle = $('#modalBrandTitle');
+  const brandFormStatus = $('#brandFormStatus');
+  let selectedBrandLogoFile = null;
+
+  function findBrandObject(val) {
+    if (!val) return null;
+    const s = String(val).toLowerCase().trim();
+    return currentBrands.find(b =>
+      (b.id && b.id.toLowerCase() === s) ||
+      (b.name_en && b.name_en.toLowerCase().trim() === s) ||
+      (b.name_ar && b.name_ar.toLowerCase().trim() === s) ||
+      (b.name_ar && s.includes(b.name_ar.toLowerCase().trim())) ||
+      (b.name_en && s.includes(b.name_en.toLowerCase().trim()))
+    );
+  }
+
+  function populateBrandSelects(selectedBrandVal = '') {
+    const prodBrandSel = $('#prodBrand');
+    if (prodBrandSel) {
+      const currentSelected = selectedBrandVal || prodBrandSel.value || '';
+      let opts = `<option value="">${adminLang === 'ar' ? '-- اختر البراند --' : '-- Select Brand --'}</option>`;
+      let hasMatch = false;
+
+      currentBrands.forEach(b => {
+        const val = b.name_en || b.name_ar;
+        const isSel = (currentSelected && (
+          currentSelected.toLowerCase() === val.toLowerCase() ||
+          currentSelected.toLowerCase() === b.name_ar.toLowerCase() ||
+          currentSelected.toLowerCase() === (b.id || '').toLowerCase()
+        ));
+        if (isSel) hasMatch = true;
+        opts += `<option value="${escapeHtml(val)}" ${isSel ? 'selected' : ''}>${escapeHtml(b.name_ar)} · ${escapeHtml(b.name_en)}</option>`;
+      });
+
+      if (currentSelected && !hasMatch) {
+        opts += `<option value="${escapeHtml(currentSelected)}" selected>${escapeHtml(currentSelected)}</option>`;
+      }
+      prodBrandSel.innerHTML = opts;
+    }
+
+    const adminBrandFilter = $('#adminBrandFilter');
+    if (adminBrandFilter) {
+      const prevFilter = adminBrandFilter.value || 'all';
+      let fOpts = `<option value="all">${adminLang === 'ar' ? 'كل البراندات' : 'All Brands'}</option>`;
+      currentBrands.forEach(b => {
+        const val = b.name_en || b.name_ar;
+        const isSel = prevFilter.toLowerCase() === val.toLowerCase() || prevFilter.toLowerCase() === b.name_ar.toLowerCase();
+        fOpts += `<option value="${escapeHtml(val)}" ${isSel ? 'selected' : ''}>${escapeHtml(b.name_ar)} · ${escapeHtml(b.name_en)}</option>`;
+      });
+      adminBrandFilter.innerHTML = fOpts;
+    }
+  }
+
+  function renderBrandsTable() {
+    const tableBody = $('#brandsTable');
+    const badge = $('#brandBadge');
+    if (badge) badge.textContent = arabicNum(currentBrands.length);
+
+    if (!tableBody) return;
+
+    if (!currentBrands.length) {
+      tableBody.innerHTML = `<tr><td colspan="6" class="empty-table">${adminLang === 'ar' ? 'لا توجد ماركات مسجلة حالياً.' : 'No brands registered yet.'}</td></tr>`;
+      return;
+    }
+
+    tableBody.innerHTML = currentBrands.map(b => {
+      const count = currentProducts.filter(p => {
+        const d = unpackProductDetails(p);
+        const bObj = findBrandObject(p.brand || d.brand);
+        return (bObj && bObj.id === b.id) ||
+               (p.brand && (p.brand.toLowerCase() === b.name_en.toLowerCase() || p.brand.toLowerCase() === b.name_ar.toLowerCase())) ||
+               (d.brand && (d.brand.toLowerCase() === b.name_en.toLowerCase() || d.brand.toLowerCase() === b.name_ar.toLowerCase()));
+      }).length;
+
+      const logoHtml = b.logo_url
+        ? `<img src="${escapeHtml(b.logo_url)}" alt="${escapeHtml(b.name_en)}" class="brand-table-logo" style="width:40px;height:40px;object-fit:contain;background:rgba(255,255,255,0.04);border-radius:6px;border:1px solid var(--line);padding:3px;">`
+        : `<span style="font-size:22px;display:grid;place-items:center;width:40px;height:40px;background:rgba(255,255,255,0.04);border-radius:6px;border:1px solid var(--line);">🏷️</span>`;
+
+      return `
+        <tr>
+          <td>${logoHtml}</td>
+          <td><strong>${escapeHtml(b.name_ar)}</strong></td>
+          <td><span style="color:var(--muted);font-size:12px;">${escapeHtml(b.name_en)}</span></td>
+          <td><span class="badge" style="background:rgba(245,165,173,0.15);color:var(--pink);font-weight:600;">${arabicNum(count)} ${adminLang === 'ar' ? 'عطر' : 'perfumes'}</span></td>
+          <td><code style="font-size:11px;color:var(--muted);">${escapeHtml(b.id)}</code></td>
+          <td>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button class="btn-icon" data-edit-brand="${escapeHtml(b.id)}" title="${adminLang === 'ar' ? 'تعديل البراند' : 'Edit Brand'}">✏️</button>
+              <button class="btn-icon" data-del-brand="${escapeHtml(b.id)}" title="${adminLang === 'ar' ? 'حذف البراند' : 'Delete Brand'}" style="color:#ff6b6b;">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function saveBrandsToSupa(brandsList) {
+    currentBrands = brandsList;
+    try { localStorage.setItem('rooh-cached-brands', JSON.stringify(brandsList)); } catch (_) {}
+    renderBrandsTable();
+    populateBrandSelects();
+    if (currentProducts && currentProducts.length) renderProductsTable(currentProducts);
+
+    if (!SUPABASE_URL.includes('YOUR_PROJECT_ID')) {
+      try {
+        const updated = await supaFetch('products', {
+          method: 'PATCH',
+          filters: '&name=eq.__system_brands__',
+          body: {
+            notes: JSON.stringify(brandsList),
+            in_stock: false,
+            price: 0,
+            category: 'unisex'
+          }
+        });
+        if (!updated || !updated.length) {
+          await supaFetch('products', {
+            method: 'POST',
+            body: {
+              name: '__system_brands__',
+              category: 'unisex',
+              price: 0,
+              in_stock: false,
+              notes: JSON.stringify(brandsList)
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Error saving brands to Supabase:', err);
+      }
+    }
+  }
+
+  function loadBrandsFromSupa(isManual = false) {
+    const refreshBtn = $('#refreshBrandsBtn');
+    if (refreshBtn && isManual) refreshBtn.classList.add('spinning');
+
+    supaFetch('products', { filters: '&name=eq.__system_brands__' })
+      .then(rows => {
+        if (rows && rows.length && rows[0].notes) {
+          try {
+            const data = JSON.parse(rows[0].notes);
+            if (Array.isArray(data) && data.length) {
+              currentBrands = data;
+              try { localStorage.setItem('rooh-cached-brands', JSON.stringify(data)); } catch (_) {}
+              renderBrandsTable();
+              populateBrandSelects();
+              if (currentProducts && currentProducts.length) renderProductsTable(currentProducts);
+            }
+          } catch (e) {
+            console.warn('Error parsing __system_brands__:', e);
+          }
+        } else if (!rows || !rows.length) {
+          saveBrandsToSupa(DEFAULT_BRANDS);
+        }
+      })
+      .catch(err => console.warn('Supabase brands fetch error:', err))
+      .finally(() => {
+        if (refreshBtn) refreshBtn.classList.remove('spinning');
+      });
+  }
+
+  function openBrandModal(brandObj = null) {
+    if (!brandForm) return;
+    brandForm.reset();
+    selectedBrandLogoFile = null;
+    const previewWrap = $('#brandLogoPreviewWrap');
+    const previewImg = $('#brandLogoPreview');
+    if (brandFormStatus) { brandFormStatus.textContent = ''; brandFormStatus.className = ''; }
+
+    if (brandObj) {
+      if (modalBrandTitle) modalBrandTitle.innerHTML = adminLang === 'ar' ? 'تعديل <em>البراند</em>' : 'Edit <em>Brand</em>';
+      $('#brandId').value = brandObj.id;
+      $('#brandNameAr').value = brandObj.name_ar || '';
+      $('#brandNameEn').value = brandObj.name_en || '';
+      $('#brandLogoUrl').value = brandObj.logo_url || '';
+      $('#brandDesc').value = brandObj.description || '';
+
+      if (brandObj.logo_url && previewWrap && previewImg) {
+        previewImg.src = brandObj.logo_url;
+        previewWrap.style.display = 'flex';
+      } else if (previewWrap) {
+        previewWrap.style.display = 'none';
+      }
+    } else {
+      if (modalBrandTitle) modalBrandTitle.innerHTML = adminLang === 'ar' ? 'إضافة <em>براند جديد</em>' : 'Add <em>New Brand</em>';
+      $('#brandId').value = '';
+      if (previewWrap) previewWrap.style.display = 'none';
+    }
+    brandModal?.classList.add('open');
+  }
+
+  function closeBrandModal() {
+    brandModal?.classList.remove('open');
+    selectedBrandLogoFile = null;
+    if (brandFormStatus) { brandFormStatus.textContent = ''; brandFormStatus.className = ''; }
+  }
+
+  $('#brandLogoFile')?.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) {
+      selectedBrandLogoFile = file;
+      const previewWrap = $('#brandLogoPreviewWrap');
+      const previewImg = $('#brandLogoPreview');
+      if (previewWrap && previewImg) {
+        previewImg.src = URL.createObjectURL(file);
+        previewWrap.style.display = 'flex';
+      }
+    }
+  });
+
+  $('#brandLogoUrl')?.addEventListener('input', e => {
+    const val = e.target.value.trim();
+    const previewWrap = $('#brandLogoPreviewWrap');
+    const previewImg = $('#brandLogoPreview');
+    if (val && previewWrap && previewImg) {
+      previewImg.src = val;
+      previewWrap.style.display = 'flex';
+    } else if (!selectedBrandLogoFile && previewWrap) {
+      previewWrap.style.display = 'none';
+    }
+  });
+
+  brandForm?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const saveBtn = $('#saveBrandBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = adminLang === 'ar' ? 'جاري الحفظ…' : 'Saving...';
+
+    try {
+      const id = $('#brandId').value.trim();
+      const nameAr = $('#brandNameAr').value.trim();
+      const nameEn = $('#brandNameEn').value.trim();
+      let logoUrl = $('#brandLogoUrl').value.trim() || '';
+      const description = $('#brandDesc').value.trim();
+
+      if (selectedBrandLogoFile) {
+        saveBtn.textContent = adminLang === 'ar' ? 'جاري رفع الشعار…' : 'Uploading logo...';
+        try {
+          const fileExt = selectedBrandLogoFile.name.split('.').pop() || 'png';
+          const cleanName = nameEn.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() || 'brand';
+          const filePath = `brand_${Date.now()}_${cleanName}.${fileExt}`;
+          const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/products/${filePath}`, {
+            method: 'POST',
+            headers: {
+              'apikey': SUPABASE_ANON,
+              'Authorization': `Bearer ${SUPABASE_ANON}`,
+              'Content-Type': selectedBrandLogoFile.type || 'image/png'
+            },
+            body: selectedBrandLogoFile
+          });
+          if (uploadRes.ok) {
+            logoUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${filePath}`;
+          } else {
+            logoUrl = await compressImage(selectedBrandLogoFile, 400, 0.85);
+          }
+        } catch (_) {
+          logoUrl = await compressImage(selectedBrandLogoFile, 400, 0.85);
+        }
+      }
+
+      const generatedId = id || (nameEn.toLowerCase().replace(/[^a-z0-9]/g, '-') || `brand-${Date.now()}`);
+
+      if (id) {
+        const idx = currentBrands.findIndex(b => b.id === id);
+        if (idx !== -1) {
+          currentBrands[idx] = {
+            ...currentBrands[idx],
+            name_ar: nameAr,
+            name_en: nameEn,
+            logo_url: logoUrl,
+            description
+          };
+        }
+      } else {
+        currentBrands.push({
+          id: generatedId,
+          name_ar: nameAr,
+          name_en: nameEn,
+          logo_url: logoUrl,
+          description,
+          created_at: new Date().toISOString()
+        });
+      }
+
+      await saveBrandsToSupa(currentBrands);
+
+      if (brandFormStatus) {
+        brandFormStatus.className = 'saved';
+        brandFormStatus.textContent = adminLang === 'ar' ? 'تم حفظ البراند بنجاح! ✓' : 'Brand saved successfully! ✓';
+      }
+
+      setTimeout(() => {
+        closeBrandModal();
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = (adminLang === 'ar' ? 'حفظ البراند' : 'Save Brand') + ' <span>←</span>';
+        populateBrandSelects(nameEn || nameAr);
+      }, 500);
+
+    } catch (err) {
+      if (brandFormStatus) {
+        brandFormStatus.className = 'error';
+        brandFormStatus.textContent = err.message;
+      }
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = (adminLang === 'ar' ? 'حفظ البراند' : 'Save Brand') + ' <span>←</span>';
+    }
+  });
+
+  $('#openAddBrand')?.addEventListener('click', () => openBrandModal());
+  $('#brandModalClose')?.addEventListener('click', closeBrandModal);
+  $('#cancelBrandBtn')?.addEventListener('click', closeBrandModal);
+  $('#quickAddBrandBtn')?.addEventListener('click', () => openBrandModal());
+  $('#refreshBrandsBtn')?.addEventListener('click', () => loadBrandsFromSupa(true));
+
+  $('#brandsTable')?.addEventListener('click', e => {
+    const editBtn = e.target.closest('[data-edit-brand]');
+    const delBtn = e.target.closest('[data-del-brand]');
+    if (editBtn) {
+      const bId = editBtn.dataset.editBrand;
+      const bObj = currentBrands.find(b => b.id === bId);
+      if (bObj) openBrandModal(bObj);
+    }
+    if (delBtn) {
+      const bId = delBtn.dataset.delBrand;
+      const bObj = currentBrands.find(b => b.id === bId);
+      const bName = bObj ? (adminLang === 'en' ? bObj.name_en : bObj.name_ar) : bId;
+      if (confirm(adminLang === 'ar' ? `هل أنت متأكد من حذف براند "${bName}"؟` : `Are you sure you want to delete brand "${bName}"?`)) {
+        currentBrands = currentBrands.filter(b => b.id !== bId);
+        saveBrandsToSupa(currentBrands);
+      }
+    }
+  });
+
   // ── Manual Refresh & Search / Filter Listeners ───────────────────────────
   $('#refreshProdsBtn')?.addEventListener('click', () => loadProducts(true));
   $('#refreshOrdersBtn')?.addEventListener('click', () => loadOrders(true));
@@ -1745,10 +2126,13 @@
   // ── Immediate Cache Render (0ms Instant Load) ─────────────────────────────
   if (currentProducts.length) renderProductsTable(currentProducts);
   if (currentOrders.length) renderOrders(currentOrders);
+  renderBrandsTable();
+  populateBrandSelects();
 
   // ── Background Revalidation from Supabase ─────────────────────────────────
   loadOrders();
   loadProducts();
+  loadBrandsFromSupa();
 
   // ── Realtime Setup via Supabase Client (Non-blocking) ─────────────────────
   function initAdminRealtime() {

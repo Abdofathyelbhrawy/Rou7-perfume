@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="admin.css">
 </head>
 <body>
-  <aside class="admin-sidebar"><a href="index.html" class="admin-logo"><img class="brand-logo" src="assets/branding/logo-dark.png" data-dark="assets/branding/logo-dark.png" data-light="assets/branding/logo-light.png" alt="رُوح | Rou7 Perfume"></a><div class="side-label">القائمة الرئيسية</div><a class="side-link selected" href="#overview"><span>◫</span> نظرة عامة</a><a class="side-link" href="#products-panel"><span>🧴</span> إدارة العطور <b id="prodBadge">٠</b></a><a class="side-link" href="#campaign"><span>✳</span> إعلان الصفحة الرئيسية</a><a class="side-link" href="#orders"><span>▤</span> الطلبات <b id="orderBadge">٠</b></a><a class="side-link" href="index.html#collection"><span>✳</span> مجموعة العطور</a><div class="sidebar-bottom"><span class="admin-avatar">ر</span><span><strong>فريق رُوح</strong><small>مساحة الإدارة</small></span></div></aside>
+  <aside class="admin-sidebar"><a href="index.html" class="admin-logo"><img class="brand-logo" src="assets/branding/logo-dark.png" data-dark="assets/branding/logo-dark.png" data-light="assets/branding/logo-light.png" alt="رُوح | Rou7 Perfume"></a><div class="side-label">القائمة الرئيسية</div><a class="side-link selected" href="#overview"><span>◫</span> نظرة عامة</a><a class="side-link" href="#products-panel"><span>🧴</span> إدارة العطور <b id="prodBadge">٠</b></a><a class="side-link" href="#brands-panel"><span>🏷️</span> إدارة البراندات <b id="brandBadge">٠</b></a><a class="side-link" href="#campaign"><span>✳</span> إعلان الصفحة الرئيسية</a><a class="side-link" href="#orders"><span>▤</span> الطلبات <b id="orderBadge">٠</b></a><a class="side-link" href="index.html#collection"><span>✳</span> مجموعة العطور</a><div class="sidebar-bottom"><span class="admin-avatar">ر</span><span><strong>فريق رُوح</strong><small>مساحة الإدارة</small></span></div></aside>
   <main class="admin-main" id="overview">
     <header class="admin-topbar">
       <div><span class="crumb">رُوح /</span> <span id="adminTopTitle">نظرة عامة</span></div>
@@ -61,6 +61,37 @@
           </thead>
           <tbody id="productsTable">
             <tr><td colspan="8" class="empty-table">جاري تحميل العطور…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- أقسام البراندات والماركات -->
+    <section class="brands-panel" id="brands-panel" style="margin-top: 48px;">
+      <div class="panel-heading">
+        <div>
+          <p class="admin-kicker">العلامات التجارية والماركات</p>
+          <h2>إدارة البراندات (Brands Management)</h2>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="button button-outline" id="refreshBrandsBtn" style="padding:10px 14px;" title="تحديث البراندات"><span>🔄</span> تحديث</button>
+          <button class="button button-primary" id="openAddBrand"><span>＋</span> إضافة براند جديد</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 80px;">اللوجو</th>
+              <th>اسم البراند (عربي)</th>
+              <th>الاسم اللاتيني / الإنجليزي</th>
+              <th>عدد العطور التابعة</th>
+              <th>معرف البراند (ID)</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="brandsTable">
+            <tr><td colspan="6" class="empty-table">جاري تحميل البراندات…</td></tr>
           </tbody>
         </table>
       </div>
@@ -288,8 +319,15 @@
                 <option value="unisex">للجميع (Unisex)</option>
               </select>
             </label>
-            <label>البراند / الماركة (Brand)
-              <input id="prodBrand" name="brand" placeholder="مثال: Matière Première، رُوح، إبراق...">
+            <label>البراند / الماركة (Brand) *
+              <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px;">
+                <select id="prodBrand" name="brand" required style="flex: 1;">
+                  <option value="">-- اختر البراند --</option>
+                </select>
+                <button type="button" class="button button-outline" id="quickAddBrandBtn" title="إضافة ماركة جديدة فوراً" style="padding: 9px 12px; font-size: 12px; white-space: nowrap; cursor: pointer;">
+                  <span>＋</span> جديد
+                </button>
+              </div>
             </label>
           </div>
 
@@ -488,6 +526,55 @@
             <button class="button button-primary" type="submit" id="saveProdBtn">حفظ العطر <span>←</span></button>
             <button class="button button-outline" type="button" id="cancelProdBtn">إلغاء</button>
             <p id="prodFormStatus" role="status"></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal إضافة وتعديل براند -->
+  <div class="modal" id="brandModal" role="dialog" aria-modal="true" aria-labelledby="modalBrandTitle">
+    <div class="modal-card" style="width: min(520px, 100%);">
+      <button class="modal-close" id="brandModalClose" aria-label="إغلاق">×</button>
+      <div class="modal-brand"><img class="brand-logo" src="assets/branding/logo-dark.png" data-dark="assets/branding/logo-dark.png" data-light="assets/branding/logo-light.png" alt="رُوح"></div>
+      <div class="product-form-view">
+        <p class="eyebrow"><span></span> إدارة الماركات</p>
+        <h2 id="modalBrandTitle">إضافة <em>براند جديد</em></h2>
+        <form id="brandForm">
+          <input type="hidden" id="brandId" name="id">
+          <div class="form-row">
+            <label>اسم البراند (عربي) *
+              <input id="brandNameAr" name="name_ar" required placeholder="مثال: إبراق، رُوح، ديور">
+            </label>
+            <label>اسم البراند (إنجليزي / لاتيني) *
+              <input id="brandNameEn" name="name_en" required placeholder="مثال: Ibraq, Rou7, Dior">
+            </label>
+          </div>
+          
+          <div class="form-section-title" style="margin-top: 14px;">شعار البراند (Brand Logo)</div>
+          <div class="form-row">
+            <label>رفع صورة اللوجو من جهازك
+              <input id="brandLogoFile" type="file" accept="image/*">
+            </label>
+            <label>أو رابط مباشر للوجو (URL)
+              <input id="brandLogoUrl" name="logo_url" type="url" placeholder="https://... رابط صورة اللوجو">
+            </label>
+          </div>
+          <div id="brandLogoPreviewWrap" style="display: none; align-items: center; gap: 12px; margin: 10px 0; padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 8px; border: 1px solid var(--line);">
+            <img id="brandLogoPreview" src="" alt="معاينة اللوجو" style="max-height: 48px; max-width: 120px; object-fit: contain; border-radius: 4px; background: rgba(0,0,0,0.2); padding: 4px;">
+            <span style="font-size: 12px; color: var(--muted);">معاينة الشعار الحالي</span>
+          </div>
+
+          <div style="margin-top: 12px;">
+            <label>نبذة أو وصف مختصر عن البراند (اختياري)
+              <textarea id="brandDesc" name="description" rows="2" placeholder="فلسفة البراند أو تفاصيل إضافية عنه..."></textarea>
+            </label>
+          </div>
+
+          <div class="form-actions" style="margin-top: 20px;">
+            <button class="button button-primary" type="submit" id="saveBrandBtn">حفظ البراند <span>←</span></button>
+            <button class="button button-outline" type="button" id="cancelBrandBtn">إلغاء</button>
+            <p id="brandFormStatus" role="status"></p>
           </div>
         </form>
       </div>

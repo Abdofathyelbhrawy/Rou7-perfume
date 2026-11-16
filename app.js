@@ -429,6 +429,28 @@
   let query = '';
   let toastTimer;
 
+  // ── Brands Registry Setup ──────────────────────────────────────────────────
+  let brands = [];
+  try {
+    const cachedB = localStorage.getItem('rooh-cached-brands');
+    if (cachedB) {
+      const parsed = JSON.parse(cachedB);
+      if (Array.isArray(parsed) && parsed.length) brands = parsed;
+    }
+  } catch (_) {}
+
+  function findBrand(val) {
+    if (!val) return null;
+    const s = String(val).toLowerCase().trim();
+    return brands.find(b =>
+      (b.id && b.id.toLowerCase() === s) ||
+      (b.name_en && b.name_en.toLowerCase().trim() === s) ||
+      (b.name_ar && b.name_ar.toLowerCase().trim() === s) ||
+      (b.name_ar && s.includes(b.name_ar.toLowerCase().trim())) ||
+      (b.name_en && s.includes(b.name_en.toLowerCase().trim()))
+    );
+  }
+
   const themeButton = $('#themeToggle');
 
   function setTheme(theme, persist = true) {
@@ -1085,7 +1107,25 @@
       .catch(err => console.warn('Announcements fetch error:', err));
   }
 
+  function loadBrands() {
+    supaFetch('products', { filters: '&name=eq.__system_brands__' })
+      .then(rows => {
+        if (rows && rows.length && rows[0].notes) {
+          try {
+            const data = JSON.parse(rows[0].notes);
+            if (Array.isArray(data) && data.length) {
+              brands = data;
+              try { localStorage.setItem('rooh-cached-brands', JSON.stringify(data)); } catch (_) {}
+              renderProducts();
+            }
+          } catch (_) {}
+        }
+      })
+      .catch(() => {});
+  }
+
   loadAnnouncements();
+  loadBrands();
   initStoryParallax();
   initStorySpray();
   initMoodPortal();
@@ -1628,11 +1668,14 @@
     }
 
     const prodBrand = (d.brand || product.brand || 'رُوح');
+    const bObj = findBrand(prodBrand);
+    const bAr = bObj ? bObj.name_ar : '';
+    const bEn = bObj ? bObj.name_en : '';
     const brandAlias = BRAND_SEARCH_ALIASES[prodBrand.toLowerCase()] || BRAND_SEARCH_ALIASES[prodBrand] || '';
     const catAlias = CATEGORY_SEARCH_ALIASES[normCat] || '';
 
     const haystack = normalizeSearchText(
-      `${product.name} ${product.latin || ''} ${prodBrand} ${brandAlias} ${d.brand_ar || ''} ${catAlias} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.inspired_by} ${d.accords}`
+      `${product.name} ${product.latin || ''} ${prodBrand} ${bAr} ${bEn} ${brandAlias} ${d.brand_ar || ''} ${catAlias} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.inspired_by} ${d.accords}`
     );
 
     if (haystack.includes(qNorm)) return true;
@@ -1901,32 +1944,55 @@
     // Update Brand Filter Dropdown & Chips
     const brandSel = $('#collectionBrandFilter');
     const brandChipsBar = $('#brandChipsBar');
-    const allBrands = Array.from(new Set(products.map(p => {
-      if (p.name === '__system_announcements__' || p.in_stock === false) return null;
+
+    const brandMap = new Map();
+    products.forEach(p => {
+      if (p.name === '__system_announcements__' || p.name === '__system_brands__' || p.in_stock === false) return;
       const d = unpackProduct(p);
-      return (d.brand || 'رُوح').trim();
-    }).filter(Boolean))).sort();
+      const rawBrand = (d.brand || 'رُوح').trim();
+      const bObj = findBrand(rawBrand);
+      const key = bObj ? (bObj.name_en || bObj.name_ar) : rawBrand;
+      if (!brandMap.has(key.toLowerCase())) {
+        brandMap.set(key.toLowerCase(), {
+          key: key,
+          name_ar: bObj ? bObj.name_ar : rawBrand,
+          name_en: bObj ? bObj.name_en : rawBrand,
+          logo_url: bObj ? bObj.logo_url : '',
+          raw: rawBrand
+        });
+      }
+    });
+
+    const activeBrandsList = Array.from(brandMap.values());
 
     if (brandSel) {
       const prevBrandVal = brandSel.value || activeBrand || 'all';
-      brandSel.innerHTML = `<option value="all">${currentLang === 'ar' ? 'كل البراندات (All Brands)' : 'All Brands'}</option>` +
-        allBrands.map(b => `<option value="${escapeHtml(b)}" ${b.toLowerCase() === prevBrandVal.toLowerCase() ? 'selected' : ''}>${escapeHtml(b)}</option>`).join('');
+      let optHtml = `<option value="all">${currentLang === 'ar' ? 'كل البراندات (All Brands)' : 'All Brands'}</option>`;
+      activeBrandsList.forEach(b => {
+        const display = currentLang === 'en' ? (b.name_en || b.name_ar) : (b.name_ar || b.name_en);
+        const isSel = b.key.toLowerCase() === prevBrandVal.toLowerCase() || b.raw.toLowerCase() === prevBrandVal.toLowerCase();
+        optHtml += `<option value="${escapeHtml(b.key)}" ${isSel ? 'selected' : ''}>${escapeHtml(display)}</option>`;
+      });
+      brandSel.innerHTML = optHtml;
     }
 
     if (brandChipsBar) {
       const isAllActive = activeBrand === 'all' ? 'active' : '';
       let chipsHtml = `<button type="button" class="brand-chip ${isAllActive}" data-brand-chip="all">${currentLang === 'ar' ? '✨ كل البراندات' : '✨ All Brands'}</button>`;
-      allBrands.forEach(b => {
-        const isAct = activeBrand.toLowerCase() === b.toLowerCase() ? 'active' : '';
-        chipsHtml += `<button type="button" class="brand-chip ${isAct}" data-brand-chip="${escapeHtml(b)}">${escapeHtml(b)}</button>`;
+      activeBrandsList.forEach(b => {
+        const display = currentLang === 'en' ? (b.name_en || b.name_ar) : (b.name_ar || b.name_en);
+        const isAct = activeBrand.toLowerCase() === b.key.toLowerCase() || activeBrand.toLowerCase() === b.raw.toLowerCase() || (b.name_ar && activeBrand.toLowerCase() === b.name_ar.toLowerCase()) ? 'active' : '';
+        const logoHtml = b.logo_url ? `<img src="${escapeHtml(b.logo_url)}" class="chip-brand-logo" alt="">` : '';
+        chipsHtml += `<button type="button" class="brand-chip ${isAct}" data-brand-chip="${escapeHtml(b.key)}">${logoHtml}<span>${escapeHtml(display)}</span></button>`;
       });
       brandChipsBar.innerHTML = chipsHtml;
     }
 
     const visible = products.filter(product => {
-      if (product.name === '__system_announcements__' || product.in_stock === false) return false;
+      if (product.name === '__system_announcements__' || product.name === '__system_brands__' || product.in_stock === false) return false;
       const d = unpackProduct(product);
-      const prodBrand = (d.brand || 'رُوح').toLowerCase();
+      const bObj = findBrand(d.brand || product.brand);
+      const prodBrandKey = bObj ? (bObj.name_en || bObj.name_ar) : (d.brand || 'رُوح');
       const pCat = (product.category || 'unisex').toLowerCase();
       const normCat = (pCat === 'women' || pCat.includes('نسائ') || pCat.includes('her')) ? 'women'
         : (pCat === 'men' || pCat.includes('رجال') || pCat.includes('him')) ? 'men' : 'unisex';
@@ -1938,7 +2004,11 @@
 
       // 2. Brand Filter: 'all' or specific brand
       if (activeBrand !== 'all') {
-        if (prodBrand !== activeBrand.toLowerCase()) return false;
+        const abLow = activeBrand.toLowerCase();
+        const matchesBrand = prodBrandKey.toLowerCase() === abLow ||
+          (d.brand && d.brand.toLowerCase() === abLow) ||
+          (bObj && (bObj.name_en.toLowerCase() === abLow || bObj.name_ar.toLowerCase() === abLow || bObj.id.toLowerCase() === abLow));
+        if (!matchesBrand) return false;
       }
 
       // 3. Search Query (Normalized multilingual name, latin, brand, notes, accords, etc.)
@@ -1976,7 +2046,12 @@
           const pricing = computeProductPrice(product);
           const prodName = currentLang === 'en' ? (product.latin || product.name) : product.name;
           const prodSub  = currentLang === 'en' ? (product.latin ? product.name : '') : (product.latin || '');
-          const prodBrand = d.brand || 'رُوح';
+          const bObj = findBrand(d.brand || product.brand);
+          const prodBrandKey = bObj ? (bObj.name_en || bObj.name_ar) : (d.brand || 'رُوح');
+          const prodBrandDisplay = bObj ? (currentLang === 'en' ? (bObj.name_en || bObj.name_ar) : (bObj.name_ar || bObj.name_en)) : prodBrandKey;
+          const brandLogoBadge = bObj && bObj.logo_url
+            ? `<img src="${escapeHtml(bObj.logo_url)}" class="brand-badge-logo" alt="">`
+            : '';
 
           const isOutOfStock = product.in_stock === false || (d.stock_quantity !== '' && d.stock_quantity !== undefined && parseInt(d.stock_quantity) <= 0);
 
@@ -2022,7 +2097,7 @@
               ${quickAddBtnHtml}
             </div>
             <div class="product-info">
-              <span class="card-brand-badge" data-brand-filter="${escapeHtml(prodBrand)}">${escapeHtml(prodBrand)}</span>
+              <span class="card-brand-badge" data-brand-filter="${escapeHtml(prodBrandKey)}">${brandLogoBadge}<span>${escapeHtml(prodBrandDisplay)}</span></span>
               <div class="product-meta">
                 <h3><a href="product.html?id=${product.id}" class="prod-title-link">${escapeHtml(prodName)}</a> ${prodSub ? `<small style="font-size:10px;opacity:.7;display:block;">${escapeHtml(prodSub)}</small>` : ''}</h3>
                 ${priceHtml}
@@ -2147,7 +2222,7 @@
 
   window.roohStore = {
     setProducts(rows) {
-      products = Array.isArray(rows) ? rows : [];
+      products = Array.isArray(rows) ? rows.filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__') : [];
       try { localStorage.setItem('rooh-cached-products', JSON.stringify(products)); } catch (_) {}
       renderProducts();
       renderHeroProduct();
