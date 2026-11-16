@@ -83,6 +83,19 @@
       middle_notes_en: 'Incense, Sandalwood, Vanilla',
       base_notes_ar: 'عنبر دافئ، جلود فاخرة، دخان معتق، عود ملكي',
       base_notes_en: 'Amber, Leather, Smoke, Oud'
+    },
+    // 7. Purple Heart Diamond
+    '384fa452-fb65-4aa4-abe9-a85894d1eaa4': {
+      name_ar: 'بيربل هارت دايموند',
+      name_en: 'Purple Heart Diamond',
+      desc_ar: 'يجسد عطر بيربل هارت دايموند الشغف والأناقة في أبهى صورها... سيمفونية عطرية ساحرة يتعانق فيها زهر البرتقال المنعش والكمثرى مع رقة الياسمين والفلفل الوردي، لتتوج بتناغم عميق من خشب الكشمير وخشب الأرز الدافئ والباتشولي الفاخر. عطر مفعم بأنوثة جريئة وساحرة، ينسج هالة آسرة توقظ الأحلام وتأسر الحواس أينما حللت.',
+      desc_en: 'Purple Heart Diamond embodies passion and elegance in its purest form. A symphony where fresh orange blossom and pear converse with tender jasmine and pink pepper, culminating in a deep harmony of cashmere wood, cedar, and patchouli. A fragrance infused with the spirit of bold femininity; it weaves a spell of captivating allure that awakens dreams and enchants the senses.',
+      top_notes_ar: 'زهر البرتقال، كمثرى، فانيليا ناعمة',
+      top_notes_en: 'Orange Blossom, Pear, Vanilla',
+      middle_notes_ar: 'فلفل وردي، ياسمين، لوز',
+      middle_notes_en: 'Pink Pepper, Jasmine, Almond',
+      base_notes_ar: 'خشب الكشمير، خشب الأرز، باتشولي فاخر',
+      base_notes_en: 'Cashmere Wood, Cedarwood, Patchouli'
     }
   };
 
@@ -275,13 +288,42 @@
       return targetLang === 'ar' ? item.desc_ar : item.desc_en;
     }
 
-    // 2. Direct Match by name
+    // 2. Direct Match by name or partial keyword
     if (productName) {
       const pNorm = normKey(productName);
       for (const item of Object.values(KNOWN_PERFUMES)) {
-        if (normKey(item.name_ar) === pNorm || normKey(item.name_en) === pNorm || pNorm.includes(normKey(item.name_en))) {
+        if (normKey(item.name_ar) === pNorm || normKey(item.name_en) === pNorm || pNorm.includes(normKey(item.name_en)) || pNorm.includes(normKey(item.name_ar))) {
           return targetLang === 'ar' ? item.desc_ar : item.desc_en;
         }
+      }
+      // Keyword fallback for well-known fragrances
+      if (pNorm.includes('purple') || pNorm.includes('بيربل') || pNorm.includes('heart') || pNorm.includes('هارت')) {
+        const item = KNOWN_PERFUMES['384fa452-fb65-4aa4-abe9-a85894d1eaa4'];
+        if (item) return targetLang === 'ar' ? item.desc_ar : item.desc_en;
+      }
+      if (pNorm.includes('blue') || pNorm.includes('بلو') || pNorm.includes('aqua') || pNorm.includes('اكوا')) {
+        const item = KNOWN_PERFUMES['da81db46-af51-49ae-8de8-7560beb12b5d'];
+        if (item) return targetLang === 'ar' ? item.desc_ar : item.desc_en;
+      }
+      if (pNorm.includes('sakura') || pNorm.includes('ساكورا') || pNorm.includes('pink') || pNorm.includes('بينك')) {
+        const item = KNOWN_PERFUMES['87f7e3c3-7263-4212-8cde-c13ac928e4b1'];
+        if (item) return targetLang === 'ar' ? item.desc_ar : item.desc_en;
+      }
+      if (pNorm.includes('nude') || pNorm.includes('نود') || pNorm.includes('coral') || pNorm.includes('كورال')) {
+        const item = KNOWN_PERFUMES['d6973def-50dd-4e75-8005-8ee22eb23872'];
+        if (item) return targetLang === 'ar' ? item.desc_ar : item.desc_en;
+      }
+      if (pNorm.includes('greek') || pNorm.includes('جريك')) {
+        const item = KNOWN_PERFUMES['7dbf55ce-89bc-4a7b-a0e4-2057974a2c78'];
+        if (item) return targetLang === 'ar' ? item.desc_ar : item.desc_en;
+      }
+      if (pNorm.includes('spanish') || pNorm.includes('سبانش')) {
+        const item = KNOWN_PERFUMES['a44cc91d-55ca-4a3c-aa1c-e1f8b791155f'];
+        if (item) return targetLang === 'ar' ? item.desc_ar : item.desc_en;
+      }
+      if (pNorm.includes('incense') || pNorm.includes('انسنس') || (pNorm.includes('black') && pNorm.includes('diamond')) || pNorm.includes('بلاك')) {
+        const item = KNOWN_PERFUMES['8b27644c-e280-422d-9574-bd5d3c99b72d'];
+        if (item) return targetLang === 'ar' ? item.desc_ar : item.desc_en;
       }
     }
 
@@ -299,6 +341,11 @@
 
     // 4. Fallback phrase dictionary for dynamic translations
     const PHRASE_PAIRS = [
+      ['Purple Heart Diamond embodies passion and elegance in its purest form', 'يجسد عطر بيربل هارت دايموند الشغف والأناقة في أبهى صورها'],
+      ['A symphony where orange blossom converses with jasmine', 'سيمفونية عطرية ساحرة يتعانق فيها زهر البرتقال مع رقة الياسمين'],
+      ['culminating in a deep harmony of cashmere wood, cedar, and patchouli', 'لتتوج بتناغم عميق من خشب الكشمير وخشب الأرز والباتشولي الفاخر'],
+      ['A fragrance infused with the spirit of bold femininity', 'عطر مفعم بأنوثة جريئة وساحرة'],
+      ['it weaves a spell of captivating allure that awakens dreams and enchants the senses', 'ينسج هالة آسرة توقظ الأحلام وتأسر الحواس'],
       ['A wonderful fantasy journey to the shores of an island', 'رحلة خيالية ساحرة تأخذك إلى شواطئ جزيرة غنّاء'],
       ['lush with refreshing memories', 'تنبض بذكريات منعشة'],
       ['flowing on your senses like wild waves', 'تتدفق على حواسك كأمواج هادئة'],
@@ -348,12 +395,20 @@
       PHRASE_PAIRS.forEach(([en, ar]) => {
         result = result.replace(new RegExp(en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), ar);
       });
+      // Safety guarantee: If still English/no Arabic, supply authentic Arabic luxury fragrance narrative
+      if (!/[\u0600-\u06FF]/.test(result)) {
+        return 'عطر فاخر صُنع بعناية فائقة ليعكس رقي حضورك، يمزج نفحات عطرية ساحرة تمنحك إطلالة فريدة وأثراً آسراً يدوم طويلاً.';
+      }
     } else {
       // Target English: If already mostly English, return it
       if (!/[\u0600-\u06FF]/.test(raw)) return raw;
       PHRASE_PAIRS.forEach(([en, ar]) => {
         result = result.replace(new RegExp(ar.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), en);
       });
+      // Safety guarantee: If still Arabic/no English, supply authentic English luxury fragrance narrative
+      if (!/[a-zA-Z]/.test(result)) {
+        return 'An exquisite luxury fragrance meticulously blended to reflect your distinct presence, crafting an irresistible aura and an enduring signature.';
+      }
     }
 
     return result || raw;
@@ -372,7 +427,25 @@
 
     const isAr = targetLang === 'ar';
     const prodId = String(product.id || '');
-    const known = KNOWN_PERFUMES[prodId] || null;
+    let known = KNOWN_PERFUMES[prodId] || null;
+    if (!known && (product.name || product.latin)) {
+      const searchKey = `${product.name || ''} ${product.latin || ''}`.toLowerCase();
+      if (searchKey.includes('purple') || searchKey.includes('بيربل') || searchKey.includes('heart') || searchKey.includes('هارت')) {
+        known = KNOWN_PERFUMES['384fa452-fb65-4aa4-abe9-a85894d1eaa4'];
+      } else if (searchKey.includes('blue') || searchKey.includes('بلو') || searchKey.includes('aqua') || searchKey.includes('اكوا')) {
+        known = KNOWN_PERFUMES['da81db46-af51-49ae-8de8-7560beb12b5d'];
+      } else if (searchKey.includes('sakura') || searchKey.includes('ساكورا') || searchKey.includes('pink') || searchKey.includes('بينك')) {
+        known = KNOWN_PERFUMES['87f7e3c3-7263-4212-8cde-c13ac928e4b1'];
+      } else if (searchKey.includes('nude') || searchKey.includes('نود') || searchKey.includes('coral') || searchKey.includes('كورال')) {
+        known = KNOWN_PERFUMES['d6973def-50dd-4e75-8005-8ee22eb23872'];
+      } else if (searchKey.includes('greek') || searchKey.includes('جريك')) {
+        known = KNOWN_PERFUMES['7dbf55ce-89bc-4a7b-a0e4-2057974a2c78'];
+      } else if (searchKey.includes('spanish') || searchKey.includes('سبانش')) {
+        known = KNOWN_PERFUMES['a44cc91d-55ca-4a3c-aa1c-e1f8b791155f'];
+      } else if (searchKey.includes('incense') || searchKey.includes('انسنس') || searchKey.includes('black') || searchKey.includes('بلاك')) {
+        known = KNOWN_PERFUMES['8b27644c-e280-422d-9574-bd5d3c99b72d'];
+      }
+    }
 
     // 1. Name & Latin
     const name = isAr
@@ -382,17 +455,29 @@
       ? (product.latin || (known ? known.name_en : ''))
       : (product.name || (known ? known.name_ar : ''));
 
-    // 2. Description
+    // 2. Description (Strict language verification: Arabic must contain Arabic script; English must contain Latin letters)
     let desc = '';
     if (isAr) {
-      desc = meta.desc_ar || (known ? known.desc_ar : null);
-      if (!desc) {
+      if (meta.desc_ar && /[\u0600-\u06FF]/.test(meta.desc_ar)) {
+        desc = meta.desc_ar;
+      } else if (known && known.desc_ar) {
+        desc = known.desc_ar;
+      } else {
         desc = translateDesc(meta.desc || product.notes || '', 'ar', prodId, product.name);
       }
+      if (!desc || !/[\u0600-\u06FF]/.test(desc)) {
+        desc = (known && known.desc_ar) || 'عطر فاخر صُنع بعناية ليعكس حضورك المتميز ويترك أثراً لا يُنسى في كل لحظة.';
+      }
     } else {
-      desc = meta.desc_en || (known ? known.desc_en : null);
-      if (!desc) {
+      if (meta.desc_en && /[a-zA-Z]/.test(meta.desc_en)) {
+        desc = meta.desc_en;
+      } else if (known && known.desc_en) {
+        desc = known.desc_en;
+      } else {
         desc = translateDesc(meta.desc || product.notes || '', 'en', prodId, product.latin || product.name);
+      }
+      if (!desc || !/[a-zA-Z]/.test(desc)) {
+        desc = (known && known.desc_en) || 'An exquisite fragrance meticulously blended to reflect your unique presence and leave an indelible impression.';
       }
     }
 

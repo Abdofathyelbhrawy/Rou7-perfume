@@ -148,6 +148,24 @@
       mood_subtitle: 'العطر ليس مجرد نفحات، بل شعور يتجسد وذكرى تدوم. انقر على أي لحظة لترى العطور التي تليق بها وتعيش أجواءها:',
       mood_sound_text: 'همس الأجواء',
       mood_reset: 'عرض الكل',
+      mood_tag_winter: 'دفء واسترخاء',
+      mood_title_winter: 'سهرة شتوية دافئة',
+      mood_desc_winter: 'فانيليا مخملية، أخشاب دافئة، وعنبر بلسمي',
+      mood_tag_majestic: 'فخامة وهيبة',
+      mood_title_majestic: 'حضور رسمي استثنائي',
+      mood_desc_majestic: 'عود ملكي، جلود فاخرة، وتوابل شرقية دافئة',
+      mood_tag_morning: 'انتعاش وطاقة',
+      mood_title_morning: 'صباح مشرق وثقة',
+      mood_desc_morning: 'حمضيات متألقة، زهور بيضاء، ونقاء أثيري',
+      mood_tag_romantic: 'جاذبية وسحر',
+      mood_title_romantic: 'غموض رومانسي ساحر',
+      mood_desc_romantic: 'مسك حريري، بودرة الورد، وتوت العليق الأسود',
+      mood_tag_aquatic: 'حرية وانطلاق',
+      mood_title_aquatic: 'نسيم البحر وحرية الصيف',
+      mood_desc_aquatic: 'رذاذ مائي أروماتك، نسيم البحر، ونقاء أزرق',
+      mab_close: '✕ رجوع لكافة العطور',
+      mab_title_active: 'أجواء اللحظة مفعلة',
+      mab_desc_active: 'نعرض لك العطور المختارة بعناية لترافق هذا الشعور',
     },
     en: {
       site_title: 'Rou7 Perfume — A Scent Touching Your Depths',
@@ -255,6 +273,24 @@
       mood_subtitle: 'A fragrance is more than notes—it is an embodied memory. Pick any atmosphere to reveal matching scents:',
       mood_sound_text: 'Atmosphere Audio',
       mood_reset: 'Show All',
+      mood_tag_winter: 'Warmth & Cozy',
+      mood_title_winter: 'Cozy Winter Evening',
+      mood_desc_winter: 'Velvet vanilla, warm woods & balsamic amber',
+      mood_tag_majestic: 'Prestige & Presence',
+      mood_title_majestic: 'Distinguished Black-Tie',
+      mood_desc_majestic: 'Royal oud, luxury leather & warm spices',
+      mood_tag_morning: 'Fresh Energy & Radiance',
+      mood_title_morning: 'Radiant Morning Drive',
+      mood_desc_morning: 'Sparkling citrus, white florals & ethereal purity',
+      mood_tag_romantic: 'Allure & Romance',
+      mood_title_romantic: 'Romantic Twilight Mystery',
+      mood_desc_romantic: 'Silky musk, rose powder & dark blackberries',
+      mood_tag_aquatic: 'Sea Breeze & Freedom',
+      mood_title_aquatic: 'Mediterranean Sea Breeze',
+      mood_desc_aquatic: 'Aromatic sea mist, ocean spray & azure freshness',
+      mab_close: '✕ Back to All Fragrances',
+      mab_title_active: 'Atmosphere Active',
+      mab_desc_active: 'Displaying curated fragrances tailored to this feeling',
     }
   };
 
@@ -527,10 +563,22 @@
       try { localStorage.setItem('rooh-lang', currentLang); } catch (_) {}
     }
 
+    updateMoodPortalLang();
     renderProducts();
     renderHeroProduct();
     renderStorySpotlight();
     updateCart();
+  }
+
+  function updateMoodPortalLang() {
+    if (activeMood && MOOD_PROFILES[activeMood]) {
+      const prof = MOOD_PROFILES[activeMood];
+      const isAr = currentLang === 'ar';
+      const mabTitle = $('#mabTitle');
+      const mabDesc = $('#mabDesc');
+      if (mabTitle) mabTitle.textContent = isAr ? `أجواء اللحظة: ${prof.ar}` : `Atmosphere: ${prof.en}`;
+      if (mabDesc) mabDesc.textContent = isAr ? `نعرض لك العطور المختارة بعناية لترافق ${prof.ar}` : `Showcasing fragrances harmonized with ${prof.en}`;
+    }
   }
 
   function escapeHtml(value) {
@@ -809,6 +857,16 @@
           openProductDetails(target.id);
         }
       };
+      // Instant touch navigation on mobile devices without tap delay or swipe conflicts
+      let touchMoved = false;
+      storyBottleWrap.ontouchstart = () => { touchMoved = false; };
+      storyBottleWrap.ontouchmove = () => { touchMoved = true; };
+      storyBottleWrap.ontouchend = (e) => {
+        if (!touchMoved) {
+          e.preventDefault();
+          openProductDetails(target.id);
+        }
+      };
     }
 
     // Bottle Image
@@ -816,6 +874,11 @@
     if (bottleImg && target.image_url) {
       bottleImg.src = target.image_url;
       bottleImg.alt = target.name;
+      bottleImg.style.cursor = 'pointer';
+      bottleImg.onclick = (e) => {
+        e.stopPropagation();
+        openProductDetails(target.id);
+      };
     }
 
     // Badge
@@ -824,6 +887,11 @@
       const badgeText = data.spotlight_badge || I18N[currentLang].spotlight_badge_default || '✨ عطر اليوم المميز';
       badgeEl.textContent = badgeText;
       badgeEl.style.display = data.spotlight_active !== false ? '' : 'none';
+      badgeEl.style.cursor = 'pointer';
+      badgeEl.onclick = (e) => {
+        e.stopPropagation();
+        openProductDetails(target.id);
+      };
     }
 
     // Headings / Content
@@ -849,7 +917,7 @@
           : (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(data.spotlight_desc, 'en', target.id, target.latin || target.name) : data.spotlight_desc);
       } else {
         const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(target, currentLang) : null;
-        descEl.textContent = (localized && localized.desc) ? localized.desc : (d.notes || I18N[currentLang].story_text);
+        descEl.textContent = (localized && localized.desc) ? localized.desc : (currentLang === 'ar' ? 'عطر فاخر صُنع بعناية ليعكس حضورك المتميز ويترك أثراً لا يُنسى في كل لحظة.' : 'An exquisite fragrance meticulously blended to reflect your unique presence and leave an indelible impression.');
       }
     }
 
@@ -1692,12 +1760,12 @@
     const normCat = (pCat === 'women' || pCat.includes('نسائ') || pCat.includes('her')) ? 'women'
       : (pCat === 'men' || pCat.includes('رجال') || pCat.includes('him')) ? 'men' : 'unisex';
 
-    // Fast-path gender check
+    // Fast-path gender check: Unisex fragrances are included in women and men, but show alone when searching for unisex
     if (qNorm === 'نسائي' || qNorm === 'حريمي' || qNorm === 'بناتي' || qNorm === 'women' || qNorm === 'for her') {
-      return normCat === 'women';
+      return normCat === 'women' || normCat === 'unisex';
     }
     if (qNorm === 'رجالي' || qNorm === 'شبابي' || qNorm === 'men' || qNorm === 'for him') {
-      return normCat === 'men';
+      return normCat === 'men' || normCat === 'unisex';
     }
     if (qNorm === 'للجميع' || qNorm === 'مشترك' || qNorm === 'للجنسين' || qNorm === 'unisex') {
       return normCat === 'unisex';
@@ -2034,8 +2102,13 @@
         : (pCat === 'men' || pCat.includes('رجال') || pCat.includes('him')) ? 'men' : 'unisex';
 
       // 1. Gender Filter: 'all', 'women', 'men', 'unisex'
-      if (activeFilter !== 'all') {
-        if (normCat !== activeFilter) return false;
+      // Unisex fragrances appear in Women and Men, and appear alone when Unisex is selected
+      if (activeFilter === 'women') {
+        if (normCat !== 'women' && normCat !== 'unisex') return false;
+      } else if (activeFilter === 'men') {
+        if (normCat !== 'men' && normCat !== 'unisex') return false;
+      } else if (activeFilter === 'unisex') {
+        if (normCat !== 'unisex') return false;
       }
 
       // 2. Brand Filter: 'all' or specific brand
@@ -2078,10 +2151,12 @@
 
     $('#productGrid').innerHTML = products.length
       ? visible.map(product => {
+          const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(product, currentLang) : null;
           const d = unpackProduct(product);
           const pricing = computeProductPrice(product);
-          const prodName = currentLang === 'en' ? (product.latin || product.name) : product.name;
-          const prodSub  = currentLang === 'en' ? (product.latin ? product.name : '') : (product.latin || '');
+          const prodName = localized ? localized.name : (currentLang === 'en' ? (product.latin || product.name) : product.name);
+          const prodSub  = localized ? localized.sub : (currentLang === 'en' ? (product.latin ? product.name : '') : (product.latin || ''));
+          const prodDesc = (localized && localized.desc) ? localized.desc : (d.notes || '');
           const bObj = findBrand(d.brand || product.brand);
           const prodBrandKey = bObj ? (bObj.name_en || bObj.name_ar) : (d.brand || 'رُوح');
           const prodBrandDisplay = bObj ? (currentLang === 'en' ? (bObj.name_en || bObj.name_ar) : (bObj.name_ar || bObj.name_en)) : prodBrandKey;
@@ -2110,8 +2185,11 @@
 
           // Key notes preview
           let notesPreview = '';
-          if (d.top_notes || d.middle_notes || d.base_notes) {
-            const rawParts = [d.top_notes, d.middle_notes, d.base_notes].filter(Boolean).join(',').split(/[,،]/).map(s => s.trim()).filter(Boolean).slice(0, 3);
+          const topN = localized ? localized.top_notes : d.top_notes;
+          const midN = localized ? localized.middle_notes : d.middle_notes;
+          const baseN = localized ? localized.base_notes : d.base_notes;
+          if (topN || midN || baseN) {
+            const rawParts = [topN, midN, baseN].filter(Boolean).join(',').split(/[,،]/).map(s => s.trim()).filter(Boolean).slice(0, 3);
             if (rawParts.length) {
               notesPreview = `<div class="card-keynotes-pills">${rawParts.map(n => `<span class="ck-pill">${escapeHtml(n)}</span>`).join('')}</div>`;
             }
@@ -2141,7 +2219,7 @@
               ${d.inspired_by ? `<div class="card-inspired-tag"><span class="ci-label">${currentLang === 'ar' ? 'مستوحى من' : 'Inspired by'}</span> <strong>${escapeHtml(d.inspired_by)}</strong></div>` : ''}
               ${notesPreview}
               ${moodMatchPillHtml}
-              <p class="product-desc">${escapeHtml(d.notes || '')}</p>
+              <p class="product-desc">${escapeHtml(prodDesc)}</p>
               ${d.accords ? `<div class="card-accords-row">${renderAccordPills(d.accords)}</div>` : ''}
               <div class="card-action-links">
                 <a href="product.html?id=${product.id}" class="btn-explore-notes"><span>✦</span> ${currentLang === 'ar' ? 'تفاصيل وتحليل العطر' : 'Fragrance Profile & Notes'}</a>
