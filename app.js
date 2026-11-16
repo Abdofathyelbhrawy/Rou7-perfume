@@ -1452,56 +1452,57 @@
           <span class="c-star star-8">·</span>
         </div>
 
-        <!-- Concentric Orbit Tracks -->
-        <div class="cosmic-orbit-tracks" aria-hidden="true">
-          <div class="cosmic-track track-1"></div>
-          <div class="cosmic-track track-2"></div>
-          <div class="cosmic-track track-3"></div>
-        </div>
+        <!-- 3D Orbital Scene & Tilted Disc -->
+        <div class="cosmic-3d-scene" id="cosmic3dScene">
+          <div class="cosmic-3d-disc" id="cosmic3dDisc">
+            <!-- Concentric Circular 3D Orbit Tracks -->
+            <div class="cosmic-track-3d track-3d-1" aria-hidden="true"></div>
+            <div class="cosmic-track-3d track-3d-2" aria-hidden="true"></div>
+            <div class="cosmic-track-3d track-3d-3" aria-hidden="true"></div>
 
-        <!-- The Central Radiant Sun (شعار رُوح في المركز كالشمس الساطعة) -->
-        <div class="cosmic-sun" id="cosmicSunCenter" role="button" tabindex="0" title="${escapeHtml(t.cosmic_sun_title)}">
-          <div class="sun-flare-aura"></div>
-          <div class="sun-corona-rays"></div>
-          <div class="sun-solar-glow"></div>
-          <div class="sun-core">
-            <img id="cosmicSunLogo" class="brand-logo cosmic-sun-logo"
-                 src="${sunLogoSrc}"
-                 data-dark="assets/branding/2.svg"
-                 data-light="assets/branding/1.svg"
-                 alt="رُوح | Rou7 Perfume">
-          </div>
-          <div class="sun-kicker-pill">
-            <span class="sun-kicker-spark">✦</span>
-            <span data-i18n="cosmic_sun_title">${escapeHtml(t.cosmic_sun_title)}</span>
-            <span class="sun-kicker-spark">✦</span>
-          </div>
-        </div>
-
-        <!-- Planets Orbit Stage (العطور ككواكب تدور حول الشمس) -->
-        <div class="cosmic-planets-stage" id="cosmicPlanetsStage">
-          ${cosmicActivePlanets.map((p, idx) => {
-            const pPricing = computeProductPrice(p);
-            const pName = currentLang === 'en' ? (p.latin || p.name) : (p.name || p.latin);
-            const safeName = escapeHtml(pName || 'Rou7');
-            const safeImg = escapeHtml(p.image_url || 'assets/branding/2.svg');
-            const pColor = COSMIC_PLANET_COLORS[idx % COSMIC_PLANET_COLORS.length];
-            return `
-              <div class="cosmic-planet" data-planet-index="${idx}" data-product-id="${p.id}" role="button" tabindex="0" title="${safeName} - ${escapeHtml(t.cosmic_orbit_hint)}">
-                <div class="planet-inner">
-                  <div class="planet-atmosphere" style="--atm-color: ${pColor};"></div>
-                  <div class="planet-bottle-wrap">
-                    <img class="planet-bottle-img" src="${safeImg}" alt="${safeName}" loading="eager">
-                  </div>
-                  <div class="planet-tag">
-                    <strong class="planet-name">${safeName}</strong>
-                    <span class="planet-price">${money(pPricing.price)}</span>
-                  </div>
-                  <span class="planet-inspect-hint">${escapeHtml(t.cosmic_orbit_hint)}</span>
-                </div>
+            <!-- The Central Sun Logo (شعار رُوح بدون ضوء مشتت خلفه) -->
+            <div class="cosmic-sun-3d" id="cosmicSunCenter" role="button" tabindex="0" title="${escapeHtml(t.cosmic_sun_title)}">
+              <div class="sun-core-3d">
+                <img id="cosmicSunLogo" class="brand-logo cosmic-sun-logo"
+                     src="${sunLogoSrc}"
+                     data-dark="assets/branding/2.svg"
+                     data-light="assets/branding/1.svg"
+                     alt="رُوح | Rou7 Perfume">
               </div>
-            `;
-          }).join('')}
+              <div class="sun-kicker-pill">
+                <span class="sun-kicker-spark">✦</span>
+                <span data-i18n="cosmic_sun_title">${escapeHtml(t.cosmic_sun_title)}</span>
+                <span class="sun-kicker-spark">✦</span>
+              </div>
+            </div>
+
+            <!-- Planets Orbit Stage in 3D (العطور ككواكب تدور في فضاء ثلاثي الأبعاد) -->
+            <div class="cosmic-planets-stage-3d" id="cosmicPlanetsStage">
+              ${cosmicActivePlanets.map((p, idx) => {
+                const pPricing = computeProductPrice(p);
+                const pName = currentLang === 'en' ? (p.latin || p.name) : (p.name || p.latin);
+                const safeName = escapeHtml(pName || 'Rou7');
+                const safeImg = escapeHtml(p.image_url || 'assets/branding/2.svg');
+                const pColor = COSMIC_PLANET_COLORS[idx % COSMIC_PLANET_COLORS.length];
+                return `
+                  <div class="cosmic-planet-3d" data-planet-index="${idx}" data-product-id="${p.id}" role="button" tabindex="0" title="${safeName} - ${escapeHtml(t.cosmic_orbit_hint)}">
+                    <div class="planet-ground-shadow"></div>
+                    <div class="planet-billboard">
+                      <div class="planet-atmosphere-3d" style="--atm-color: ${pColor};"></div>
+                      <div class="planet-bottle-wrap-3d">
+                        <img class="planet-bottle-img-3d" src="${safeImg}" alt="${safeName}" loading="eager">
+                      </div>
+                      <div class="planet-tag-3d">
+                        <strong class="planet-name">${safeName}</strong>
+                        <span class="planet-price">${money(pPricing.price)}</span>
+                      </div>
+                      <span class="planet-inspect-hint">${escapeHtml(t.cosmic_orbit_hint)}</span>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
         </div>
 
         <!-- Cosmic Inspector Card HUD (بطاقة النوتات وتفاصيل العطر) -->
@@ -1523,49 +1524,57 @@
       </div>
     `;
 
-    // ── Continuous Planetary Orbit Animation Loop ─────────────────────────────
+    // ── Continuous 3D Planetary Orbit Animation Loop ─────────────────────────
     function updateCosmicOrbit() {
       if (cosmicOrbitRunning && cosmicInspectIndex === -1) {
         cosmicBaseAngle += cosmicOrbitSpeed;
       }
 
-      const stage = $('#cosmicPlanetsStage');
-      if (stage) {
+      const disc = $('#cosmic3dDisc');
+      if (disc) {
         const isMobile = window.innerWidth <= 600;
         const isTablet = window.innerWidth <= 900;
-        const rx = isMobile ? 138 : (isTablet ? 230 : 330);
-        const ry = isMobile ? 68 : (isTablet ? 115 : 155);
+        const baseRadius = isMobile ? 155 : (isTablet ? 235 : 295);
 
-        const planetEls = stage.querySelectorAll('.cosmic-planet');
+        const planetEls = disc.querySelectorAll('.cosmic-planet-3d');
         const total = planetEls.length;
 
         planetEls.forEach((el) => {
           const pIdx = parseInt(el.dataset.planetIndex, 10);
+          const billboard = el.querySelector('.planet-billboard');
+
           if (cosmicInspectIndex === pIdx) {
-            // Focused planet glides to focal inspection zone
+            // Focused planet glides forward into 3D spotlight
             const isRtl = document.documentElement.dir === 'rtl';
             if (isMobile) {
-              el.style.transform = 'translate3d(0, -96px, 0) scale(1.15)';
+              el.style.transform = 'translate3d(0, 40px, 90px)';
+              if (billboard) billboard.style.transform = 'translate(-50%, -92%) rotateZ(0deg) rotateX(-52deg) scale(1.28) translateY(-10px)';
             } else {
               const focalX = isRtl ? 190 : -190;
-              el.style.transform = `translate3d(${focalX}px, 0, 0) scale(1.24)`;
+              el.style.transform = `translate3d(${focalX}px, 60px, 110px)`;
+              if (billboard) billboard.style.transform = 'translate(-50%, -92%) rotateZ(0deg) rotateX(-62deg) scale(1.35) translateY(-15px)';
             }
-            el.style.zIndex = '45';
-            el.style.opacity = '1';
+            el.style.zIndex = '50';
             return;
           }
 
+          // Stagger radii slightly across orbits
+          const trackOffset = (pIdx % 3 === 0) ? -35 : (pIdx % 3 === 1 ? 0 : 35);
+          const r = baseRadius + trackOffset;
           const theta = cosmicBaseAngle + (pIdx * (2 * Math.PI / total));
-          const x = rx * Math.cos(theta);
-          const y = ry * Math.sin(theta);
-          const z = Math.sin(theta); // -1 (back of sun) to +1 (front of sun)
-          const scale = isMobile ? (0.75 + 0.25 * ((z + 1) / 2)) : (0.8 + 0.32 * ((z + 1) / 2));
-          const zIndex = Math.round(10 + z * 8);
-          const opacity = cosmicInspectIndex !== -1 ? 0.16 : (0.78 + 0.22 * ((z + 1) / 2));
+          const x = r * Math.cos(theta);
+          const y = r * Math.sin(theta);
 
-          el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(2)})`;
+          // On a plane tilted 62deg: y > 0 is in front of the sun, y < 0 is behind
+          const zIndex = y > 0 ? 30 : 10;
+
+          el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0px)`;
           el.style.zIndex = String(zIndex);
-          el.style.opacity = String(opacity);
+
+          if (billboard && cosmicInspectIndex === -1) {
+            const bobY = Math.sin(cosmicBaseAngle * 3.5 + pIdx) * 3.5;
+            billboard.style.transform = `translate(-50%, calc(-88% + ${bobY.toFixed(1)}px)) rotateZ(8deg) rotateX(-62deg)`;
+          }
         });
       }
 
@@ -1600,7 +1609,7 @@
       });
 
       // Update planets state
-      $$('.cosmic-planet').forEach((el, i) => {
+      $$('.cosmic-planet-3d').forEach((el, i) => {
         el.classList.toggle('planet-focused', i === index);
         el.classList.toggle('planet-dimmed', i !== index);
       });
@@ -1773,18 +1782,38 @@
       if (orbitText) orbitText.textContent = t.cosmic_pause_orbit;
 
       // Remove active classes
-      $$('.cosmic-planet').forEach(el => {
+      $$('.cosmic-planet-3d').forEach(el => {
         el.classList.remove('planet-focused', 'planet-dimmed');
       });
       $$('.cosmic-pill-btn').forEach(btn => btn.classList.remove('active'));
     }
 
-    // ── Bind Interactive Event Listeners ─────────────────────────────────────
+    // ── Bind Interactive Event Listeners & 3D Tilt ───────────────────────────
     const universe = $('#cosmicUniverse');
     if (universe) {
+      // Interactive 3D mouse parallax on the orbital disc
+      universe.addEventListener('mousemove', (e) => {
+        if (cosmicInspectIndex !== -1) return;
+        const disc = $('#cosmic3dDisc');
+        if (!disc) return;
+        const rect = universe.getBoundingClientRect();
+        const nx = (e.clientX - rect.left) / rect.width - 0.5;
+        const ny = (e.clientY - rect.top) / rect.height - 0.5;
+        const tiltX = 62 + ny * 10;
+        const tiltZ = -8 + nx * 12;
+        disc.style.transform = `rotateX(${tiltX.toFixed(1)}deg) rotateZ(${tiltZ.toFixed(1)}deg)`;
+      });
+
+      universe.addEventListener('mouseleave', () => {
+        const disc = $('#cosmic3dDisc');
+        if (disc && cosmicInspectIndex === -1) {
+          disc.style.transform = 'rotateX(62deg) rotateZ(-8deg)';
+        }
+      });
+
       // Planet Click Listener
       universe.addEventListener('click', (e) => {
-        const planet = e.target.closest('.cosmic-planet');
+        const planet = e.target.closest('.cosmic-planet-3d');
         if (planet) {
           e.preventDefault();
           e.stopPropagation();
@@ -1837,11 +1866,10 @@
           if (cosmicInspectIndex !== -1) {
             cosmicCloseInspection();
           } else {
-            // Pulse the sun aura!
-            const aura = sunCenter.querySelector('.sun-flare-aura');
-            if (aura) {
-              aura.style.transform = 'scale(1.4)';
-              setTimeout(() => { aura.style.transform = ''; }, 450);
+            const core = sunCenter.querySelector('.sun-core-3d');
+            if (core) {
+              core.style.transform = 'scale(1.15)';
+              setTimeout(() => { core.style.transform = ''; }, 350);
             }
           }
           return;
