@@ -245,6 +245,7 @@
   let currentOrders = [];
   let deletedOrderIds = new Set();
   let orderStatusMap = {};
+  let salesTimeRange = 'all';
 
   try {
     const savedDel = JSON.parse(localStorage.getItem('rooh-deleted-orders') || '[]');
@@ -768,9 +769,8 @@
     calculateSalesAnalytics();
   }
 
-  let salesTimeRange = 'all';
-
-  function calculateSalesAnalytics(range = salesTimeRange) {
+  function calculateSalesAnalytics(range) {
+    if (!range) range = salesTimeRange || 'all';
     salesTimeRange = range;
     const now = Date.now();
     const dayMs = 24 * 60 * 60 * 1000;
