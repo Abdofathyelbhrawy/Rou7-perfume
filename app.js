@@ -523,6 +523,13 @@
         el.textContent = currentAnnouncements.top_bar;
         return;
       }
+      if (key && key.startsWith('val_') && currentAnnouncements && Array.isArray(currentAnnouncements.values_strip) && currentLang === 'ar') {
+        const valIdx = parseInt(key.replace('val_', ''), 10) - 1;
+        if (currentAnnouncements.values_strip[valIdx] && currentAnnouncements.values_strip[valIdx].trim()) {
+          el.textContent = currentAnnouncements.values_strip[valIdx].trim();
+          return;
+        }
+      }
       if (t[key]) {
         if (t[key].includes('<') || t[key].includes('&')) {
           el.innerHTML = t[key];
@@ -1165,6 +1172,16 @@
     // 3. Dynamic Story Spotlight Fragrance & Storewide Discount Re-render
     renderStorySpotlight();
     renderProducts();
+
+    // 4. Values Strip Customization
+    if (data.values_strip && Array.isArray(data.values_strip) && data.values_strip.length && currentLang === 'ar') {
+      const stripEls = document.querySelectorAll('.values-strip > div > span[data-i18n]');
+      data.values_strip.forEach((valText, idx) => {
+        if (stripEls[idx] && valText && String(valText).trim()) {
+          stripEls[idx].textContent = String(valText).trim();
+        }
+      });
+    }
   }
 
   function loadAnnouncements() {
@@ -1189,7 +1206,8 @@
           storewide_discount_active: parsed.storewide_discount_active || false,
           storewide_discount_percent: parsed.storewide_discount_percent || '',
           storewide_discount_scope: parsed.storewide_discount_scope || 'only_no_custom',
-          storewide_discount_badge: parsed.storewide_discount_badge || ''
+          storewide_discount_badge: parsed.storewide_discount_badge || '',
+          values_strip: parsed.values_strip || null
         });
       }
     } catch (_) {}
@@ -1243,6 +1261,109 @@
   let heroHovered = false;
   let heroListenersBound = false;
 
+  function getNoteContextualPopup(noteText, phase, lang) {
+    const raw = String(noteText || '').toLowerCase();
+    const isAr = lang === 'ar';
+
+    // 1. Spices (توابل / بهارات)
+    if (/spice|pepper|cinnamon|cardamom|saffron|ginger|clove|nutmeg|توابل|بهار|فلفل|قرفة|هيل|زعفران|زنجبيل|قرنفل|جوزة الطيب/.test(raw)) {
+      if (phase === 'top') {
+        return isAr ? 'افتتاحية تابلية متقدة بالحيوية والجاذبية 🌿' : 'Invigorating spicy opening bursting with allure';
+      } else if (phase === 'middle') {
+        return isAr ? 'قلب تابل دافئ ينبض بالحيوية والأناقة حتى 3 ساعات 🌿' : 'Warm captivating spicy heart lasting up to 3h';
+      } else {
+        return isAr ? 'قاعدة متبلة عميقة تمنح العطر ثباتاً وفخامة تدوم 🌿' : 'Rich spicy base lingering with elegance';
+      }
+    }
+
+    // 2. Citrus & Fresh Fruits (حمضيات وفواكه منعشة)
+    if (/citrus|bergamot|lemon|lime|mandarin|grapefruit|orange|apple|peach|pear|berry|berries|حمضيات|برغموت|ليمون|يوسفي|جريب فروت|برتقال|تفاح|خوخ|كمثرى|توت/.test(raw)) {
+      if (phase === 'top') {
+        return isAr ? 'نفحات افتتاحية حمضية فوارة توقظ الحواس في أول ربع ساعة 🍋' : 'Crisp citrus opening bursting with energy in first 15 mins';
+      } else if (phase === 'middle') {
+        return isAr ? 'قلب فاكهي حمضي منعش يمنح العطر إشراقة تدوم 🍋' : 'Radiant fresh heart that brightens the day';
+      } else {
+        return isAr ? 'قاعدة حمضية خشبية متوازنة ونقية 🍋' : 'Clean lingering citrus undertone';
+      }
+    }
+
+    // 3. Floral (زهور وورود)
+    if (/rose|jasmine|peony|flower|floral|blossom|neroli|lily|iris|violet|tuberose|gardenia|sakura|ورد|ياسمين|زهور|فاوانيا|نيرولي|زنبق|سوسن|بنفسج|مسك الروم|غاردينيا|ساكورا/.test(raw)) {
+      if (phase === 'top') {
+        return isAr ? 'افتتاحية زهرية ناعمة تأسر اللحظة الأولى بنقاء 🌸' : 'Delicate floral opening that captivates';
+      } else if (phase === 'middle') {
+        return isAr ? 'قلب العطر الزهري الآسر يفيض رقة وجاذبية حتى 3 ساعات 🌸' : 'Alluring floral heart lasting up to 3h';
+      } else {
+        return isAr ? 'قاعدة زهرية مخملية تترك أثراً ناعماً لا يُنسى 🌸' : 'Velvety floral base with unforgettable sillage';
+      }
+    }
+
+    // 4. Woody (أخشاب)
+    if (/wood|woody|cedar|sandalwood|vetiver|patchouli|guaiac|birch|cashmeran|cypress|خشب|أخشاب|أرز|صندل|باتشولي|فيتيفر|كشميران|سرو/.test(raw)) {
+      if (phase === 'top') {
+        return isAr ? 'انطلاقة خشبية راقية تفرض هيبة العطر من اللحظة الأولى 🪵' : 'Noble woody opening commanding presence';
+      } else if (phase === 'middle') {
+        return isAr ? 'قلب خشبي عميق متزن يعكس الثقة والأصالة 🪵' : 'Deep sophisticated woody heart';
+      } else {
+        return isAr ? 'قاعدة خشبية فاخرة تمنح العطر عمقاً وهيبة تدوم لأكثر من 10 ساعات 🪵' : 'Luxurious woody base lasting 10+ hours';
+      }
+    }
+
+    // 5. Leather & Oud & Tobacco (جلود وعود وفخامة ملكية)
+    if (/oud|leather|suede|tobacco|smoke|عود|جلود|جلد|سويد|تبغ|دخان/.test(raw)) {
+      if (phase === 'top') {
+        return isAr ? 'انطلاقة شرقية ملكية مهيبة بالعود والجلود 👑' : 'Majestic oriental opening with rich oud & leather';
+      } else if (phase === 'middle') {
+        return isAr ? 'قلب شرقي ملكي من العود والجلود المعتقة الفاخرة 👑' : 'Sumptuous royal heart of aged leather & oud';
+      } else {
+        return isAr ? 'قاعدة ملكية فاخرة تثبت بحضور لا يقاوم لأكثر من 10 ساعات 👑' : 'Royal base with unmatched longevity & presence';
+      }
+    }
+
+    // 6. Amber, Vanilla & Gourmand (عنبر وفانيليا وسويت)
+    if (/vanilla|amber|caramel|tonka|cocoa|chocolate|coffee|honey|praline|عنبر|فانيليا|كراميل|تونكا|كاكاو|شوكولاتة|قهوة|عسل/.test(raw)) {
+      if (phase === 'top') {
+        return isAr ? 'افتتاحية شهية ودافئة تجذب الحواس برقة ✨' : 'Warm sweet opening inviting the senses';
+      } else if (phase === 'middle') {
+        return isAr ? 'قلب عنبري دافئ مغرٍ بلمسات العنبر والفانيليا 3 ساعات ✨' : 'Seductive warm heart with amber & vanilla';
+      } else {
+        return isAr ? 'قاعدة عنبرية دافئة غنية تثبت لأكثر من 10 ساعات ✨' : 'Deep warm ambery base resting on skin for 10+ hours';
+      }
+    }
+
+    // 7. Marine & Aquatic (بحري ومائي)
+    if (/aqua|marine|sea|water|ocean|بحر|مائي|بحري|أمواج|نسيم/.test(raw)) {
+      if (phase === 'top') {
+        return isAr ? 'نفحات بحرية مائية منعشة كنسيم الشواطئ 🌊' : 'Crisp oceanic breeze like a refreshing coastline';
+      } else if (phase === 'middle') {
+        return isAr ? 'قلب مائي منعش يمنحك شعوراً بالحرية والانطلاق 🌊' : 'Invigorating aquatic heart full of freedom';
+      } else {
+        return isAr ? 'قاعدة بحرية نقية تدوم بانتعاش يدوم طويلاً 🌊' : 'Clean marine base lingering with purity';
+      }
+    }
+
+    // 8. Musk & Powdery (مسك وبودري)
+    if (/musk|powder|powdery|مسك|بودر|بودرة/.test(raw)) {
+      if (phase === 'top') {
+        return isAr ? 'افتتاحية مخملية هادئة من النقاء والمسك ☁️' : 'Soft pure musk opening';
+      } else if (phase === 'middle') {
+        return isAr ? 'قلب مسكي نقي يلامس الحواس بنعومة فائقة ☁️' : 'Pure velvety musk heart';
+      } else {
+        return isAr ? 'قاعدة مسكية نقية تثبت بنعومة فائقة لأكثر من 10 ساعات ☁️' : 'Clean musk base lasting softly for 10+ hours';
+      }
+    }
+
+    // Fallbacks
+    if (phase === 'top') {
+      return isAr ? 'نفحات افتتاحية تأسر الحواس في أول ربع ساعة ✦' : 'Crisp opening note in first 15 mins';
+    } else if (phase === 'middle') {
+      return isAr ? 'قلب العطر الآسر ينبض بروعة حتى 3 ساعات ✦' : 'Alluring heart note lasting up to 3h';
+    } else if (phase === 'base') {
+      return isAr ? 'قاعدة دافئة غنية تثبت لأكثر من 10 ساعات ✦' : 'Deep warm base resting on skin for 10+ hours';
+    }
+    return isAr ? 'نوتة عطرية مميزة لشخصية العطر ✦' : 'Signature aromatic note';
+  }
+
   function renderHeroProduct(targetIndex = null) {
     const hero = $('#heroProduct');
     if (!hero) return;
@@ -1278,9 +1399,9 @@
         pos: 'fn-pos-1',
         icon: '▲',
         iconClass: 'sp-top',
-        phase: currentLang === 'ar' ? 'قمة العطر · Top' : 'TOP NOTE',
+        phase: currentLang === 'ar' ? 'قمة العطر · TOP' : 'TOP NOTE',
         text: escapeHtml(localizedTop),
-        popup: currentLang === 'ar' ? 'نفحات افتتاحية منعشة في أول ربع ساعة 🍋' : 'Crisp opening note in first 15 mins'
+        popup: getNoteContextualPopup(`${firstTop} ${localizedTop}`, 'top', currentLang)
       });
     }
     if (d.middle_notes) {
@@ -1290,9 +1411,9 @@
         pos: 'fn-pos-2',
         icon: '■',
         iconClass: 'sp-trapezoid',
-        phase: currentLang === 'ar' ? 'قلب العطر · Heart' : 'HEART NOTE',
+        phase: currentLang === 'ar' ? 'قلب العطر · HEART' : 'HEART NOTE',
         text: escapeHtml(localizedMid),
-        popup: currentLang === 'ar' ? 'قلب العطر الزهري الآسر حتى 3 ساعات 🌸' : 'Alluring heart note lasting up to 3h'
+        popup: getNoteContextualPopup(`${firstMid} ${localizedMid}`, 'middle', currentLang)
       });
     }
     if (d.base_notes) {
@@ -1302,9 +1423,9 @@
         pos: 'fn-pos-3',
         icon: '◼',
         iconClass: 'sp-square',
-        phase: currentLang === 'ar' ? 'قاعدة العطر · Base' : 'BASE NOTE',
+        phase: currentLang === 'ar' ? 'قاعدة العطر · BASE' : 'BASE NOTE',
         text: escapeHtml(localizedBase),
-        popup: currentLang === 'ar' ? 'قاعدة دافئة غنية تثبت لأكثر من 10 ساعات ✨' : 'Deep warm base resting on skin for 10+ hours'
+        popup: getNoteContextualPopup(`${firstBase} ${localizedBase}`, 'base', currentLang)
       });
     }
     if (d.inspired_by) {
@@ -1318,13 +1439,14 @@
       });
     } else if (d.accords) {
       const firstAccord = d.accords.split(/[,،]/)[0].trim();
+      const localizedAccord = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(firstAccord, currentLang) : firstAccord;
       floatingNotes.push({
         pos: 'fn-pos-4',
         icon: '●',
         iconClass: 'sp-accord',
-        phase: currentLang === 'ar' ? 'الطابع' : 'ACCORD',
-        text: escapeHtml(firstAccord),
-        popup: currentLang === 'ar' ? 'الطابع العطري المميز لشخصية العطر 🌿' : 'Signature olfactory character'
+        phase: currentLang === 'ar' ? 'الطابع العطري' : 'ACCORD',
+        text: escapeHtml(localizedAccord),
+        popup: getNoteContextualPopup(`${firstAccord} ${localizedAccord}`, 'accord', currentLang)
       });
     }
 
@@ -1333,25 +1455,21 @@
       const icons = ['▲', '■', '◼', '✦'];
       const iconClasses = ['sp-top', 'sp-trapezoid', 'sp-square', 'sp-spark'];
       const phases = [
-        currentLang === 'ar' ? 'نوتة عليا' : 'TOP',
-        currentLang === 'ar' ? 'قلب العطر' : 'HEART',
-        currentLang === 'ar' ? 'نوتة دافئة' : 'BASE',
+        currentLang === 'ar' ? 'قمة العطر · TOP' : 'TOP NOTE',
+        currentLang === 'ar' ? 'قلب العطر · HEART' : 'HEART NOTE',
+        currentLang === 'ar' ? 'قاعدة العطر · BASE' : 'BASE NOTE',
         currentLang === 'ar' ? 'طابع العطر' : 'ACCORD'
       ];
-      const popups = [
-        currentLang === 'ar' ? 'نفحات افتتاحية منعشة 🍋' : 'Crisp opening note',
-        currentLang === 'ar' ? 'قلب العطر الآسر 🌸' : 'Alluring heart note',
-        currentLang === 'ar' ? 'قاعدة دافئة وثابتة ✨' : 'Warm lingering base',
-        currentLang === 'ar' ? 'طابع العطر المميز 🌿' : 'Signature accord'
-      ];
       parts.slice(0, 4).forEach((part, idx) => {
+        const localizedPart = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(part, currentLang) : part;
+        const phaseKey = idx === 0 ? 'top' : (idx === 1 ? 'middle' : (idx === 2 ? 'base' : 'accord'));
         floatingNotes.push({
           pos: `fn-pos-${idx + 1}`,
           icon: icons[idx] || '●',
           iconClass: iconClasses[idx] || 'sp-accord',
           phase: phases[idx] || 'NOTE',
-          text: escapeHtml(part),
-          popup: popups[idx] || ''
+          text: escapeHtml(localizedPart),
+          popup: getNoteContextualPopup(`${part} ${localizedPart}`, phaseKey, currentLang)
         });
       });
     }

@@ -149,6 +149,13 @@
     'white floral': 'زهور بيضاء',
 
     // Spices
+    'spices': 'توابل عطرية',
+    'refreshing spices': 'توابل منعشة',
+    'fresh spices': 'توابل منعشة',
+    'warm spices': 'توابل دافئة',
+    'oriental spices': 'توابل شرقية',
+    'spicy notes': 'نوتات تابلية حارة',
+    'pepper': 'فلفل',
     'saffron': 'زعفران',
     'cardamom': 'هيل',
     'pink pepper': 'فلفل وردي',

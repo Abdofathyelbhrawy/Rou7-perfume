@@ -1429,3 +1429,157 @@ body.light .admin-discount-badge {
   background: rgba(129, 45, 53, 0.12);
   color: var(--burgundy);
 }
+
+/* ── Sales & Profit Analytics Panel ──────────────────────────── */
+.sales-panel {
+  margin-top: 48px;
+}
+.sales-time-filters {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 4px;
+}
+.btn-time-filter {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  padding: 6px 12px;
+  font-size: 11.5px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .2s;
+}
+.btn-time-filter:hover {
+  color: var(--ink);
+}
+.btn-time-filter.active {
+  background: var(--pink);
+  color: var(--navy);
+  font-weight: 700;
+}
+body.light .btn-time-filter.active {
+  background: var(--burgundy);
+  color: #fff;
+}
+.sales-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.sales-kpi-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  transition: transform .2s ease, border-color .2s ease;
+}
+.sales-kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 165, 173, 0.4);
+}
+.sales-kpi-card .kpi-title {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+.sales-kpi-card .kpi-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 4px 0;
+}
+.sales-kpi-card .kpi-sub {
+  font-size: 10px;
+  color: var(--muted);
+}
+.sales-kpi-card .kpi-icon {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-size: 24px;
+  opacity: 0.25;
+}
+html[dir="ltr"] .sales-kpi-card .kpi-icon {
+  left: auto;
+  right: 16px;
+}
+.sales-kpi-card.highlight-profit {
+  border-color: rgba(46, 204, 113, 0.35);
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.05), transparent);
+}
+.sales-kpi-card.highlight-profit .kpi-value {
+  color: #2ecc71;
+}
+.sales-analytics-layout {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.analytics-box {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  min-width: 320px;
+}
+.analytics-box-header {
+  margin-bottom: 16px;
+}
+.analytics-box-header h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  color: var(--ink);
+}
+.financial-summary-card {
+  margin-top: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.financial-summary-card h4 {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--pink);
+}
+body.light .financial-summary-card h4 {
+  color: var(--burgundy);
+}
+.fin-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.fin-row.fin-total {
+  border-bottom: none;
+  border-top: 1px solid var(--line);
+  margin-top: 6px;
+  padding-top: 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.fin-note {
+  display: block;
+  margin-top: 10px;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+@media (max-width: 900px) {
+  .sales-analytics-layout {
+    flex-direction: column;
+  }
+}

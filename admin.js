@@ -461,6 +461,16 @@
         spotlightCard.style.opacity = spotlightActiveInput.checked ? '1' : '0.4';
       }
     }
+
+    // Values Strip Live Preview
+    const v1 = $('#valItem1')?.value.trim() || 'تركيبات غنية تدوم طويلاً';
+    const v2 = $('#valItem2')?.value.trim() || 'خامات مختارة بعناية';
+    const v3 = $('#valItem3')?.value.trim() || 'صُنع بحب في مصر';
+    const v4 = $('#valItem4')?.value.trim() || 'هدية تحكي عنك';
+    if ($('#vPreview1')) $('#vPreview1').textContent = v1;
+    if ($('#vPreview2')) $('#vPreview2').textContent = v2;
+    if ($('#vPreview3')) $('#vPreview3').textContent = v3;
+    if ($('#vPreview4')) $('#vPreview4').textContent = v4;
   }
 
   function populateSpotlightSelect(prods) {
@@ -497,6 +507,16 @@
     if ($('#storewideDiscountPercent')) $('#storewideDiscountPercent').value = data.storewide_discount_percent !== undefined ? data.storewide_discount_percent : '';
     if ($('#storewideDiscountScope')) $('#storewideDiscountScope').value = data.storewide_discount_scope || 'only_no_custom';
     if ($('#storewideDiscountBadge')) $('#storewideDiscountBadge').value = data.storewide_discount_badge || '';
+
+    // Values Strip fields
+    const vs = Array.isArray(data.values_strip) && data.values_strip.length === 4
+      ? data.values_strip
+      : ['تركيبات غنية تدوم طويلاً', 'خامات مختارة بعناية', 'صُنع بحب في مصر', 'هدية تحكي عنك'];
+    if ($('#valItem1')) $('#valItem1').value = vs[0] || 'تركيبات غنية تدوم طويلاً';
+    if ($('#valItem2')) $('#valItem2').value = vs[1] || 'خامات مختارة بعناية';
+    if ($('#valItem3')) $('#valItem3').value = vs[2] || 'صُنع بحب في مصر';
+    if ($('#valItem4')) $('#valItem4').value = vs[3] || 'هدية تحكي عنك';
+
     showCampaignPreview();
   }
 
@@ -564,7 +584,13 @@
         storewide_discount_active: $('#storewideDiscountActive')?.checked || false,
         storewide_discount_percent: $('#storewideDiscountPercent')?.value ? Number($('#storewideDiscountPercent').value) : '',
         storewide_discount_scope: $('#storewideDiscountScope')?.value || 'only_no_custom',
-        storewide_discount_badge: $('#storewideDiscountBadge')?.value.trim() || ''
+        storewide_discount_badge: $('#storewideDiscountBadge')?.value.trim() || '',
+        values_strip: [
+          $('#valItem1')?.value.trim() || 'تركيبات غنية تدوم طويلاً',
+          $('#valItem2')?.value.trim() || 'خامات مختارة بعناية',
+          $('#valItem3')?.value.trim() || 'صُنع بحب في مصر',
+          $('#valItem4')?.value.trim() || 'هدية تحكي عنك'
+        ]
       };
 
       try {
@@ -738,6 +764,196 @@
         </td>
       </tr>`;
     }).join('');
+
+    calculateSalesAnalytics();
+  }
+
+  let salesTimeRange = 'all';
+
+  function calculateSalesAnalytics(range = salesTimeRange) {
+    salesTimeRange = range;
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+
+    let filteredOrders = (currentOrders || []).filter(o => !deletedOrderIds.has(String(o.id)));
+
+    if (range === 'today') {
+      const todayStart = new Date().setHours(0, 0, 0, 0);
+      filteredOrders = filteredOrders.filter(o => {
+        const t = new Date(o.created_at || now).getTime();
+        return t >= todayStart;
+      });
+    } else if (range === 'week') {
+      const weekStart = now - (7 * dayMs);
+      filteredOrders = filteredOrders.filter(o => {
+        const t = new Date(o.created_at || now).getTime();
+        return t >= weekStart;
+      });
+    } else if (range === 'month') {
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
+      filteredOrders = filteredOrders.filter(o => {
+        const t = new Date(o.created_at || now).getTime();
+        return t >= monthStart;
+      });
+    }
+
+    // Build product maps for price and cost lookup
+    const productCostMap = new Map();
+    const productPriceMap = new Map();
+    const productObjMap = new Map();
+    (currentProducts || []).forEach(p => {
+      const d = unpackProductDetails(p);
+      const c = parseFloat(d.cost_price || p.cost_price) || 0;
+      const s = parseFloat(d.sale_price || p.sale_price) || parseFloat(p.price) || 0;
+      productCostMap.set(String(p.id), c);
+      productPriceMap.set(String(p.id), s);
+      productObjMap.set(String(p.id), p);
+      if (p.name) {
+        const normName = p.name.trim().toLowerCase();
+        productCostMap.set(normName, c);
+        productPriceMap.set(normName, s);
+        productObjMap.set(normName, p);
+      }
+    });
+
+    let totalRevenue = 0;
+    let totalEstimatedCost = 0;
+    let totalBottlesSold = 0;
+    const perfumeLeaderboard = new Map();
+    const statusCounts = {
+      delivered: 0,
+      shipped: 0,
+      confirmed: 0,
+      processing: 0,
+      pending: 0,
+      cancelled: 0
+    };
+
+    filteredOrders.forEach(order => {
+      const orderTotal = parseFloat(order.total) || 0;
+      totalRevenue += orderTotal;
+
+      const st = (order.status || 'pending').toLowerCase();
+      if (statusCounts[st] !== undefined) statusCounts[st]++;
+      else statusCounts.pending++;
+
+      const items = parseOrderItems(order.items);
+      items.forEach(item => {
+        const q = parseInt(item.qty || item.quantity) || 1;
+        const pPrice = parseFloat(item.price) || 0;
+        totalBottlesSold += q;
+
+        let itemCost = 0;
+        let pObj = null;
+        if (item.id && productCostMap.has(String(item.id))) {
+          itemCost = productCostMap.get(String(item.id));
+          pObj = productObjMap.get(String(item.id));
+        } else if (item.name && productCostMap.has(item.name.trim().toLowerCase())) {
+          itemCost = productCostMap.get(item.name.trim().toLowerCase());
+          pObj = productObjMap.get(item.name.trim().toLowerCase());
+        }
+
+        const itemRev = pPrice > 0 ? (pPrice * q) : (orderTotal);
+        const itemTotCost = itemCost * q;
+        totalEstimatedCost += itemTotCost;
+
+        const perfumeKey = item.name || (pObj ? pObj.name : 'عطر رُوح');
+        if (!perfumeLeaderboard.has(perfumeKey)) {
+          perfumeLeaderboard.set(perfumeKey, {
+            name: perfumeKey,
+            image: pObj ? pObj.image_url : null,
+            sellingPrice: pPrice || (pObj ? pObj.price : 0),
+            costPrice: itemCost,
+            unitsSold: 0,
+            revenue: 0,
+            profit: 0
+          });
+        }
+        const record = perfumeLeaderboard.get(perfumeKey);
+        record.unitsSold += q;
+        record.revenue += itemRev;
+        record.profit += (itemRev - itemTotCost);
+      });
+    });
+
+    const netProfit = totalRevenue - totalEstimatedCost;
+    const profitMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100).toFixed(1) : 0;
+    const avgOrderValue = filteredOrders.length > 0 ? (totalRevenue / filteredOrders.length) : 0;
+
+    // Render KPIs
+    if ($('#kpiTotalRevenue')) $('#kpiTotalRevenue').textContent = money(totalRevenue);
+    if ($('#kpiRevenueSub')) $('#kpiRevenueSub').textContent = `${arabicNum(filteredOrders.length)} ${adminLang === 'ar' ? 'طلبات مسجلة' : 'recorded orders'}`;
+    if ($('#kpiNetProfit')) $('#kpiNetProfit').textContent = money(netProfit);
+    if ($('#kpiMarginSub')) $('#kpiMarginSub').textContent = `${adminLang === 'ar' ? 'هامش الربح الإجمالي:' : 'Total Margin:'} ${arabicNum(profitMargin)}%`;
+    if ($('#kpiTotalBottles')) $('#kpiTotalBottles').textContent = arabicNum(totalBottlesSold);
+    if ($('#kpiOrdersCountSub')) $('#kpiOrdersCountSub').textContent = `${adminLang === 'ar' ? 'من خلال' : 'across'} ${arabicNum(filteredOrders.length)} ${adminLang === 'ar' ? 'طلبات' : 'orders'}`;
+    if ($('#kpiAvgOrder')) $('#kpiAvgOrder').textContent = money(avgOrderValue);
+
+    // Overview stat card
+    if ($('#statProfit')) $('#statProfit').textContent = money(netProfit);
+
+    // Leaderboard table
+    const sortedPerfumes = Array.from(perfumeLeaderboard.values()).sort((a, b) => b.unitsSold - a.unitsSold || b.profit - a.profit);
+    const tbody = $('#salesLeaderboardBody');
+    if (tbody) {
+      if (!sortedPerfumes.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-table">${adminLang === 'ar' ? 'لا توجد بيانات مبيعات في هذه الفترة المحددة.' : 'No sales data for this period.'}</td></tr>`;
+      } else {
+        tbody.innerHTML = sortedPerfumes.map((p, idx) => {
+          const imgH = p.image ? `<img src="${escapeHtml(p.image)}" style="width:28px;height:28px;object-fit:contain;border-radius:4px;margin-inline-end:8px;vertical-align:middle;background:rgba(255,255,255,0.05);">` : '🧴 ';
+          const margin = p.revenue > 0 ? ((p.profit / p.revenue) * 100).toFixed(0) : 0;
+          const rankBadge = idx === 0 ? '🥇 ' : (idx === 1 ? '🥈 ' : (idx === 2 ? '🥉 ' : ''));
+          return `
+            <tr>
+              <td><strong>${rankBadge}${imgH}${escapeHtml(p.name)}</strong></td>
+              <td>${money(p.sellingPrice)}</td>
+              <td><span style="color:var(--admin-muted);">${p.costPrice > 0 ? money(p.costPrice) : '—'}</span></td>
+              <td><strong style="color:var(--pink);">${arabicNum(p.unitsSold)}</strong> ${adminLang === 'ar' ? 'زجاجة' : 'bottles'}</td>
+              <td><strong>${money(p.revenue)}</strong></td>
+              <td><strong style="color:${p.profit >= 0 ? '#2ecc71' : '#e74c3c'};">${money(p.profit)}</strong></td>
+              <td><span class="stock-tag in" style="font-size:11px;">${arabicNum(margin)}%</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    // Financial statement summary
+    if ($('#finGrossSales')) $('#finGrossSales').textContent = money(totalRevenue);
+    if ($('#finTotalCost')) $('#finTotalCost').textContent = money(totalEstimatedCost);
+    if ($('#finNetProfit')) $('#finNetProfit').textContent = money(netProfit);
+
+    renderStatusBreakdownBars(statusCounts, filteredOrders.length);
+  }
+
+  function renderStatusBreakdownBars(counts, total) {
+    const wrap = $('#orderStatusBreakdown');
+    if (!wrap) return;
+    const t = total || 1;
+    const labels = {
+      delivered:  { text: adminLang === 'ar' ? 'تم التوصيل' : 'Delivered', color: '#2ecc71', icon: '★' },
+      shipped:    { text: adminLang === 'ar' ? 'تم الشحن' : 'Shipped', color: '#3498db', icon: '🚚' },
+      confirmed:  { text: adminLang === 'ar' ? 'مؤكد' : 'Confirmed', color: '#9b59b6', icon: '✓' },
+      processing: { text: adminLang === 'ar' ? 'قيد التجهيز' : 'Processing', color: '#e67e22', icon: '⏳' },
+      pending:    { text: adminLang === 'ar' ? 'قيد الانتظار' : 'Pending', color: '#f39c12', icon: '⏱' },
+      cancelled:  { text: adminLang === 'ar' ? 'ملغي' : 'Cancelled', color: '#e74c3c', icon: '✕' }
+    };
+
+    wrap.innerHTML = Object.entries(labels).map(([k, meta]) => {
+      const c = counts[k] || 0;
+      const pct = total > 0 ? Math.round((c / t) * 100) : 0;
+      return `
+        <div style="margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:5px;">
+            <span>${meta.icon} ${meta.text}</span>
+            <strong>${arabicNum(c)} (${arabicNum(pct)}%)</strong>
+          </div>
+          <div style="height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden;">
+            <div style="width:${pct}%; height:100%; background:${meta.color}; border-radius:3px; transition:width .4s ease;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   async function persistOrdersMeta() {
@@ -818,6 +1034,7 @@
     $('#statProducts').textContent = arabicNum(currentProducts.length);
     $('#prodBadge').textContent     = arabicNum(currentProducts.length);
     populateSpotlightSelect(currentProducts);
+    if (typeof calculateSalesAnalytics === 'function') calculateSalesAnalytics();
 
     // Update Brand Filter dropdown options
     populateBrandSelects();
@@ -897,6 +1114,7 @@
       }
 
       const saleVal = Number(p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : d.sale_price);
+      const costVal = Number(p.cost_price !== undefined && p.cost_price !== null ? p.cost_price : d.cost_price);
       let priceCellHtml = `<strong>${money(p.price)}</strong>`;
       if (saleVal && saleVal > 0 && saleVal < p.price) {
         const pct = Math.round(((p.price - saleVal) / p.price) * 100);
@@ -905,6 +1123,16 @@
             <strong class="admin-sale-price">${money(saleVal)}</strong>
             <del class="admin-old-price">${money(p.price)}</del>
             <span class="admin-discount-badge">${d.discount_badge || `-${pct}%`}</span>
+          </div>
+        `;
+      }
+      if (costVal > 0) {
+        const activePrice = (saleVal && saleVal > 0 && saleVal < p.price) ? saleVal : p.price;
+        const netProfit = activePrice - costVal;
+        const marginPct = activePrice > 0 ? ((netProfit / activePrice) * 100).toFixed(0) : 0;
+        priceCellHtml += `
+          <div style="font-size:10px; color:${netProfit >= 0 ? '#2ecc71' : '#e74c3c'}; margin-top:3px; white-space:nowrap;" title="سعر الشراء: ${money(costVal)} · صافي الربح: ${money(netProfit)}">
+            <span style="opacity:0.75;">تكلفة:</span> ${money(costVal)} · <span style="font-weight:600;">ربح: +${money(netProfit)} (${arabicNum(marginPct)}%)</span>
           </div>
         `;
       }
@@ -1175,7 +1403,8 @@
       sale_price:   p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : (meta.sale_price !== undefined ? meta.sale_price : ''),
       discount_percent: p.discount_percent || meta.discount_percent || '',
       discount_badge:   p.discount_badge || meta.discount_badge || '',
-      stock_quantity:   p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : '')
+      stock_quantity:   p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : ''),
+      cost_price:       p.cost_price !== undefined && p.cost_price !== null ? p.cost_price : (meta.cost_price !== undefined && meta.cost_price !== null ? meta.cost_price : '')
     };
   }
 
@@ -1199,6 +1428,33 @@
         feedback.style.display = 'none';
         feedback.textContent = '';
       }
+    }
+  }
+
+  function syncProfitFeedback() {
+    const priceVal = parseFloat($('#prodPrice')?.value) || 0;
+    const saleVal = parseFloat($('#prodSalePrice')?.value);
+    const costVal = parseFloat($('#prodCostPrice')?.value) || 0;
+    const activePrice = (!isNaN(saleVal) && saleVal > 0 && saleVal < priceVal) ? saleVal : priceVal;
+
+    const summaryEl = $('#profitSummaryText');
+    const hintEl = $('#profitFormulaHint');
+    if (!summaryEl) return;
+
+    if (costVal > 0 && activePrice > 0) {
+      const profit = activePrice - costVal;
+      const margin = ((profit / activePrice) * 100).toFixed(1);
+      const isPositive = profit >= 0;
+      summaryEl.style.color = isPositive ? '#2ecc71' : '#e74c3c';
+      summaryEl.innerHTML = `صافي الربح المتوقع: <strong>${money(profit)}</strong> لكل زجاجة · هامش الربح: <strong>${arabicNum(margin)}%</strong> ${isPositive ? '📈' : '⚠️'}`;
+      if (hintEl) hintEl.innerHTML = `(سعر البيع الفعلي ${money(activePrice)} − سعر الشراء ${money(costVal)})`;
+    } else if (costVal > 0 && activePrice <= 0) {
+      summaryEl.style.color = 'var(--admin-muted)';
+      summaryEl.textContent = 'أدخل سعر البيع لحساب الربح المتوقع.';
+    } else {
+      summaryEl.style.color = 'var(--admin-muted)';
+      summaryEl.textContent = 'أدخل سعر الشراء / التكلفة لحساب نسبة وصافي الربح تلقائياً.';
+      if (hintEl) hintEl.textContent = '(سعر البيع الفعلي − سعر الشراء)';
     }
   }
 
@@ -1244,7 +1500,9 @@
       // Discount inputs
       if (saleInp) saleInp.value = details.sale_price || '';
       if (badgeInp) badgeInp.value = details.discount_badge || '';
+      if ($('#prodCostPrice')) $('#prodCostPrice').value = details.cost_price !== '' && details.cost_price !== undefined ? details.cost_price : '';
       syncDiscountFeedback();
+      syncProfitFeedback();
 
       // Scent DNA Accords & Main Accord
       let currentAccordsList = (details.accords || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
@@ -1270,7 +1528,9 @@
       if (saleInp) saleInp.value = '';
       if (pctInp) pctInp.value = '';
       if (badgeInp) badgeInp.value = '';
+      if ($('#prodCostPrice')) $('#prodCostPrice').value = '';
       if (feedback) feedback.style.display = 'none';
+      syncProfitFeedback();
 
       if ($('#prodMainAccord')) $('#prodMainAccord').value = '';
       renderAdminAccordsChips([]);
@@ -1361,10 +1621,15 @@
   $('#cancelProdBtn')?.addEventListener('click', closeProductModal);
   prodModal?.addEventListener('click', e => { if (e.target === prodModal) closeProductModal(); });
 
-  // Live sync between Price, Sale Price, and Discount Percent in product modal
-  $('#prodSalePrice')?.addEventListener('input', () => syncDiscountFeedback());
+  // Live sync between Price, Sale Price, Cost Price, and Discount Percent in product modal
+  $('#prodCostPrice')?.addEventListener('input', () => syncProfitFeedback());
+  $('#prodSalePrice')?.addEventListener('input', () => {
+    syncDiscountFeedback();
+    syncProfitFeedback();
+  });
   $('#prodPrice')?.addEventListener('input', () => {
     if ($('#prodSalePrice')?.value) syncDiscountFeedback();
+    syncProfitFeedback();
   });
   $('#prodDiscountPercent')?.addEventListener('input', () => {
     const pPrice = parseFloat($('#prodPrice')?.value) || 0;
@@ -1374,9 +1639,11 @@
       const sPrice = Math.round(pPrice * (1 - pct / 100));
       if (saleInp) saleInp.value = sPrice;
       syncDiscountFeedback();
+      syncProfitFeedback();
     } else if (!pct) {
       if (saleInp) saleInp.value = '';
       syncDiscountFeedback();
+      syncProfitFeedback();
     }
   });
 
@@ -1620,6 +1887,8 @@
     const rawPrice = parseFloat($('#prodPrice').value) || 0;
     const rawSale = parseFloat($('#prodSalePrice')?.value);
     const validSalePrice = (!isNaN(rawSale) && rawSale > 0 && rawSale < rawPrice) ? rawSale : null;
+    const rawCost = parseFloat($('#prodCostPrice')?.value);
+    const costPrice = (!isNaN(rawCost) && rawCost >= 0) ? rawCost : null;
     const validBadge = $('#prodDiscountBadge')?.value.trim() || null;
     const validPercent = validSalePrice ? Math.round(((rawPrice - validSalePrice) / rawPrice) * 100) : null;
     const rawStock = $('#prodStockQuantity')?.value.trim();
@@ -1648,6 +1917,7 @@
       brand:       $('#prodBrand')?.value.trim() || null,
       price:       rawPrice,
       sale_price:  validSalePrice,
+      cost_price:  costPrice,
       discount_percent: validPercent,
       discount_badge:   validBadge,
       category:    $('#prodCategory').value,
@@ -1687,7 +1957,7 @@
       } catch (colErr) {
         // إذا لم تكن الأعمدة الجديدة مضافة في Supabase بعد، نحفظها كـ JSON داخل notes تلقائياً
         const errMsg = String(colErr?.message || '');
-        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('top_notes') || errMsg.includes('brand') || errMsg.includes('main_accord') || errMsg.includes('seasons') || errMsg.includes('sale_price') || errMsg.includes('discount') || errMsg.includes('stock_quantity')) {
+        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('cost_price') || errMsg.includes('top_notes') || errMsg.includes('brand') || errMsg.includes('main_accord') || errMsg.includes('seasons') || errMsg.includes('sale_price') || errMsg.includes('discount') || errMsg.includes('stock_quantity')) {
           console.warn('Columns not yet in Supabase schema, falling back to JSON notes:', colErr);
           const fallbackPayload = {
             name:        payload.name,
@@ -1719,6 +1989,7 @@
               main_accord:  payload.main_accord,
               seasons:      payload.seasons,
               sale_price:   payload.sale_price,
+              cost_price:   costPrice,
               discount_percent: payload.discount_percent,
               discount_badge: payload.discount_badge,
               stock_quantity: stockQty
@@ -2332,13 +2603,40 @@
   // ── Manual Refresh & Search / Filter Listeners ───────────────────────────
   $('#refreshProdsBtn')?.addEventListener('click', () => loadProducts(true));
   $('#refreshOrdersBtn')?.addEventListener('click', () => loadOrders(true));
+  $('#refreshSalesBtn')?.addEventListener('click', () => {
+    loadOrders(true);
+    calculateSalesAnalytics();
+  });
   $('#adminProdSearch')?.addEventListener('input', () => renderProductsTable());
   $('#adminCatFilter')?.addEventListener('change', () => renderProductsTable());
   $('#adminBrandFilter')?.addEventListener('change', () => renderProductsTable());
 
+  // ── Sales Time Filter Buttons Listener ────────────────────────────────────
+  $('#salesTimeFilters')?.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-time-filter');
+    if (!btn) return;
+    $('#salesTimeFilters').querySelectorAll('.btn-time-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    calculateSalesAnalytics(btn.dataset.range);
+  });
+
+  // ── Sidebar Active Tab Sync on Hash Change ───────────────────────────────
+  function updateActiveSideLink() {
+    const hash = window.location.hash || '#overview';
+    document.querySelectorAll('.admin-sidebar .side-link').forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        link.classList.toggle('selected', href === hash);
+      }
+    });
+  }
+  window.addEventListener('hashchange', updateActiveSideLink);
+  updateActiveSideLink();
+
   // ── Immediate Cache Render (0ms Instant Load) ─────────────────────────────
   if (currentProducts.length) renderProductsTable(currentProducts);
   if (currentOrders.length) renderOrders(currentOrders);
+  calculateSalesAnalytics('all');
   renderBrandsTable();
   populateBrandSelects();
 

@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="admin.css">
 </head>
 <body>
-  <aside class="admin-sidebar"><a href="index.html" class="admin-logo"><img class="brand-logo" src="assets/branding/logo-dark.png" data-dark="assets/branding/logo-dark.png" data-light="assets/branding/logo-light.png" alt="رُوح | Rou7 Perfume"></a><div class="side-label">القائمة الرئيسية</div><a class="side-link selected" href="#overview"><span>◫</span> نظرة عامة</a><a class="side-link" href="#products-panel"><span>🧴</span> إدارة العطور <b id="prodBadge">٠</b></a><a class="side-link" href="#brands-panel"><span>🏷️</span> إدارة البراندات <b id="brandBadge">٠</b></a><a class="side-link" href="#campaign"><span>✳</span> إعلان الصفحة الرئيسية</a><a class="side-link" href="#orders"><span>▤</span> الطلبات <b id="orderBadge">٠</b></a><a class="side-link" href="index.html#collection"><span>✳</span> مجموعة العطور</a><div class="sidebar-bottom"><span class="admin-avatar">ر</span><span><strong>فريق رُوح</strong><small>مساحة الإدارة</small></span></div></aside>
+  <aside class="admin-sidebar"><a href="index.html" class="admin-logo"><img class="brand-logo" src="assets/branding/logo-dark.png" data-dark="assets/branding/logo-dark.png" data-light="assets/branding/logo-light.png" alt="رُوح | Rou7 Perfume"></a><div class="side-label">القائمة الرئيسية</div><a class="side-link selected" href="#overview"><span>◫</span> نظرة عامة</a><a class="side-link" href="#products-panel"><span>🧴</span> إدارة العطور <b id="prodBadge">٠</b></a><a class="side-link" href="#brands-panel"><span>🏷️</span> إدارة البراندات <b id="brandBadge">٠</b></a><a class="side-link" href="#campaign"><span>✳</span> إعلان ومميزات المتجر</a><a class="side-link" href="#orders"><span>▤</span> الطلبات <b id="orderBadge">٠</b></a><a class="side-link" href="#sales-panel"><span>📊</span> تقارير المبيعات والأرباح</a><a class="side-link" href="index.html#collection"><span>✳</span> متجر رُوح</a><div class="sidebar-bottom"><span class="admin-avatar">ر</span><span><strong>فريق رُوح</strong><small>مساحة الإدارة</small></span></div></aside>
   <main class="admin-main" id="overview">
     <header class="admin-topbar">
       <div><span class="crumb">رُوح /</span> <span id="adminTopTitle">نظرة عامة</span></div>
@@ -20,7 +20,7 @@
       </div>
     </header>
     <section class="welcome"><div><p class="admin-kicker">مساحة رُوح</p><h1>أهلاً بفريق <em>رُوح</em></h1><p>نظرة هادئة على حركة متجرك اليوم.</p></div><span class="welcome-flower">✳</span></section>
-    <section class="stats-grid"><article class="stat-card"><span>إجمالي الطلبات المسجلة</span><strong id="statOrders">٠</strong><small>تحديث فوري Realtime</small><i>▤</i></article><article class="stat-card"><span>منتجات المجموعة</span><strong id="statProducts">٠</strong><small>متوفرة في المتجر</small><i>✳</i></article><article class="stat-card"><span>إجمالي قيمة الطلبات</span><strong id="statTotal">٠ ج.م</strong><small>من مبيعات المتجر</small><i>↗</i></article></section>
+    <section class="stats-grid"><article class="stat-card"><span>إجمالي الطلبات المسجلة</span><strong id="statOrders">٠</strong><small>تحديث فوري Realtime</small><i>▤</i></article><article class="stat-card"><span>منتجات المجموعة</span><strong id="statProducts">٠</strong><small>متوفرة في المتجر</small><i>✳</i></article><article class="stat-card"><span>إجمالي قيمة الطلبات</span><strong id="statTotal">٠ ج.م</strong><small>من مبيعات المتجر</small><i>↗</i></article><article class="stat-card" style="cursor:pointer;" onclick="location.hash='#sales-panel'"><span>إجمالي صافي الأرباح</span><strong id="statProfit" style="color:#2ecc71;">٠ ج.م</strong><small>حساب فوري للأرباح 📊</small><i>📈</i></article></section>
 
     <section class="products-panel" id="products-panel">
       <div class="panel-heading">
@@ -218,6 +218,28 @@
             </div>
           </div>
 
+          <!-- 5. Values Strip / شريط مميزات المتجر -->
+          <div class="campaign-fieldset" style="border: 1px solid var(--admin-line); border-radius: 12px; padding: 18px; margin-bottom: 20px; background: rgba(255,255,255,0.02);">
+            <h3 style="font-size: 14px; margin: 0 0 8px; color: var(--admin-accent); display: flex; align-items: center; gap: 8px;">
+              <span>✳️</span> شريط مميزات وثقة المتجر (أسفل العطر الرئيسي)
+            </h3>
+            <small style="display:block; color:var(--admin-muted); font-size:11px; margin-bottom:14px;">العبارات الـ ٤ التي تظهر في الشريط الأبيض الأنيق أسفل واجهة العطور في الصفحة الرئيسية:</small>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <label>الميزة الأولى
+                <input id="valItem1" maxlength="60" placeholder="مثال: تركيبات غنية تدوم طويلاً">
+              </label>
+              <label>الميزة الثانية
+                <input id="valItem2" maxlength="60" placeholder="مثال: خامات ومستخلصات مختارة بعناية">
+              </label>
+              <label>الميزة الثالثة
+                <input id="valItem3" maxlength="60" placeholder="مثال: صُنع بحب في مصر">
+              </label>
+              <label>الميزة الرابعة
+                <input id="valItem4" maxlength="60" placeholder="مثال: هدية تليق بك وبمن تُحب">
+              </label>
+            </div>
+          </div>
+
           <div class="campaign-actions">
             <button class="button button-primary" type="submit" id="saveCampaignBtn">حفظ ونشر الإعلانات فوراً <span>←</span></button>
             <p id="campaignStatus" role="status"></p>
@@ -225,7 +247,7 @@
         </form>
 
         <div class="campaign-preview">
-          <span>معاينة حية للإعلانات</span>
+          <span>معاينة حية للإعلانات والمميزات</span>
           <!-- Top Bar Preview -->
           <div style="margin-bottom: 16px;">
             <small style="display:block; margin-bottom:6px; color:var(--admin-muted); font-size:11px;">الشريط العلوي:</small>
@@ -239,6 +261,15 @@
             <small id="promoPreviewKicker">عرض من رُوح</small>
             <strong id="promoPreviewTitle">شحن مجاني للطلبات فوق ١٥٠٠ جنيه</strong>
             <p id="promoPreviewDetails"></p>
+          </div>
+
+          <!-- Values Strip Preview -->
+          <small style="display:block; margin-bottom:6px; color:var(--admin-muted); font-size:11px;">شريط مميزات المتجر أسفل الهيرو:</small>
+          <div id="valuesStripPreview" style="background:#ffffff; color:#1b2a4a; font-size:10px; padding:9px 10px; border-radius:8px; text-align:center; font-weight:600; display:flex; flex-direction:column; gap:4px; margin-bottom:16px;">
+            <div>✳ <span id="vPreview1">تركيبات غنية تدوم طويلاً</span></div>
+            <div>✳ <span id="vPreview2">خامات مختارة بعناية</span></div>
+            <div>✳ <span id="vPreview3">صُنع بحب في مصر</span></div>
+            <div>✳ <span id="vPreview4">هدية تحكي عنك</span></div>
           </div>
 
           <!-- Spotlight Preview -->
@@ -287,6 +318,113 @@
         </table>
       </div>
     </section>
+
+    <!-- 📊 قسم تقارير المبيعات والأرباح (Sales & Analytics) -->
+    <section class="sales-panel" id="sales-panel" style="margin-top: 48px;">
+      <div class="panel-heading">
+        <div>
+          <p class="admin-kicker">التقارير المالية والتحليل الذكي</p>
+          <h2>📊 تقارير المبيعات وحساب الأرباح</h2>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <div class="sales-time-filters" id="salesTimeFilters">
+            <button type="button" class="btn-time-filter active" data-range="all">كل الأوقات</button>
+            <button type="button" class="btn-time-filter" data-range="month">هذا الشهر</button>
+            <button type="button" class="btn-time-filter" data-range="week">آخر ٧ أيام</button>
+            <button type="button" class="btn-time-filter" data-range="today">اليوم</button>
+          </div>
+          <button class="button button-outline" id="refreshSalesBtn" style="padding:9px 13px; font-size:12px;" title="تحديث بيانات المبيعات">
+            <span>🔄</span> تحديث التقارير
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="sales-kpi-grid">
+        <div class="sales-kpi-card">
+          <span class="kpi-title">إجمالي المبيعات (Revenue)</span>
+          <strong class="kpi-value" id="kpiTotalRevenue">٠ ج.م</strong>
+          <small class="kpi-sub" id="kpiRevenueSub">إجمالي مبيعات الطلبات المسجلة</small>
+          <span class="kpi-icon">💰</span>
+        </div>
+        <div class="sales-kpi-card highlight-profit">
+          <span class="kpi-title">صافي الأرباح المقدرة (Net Profit)</span>
+          <strong class="kpi-value" id="kpiNetProfit">٠ ج.م</strong>
+          <small class="kpi-sub" id="kpiMarginSub">هامش الربح الإجمالي: ٠٪</small>
+          <span class="kpi-icon">📈</span>
+        </div>
+        <div class="sales-kpi-card">
+          <span class="kpi-title">إجمالي الزجاجات المباعة</span>
+          <strong class="kpi-value" id="kpiTotalBottles">٠</strong>
+          <small class="kpi-sub" id="kpiOrdersCountSub">من خلال ٠ طلبات</small>
+          <span class="kpi-icon">🧴</span>
+        </div>
+        <div class="sales-kpi-card">
+          <span class="kpi-title">متوسط قيمة الطلب (AOV)</span>
+          <strong class="kpi-value" id="kpiAvgOrder">٠ ج.م</strong>
+          <small class="kpi-sub">متوسط إنفاق العميل للطلب الواحد</small>
+          <span class="kpi-icon">🎯</span>
+        </div>
+      </div>
+
+      <!-- Main Analytics Two Columns -->
+      <div class="sales-analytics-layout">
+        <!-- Column 1: Best Sellers & Profit per Perfume -->
+        <div class="analytics-box" style="flex: 1.4;">
+          <div class="analytics-box-header">
+            <h3>🏆 صدارة العطور الأكثر مبيعاً والأعلى ربحاً</h3>
+            <small style="color:var(--admin-muted); font-size:11px;">مرتبة حسب عدد الزجاجات المباعة وصافي الأرباح المحققة</small>
+          </div>
+          <div class="table-wrap">
+            <table class="analytics-table">
+              <thead>
+                <tr>
+                  <th>العطر</th>
+                  <th>سعر البيع</th>
+                  <th>التكلفة</th>
+                  <th>الزجاجات المباعة</th>
+                  <th>إجمالي المبيعات</th>
+                  <th>صافي الربح</th>
+                  <th>معدل الربح</th>
+                </tr>
+              </thead>
+              <tbody id="salesLeaderboardBody">
+                <tr><td colspan="7" class="empty-table">جاري تجميع بيانات المبيعات…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Column 2: Order Status Distribution & Financial Summary -->
+        <div class="analytics-box" style="flex: 1;">
+          <div class="analytics-box-header">
+            <h3>📦 حالة الطلبات والتسليم</h3>
+            <small style="color:var(--admin-muted); font-size:11px;">متابعة سير التحصيل والتوصيل</small>
+          </div>
+          <div id="orderStatusBreakdown" class="status-breakdown-wrap">
+            <!-- Dynamic Status Bars -->
+          </div>
+
+          <div class="financial-summary-card">
+            <h4>💡 كشف الحساب التقديري</h4>
+            <div class="fin-row">
+              <span>إجمالي إيرادات المبيعات:</span>
+              <strong id="finGrossSales">٠ ج.م</strong>
+            </div>
+            <div class="fin-row">
+              <span>تكلفة شراء المنتجات التقديرية:</span>
+              <strong id="finTotalCost" style="color:#e74c3c;">٠ ج.م</strong>
+            </div>
+            <div class="fin-row fin-total">
+              <span>صافي الأرباح المحققة:</span>
+              <strong id="finNetProfit" style="color:#2ecc71;">٠ ج.م</strong>
+            </div>
+            <small class="fin-note">* ملاحظة: حساب التكلفة والأرباح يعتمد على "سعر الشراء" المُدخل في بطاقة كل عطر.</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <footer class="admin-footer"><span>رُوح | Rou7 Perfume</span><span>عطر يلامس أعماقك <b>✳</b></span></footer>
   </main>
 
@@ -309,8 +447,11 @@
             </label>
           </div>
           <div class="form-row">
-            <label>السعر (ج.م) *
+            <label>سعر البيع للجمهور (ج.م) *
               <input id="prodPrice" name="price" type="number" step="0.01" min="0" required placeholder="مثال: 350">
+            </label>
+            <label>سعر الشراء / التكلفة (ج.م)
+              <input id="prodCostPrice" name="cost_price" type="number" step="0.01" min="0" placeholder="مثال: 200">
             </label>
             <label>الصنف *
               <select id="prodCategory" name="category" required>
@@ -337,6 +478,18 @@
                 </div>
               </div>
             </label>
+          </div>
+
+          <!-- Real-Time Profit Calculation Panel -->
+          <div id="prodProfitBox" style="background: rgba(46, 204, 113, 0.08); border: 1px solid rgba(46, 204, 113, 0.25); border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px;">
+              <span>📈</span>
+              <strong>حساب الأرباح التلقائي:</strong>
+              <span id="profitSummaryText" style="color: #2ecc71; font-weight: 600;">أدخل سعر الشراء لحساب صافي الربح وهامش الربح تلقائياً.</span>
+            </div>
+            <div style="font-size: 11px; color: var(--admin-muted);" id="profitFormulaHint">
+              (سعر البيع الفعلي − سعر الشراء)
+            </div>
           </div>
 
           <!-- Product Discount Box -->
