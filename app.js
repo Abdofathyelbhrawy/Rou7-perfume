@@ -71,16 +71,13 @@
       val_2: 'خامات مختارة بعناية',
       val_3: 'صُنع بحب في مصر',
       val_4: 'هدية تحكي عنك',
-      val_custom: 'متاح عندنا طلب عطر مخصص بالطلب',
-      cp_eyebrow: 'خدمة رُوح الخاصة للأصالة والفخامة ✦',
-      cp_title: 'متاح عندنا <em>طلب عطر مخصص</em> بالطلب',
-      cp_desc: 'هل تبحث عن توقيع عطري استثنائي يُصنع خصيصاً لك؟ نبتكر لك عطرك المفضل بتركيبة فريدة تناسب ذوقك ونوتاتك المرغوبة، مع تركيز إكستري دو بارفان فائق الثبات وإمكانية حفر اسمك أو إهدائك الفاخر بالذهب على الزجاجة.',
-      cp_feat_1: 'خامات وزيوت فرنسية وشرقية نقية معتمدة',
-      cp_feat_2: 'تركيز إكستري دو بارفان يدوم طويلاً',
-      cp_feat_3: 'تغليف ملكي مع حفر اسمك بالذهب',
-      cp_cta: 'اطلب عطرك المخصص عبر واتساب 💬',
-      cp_consult_note: 'استشارة فورية مجانية مع خبير العطور لتحديد نوتاتك',
-      nav_custom: 'عطر مخصص',
+      val_custom: 'لو في عطر مش موجود ومحتاجه نقدر نوفرهولك',
+      cp_eyebrow: 'خدمة رُوح الخاصة ✦',
+      cp_title: 'لو في عطر مش موجود ومحتاجه… <em>نقدر نوفرهولك</em>',
+      cp_desc: 'بتدور على عطر معين ومش لاقيه في المتجر؟ ابعتلنا اسمه أو صورته على واتساب وهنوفرهولك فوراً بأفضل سعر وأعلى جودة وأصلية مضمونة 100%.',
+      cp_cta: 'اطلب توفير عطرك عبر واتساب 💬',
+      cp_consult_note: 'رد وتأكيد فوري على مدار الساعة',
+      nav_custom: 'طلب توفير عطر',
       mood_nature_playing: 'همس الطبيعة: شغال 🍃',
       mood_nature_paused: 'همس الطبيعة',
       coll_eyebrow: 'اكتشف عطرك',
@@ -222,16 +219,13 @@
       val_2: 'Carefully selected essences',
       val_3: 'Crafted with love in Egypt',
       val_4: 'A gift that speaks of you',
-      val_custom: 'Custom Bespoke Perfumes Available on Demand',
-      cp_eyebrow: 'Rou7 Bespoke Signature Service ✦',
-      cp_title: 'Custom Bespoke Perfumes <em>Available on Demand</em>',
-      cp_desc: 'Seeking an exclusive signature scent crafted solely for you? We compose your custom fragrance with your favorite notes, supreme Extrait concentration, and personalized gold bottle engraving.',
-      cp_feat_1: '100% Pure Certified French & Oriental Oils',
-      cp_feat_2: 'Long-Lasting Extrait de Parfum Concentration',
-      cp_feat_3: 'Royal Presentation with Gold Name Engraving',
-      cp_cta: 'Order Your Bespoke Scent on WhatsApp 💬',
-      cp_consult_note: 'Free direct consultation with our master perfumer to pick your notes',
-      nav_custom: 'Bespoke Perfume',
+      val_custom: 'Looking for a scent not listed? We can provide it for you',
+      cp_eyebrow: 'Rou7 Special Sourcing Service ✦',
+      cp_title: 'Can’t find your favorite perfume? <em>We can provide it for you</em>',
+      cp_desc: 'Searching for a specific fragrance that is not listed in our store? Message us on WhatsApp with its name or photo and we will source it for you at the best price with 100% authenticity guaranteed.',
+      cp_cta: 'Request Your Perfume on WhatsApp 💬',
+      cp_consult_note: 'Instant 24/7 response & inquiry confirmation',
+      nav_custom: 'Request a Scent',
       mood_nature_playing: 'Nature Sounds: On 🍃',
       mood_nature_paused: 'Nature Sounds',
       coll_eyebrow: 'Discover Your Scent',
@@ -1757,6 +1751,9 @@
           </div>
         </div>
 
+        <!-- Cosmic Inspector Backdrop for Mobile/Desktop Overlay -->
+        <div class="cosmic-inspector-backdrop" id="cosmicBackdrop" hidden></div>
+
         <!-- Cosmic Inspector Card HUD (بطاقة النوتات وتفاصيل العطر) -->
         <div class="cosmic-inspector-card" id="cosmicInspectorCard" hidden></div>
 
@@ -1786,7 +1783,7 @@
       if (disc) {
         const isMobile = window.innerWidth <= 600;
         const isTablet = window.innerWidth <= 900;
-        const baseRadius = isMobile ? 155 : (isTablet ? 235 : 295);
+        const baseRadius = isMobile ? 100 : (isTablet ? 190 : 295);
 
         const planetEls = disc.querySelectorAll('.cosmic-planet-3d');
         const total = planetEls.length;
@@ -1799,33 +1796,40 @@
             // Focused planet glides forward into 3D spotlight
             const isRtl = document.documentElement.dir === 'rtl';
             if (isMobile) {
-              el.style.transform = 'translate3d(0, 40px, 90px)';
-              if (billboard) billboard.style.transform = 'translate(-50%, -92%) rotateZ(0deg) rotateX(-52deg) scale(1.28) translateY(-10px)';
+              // On mobile, the inspector modal/sheet takes focus; hide 3D billboard to prevent overlap
+              el.style.opacity = '0';
+              el.style.pointerEvents = 'none';
             } else {
               const focalX = isRtl ? 190 : -190;
               el.style.transform = `translate3d(${focalX}px, 60px, 110px)`;
               if (billboard) billboard.style.transform = 'translate(-50%, -92%) rotateZ(0deg) rotateX(-62deg) scale(1.35) translateY(-15px)';
+              el.style.opacity = '1';
+              el.style.pointerEvents = 'auto';
+              el.style.zIndex = '50';
             }
-            el.style.zIndex = '50';
             return;
           }
 
-          // Stagger radii slightly across orbits
-          const trackOffset = (pIdx % 3 === 0) ? -35 : (pIdx % 3 === 1 ? 0 : 35);
+          el.style.opacity = '';
+          el.style.pointerEvents = '';
+
+          // Stagger radii slightly across orbits without clipping screen edges
+          const trackOffset = isMobile ? ((pIdx % 3 === 0) ? -18 : ((pIdx % 3 === 1) ? 0 : 18)) : ((pIdx % 3 === 0) ? -35 : ((pIdx % 3 === 1) ? 0 : 35));
           const r = baseRadius + trackOffset;
           const theta = cosmicBaseAngle + (pIdx * (2 * Math.PI / total));
           const x = r * Math.cos(theta);
           const y = r * Math.sin(theta);
 
-          // On a plane tilted 62deg: y > 0 is in front of the sun, y < 0 is behind
+          // On a plane tilted: y > 0 is in front of the sun, y < 0 is behind
           const zIndex = y > 0 ? 30 : 10;
 
           el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0px)`;
           el.style.zIndex = String(zIndex);
 
           if (billboard && cosmicInspectIndex === -1) {
-            const bobY = Math.sin(cosmicBaseAngle * 3.5 + pIdx) * 3.5;
-            billboard.style.transform = `translate(-50%, calc(-88% + ${bobY.toFixed(1)}px)) rotateZ(8deg) rotateX(-62deg)`;
+            const bobY = isMobile ? Math.sin(cosmicBaseAngle * 3.5 + pIdx) * 1.8 : Math.sin(cosmicBaseAngle * 3.5 + pIdx) * 3.5;
+            const tiltAngle = isMobile ? -46 : -62;
+            billboard.style.transform = `translate(-50%, calc(-88% + ${bobY.toFixed(1)}px)) rotateZ(6deg) rotateX(${tiltAngle}deg)`;
           }
         });
       }
@@ -1866,6 +1870,12 @@
         el.classList.toggle('planet-dimmed', i !== index);
       });
 
+      // Universe & Backdrop inspection state
+      const universeEl = $('#cosmicUniverse');
+      if (universeEl) universeEl.classList.add('inspecting');
+      const bdEl = $('#cosmicBackdrop');
+      if (bdEl) bdEl.hidden = false;
+
       // Extract & Translate Fragrance Notes
       const topRaw = d.top_notes || '';
       const midRaw = d.middle_notes || '';
@@ -1888,6 +1898,7 @@
 
       // Inspired by text
       const inspiredText = d.inspired_by ? `${t.cosmic_inspired_prefix} ${escapeHtml(d.inspired_by)}` : (isAr ? 'تركيبة استثنائية من دار رُوح ✦' : 'Signature creation by Rou7 ✦');
+      const safeThumbImg = escapeHtml(p.image_url || 'assets/branding/2.svg');
 
       // Build Inspector Card HTML
       const card = $('#cosmicInspectorCard');
@@ -1896,16 +1907,18 @@
       card.hidden = false;
       card.innerHTML = `
         <div class="inspector-header">
-          <div class="inspector-badges-row">
-            <span class="inspector-pill-badge">${genderText}</span>
-            ${pPricing.hasDiscount ? `<span class="inspector-pill-badge sale-badge">${escapeHtml(pPricing.discountBadge)}</span>` : ''}
+          <div class="inspector-header-info">
+            <img class="inspector-prod-thumb" src="${safeThumbImg}" alt="${safeName}">
+            <div class="inspector-title-wrap">
+              <div class="inspector-badges-row">
+                <span class="inspector-pill-badge">${genderText}</span>
+                ${pPricing.hasDiscount ? `<span class="inspector-pill-badge sale-badge">${escapeHtml(pPricing.discountBadge)}</span>` : ''}
+              </div>
+              <h3 class="inspector-perfume-name">${safeName}</h3>
+              <span class="inspector-inspired-tag"><span>✦</span> ${inspiredText}</span>
+            </div>
           </div>
           <button type="button" class="btn-inspector-close" id="btnCosmicClose" aria-label="إغلاق والعودة للمدار">✕</button>
-        </div>
-
-        <div class="inspector-title-wrap">
-          <h3 class="inspector-perfume-name">${safeName}</h3>
-          <span class="inspector-inspired-tag"><span>✦</span> ${inspiredText}</span>
         </div>
 
         <div class="inspector-notes-pyramid">
@@ -1966,6 +1979,11 @@
           card.style.left = 'auto';
           card.style.right = '40px';
         }
+      } else {
+        card.style.top = '';
+        card.style.transform = '';
+        card.style.left = '';
+        card.style.right = '';
       }
 
       // Start 8-second countdown timer
@@ -2024,8 +2042,17 @@
       cosmicInspectIndex = -1;
       cosmicOrbitRunning = true;
 
+      const universe = $('#cosmicUniverse');
+      if (universe) universe.classList.remove('inspecting');
+
+      const bd = $('#cosmicBackdrop');
+      if (bd) bd.hidden = true;
+
       const card = $('#cosmicInspectorCard');
-      if (card) card.hidden = true;
+      if (card) {
+        card.hidden = true;
+        card.innerHTML = '';
+      }
 
       // Update control button
       const orbitIcon = $('#orbitIcon');
@@ -2039,6 +2066,12 @@
       });
       $$('.cosmic-pill-btn').forEach(btn => btn.classList.remove('active'));
     }
+
+    // Backdrop click to dismiss inspection
+    $('#cosmicBackdrop')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      cosmicCloseInspection();
+    });
 
     // ── Bind Interactive Event Listeners & 3D Tilt ───────────────────────────
     const universe = $('#cosmicUniverse');

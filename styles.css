@@ -1918,60 +1918,25 @@ body.light .cp-main-title em {
   font-size: 13.5px;
   line-height: 1.7;
   color: var(--muted);
-  margin: 0 0 18px;
+  margin: 0;
   max-width: 660px;
 }
-.cp-features-strip {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.cp-feat-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ink);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 5px 12px;
-  border-radius: 8px;
-}
-body.light .cp-feat-item {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.06);
-}
-.cp-feat-icon {
-  font-size: 14px;
-}
 .cp-action-col {
-  flex: 1;
-  min-width: min(100%, 260px);
+  flex: 0 0 auto;
+  min-width: min(100%, 250px);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 10px;
+  gap: 8px;
   background: rgba(212, 175, 55, 0.06);
   border: 1px solid rgba(212, 175, 55, 0.2);
   border-radius: 16px;
-  padding: 20px 22px;
+  padding: 16px 20px;
 }
 body.light .cp-action-col {
   background: rgba(184, 134, 11, 0.05);
   border-color: rgba(184, 134, 11, 0.18);
-}
-.cp-badge-floating {
-  font-size: 10.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: #ffd166;
-}
-body.light .cp-badge-floating {
-  color: #8b5a00;
 }
 .btn-custom-order {
   display: inline-flex;
@@ -1979,17 +1944,18 @@ body.light .cp-badge-floating {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  padding: 13px 22px;
+  padding: 12px 20px;
   border-radius: 12px;
   background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
   color: #0b111a !important;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13.5px;
   border: none;
   cursor: pointer;
   box-shadow: 0 8px 22px rgba(212, 175, 55, 0.35);
   transition: all .25s ease;
   text-decoration: none;
+  white-space: nowrap;
 }
 .btn-custom-order:hover {
   transform: translateY(-2px);
@@ -3913,6 +3879,30 @@ body.light .planet-inspect-hint {
   filter: drop-shadow(0 24px 38px rgba(245, 165, 173, 0.55));
 }
 
+/* Dim background 3D scene when inspecting */
+.cosmic-solar-universe.inspecting .cosmic-3d-scene {
+  opacity: 0.12 !important;
+  filter: blur(8px) !important;
+  transform: scale(0.92);
+  pointer-events: none;
+  transition: all .35s ease;
+}
+
+/* Inspector Backdrop */
+.cosmic-inspector-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  background: rgba(11, 19, 32, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn 0.25s ease forwards;
+  cursor: pointer;
+}
+body.light .cosmic-inspector-backdrop {
+  background: rgba(245, 240, 235, 0.75);
+}
+
 /* 6. Cosmic Inspector Card HUD (بطاقة فحص النوتات العطرية) */
 .cosmic-inspector-card {
   position: absolute;
@@ -3952,6 +3942,26 @@ body.light .cosmic-inspector-card {
   margin-bottom: 12px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--line);
+}
+
+.inspector-header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.inspector-prod-thumb {
+  width: 48px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+body.light .inspector-prod-thumb {
+  filter: drop-shadow(0 4px 10px rgba(66, 44, 36, 0.18));
 }
 
 .inspector-badges-row {
@@ -4334,59 +4344,123 @@ body.light .cosmic-pill-btn.active {
 
 @media (max-width: 900px) {
   .cosmic-solar-universe {
-    min-height: 560px;
+    min-height: 530px;
   }
   .cosmic-3d-disc {
-    width: 600px;
-    height: 600px;
-    transform: rotateX(58deg) rotateZ(-6deg);
+    width: 500px;
+    height: 500px;
+    transform: rotateX(55deg) rotateZ(-5deg);
   }
-  .track-3d-1 { width: 300px; height: 300px; }
-  .track-3d-2 { width: 450px; height: 450px; }
-  .track-3d-3 { width: 600px; height: 600px; }
-  .sun-core-3d { width: 105px; height: 105px; }
-  .cosmic-sun-logo { max-width: 68px; max-height: 68px; }
-  .planet-billboard { width: 100px; height: 150px; }
-  .planet-bottle-img-3d { max-height: 95px; }
+  .track-3d-1 { width: 250px; height: 250px; }
+  .track-3d-2 { width: 375px; height: 375px; }
+  .track-3d-3 { width: 500px; height: 500px; }
+  .sun-core-3d { width: 92px; height: 92px; }
+  .cosmic-sun-logo { max-width: 60px; max-height: 60px; }
+  .planet-billboard { width: 84px; height: 125px; }
+  .planet-bottle-img-3d { max-height: 75px; }
+  .planet-tag-3d { padding: 2px 5px; font-size: 8.5px; }
+  .planet-name { font-size: 8.5px; max-width: 64px; }
+  .planet-price { font-size: 8px; }
   .cosmic-inspector-card { width: 340px; padding: 18px 20px 14px; }
 }
 
 @media (max-width: 600px) {
   .cosmic-solar-universe {
-    min-height: 520px;
-    border-radius: 20px;
-    perspective: 900px;
+    min-height: 460px;
+    border-radius: 18px;
+    perspective: 750px;
+    overflow: hidden;
   }
   .cosmic-3d-disc {
-    width: 440px;
-    height: 440px;
-    transform: rotateX(52deg) rotateZ(-4deg);
+    width: 290px;
+    height: 290px;
+    transform: rotateX(46deg) rotateZ(-3deg);
   }
-  .track-3d-1 { width: 220px; height: 220px; }
-  .track-3d-2 { width: 330px; height: 330px; }
-  .track-3d-3 { width: 440px; height: 440px; }
-  .sun-core-3d { width: 88px; height: 88px; }
-  .cosmic-sun-logo { max-width: 58px; max-height: 58px; }
-  .sun-kicker-pill { font-size: 9.5px; padding: 3px 10px; }
-  .planet-billboard { width: 80px; height: 130px; }
-  .planet-bottle-img-3d { max-height: 80px; }
-  .planet-tag-3d { padding: 2px 6px; font-size: 9px; }
-  .planet-name { font-size: 9.5px; max-width: 70px; }
-  .planet-price { font-size: 8.5px; }
+  .track-3d-1 { width: 130px; height: 130px; }
+  .track-3d-2 { width: 200px; height: 200px; }
+  .track-3d-3 { width: 270px; height: 270px; }
+  .sun-core-3d { width: 62px; height: 62px; }
+  .cosmic-sun-logo { max-width: 40px; max-height: 40px; }
+  .sun-kicker-pill { font-size: 7.5px; padding: 2px 7px; margin-top: 2px; }
+  .planet-billboard { width: 56px; height: 86px; }
+  .planet-bottle-img-3d { max-height: 48px; }
+  .planet-tag-3d { padding: 1.5px 4px; font-size: 7.5px; border-radius: 6px; }
+  .planet-name { font-size: 7.5px; max-width: 48px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .planet-price { font-size: 7px; }
+  .planet-ground-shadow { width: 36px; height: 8px; }
+  .planet-atmosphere-3d { width: 58px; height: 58px; }
+
+  .cosmic-inspector-backdrop {
+    position: fixed;
+    z-index: 90;
+    background: rgba(11, 19, 32, 0.72);
+  }
+  body.light .cosmic-inspector-backdrop {
+    background: rgba(245, 240, 235, 0.82);
+  }
+
   .cosmic-inspector-card {
     position: fixed;
-    bottom: 12px;
-    left: 12px;
-    right: 12px;
-    width: auto;
-    max-width: none;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
     z-index: 100;
-    padding: 16px 18px 14px;
-    border-radius: 20px;
+    padding: 16px 18px 22px;
+    border-radius: 22px 22px 0 0;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    background: #142236 !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.65), 0 0 30px rgba(245, 165, 173, 0.18);
+    max-height: 85vh;
+    overflow-y: auto;
   }
-  .inspector-perfume-name { font-size: 18px; }
-  .inspector-notes-pyramid { margin: 10px 0 12px; padding: 9px 11px; }
-  .note-phase-badge { min-width: 75px; font-size: 9px; }
-  .scent-note-chip { font-size: 9.5px; padding: 1px 6px; }
+  body.light .cosmic-inspector-card {
+    background: #ffffff !important;
+    border-color: rgba(129, 45, 53, 0.18);
+    box-shadow: 0 -10px 40px rgba(66, 44, 36, 0.18);
+  }
+  .inspector-header {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+  }
+  .inspector-prod-thumb {
+    width: 44px;
+    height: 52px;
+  }
+  .inspector-perfume-name {
+    font-size: 16px;
+  }
+  .inspector-inspired-tag {
+    font-size: 10.5px;
+  }
+  .inspector-notes-pyramid {
+    margin: 8px 0 10px;
+    padding: 8px 10px;
+    gap: 6px;
+  }
+  .note-phase-badge {
+    min-width: 70px;
+    font-size: 8.5px;
+  }
+  .scent-note-chip {
+    font-size: 9px;
+    padding: 1px 5px;
+  }
+  .inspector-footer-bar {
+    gap: 10px;
+  }
+  .inspector-current-price {
+    font-size: 16px;
+  }
+  .inspector-btn-group {
+    gap: 6px;
+  }
+  .btn-cosmic-explore, .btn-cosmic-quickadd {
+    padding: 7px 11px;
+    font-size: 11px;
+  }
   .cosmic-planet-pills { display: none; }
 }

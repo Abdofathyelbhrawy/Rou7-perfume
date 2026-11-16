@@ -56,7 +56,7 @@ body.light {
 }
 
 body.light .admin-sidebar {
-  background: #ffffff;
+  background: #ffffff !important;
   color: var(--ink);
   border-inline-end: 1px solid var(--line);
   box-shadow: -4px 0 24px rgba(66, 44, 36, 0.05);
