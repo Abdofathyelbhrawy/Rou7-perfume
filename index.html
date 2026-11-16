@@ -239,6 +239,7 @@
           <button class="filter" data-filter="women" data-i18n="filter_women">نسائي</button>
           <button class="filter" data-filter="men" data-i18n="filter_men">رجالي</button>
           <button class="filter" data-filter="unisex" data-i18n="filter_unisex">للجميع</button>
+          <button class="filter filter-gifts" data-filter="gifts" data-i18n="filter_gifts">هدايا 🎁</button>
         </div>
         <div class="collection-actions">
           <div class="collection-brand-wrap">
@@ -259,6 +260,10 @@
       </div>
       <!-- Brand Quick Filter Chips -->
       <div class="brand-chips-bar" id="brandChipsBar" aria-label="تصفية سريعة بالبراندات"></div>
+
+      <!-- Luxury Gift Box Customizer Banner (يظهر عند اختيار قسم الهدايا) -->
+      <div class="gifts-builder-banner" id="giftsBuilderBanner" style="display: none;"></div>
+
       <div class="product-grid" id="productGrid"></div>
     </section>
 
@@ -457,6 +462,16 @@
     <div class="modal-card quiz-modal-card">
       <button class="modal-close" id="quizModalClose" aria-label="إغلاق">×</button>
       <div class="quiz-container" id="quizContainer">
+        <!-- Dynamically injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal تجميع وتخصيص بوكس الهدايا -->
+  <div class="modal" id="giftBoxBuilderModal" role="dialog" aria-modal="true" aria-labelledby="giftBuilderTitle">
+    <div class="modal-card gift-builder-card">
+      <button class="modal-close" id="giftBuilderClose" aria-label="إغلاق">×</button>
+      <div class="gift-builder-container" id="giftBuilderContainer">
         <!-- Dynamically injected via JavaScript -->
       </div>
     </div>

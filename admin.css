@@ -632,6 +632,17 @@ td {
   border: 1px solid rgba(247, 180, 148, 0.35);
 }
 
+.cat-pill.gifts {
+  background: rgba(212, 175, 55, 0.18);
+  color: #ffd166;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+}
+body.light .cat-pill.gifts {
+  background: rgba(184, 134, 11, 0.12);
+  color: #8b5a00;
+  border-color: rgba(184, 134, 11, 0.35);
+}
+
 .tag-badge {
   display: inline-block;
   font-size: 8px;
@@ -1558,7 +1569,7 @@ body.light .admin-discount-badge {
 
 /* ── Sales & Profit Analytics Panel ──────────────────────────── */
 .sales-panel {
-  margin-top: 48px;
+  margin-top: 24px;
 }
 .sales-time-filters {
   display: inline-flex;

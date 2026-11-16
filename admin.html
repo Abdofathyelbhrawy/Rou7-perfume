@@ -36,10 +36,11 @@
       <div class="admin-table-filters">
         <input type="search" id="adminProdSearch" class="admin-search-input" placeholder="🔍 بحث في العطور بالاسم، البراند، أو التصنيف...">
         <select id="adminCatFilter" class="admin-filter-select" aria-label="تصنيف العطور">
-          <option value="all">كل الأصناف (نسائي / رجالي / للجميع)</option>
+          <option value="all">كل الأصناف (نسائي / رجالي / للجميع / هدايا)</option>
           <option value="women">نسائي</option>
           <option value="men">رجالي</option>
           <option value="unisex">للجميع</option>
+          <option value="gifts">🎁 بوكسات وهدايا</option>
           <option value="__solar__">🪐 عطور المنظومة الشمسية فقط</option>
         </select>
         <select id="adminBrandFilter" class="admin-filter-select" aria-label="تصفية البراند">
@@ -123,6 +124,37 @@
               <input id="topBarActiveInput" type="checkbox" checked>
               <span>تفعيل وإظهار الشريط العلوي في كل الصفحات</span>
             </label>
+          </div>
+
+          <!-- 1.5. Hero Values & Features Ticker Strip (شريط مميزات وشعار رُوح المتحرك) -->
+          <div class="campaign-fieldset" style="border: 1px solid var(--admin-line); border-radius: 12px; padding: 18px; margin-bottom: 20px; background: rgba(255,255,255,0.02);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <h3 style="font-size: 14px; margin: 0; color: var(--admin-accent); display: flex; align-items: center; gap: 8px;">
+                <span>✨</span> شريط المميزات والشعار المتحرك (أسفل الواجهة)
+              </h3>
+              <small style="color: var(--admin-muted); font-size: 11.5px;">تعديل عبارات الشريط الإعلاني المتحرك</small>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <label>الميزة الأولى
+                <input id="tickerItem1" name="ticker_item_1" placeholder="صُنع بحب في مصر">
+              </label>
+              <label>الميزة الثانية
+                <input id="tickerItem2" name="ticker_item_2" placeholder="خامات مختارة بعناية">
+              </label>
+              <label>الميزة الثالثة
+                <input id="tickerItem3" name="ticker_item_3" placeholder="تركيبات غنية تدوم طويلاً">
+              </label>
+              <label>الميزة الرابعة
+                <input id="tickerItem4" name="ticker_item_4" placeholder="هدية تحكي عنك">
+              </label>
+            </div>
+            <label style="margin-bottom: 12px;">الميزة الخامسة (خدمة توفير العطور غير المتوفرة بالمتجر)
+              <input id="tickerItem5" name="ticker_item_5" placeholder="لو في عطر مش موجود ومحتاجه نقدر نوفرهولك">
+            </label>
+            <div class="ticker-live-preview" style="background: rgba(0,0,0,0.12); border: 1px dashed var(--admin-line); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--admin-muted); display: flex; align-items: center; gap: 8px; overflow-x: auto;">
+              <strong style="color: var(--admin-accent); white-space: nowrap;">معاينة الشريط:</strong>
+              <span id="tickerPreviewText" style="white-space: nowrap; color: var(--admin-ink);">✳ صُنع بحب في مصر · ✳ خامات مختارة بعناية · ✳ تركيبات غنية تدوم طويلاً · ✳ هدية تحكي عنك · ✦ لو في عطر مش موجود ومحتاجه نقدر نوفرهولك</span>
+            </div>
           </div>
 
           <!-- 2. Main Promo Banner -->
@@ -340,6 +372,9 @@
           <button class="button button-outline" id="refreshSalesBtn" style="padding:9px 13px; font-size:12px;" title="تحديث بيانات المبيعات">
             <span>🔄</span> تحديث التقارير
           </button>
+          <button class="button button-outline" id="printSalesReportBtn" onclick="window.print()" style="padding:9px 13px; font-size:12px;" title="طباعة أو تصدير تقرير المبيعات">
+            <span>🖨️</span> طباعة التقرير
+          </button>
         </div>
       </div>
 
@@ -462,6 +497,7 @@
                 <option value="women">نسائي</option>
                 <option value="men">رجالي</option>
                 <option value="unisex">للجميع (Unisex)</option>
+                <option value="gifts">🎁 بوكسات وهدايا فاخرة (Gifts & Boxes)</option>
               </select>
             </label>
             <label>البراند / الماركة (Brand) *
@@ -516,6 +552,30 @@
               </label>
             </div>
             <div id="prodDiscountFeedback" style="font-size: 11.5px; color: var(--admin-accent); padding: 4px 6px; display: none;"></div>
+          </div>
+
+          <!-- Gift Box Details (إعدادات بوكسات الهدايا والتجميع) -->
+          <div id="prodGiftBoxPanel" style="background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 10px; padding: 14px; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+              <strong style="color: #f6bd60; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                <span>🎁</span> تفاصيل وتجميع بوكس الهدايا
+              </strong>
+              <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; color: var(--admin-ink);">
+                <input type="checkbox" id="prodCustomBox" name="is_custom_box">
+                <span>إتاحة تخصيص وتجميع العطور بالبوكس للعميل</span>
+              </label>
+            </div>
+            <label style="margin-bottom: 10px;">محتويات البوكس / العطور المشمولة
+              <input id="prodBoxItems" name="box_items" placeholder="مثال: عطرين ٥٠ مل من اختيارك + كارت إهداء وتغليف ملكي فاخر">
+            </label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <label>سعر إضافة عطر إضافي للبوكس <span>(ج.م)</span>
+                <input id="prodExtraPrice" name="extra_item_price" type="number" step="0.01" min="0" placeholder="مثال: 1200">
+              </label>
+              <label>الحد الأقصى للعطور بالبوكس
+                <input id="prodMaxItems" name="max_box_items" type="number" min="1" max="10" placeholder="مثال: 4">
+              </label>
+            </div>
           </div>
           <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; margin-bottom: 4px;">
             <label style="margin: 0; font-weight: 500;">الوصف العام للعطر (Description)</label>

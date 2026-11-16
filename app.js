@@ -87,6 +87,20 @@
       filter_women: 'نسائي',
       filter_men: 'رجالي',
       filter_unisex: 'للجميع',
+      filter_gifts: 'هدايا 🎁',
+      gift_builder_badge: 'خدمة بوكسات رُوح الفاخرة',
+      gift_builder_title: 'صمّم بوكس هدايا ملكي على ذوقك',
+      gift_builder_desc: 'اختر عطورك المفضلة وضعها داخل بوكس رُوح المخملي الفاخر مع كارت إهداء خاص وتغليف إهداء راقٍ.',
+      gift_builder_btn: 'تجميع بوكس جديد الآن ✨',
+      gift_modal_title: 'صمّم بوكس هدايا رُوح الملكي 🎁',
+      gift_tier_2: 'بوكس الثنائيات (عطرين ٥٠ مل)',
+      gift_tier_3: 'بوكس الترويكا (٣ عطور ٥٠ مل)',
+      gift_tier_4: 'بوكس النخبة (٤ عطور ٥٠ مل)',
+      gift_select_fragrances: 'اختر العطور لتضمينها بالبوكس:',
+      gift_card_msg_label: 'رسالة الإهداء الخاصة على الكارت (اختياري):',
+      gift_card_msg_ph: 'اكتب الكلمات التي تريد طباعتها على كارت الإهداء الملكي...',
+      gift_add_to_cart: 'أضف بوكس الهدايا للسلة 🛍️',
+      gift_order_wa: 'اطلب عبر واتساب 💬',
       quick_add: 'أضيفي إلى السلة',
       no_results: 'ملقيناش عطرك… جرّب كلمة تانية.',
       story_eyebrow: 'حكايتنا',
@@ -235,6 +249,20 @@
       filter_women: 'For Her',
       filter_men: 'For Him',
       filter_unisex: 'Unisex',
+      filter_gifts: 'Gifts 🎁',
+      gift_builder_badge: 'Rou7 Luxury Gift Boxes',
+      gift_builder_title: 'Curate Your Bespoke Gift Box',
+      gift_builder_desc: 'Handpick your favorite fragrances packaged in Rou7 velvet royal box with personalized dedication card.',
+      gift_builder_btn: 'Build Gift Box Now ✨',
+      gift_modal_title: 'Curate Rou7 Royal Gift Box 🎁',
+      gift_tier_2: 'Royal Duo Box (2 Perfumes 50ml)',
+      gift_tier_3: 'Elite Trio Box (3 Perfumes 50ml)',
+      gift_tier_4: 'Masterpiece Box (4 Perfumes 50ml)',
+      gift_select_fragrances: 'Select fragrances for your box:',
+      gift_card_msg_label: 'Personal Dedication Message on Card (Optional):',
+      gift_card_msg_ph: 'Write your heartfelt message to be printed on the royal gold card...',
+      gift_add_to_cart: 'Add Gift Box to Bag 🛍️',
+      gift_order_wa: 'Order via WhatsApp 💬',
       quick_add: 'Add to Bag',
       no_results: 'No fragrance found… Try another search.',
       story_eyebrow: 'Our Story',
@@ -477,6 +505,70 @@
         accords: 'Fresh, Floral, Citrus, Musky, Aquatic',
         main_accord: 'Fresh',
         seasons: 'spring,summer,day'
+      })
+    },
+    {
+      id: 'gift-box-royal-duo',
+      name: 'بوكس رُوح الملكي (عطرين فاخرين + بوكس إهداء)',
+      latin: 'Rou7 Royal Duo Gift Box',
+      brand: 'رُوح',
+      price: 2800,
+      cost_price: 1800,
+      category: 'gifts',
+      tag: '🎁 هدايا فاخرة',
+      image_url: 'assets/branding/2.svg',
+      is_featured: true,
+      in_stock: true,
+      sort_order: 10,
+      notes: JSON.stringify({
+        brand: 'رُوح',
+        brand_ar: 'روح رُوح rou7',
+        desc: 'بوكس إهداء فاخر مخملي من دار رُوح يحتوي على عطرين من اختيارك (٥٠ مل) بتغليف ملكي مع كارت إهداء خاص وريبون ذهبي راقٍ.',
+        box_items: '٢ عطر فاخر ٥٠ مل من اختيارك + كارت إهداء وتغليف ملكي',
+        is_custom_box: true,
+        extra_item_price: 1200,
+        max_box_items: 4,
+        top_notes: 'نوتات عطرية فاخرة',
+        middle_notes: 'عطور رُوح الخاصة',
+        base_notes: 'تغليف ملكي أسود وذهبي',
+        inspired_by: 'مجموعة رُوح الحصرية للإهداء',
+        longevity: 5,
+        sillage: 5,
+        accords: 'Gift, Luxury, Oriental, Royal',
+        main_accord: 'Gift',
+        seasons: 'all,night,day'
+      })
+    },
+    {
+      id: 'gift-box-elite-trio',
+      name: 'بوكس نخبة رُوح الثلاثي (٣ عطور + تغليف إهداء)',
+      latin: 'Rou7 Elite Trio Luxury Box',
+      brand: 'رُوح',
+      price: 3900,
+      cost_price: 2500,
+      category: 'gifts',
+      tag: '✨ الأكثر طلباً',
+      image_url: 'assets/branding/2.svg',
+      is_featured: true,
+      in_stock: true,
+      sort_order: 11,
+      notes: JSON.stringify({
+        brand: 'رُوح',
+        brand_ar: 'روح رُوح rou7',
+        desc: 'المجموعة الكاملة لأرقى إبداعات رُوح العطرية؛ ٣ عطور بحجم ٥٠ مل داخل بوكس جلدي فاخر مع بطاقة إهداء مختومة بالذهب.',
+        box_items: '٣ عطور بحجم ٥٠ مل + عينات مجانية + بوكس ملكي كبير وكارت إهداء',
+        is_custom_box: true,
+        extra_item_price: 1200,
+        max_box_items: 5,
+        top_notes: 'مجموعة متكاملة من أرقى النوتات',
+        middle_notes: 'نوتات شرقية وفرنسية ساحرة',
+        base_notes: 'ثبات وفوحان استثنائي',
+        inspired_by: 'مجموعة النخبة للإهداء',
+        longevity: 5,
+        sillage: 5,
+        accords: 'Gift, Luxury, Trio, Exclusive',
+        main_accord: 'Gift',
+        seasons: 'all,night,day'
       })
     }
   ];
@@ -1435,14 +1527,19 @@
     renderStorySpotlight();
     renderProducts();
 
-    // 4. Values Strip Customization
-    if (data.values_strip && Array.isArray(data.values_strip) && data.values_strip.length && currentLang === 'ar') {
-      const stripEls = document.querySelectorAll('.values-strip > div > span[data-i18n]');
-      data.values_strip.forEach((valText, idx) => {
-        if (stripEls[idx] && valText && String(valText).trim()) {
-          stripEls[idx].textContent = String(valText).trim();
-        }
-      });
+    // 4. Values & Marquee Strip Customization
+    if (currentLang === 'ar') {
+      const stripEls = document.querySelectorAll('.values-strip > div > span[data-i18n], .values > div > span[data-i18n]');
+      const items = Array.isArray(data.values_strip) && data.values_strip.length
+        ? data.values_strip
+        : [data.ticker_item_3, data.ticker_item_2, data.ticker_item_1, data.ticker_item_4, data.ticker_item_5].filter(Boolean);
+      if (items.length) {
+        stripEls.forEach((el, idx) => {
+          if (items[idx] && String(items[idx]).trim()) {
+            el.textContent = String(items[idx]).trim();
+          }
+        });
+      }
     }
   }
 
@@ -1774,7 +1871,25 @@
     `;
 
     // ── Continuous 3D Planetary Orbit Animation Loop ─────────────────────────
+    let cosmicInView = true;
+    const cosmicUniverseEl = $('#cosmicUniverse');
+    if ('IntersectionObserver' in window && cosmicUniverseEl) {
+      const cosmicObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          cosmicInView = entry.isIntersecting;
+          if (cosmicInView && cosmicOrbitRunning && cosmicInspectIndex === -1 && !cosmicRafId) {
+            cosmicRafId = requestAnimationFrame(updateCosmicOrbit);
+          }
+        });
+      }, { rootMargin: '80px' });
+      cosmicObs.observe(cosmicUniverseEl);
+    }
+
     function updateCosmicOrbit() {
+      if (!cosmicInView) {
+        cosmicRafId = null;
+        return; // Pause RAF loop completely when out of viewport to preserve mobile 60fps performance!
+      }
       if (cosmicOrbitRunning && cosmicInspectIndex === -1) {
         cosmicBaseAngle += cosmicOrbitSpeed;
       }
@@ -1783,7 +1898,9 @@
       if (disc) {
         const isMobile = window.innerWidth <= 600;
         const isTablet = window.innerWidth <= 900;
-        const baseRadius = isMobile ? 100 : (isTablet ? 190 : 295);
+        // Responsive mobile radius enlarged so it beautifully spans the viewport
+        const mobileBase = Math.min(150, Math.max(120, Math.round((window.innerWidth - 30) / 2.35)));
+        const baseRadius = isMobile ? mobileBase : (isTablet ? 200 : 295);
 
         const planetEls = disc.querySelectorAll('.cosmic-planet-3d');
         const total = planetEls.length;
@@ -1814,7 +1931,7 @@
           el.style.pointerEvents = '';
 
           // Stagger radii slightly across orbits without clipping screen edges
-          const trackOffset = isMobile ? ((pIdx % 3 === 0) ? -18 : ((pIdx % 3 === 1) ? 0 : 18)) : ((pIdx % 3 === 0) ? -35 : ((pIdx % 3 === 1) ? 0 : 35));
+          const trackOffset = isMobile ? ((pIdx % 3 === 0) ? -24 : ((pIdx % 3 === 1) ? 0 : 24)) : ((pIdx % 3 === 0) ? -35 : ((pIdx % 3 === 1) ? 0 : 35));
           const r = baseRadius + trackOffset;
           const theta = cosmicBaseAngle + (pIdx * (2 * Math.PI / total));
           const x = r * Math.cos(theta);
@@ -1828,7 +1945,7 @@
 
           if (billboard && cosmicInspectIndex === -1) {
             const bobY = isMobile ? Math.sin(cosmicBaseAngle * 3.5 + pIdx) * 1.8 : Math.sin(cosmicBaseAngle * 3.5 + pIdx) * 3.5;
-            const tiltAngle = isMobile ? -46 : -62;
+            const tiltAngle = isMobile ? -45 : -62;
             billboard.style.transform = `translate(-50%, calc(-88% + ${bobY.toFixed(1)}px)) rotateZ(6deg) rotateX(${tiltAngle}deg)`;
           }
         });
@@ -2795,18 +2912,47 @@
       brandChipsBar.innerHTML = chipsHtml;
     }
 
+    // Toggle Gifts & Custom Box Builder Banner
+    const giftsBanner = $('#giftsBuilderBanner');
+    if (giftsBanner) {
+      if (activeFilter === 'gifts') {
+        giftsBanner.style.display = 'block';
+        giftsBanner.innerHTML = `
+          <div class="gifts-builder-banner">
+            <div class="gbb-glow" aria-hidden="true"></div>
+            <div class="gbb-content">
+              <span class="gbb-badge"><span>🎁</span> ${t.gift_builder_badge}</span>
+              <h3 class="gbb-title">${t.gift_builder_title}</h3>
+              <p class="gbb-desc">${t.gift_builder_desc}</p>
+            </div>
+            <button type="button" class="btn-open-gift-builder" id="btnOpenGiftBuilder">
+              <span>✨</span> ${t.gift_builder_btn}
+            </button>
+          </div>
+        `;
+        $('#btnOpenGiftBuilder')?.addEventListener('click', openGiftBuilderModal);
+      } else {
+        giftsBanner.style.display = 'none';
+        giftsBanner.innerHTML = '';
+      }
+    }
+
     const visible = products.filter(product => {
       if (product.name.startsWith('__system_') || product.in_stock === false) return false;
       const d = unpackProduct(product);
       const bObj = findBrand(d.brand || product.brand);
       const prodBrandKey = bObj ? (bObj.name_en || bObj.name_ar) : (d.brand || 'رُوح');
       const pCat = (product.category || 'unisex').toLowerCase();
-      const normCat = (pCat === 'women' || pCat.includes('نسائ') || pCat.includes('her')) ? 'women'
+      const normCat = (pCat === 'gifts' || pCat.includes('هد') || pCat.includes('gift') || pCat.includes('box') || pCat.includes('بوكس')) ? 'gifts'
+        : (pCat === 'women' || pCat.includes('نسائ') || pCat.includes('her')) ? 'women'
         : (pCat === 'men' || pCat.includes('رجال') || pCat.includes('him')) ? 'men' : 'unisex';
 
-      // 1. Gender Filter: 'all', 'women', 'men', 'unisex'
+      // 1. Gender / Category Filter: 'all', 'women', 'men', 'unisex', 'gifts'
       // Unisex fragrances appear in Women and Men, and appear alone when Unisex is selected
-      if (activeFilter === 'women') {
+      // Gifts appear when 'gifts' is active or in 'all'
+      if (activeFilter === 'gifts') {
+        if (normCat !== 'gifts') return false;
+      } else if (activeFilter === 'women') {
         if (normCat !== 'women' && normCat !== 'unisex') return false;
       } else if (activeFilter === 'men') {
         if (normCat !== 'men' && normCat !== 'unisex') return false;
@@ -2908,7 +3054,7 @@
           return `<article class="product-card" data-product-id="${product.id}">
             <div class="product-image">
               <a href="product.html?id=${product.id}" class="product-thumb-link" aria-label="${escapeHtml(prodName)}">
-                ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}" loading="lazy">` : ''}
+                ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}" loading="lazy" decoding="async">` : ''}
               </a>
               ${tagHtml}
               ${quickAddBtnHtml}
@@ -3144,7 +3290,7 @@
   }
 
   function updateCart() {
-    cart = cart.filter(row => row.qty > 0 && products.some(product => product.id === row.id));
+    cart = cart.filter(row => row.qty > 0 && (row.is_custom_box || products.some(product => product.id === row.id)));
     const count = cart.reduce((sum, row) => sum + row.qty, 0);
     $('#cartCount').textContent = formatDigits(count);
     $('#drawerCount').textContent = `(${formatDigits(count)})`;
@@ -3152,6 +3298,27 @@
     $('#cartSummary').classList.toggle('empty', count === 0);
 
     $('#cartItems').innerHTML = cart.map(row => {
+      if (row.is_custom_box) {
+        const prodName = row.name || (currentLang === 'ar' ? 'بوكس هدايا رُوح الملكي 🎁' : 'Rou7 Royal Gift Box 🎁');
+        const boxItemsDesc = Array.isArray(row.box_items) ? row.box_items.join(' + ') : (row.box_items || '');
+        const cardMsgDesc = row.card_message ? (currentLang === 'ar' ? `كارت إهداء: "${row.card_message}"` : `Card: "${row.card_message}"`) : '';
+        return `<div class="cart-row cart-custom-box-card">
+          <div class="cart-thumb"><span style="font-size:24px;">🎁</span></div>
+          <div>
+            <h3>${escapeHtml(prodName)}</h3>
+            <p>${money(row.customPrice || row.price || 0)}</p>
+            ${boxItemsDesc ? `<div class="cart-custom-box-notes"><strong>${currentLang === 'ar' ? 'العطور:' : 'Perfumes:'}</strong> ${escapeHtml(boxItemsDesc)}</div>` : ''}
+            ${cardMsgDesc ? `<div class="cart-custom-box-card"><strong>💌</strong> ${escapeHtml(cardMsgDesc)}</div>` : ''}
+            <div class="qty">
+              <button data-qty="${row.id}" data-step="-1" aria-label="تقليل">−</button>
+              <span>${formatDigits(row.qty)}</span>
+              <button data-qty="${row.id}" data-step="1" aria-label="زيادة">＋</button>
+            </div>
+          </div>
+          <button class="remove-item" data-remove="${row.id}" aria-label="حذف">×</button>
+        </div>`;
+      }
+
       const product = products.find(item => item.id === row.id);
       if (!product) return '';
       const prodName = currentLang === 'en' ? (product.latin || product.name) : product.name;
@@ -3174,7 +3341,7 @@
       </div>`;
     }).join('');
 
-    const total = cart.reduce((sum, row) => sum + (row.customPrice || products.find(p => p.id === row.id)?.price || 0) * row.qty, 0);
+    const total = cart.reduce((sum, row) => sum + (row.customPrice || (products.find(p => p.id === row.id)?.price || 0)) * row.qty, 0);
     $('#cartTotal').textContent = money(total);
     $('#checkoutTotal').textContent = money(total);
 
@@ -3263,6 +3430,228 @@
     activeFilter = button.dataset.filter;
     renderProducts();
   }));
+
+  // ── Custom Gift Box Interactive Builder ──────────────────────────────────
+  const giftModal = $('#giftBoxBuilderModal');
+  const giftContainer = $('#giftBuilderContainer');
+  let giftSelectedTier = 2; // Default 2 perfumes
+  let giftSelectedPerfumeIds = [];
+  let giftCardMessage = '';
+
+  const GIFT_TIERS = {
+    2: { id: 2, key: 'gift_tier_2', title_ar: 'بوكس الثنائيات الملكي (عطرين ٥٠ مل)', title_en: 'Royal Duo Box (2 Perfumes 50ml)', price: 2800, max: 2, sub_ar: 'اختر عطرين فاخرين مع كارت إهداء وتغليف ملكي', sub_en: 'Choose 2 luxury fragrances + card & velvet box' },
+    3: { id: 3, key: 'gift_tier_3', title_ar: 'بوكس الترويكا الملكي (٣ عطور ٥٠ مل)', title_en: 'Elite Trio Box (3 Perfumes 50ml)', price: 3900, max: 3, sub_ar: 'اختر ٣ عطور مفضلة مع كارت إهداء وتغليف ملكي', sub_en: 'Choose 3 favorite fragrances + card & velvet box' },
+    4: { id: 4, key: 'gift_tier_4', title_ar: 'بوكس النخبة الملكي (٤ عطور ٥٠ مل)', title_en: 'Masterpiece Box (4 Perfumes 50ml)', price: 4900, max: 4, sub_ar: 'المجموعة الكاملة ٤ عطور مع كارت إهداء وتغليف ملكي', sub_en: 'Complete 4-perfume collection + card & velvet box' }
+  };
+
+  function openGiftBuilderModal() {
+    giftSelectedTier = 2;
+    giftSelectedPerfumeIds = [];
+    giftCardMessage = '';
+    renderGiftBuilder();
+    if (giftModal) giftModal.classList.add('open');
+  }
+
+  function closeGiftBuilderModal() {
+    if (giftModal) giftModal.classList.remove('open');
+  }
+
+  function renderGiftBuilder() {
+    if (!giftContainer) return;
+    const isAr = currentLang === 'ar';
+    const t = I18N[currentLang];
+    const currentTier = GIFT_TIERS[giftSelectedTier] || GIFT_TIERS[2];
+
+    // Selectable perfumes: In-stock non-gift fragrances
+    const candidatePerfumes = products.filter(p => {
+      if (p.name.startsWith('__system_') || p.in_stock === false) return false;
+      const pCat = (p.category || '').toLowerCase();
+      if (pCat === 'gifts' || pCat.includes('هد') || pCat.includes('gift') || pCat.includes('box')) return false;
+      return true;
+    });
+
+    const isComplete = giftSelectedPerfumeIds.length === currentTier.max;
+
+    giftContainer.innerHTML = `
+      <div class="gb-header">
+        <span class="gb-badge"><span>🎁</span> ${t.gift_builder_badge}</span>
+        <h2 class="gb-title" id="giftBuilderTitle">${t.gift_modal_title}</h2>
+        <p class="gb-desc">${t.gift_builder_desc}</p>
+      </div>
+
+      <!-- Tiers Selection -->
+      <div class="gb-tiers-row">
+        ${[2, 3, 4].map(tierId => {
+          const tier = GIFT_TIERS[tierId];
+          const isAct = giftSelectedTier === tierId ? 'active' : '';
+          return `
+            <div class="gb-tier-card ${isAct}" data-tier-id="${tierId}" role="button" tabindex="0">
+              <div class="gb-tier-name">${isAr ? tier.title_ar : tier.title_en}</div>
+              <div class="gb-tier-sub">${isAr ? tier.sub_ar : tier.sub_en}</div>
+              <div class="gb-tier-price">${money(tier.price)}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- Perfumes Selection -->
+      <div class="gb-picker-status">
+        <span>${t.gift_select_fragrances}</span>
+        <span class="gb-picker-counter">${isAr ? `تم اختيار: ${arabicDigits(giftSelectedPerfumeIds.length)} من ${arabicDigits(currentTier.max)} عطور` : `Selected: ${giftSelectedPerfumeIds.length} of ${currentTier.max}`}</span>
+      </div>
+
+      <div class="gb-perfumes-grid">
+        ${candidatePerfumes.map(p => {
+          const isSel = giftSelectedPerfumeIds.includes(String(p.id));
+          const pName = isAr ? p.name : (p.latin || p.name);
+          const pBrand = p.brand || 'رُوح';
+          return `
+            <div class="gb-perfume-chip ${isSel ? 'selected' : ''}" data-perfume-id="${p.id}" role="button" tabindex="0">
+              <span class="gb-chip-check">${isSel ? '✓' : '＋'}</span>
+              ${p.image_url ? `<img src="${p.image_url}" class="gb-chip-thumb" alt="${escapeHtml(pName)}" loading="lazy">` : '<span style="font-size:24px;">🧴</span>'}
+              <span class="gb-chip-name">${escapeHtml(pName)}</span>
+              <small class="gb-chip-brand">${escapeHtml(pBrand)}</small>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- Dedication Card Message -->
+      <div class="gb-card-field">
+        <label for="gbCardInput" style="display:block; font-size:12px; margin-bottom:6px; font-weight:600; color:var(--ink);">
+          💌 ${t.gift_card_msg_label}
+        </label>
+        <textarea id="gbCardInput" class="gb-card-input" placeholder="${escapeHtml(t.gift_card_msg_ph)}">${escapeHtml(giftCardMessage)}</textarea>
+      </div>
+
+      <!-- Footer & Actions -->
+      <div class="gb-footer">
+        <div class="gb-price-block">
+          <span class="gb-price-label">${isAr ? 'السعر الإجمالي للبوكس الملكي:' : 'Total Box Price:'}</span>
+          <span class="gb-price-val">${money(currentTier.price)}</span>
+        </div>
+        <div class="gb-actions-row">
+          <button type="button" class="btn-gb-cart" id="btnGbAddToCart" ${!isComplete ? 'disabled' : ''}>
+            ${t.gift_add_to_cart}
+          </button>
+          <button type="button" class="btn-gb-wa" id="btnGbOrderWa" ${!isComplete ? 'disabled' : ''}>
+            <span>💬</span> ${t.gift_order_wa}
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Handle Gift Builder Interactions
+  giftContainer?.addEventListener('click', e => {
+    // 1. Tier Card Selection
+    const tierCard = e.target.closest('.gb-tier-card');
+    if (tierCard) {
+      const newTierId = parseInt(tierCard.dataset.tierId, 10);
+      if (newTierId && GIFT_TIERS[newTierId]) {
+        giftSelectedTier = newTierId;
+        const max = GIFT_TIERS[newTierId].max;
+        if (giftSelectedPerfumeIds.length > max) {
+          giftSelectedPerfumeIds = giftSelectedPerfumeIds.slice(0, max);
+        }
+        renderGiftBuilder();
+      }
+      return;
+    }
+
+    // 2. Perfume Chip Toggle
+    const chip = e.target.closest('.gb-perfume-chip');
+    if (chip) {
+      const pId = String(chip.dataset.perfumeId);
+      const currentTier = GIFT_TIERS[giftSelectedTier] || GIFT_TIERS[2];
+      const idx = giftSelectedPerfumeIds.indexOf(pId);
+      if (idx !== -1) {
+        giftSelectedPerfumeIds.splice(idx, 1);
+      } else {
+        if (giftSelectedPerfumeIds.length < currentTier.max) {
+          giftSelectedPerfumeIds.push(pId);
+        } else {
+          showToast(currentLang === 'ar' ? `لقد اكتمل عدد عطور البوكس (${arabicDigits(currentTier.max)} عطور)` : `Box capacity reached (${currentTier.max} perfumes)`);
+          return;
+        }
+      }
+      renderGiftBuilder();
+      return;
+    }
+
+    // 3. Add to Cart Button
+    const addCartBtn = e.target.closest('#btnGbAddToCart');
+    if (addCartBtn && !addCartBtn.disabled) {
+      const currentTier = GIFT_TIERS[giftSelectedTier] || GIFT_TIERS[2];
+      const isAr = currentLang === 'ar';
+      const selectedNames = giftSelectedPerfumeIds.map(id => {
+        const p = products.find(prod => String(prod.id) === String(id));
+        return p ? (isAr ? p.name : (p.latin || p.name)) : '';
+      }).filter(Boolean);
+
+      const customBoxRow = {
+        id: `custom_box_${Date.now()}`,
+        name: isAr ? currentTier.title_ar : currentTier.title_en,
+        latin: currentTier.title_en,
+        is_custom_box: true,
+        price: currentTier.price,
+        customPrice: currentTier.price,
+        qty: 1,
+        box_items: selectedNames,
+        card_message: giftCardMessage.trim()
+      };
+
+      cart.push(customBoxRow);
+      updateCart();
+      closeGiftBuilderModal();
+      drawer(true);
+      showToast(isAr ? 'تمت إضافة بوكس الهدايا الملكي إلى سلتك 🎁' : 'Royal Gift Box added to your bag 🎁');
+      return;
+    }
+
+    // 4. WhatsApp Direct Order Button
+    const waBtn = e.target.closest('#btnGbOrderWa');
+    if (waBtn && !waBtn.disabled) {
+      const currentTier = GIFT_TIERS[giftSelectedTier] || GIFT_TIERS[2];
+      const isAr = currentLang === 'ar';
+      const selectedNames = giftSelectedPerfumeIds.map(id => {
+        const p = products.find(prod => String(prod.id) === String(id));
+        return p ? (isAr ? p.name : (p.latin || p.name)) : '';
+      }).filter(Boolean);
+
+      let msg = '';
+      if (isAr) {
+        msg = `مرحباً رُوح، أود طلب بوكس هدايا ملكي مخصص:\n` +
+          `🎁 *البوكس:* ${currentTier.title_ar}\n` +
+          `🌸 *العطور المختارة:*\n${selectedNames.map((n, i) => `  ${i + 1}. ${n}`).join('\n')}\n` +
+          (giftCardMessage.trim() ? `💌 *رسالة كارت الإهداء:* "${giftCardMessage.trim()}"\n` : '') +
+          `💰 *السعر الإجمالي:* ${money(currentTier.price)}\n` +
+          `أرجو تأكيد الطلب والتوصيل 🌸`;
+      } else {
+        msg = `Hello Rou7, I would like to order a curated Royal Gift Box:\n` +
+          `🎁 *Box:* ${currentTier.title_en}\n` +
+          `🌸 *Selected Fragrances:*\n${selectedNames.map((n, i) => `  ${i + 1}. ${n}`).join('\n')}\n` +
+          (giftCardMessage.trim() ? `💌 *Card Message:* "${giftCardMessage.trim()}"\n` : '') +
+          `💰 *Total Price:* ${money(currentTier.price)}\n` +
+          `Please confirm my order 🌸`;
+      }
+      window.open(`${WHATSAPP_BASE_URL}&text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+      closeGiftBuilderModal();
+      return;
+    }
+  });
+
+  // Keep card message updated on typing
+  giftContainer?.addEventListener('input', e => {
+    if (e.target.id === 'gbCardInput') {
+      giftCardMessage = e.target.value;
+    }
+  });
+
+  $('#giftBuilderClose')?.addEventListener('click', closeGiftBuilderModal);
+  giftModal?.addEventListener('click', e => {
+    if (e.target === giftModal) closeGiftBuilderModal();
+  });
 
   $('#productGrid').addEventListener('click', event => {
     const qvBtn = event.target.closest('[data-quickview], [data-explore]');
@@ -3403,7 +3792,19 @@
       const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(bestMatch, currentLang) : null;
       const d = unpackProduct(bestMatch);
       const prodName = localized ? localized.name : (isAr ? bestMatch.name : (bestMatch.latin || bestMatch.name));
-      const quizDesc = (localized && localized.desc) ? localized.desc : (d.notes || (isAr ? 'عطر فاخر يمزج بين النقاء والجاذبية والثبات العالي، مصمم ليعبر عن روحك في كل مناسبة.' : 'A masterfully balanced fragrance tailored to your personality and presence.'));
+
+      let quizDesc = (localized && localized.desc) ? localized.desc : (d.desc || d.notes || '');
+      if (isAr) {
+        if (!quizDesc || !/[\u0600-\u06FF]/.test(quizDesc)) {
+          quizDesc = (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(quizDesc || d.notes || '', 'ar', bestMatch.id, bestMatch.name) : '') ||
+            'عطر استثنائي يجمع بين النقاء والجاذبية والثبات العالي، صُمم بعناية ليعبر عن روحك ويترك أثراً لا يُنسى في كل لحظة.';
+        }
+      } else {
+        if (!quizDesc || !/[a-zA-Z]/.test(quizDesc)) {
+          quizDesc = (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(quizDesc || d.notes || '', 'en', bestMatch.id, bestMatch.latin || bestMatch.name) : '') ||
+            'An exquisite signature fragrance tailored to complement your presence, leaving an unforgettable trace.';
+        }
+      }
       const matchPct = 96 + Math.floor(Math.random() * 4);
 
       quizContainer.innerHTML = `
@@ -3652,11 +4053,23 @@
     const phone   = form.phone.value.trim();
     const address = form.address.value.trim();
     const items   = cart.map(row => {
+      if (row.is_custom_box) {
+        return {
+          id: row.id,
+          name: row.name,
+          latin: row.latin,
+          price: row.customPrice || row.price || 0,
+          qty: row.qty,
+          is_custom_box: true,
+          box_items: row.box_items || [],
+          card_message: row.card_message || ''
+        };
+      }
       const product = products.find(p => p.id === row.id);
       const unitPrice = row.customPrice || product?.price || 0;
       return { id: row.id, name: product?.name, latin: product?.latin, price: unitPrice, qty: row.qty };
     });
-    const total   = cart.reduce((sum, row) => sum + (row.customPrice || products.find(p => p.id === row.id)?.price || 0) * row.qty, 0);
+    const total   = cart.reduce((sum, row) => sum + (row.customPrice || products.find(p => p.id === row.id)?.price || row.price || 0) * row.qty, 0);
 
     const submitBtn = form.querySelector('[type=submit]');
     submitBtn.disabled = true;
@@ -3739,7 +4152,14 @@
     // Structured WhatsApp order message
     let waMessage;
     if (currentLang === 'en') {
-      const itemsTextEn = items.map(i => `• ${i.latin || i.name} × ${i.qty} — ${money(i.price * i.qty)}`).join('\n');
+      const itemsTextEn = items.map(i => {
+        if (i.is_custom_box) {
+          const boxed = Array.isArray(i.box_items) ? i.box_items.join(', ') : (i.box_items || '');
+          const card = i.card_message ? ` [Card: "${i.card_message}"]` : '';
+          return `• 🎁 ${i.latin || i.name} (Perfumes: ${boxed})${card} × ${i.qty} — ${money(i.price * i.qty)}`;
+        }
+        return `• ${i.latin || i.name} × ${i.qty} — ${money(i.price * i.qty)}`;
+      }).join('\n');
       waMessage =
 `✨ *New Order from Rou7-perfume* ✨
 ━━━━━━━━━━━━━━━━━━
@@ -3757,7 +4177,14 @@ ${itemsTextEn}
 ━━━━━━━━━━━━━━━━━━
 I would like to confirm my order please 🌸`;
     } else {
-      const itemsTextAr = items.map(i => `• ${i.name} × ${i.qty} — ${money(i.price * i.qty)}`).join('\n');
+      const itemsTextAr = items.map(i => {
+        if (i.is_custom_box) {
+          const boxed = Array.isArray(i.box_items) ? i.box_items.join(' + ') : (i.box_items || '');
+          const card = i.card_message ? ` [كارت إهداء: "${i.card_message}"]` : '';
+          return `• 🎁 ${i.name} (العطور: ${boxed})${card} × ${i.qty} — ${money(i.price * i.qty)}`;
+        }
+        return `• ${i.name} × ${i.qty} — ${money(i.price * i.qty)}`;
+      }).join('\n');
       waMessage =
 `✨ *طلب جديد من متجر رُوح | Rou7-perfume* ✨
 ━━━━━━━━━━━━━━━━━━
@@ -3848,14 +4275,31 @@ ${itemsTextAr}
   // Apply initial language state
   setLanguage(currentLang, false);
 
-  window.addEventListener('load', () => setTimeout(() => $('#loader').classList.add('done'), 420));
+  // ── Fast Instant Loader Dismissal & Keyboard Controls ───────────────────
+  function dismissLoader() {
+    const ldr = $('#loader');
+    if (ldr && !ldr.classList.contains('done')) {
+      ldr.classList.add('done');
+    }
+  }
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    dismissLoader();
+  } else {
+    document.addEventListener('DOMContentLoaded', dismissLoader);
+  }
+  window.addEventListener('load', dismissLoader);
+  setTimeout(dismissLoader, 400); // Failsafe fast load timeout
+
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
       drawer(false);
-      $('#checkoutModal').classList.remove('open');
-      $('#trackingModal').classList.remove('open');
-      $('#mobileMenu').classList.remove('open');
-      $('#searchBar').classList.remove('open');
+      $('#checkoutModal')?.classList.remove('open');
+      $('#trackingModal')?.classList.remove('open');
+      $('#mobileMenu')?.classList.remove('open');
+      $('#searchBar')?.classList.remove('open');
+      $('#giftBoxBuilderModal')?.classList.remove('open');
+      if (typeof closeProductDetailModal === 'function') closeProductDetailModal();
+      if (typeof closeScentQuiz === 'function') closeScentQuiz();
     }
   });
 })();

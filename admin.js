@@ -465,15 +465,20 @@
       }
     }
 
-    // Values Strip Live Preview
-    const v1 = $('#valItem1')?.value.trim() || 'تركيبات غنية تدوم طويلاً';
-    const v2 = $('#valItem2')?.value.trim() || 'خامات مختارة بعناية';
-    const v3 = $('#valItem3')?.value.trim() || 'صُنع بحب في مصر';
-    const v4 = $('#valItem4')?.value.trim() || 'هدية تحكي عنك';
-    if ($('#vPreview1')) $('#vPreview1').textContent = v1;
-    if ($('#vPreview2')) $('#vPreview2').textContent = v2;
-    if ($('#vPreview3')) $('#vPreview3').textContent = v3;
-    if ($('#vPreview4')) $('#vPreview4').textContent = v4;
+    // Values & Ticker Live Preview
+    const t1 = $('#tickerItem1')?.value.trim() || $('#valItem1')?.value.trim() || 'صُنع بحب في مصر';
+    const t2 = $('#tickerItem2')?.value.trim() || $('#valItem2')?.value.trim() || 'خامات مختارة بعناية';
+    const t3 = $('#tickerItem3')?.value.trim() || $('#valItem3')?.value.trim() || 'تركيبات غنية تدوم طويلاً';
+    const t4 = $('#tickerItem4')?.value.trim() || $('#valItem4')?.value.trim() || 'هدية تحكي عنك';
+    const t5 = $('#tickerItem5')?.value.trim() || 'لو في عطر مش موجود ومحتاجه نقدر نوفرهولك';
+    const tickerPrev = $('#tickerPreviewText');
+    if (tickerPrev) {
+      tickerPrev.textContent = `✳ ${t1} · ✳ ${t2} · ✳ ${t3} · ✳ ${t4} · ✦ ${t5}`;
+    }
+    if ($('#vPreview1')) $('#vPreview1').textContent = t1;
+    if ($('#vPreview2')) $('#vPreview2').textContent = t2;
+    if ($('#vPreview3')) $('#vPreview3').textContent = t3;
+    if ($('#vPreview4')) $('#vPreview4').textContent = t4;
   }
 
   function populateSpotlightSelect(prods) {
@@ -511,14 +516,24 @@
     if ($('#storewideDiscountScope')) $('#storewideDiscountScope').value = data.storewide_discount_scope || 'only_no_custom';
     if ($('#storewideDiscountBadge')) $('#storewideDiscountBadge').value = data.storewide_discount_badge || '';
 
-    // Values Strip fields
-    const vs = Array.isArray(data.values_strip) && data.values_strip.length === 4
-      ? data.values_strip
-      : ['تركيبات غنية تدوم طويلاً', 'خامات مختارة بعناية', 'صُنع بحب في مصر', 'هدية تحكي عنك'];
-    if ($('#valItem1')) $('#valItem1').value = vs[0] || 'تركيبات غنية تدوم طويلاً';
-    if ($('#valItem2')) $('#valItem2').value = vs[1] || 'خامات مختارة بعناية';
-    if ($('#valItem3')) $('#valItem3').value = vs[2] || 'صُنع بحب في مصر';
-    if ($('#valItem4')) $('#valItem4').value = vs[3] || 'هدية تحكي عنك';
+    // Values & Ticker fields
+    const vs = Array.isArray(data.values_strip) ? data.values_strip : [];
+    const t1 = data.ticker_item_1 || vs[0] || 'صُنع بحب في مصر';
+    const t2 = data.ticker_item_2 || vs[1] || 'خامات مختارة بعناية';
+    const t3 = data.ticker_item_3 || vs[2] || 'تركيبات غنية تدوم طويلاً';
+    const t4 = data.ticker_item_4 || vs[3] || 'هدية تحكي عنك';
+    const t5 = data.ticker_item_5 || vs[4] || 'لو في عطر مش موجود ومحتاجه نقدر نوفرهولك';
+
+    if ($('#tickerItem1')) $('#tickerItem1').value = t1;
+    if ($('#tickerItem2')) $('#tickerItem2').value = t2;
+    if ($('#tickerItem3')) $('#tickerItem3').value = t3;
+    if ($('#tickerItem4')) $('#tickerItem4').value = t4;
+    if ($('#tickerItem5')) $('#tickerItem5').value = t5;
+
+    if ($('#valItem1')) $('#valItem1').value = t3;
+    if ($('#valItem2')) $('#valItem2').value = t2;
+    if ($('#valItem3')) $('#valItem3').value = t1;
+    if ($('#valItem4')) $('#valItem4').value = t4;
 
     showCampaignPreview();
   }
@@ -588,11 +603,17 @@
         storewide_discount_percent: $('#storewideDiscountPercent')?.value ? Number($('#storewideDiscountPercent').value) : '',
         storewide_discount_scope: $('#storewideDiscountScope')?.value || 'only_no_custom',
         storewide_discount_badge: $('#storewideDiscountBadge')?.value.trim() || '',
+        ticker_item_1: $('#tickerItem1')?.value.trim() || $('#valItem3')?.value.trim() || 'صُنع بحب في مصر',
+        ticker_item_2: $('#tickerItem2')?.value.trim() || $('#valItem2')?.value.trim() || 'خامات مختارة بعناية',
+        ticker_item_3: $('#tickerItem3')?.value.trim() || $('#valItem1')?.value.trim() || 'تركيبات غنية تدوم طويلاً',
+        ticker_item_4: $('#tickerItem4')?.value.trim() || $('#valItem4')?.value.trim() || 'هدية تحكي عنك',
+        ticker_item_5: $('#tickerItem5')?.value.trim() || 'لو في عطر مش موجود ومحتاجه نقدر نوفرهولك',
         values_strip: [
-          $('#valItem1')?.value.trim() || 'تركيبات غنية تدوم طويلاً',
-          $('#valItem2')?.value.trim() || 'خامات مختارة بعناية',
-          $('#valItem3')?.value.trim() || 'صُنع بحب في مصر',
-          $('#valItem4')?.value.trim() || 'هدية تحكي عنك'
+          $('#tickerItem1')?.value.trim() || $('#valItem3')?.value.trim() || 'صُنع بحب في مصر',
+          $('#tickerItem2')?.value.trim() || $('#valItem2')?.value.trim() || 'خامات مختارة بعناية',
+          $('#tickerItem3')?.value.trim() || $('#valItem1')?.value.trim() || 'تركيبات غنية تدوم طويلاً',
+          $('#tickerItem4')?.value.trim() || $('#valItem4')?.value.trim() || 'هدية تحكي عنك',
+          $('#tickerItem5')?.value.trim() || 'لو في عطر مش موجود ومحتاجه نقدر نوفرهولك'
         ]
       };
 
@@ -1064,7 +1085,8 @@
         const inSolar = Boolean(p.in_solar_system || d.in_solar_system);
         if (!inSolar) return false;
       } else if (catFilterVal !== 'all') {
-        const normCat = (pCat === 'women' || pCat.includes('نسائ')) ? 'women'
+        const normCat = (pCat === 'gifts' || pCat.includes('هد') || pCat.includes('gift') || pCat.includes('box')) ? 'gifts'
+          : (pCat === 'women' || pCat.includes('نسائ')) ? 'women'
           : (pCat === 'men' || pCat.includes('رجال')) ? 'men' : 'unisex';
         if (normCat !== catFilterVal) return false;
       }
@@ -1099,11 +1121,13 @@
       women:  { text: adminLang === 'ar' ? 'نسائي' : 'For Her', class: 'women' },
       men:    { text: adminLang === 'ar' ? 'رجالي' : 'For Him', class: 'men' },
       unisex: { text: adminLang === 'ar' ? 'للجميع' : 'Unisex', class: 'unisex' },
+      gifts:  { text: adminLang === 'ar' ? '🎁 بوكسات وهدايا' : '🎁 Gifts & Boxes', class: 'gifts' },
     };
 
     $('#productsTable').innerHTML = filtered.map(p => {
       const pCat = (p.category || 'unisex').toLowerCase();
-      const normCatKey = (pCat === 'women' || pCat.includes('نسائ')) ? 'women'
+      const normCatKey = (pCat === 'gifts' || pCat.includes('هد') || pCat.includes('gift') || pCat.includes('box')) ? 'gifts'
+        : (pCat === 'women' || pCat.includes('نسائ')) ? 'women'
         : (pCat === 'men' || pCat.includes('رجال')) ? 'men' : 'unisex';
       const cat = catLabels[normCatKey] || { text: p.category || (adminLang === 'ar' ? 'للجميع' : 'Unisex'), class: 'unisex' };
       const d = unpackProductDetails(p);
@@ -1520,6 +1544,10 @@
       if (saleInp) saleInp.value = details.sale_price || '';
       if (badgeInp) badgeInp.value = details.discount_badge || '';
       if ($('#prodCostPrice')) $('#prodCostPrice').value = details.cost_price !== '' && details.cost_price !== undefined ? details.cost_price : '';
+      if ($('#prodBoxItems')) $('#prodBoxItems').value = details.box_items || product.box_items || '';
+      if ($('#prodCustomBox')) $('#prodCustomBox').checked = Boolean(details.is_custom_box || product.is_custom_box);
+      if ($('#prodExtraPrice')) $('#prodExtraPrice').value = (details.extra_item_price !== '' && details.extra_item_price !== undefined) ? details.extra_item_price : '';
+      if ($('#prodMaxItems')) $('#prodMaxItems').value = details.max_box_items || product.max_box_items || '4';
       syncDiscountFeedback();
       syncProfitFeedback();
 
@@ -1550,6 +1578,10 @@
       if (pctInp) pctInp.value = '';
       if (badgeInp) badgeInp.value = '';
       if ($('#prodCostPrice')) $('#prodCostPrice').value = '';
+      if ($('#prodBoxItems')) $('#prodBoxItems').value = '';
+      if ($('#prodCustomBox')) $('#prodCustomBox').checked = false;
+      if ($('#prodExtraPrice')) $('#prodExtraPrice').value = '';
+      if ($('#prodMaxItems')) $('#prodMaxItems').value = '4';
       if (feedback) feedback.style.display = 'none';
       syncProfitFeedback();
 
@@ -2000,6 +2032,10 @@
       in_solar_system: Boolean($('#prodInSolar')?.checked),
       in_stock:    inStockVal,
       stock_quantity: stockQty,
+      box_items:   $('#prodBoxItems')?.value.trim() || null,
+      is_custom_box: Boolean($('#prodCustomBox')?.checked),
+      extra_item_price: parseFloat($('#prodExtraPrice')?.value) || 0,
+      max_box_items: parseInt($('#prodMaxItems')?.value) || 4,
     };
 
     try {
@@ -2057,7 +2093,11 @@
               discount_percent: payload.discount_percent,
               discount_badge: payload.discount_badge,
               stock_quantity: stockQty,
-              in_solar_system: payload.in_solar_system
+              in_solar_system: payload.in_solar_system,
+              box_items:      payload.box_items,
+              is_custom_box:  payload.is_custom_box,
+              extra_item_price: payload.extra_item_price,
+              max_box_items:  payload.max_box_items
             }),
           };
           if (id) {
@@ -2696,18 +2736,50 @@
     calculateSalesAnalytics(btn.dataset.range);
   });
 
-  // ── Sidebar Active Tab Sync on Hash Change ───────────────────────────────
-  function updateActiveSideLink() {
-    const hash = window.location.hash || '#overview';
+  // ── Admin Views & Tab Routing Engine (صفحات الداشبورد المستقلة) ────────────
+  const ADMIN_PANEL_IDS = ['products-panel', 'brands-panel', 'campaign', 'orders', 'sales-panel'];
+
+  function switchAdminView(targetHash) {
+    const rawHash = (targetHash !== undefined ? targetHash : (window.location.hash || '#overview')).trim();
+    const cleanHash = (rawHash.startsWith('#') ? rawHash.slice(1) : rawHash).toLowerCase() || 'overview';
+
+    // Update active class on sidebar links
     document.querySelectorAll('.admin-sidebar .side-link').forEach(link => {
       const href = link.getAttribute('href');
       if (href && href.startsWith('#')) {
-        link.classList.toggle('selected', href === hash);
+        const linkHash = href.slice(1).toLowerCase();
+        link.classList.toggle('selected', linkHash === cleanHash || (cleanHash === 'overview' && linkHash === 'overview'));
       }
     });
+
+    const welcomeEl = document.querySelector('.welcome');
+    const statsGrid = document.querySelector('.stats-grid');
+
+    if (cleanHash === 'overview') {
+      if (welcomeEl) welcomeEl.style.display = '';
+      if (statsGrid) statsGrid.style.display = '';
+      ADMIN_PANEL_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = '';
+      });
+    } else {
+      // In dedicated view (e.g. Sales Page, Orders, Products, Brands, Campaign)
+      if (welcomeEl) welcomeEl.style.display = 'none';
+      if (statsGrid) statsGrid.style.display = 'none';
+      ADMIN_PANEL_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.display = (id.toLowerCase() === cleanHash) ? 'block' : 'none';
+        }
+      });
+      if (cleanHash === 'sales-panel') {
+        calculateSalesAnalytics();
+      }
+    }
   }
-  window.addEventListener('hashchange', updateActiveSideLink);
-  updateActiveSideLink();
+
+  window.addEventListener('hashchange', () => switchAdminView());
+  switchAdminView();
 
   // ── Immediate Cache Render (0ms Instant Load) ─────────────────────────────
   if (currentProducts.length) renderProductsTable(currentProducts);
