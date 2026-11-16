@@ -568,6 +568,9 @@
     renderHeroProduct();
     renderStorySpotlight();
     updateCart();
+    if (typeof quizModal !== 'undefined' && quizModal && quizModal.classList.contains('open')) {
+      renderQuizStep();
+    }
   }
 
   function updateMoodPortalLang() {
@@ -1509,13 +1512,37 @@
     if (p.notes && typeof p.notes === 'string' && (p.notes.trim().startsWith('{') || p.notes.trim().startsWith('['))) {
       try { meta = JSON.parse(p.notes); } catch (_) {}
     }
+
+    const isAr = currentLang === 'ar';
+    let localizedDesc = '';
+    let localizedTop = '';
+    let localizedMid = '';
+    let localizedBase = '';
+    if (window.PerfumeI18n) {
+      const loc = window.PerfumeI18n.getLocalizedProduct(p, currentLang);
+      if (loc) {
+        if (loc.desc) localizedDesc = loc.desc;
+        if (loc.top_notes) localizedTop = loc.top_notes;
+        if (loc.middle_notes) localizedMid = loc.middle_notes;
+        if (loc.base_notes) localizedBase = loc.base_notes;
+      }
+    }
+    if (!localizedDesc) {
+      if (isAr) {
+        localizedDesc = (meta.desc_ar && /[\u0600-\u06FF]/.test(meta.desc_ar)) ? meta.desc_ar : (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(meta.desc || p.notes || '', 'ar', p.id, p.name) : (meta.desc || p.notes || ''));
+      } else {
+        localizedDesc = (meta.desc_en && /[a-zA-Z]/.test(meta.desc_en)) ? meta.desc_en : (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(meta.desc || p.notes || '', 'en', p.id, p.latin || p.name) : (meta.desc || p.notes || ''));
+      }
+    }
+
     return {
       brand:        p.brand || meta.brand || 'رُوح',
       brand_ar:     meta.brand_ar || '',
-      notes:        meta.desc !== undefined ? meta.desc : (p.notes || ''),
-      top_notes:    p.top_notes || meta.top_notes || '',
-      middle_notes: p.middle_notes || meta.middle_notes || '',
-      base_notes:   p.base_notes || meta.base_notes || '',
+      notes:        localizedDesc || (meta.desc !== undefined ? meta.desc : (p.notes || '')),
+      desc:         localizedDesc || (meta.desc !== undefined ? meta.desc : (p.notes || '')),
+      top_notes:    localizedTop || p.top_notes || meta.top_notes || '',
+      middle_notes: localizedMid || p.middle_notes || meta.middle_notes || '',
+      base_notes:   localizedBase || p.base_notes || meta.base_notes || '',
       inspired_by:  p.inspired_by || meta.inspired_by || '',
       longevity:    parseInt(p.longevity || meta.longevity) || 3,
       sillage:      parseInt(p.sillage || meta.sillage) || 2,
@@ -1620,8 +1647,21 @@
     return html;
   }
 
-  const longevityLabels = { 1: '<1hr', 2: '1-3hrs', 3: '4-6hrs', 4: '8-10hrs', 5: '12hrs+' };
-  const sillageLabels   = { 1: 'Skin (ملاصق)', 2: '1-2hrs', 3: 'Moderate (معتدل)', 4: 'Strong (قوي)', 5: 'Beast (وحش)' };
+  function getLongevityLabel(lvl) {
+    const isAr = currentLang === 'ar';
+    const map = isAr
+      ? { 1: 'أقل من ساعة', 2: '١-٣ ساعات', 3: '٤-٦ ساعات', 4: '٨-١٠ ساعات', 5: 'أكثر من ١٢ ساعة' }
+      : { 1: '< 1 hr', 2: '1-3 hrs', 3: '4-6 hrs', 4: '8-10 hrs', 5: '12+ hrs' };
+    return map[lvl] || (isAr ? '٤-٦ ساعات' : '4-6 hrs');
+  }
+
+  function getSillageLabel(lvl) {
+    const isAr = currentLang === 'ar';
+    const map = isAr
+      ? { 1: 'ملاصق للبشرة', 2: 'هادئ وقريب', 3: 'معتدل وواضح', 4: 'قوي ومميز', 5: 'فوحان طاغٍ (وحش)' }
+      : { 1: 'Intimate Skin Scent', 2: 'Soft & Close', 3: 'Moderate & Noticeable', 4: 'Strong & Distinct', 5: 'Beast Mode' };
+    return map[lvl] || (isAr ? 'معتدل وواضح' : 'Moderate');
+  }
 
   function renderAccordPills(accordsStr) {
     if (!accordsStr) return '';
@@ -1707,12 +1747,12 @@
     return `<div class="perf-cards-row">
       <div class="perf-metric-box">
         <span class="perf-metric-tag">${currentLang === 'ar' ? 'الثبات · LONGEVITY' : 'LONGEVITY'}</span>
-        <strong class="perf-metric-val">${longevityLabels[longVal] || '4-6hrs'}</strong>
+        <strong class="perf-metric-val">${getLongevityLabel(longVal)}</strong>
         ${renderPerfBars(longVal)}
       </div>
       <div class="perf-metric-box">
         <span class="perf-metric-tag">${currentLang === 'ar' ? 'الانتشار · SILLAGE' : 'SILLAGE'}</span>
-        <strong class="perf-metric-val">${sillageLabels[silVal] || 'Moderate'}</strong>
+        <strong class="perf-metric-val">${getSillageLabel(silVal)}</strong>
         ${renderPerfBars(silVal)}
       </div>
     </div>`;
@@ -2601,7 +2641,7 @@
       options: [
         { val: 'men', icon: '👔', t_ar: 'لي أنا (عطر رجالي)', t_en: 'For Me (Men)', s_ar: 'نفحات رجالية أنيقة وقوية', s_en: 'Bold & elegant masculine notes' },
         { val: 'women', icon: '👗', t_ar: 'لي أنا (عطر نسائي)', t_en: 'For Me (Women)', s_ar: 'أنوثة ناعمة وجاذبية ساحرة', s_en: 'Soft & alluring feminine aura' },
-        { val: 'unisex', icon: '✨', t_ar: 'عطر للجميع (Unisex)', t_en: 'Unisex Fragrance', s_ar: 'توازن فاخر يناسب كل الأذواق', s_en: 'Balanced luxury for everyone' },
+        { val: 'unisex', icon: '✨', t_ar: 'عطر للجميع (للجنسين)', t_en: 'Unisex Fragrance', s_ar: 'توازن فاخر يناسب كل الأذواق', s_en: 'Balanced luxury for everyone' },
         { val: 'gift', icon: '🎁', t_ar: 'هدية راقية لشخص مميز', t_en: 'A Luxury Gift', s_ar: 'عطر يترك ذكرى لا تُنسى', s_en: 'A gift made to be remembered' }
       ]
     },
@@ -2612,10 +2652,10 @@
       desc_en: 'The scent that feels closest to your personality',
       key: 'mood',
       options: [
-        { val: 'sweet', icon: '🍦', t_ar: 'فانيليا وسكريات دافئة (Sweet & Vanilla)', t_en: 'Sweet & Vanilla', s_ar: 'فانيليا ناعمة، لمسة سكرية وكراميل', s_en: 'Velvety vanilla & cozy gourmand' },
-        { val: 'woody', icon: '🪵', t_ar: 'أخشاب وعنبر فاخر (Woody & Amber)', t_en: 'Woody & Amber', s_ar: 'صندل، خشب كشمير وعنبر أصيل', s_en: 'Rich amber, sandalwood & cashmeran' },
-        { val: 'fresh', icon: '🍋', t_ar: 'منعش ونقي (Fresh & Citrus)', t_en: 'Fresh & Clean', s_ar: 'برغموت منعش ونفحات زهور بيضاء', s_en: 'Crisp bergamot & uplifting florals' },
-        { val: 'spicy', icon: '🌙', t_ar: 'شرقي غامض وجريء (Spicy & Bold)', t_en: 'Spicy & Oriental', s_ar: 'زعفران، توابل راقية وأثر لا يُقاوم', s_en: 'Exotic saffron & hypnotic spices' }
+        { val: 'sweet', icon: '🍦', t_ar: 'فانيليا ونفحات سكرية دافئة', t_en: 'Sweet & Vanilla', s_ar: 'فانيليا ناعمة، لمسة سكرية وكراميل', s_en: 'Velvety vanilla & cozy gourmand' },
+        { val: 'woody', icon: '🪵', t_ar: 'أخشاب فاخرة وعنبر دافئ', t_en: 'Woody & Amber', s_ar: 'صندل، خشب كشمير وعنبر أصيل', s_en: 'Rich amber, sandalwood & cashmeran' },
+        { val: 'fresh', icon: '🍋', t_ar: 'انتعاش حمضي ونقاء أثيري', t_en: 'Fresh & Clean', s_ar: 'برغموت منعش ونفحات زهور بيضاء', s_en: 'Crisp bergamot & uplifting florals' },
+        { val: 'spicy', icon: '🌙', t_ar: 'طابع شرقي غامض وجريء', t_en: 'Spicy & Oriental', s_ar: 'زعفران، توابل راقية وأثر لا يُقاوم', s_en: 'Exotic saffron & hypnotic spices' }
       ]
     },
     {
@@ -2697,18 +2737,20 @@
       });
 
       if (!bestMatch && available.length) bestMatch = available[0];
+      const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(bestMatch, currentLang) : null;
       const d = unpackProduct(bestMatch);
-      const prodName = isAr ? bestMatch.name : (bestMatch.latin || bestMatch.name);
+      const prodName = localized ? localized.name : (isAr ? bestMatch.name : (bestMatch.latin || bestMatch.name));
+      const quizDesc = (localized && localized.desc) ? localized.desc : (d.notes || (isAr ? 'عطر فاخر يمزج بين النقاء والجاذبية والثبات العالي، مصمم ليعبر عن روحك في كل مناسبة.' : 'A masterfully balanced fragrance tailored to your personality and presence.'));
       const matchPct = 96 + Math.floor(Math.random() * 4);
 
       quizContainer.innerHTML = `
         <div class="quiz-result-card">
           <div class="quiz-match-pill">✨ ${isAr ? `نسبة التطابق العطري: ${arabicDigits(matchPct)}%` : `Fragrance Match: ${matchPct}%`}</div>
-          ${bestMatch.image_url ? `<img src="${bestMatch.image_url}" alt="${escapeHtml(prodName)}" class="quiz-result-bottle">` : ''}
-          <h3 class="quiz-result-title">${escapeHtml(prodName)}</h3>
-          <p class="quiz-result-desc">${escapeHtml(d.notes || (isAr ? 'عطر فاخر يمزج بين النقاء والجاذبية والثبات العالي، مصمم ليعبر عن روحك في كل مناسبة.' : 'A masterfully balanced fragrance tailored to your personality and presence.'))}</p>
+          ${bestMatch.image_url ? `<a href="product.html?id=${encodeURIComponent(bestMatch.id)}" style="display:inline-block;"><img src="${bestMatch.image_url}" alt="${escapeHtml(prodName)}" class="quiz-result-bottle" style="cursor:pointer;"></a>` : ''}
+          <h3 class="quiz-result-title"><a href="product.html?id=${encodeURIComponent(bestMatch.id)}" style="color:inherit;text-decoration:none;">${escapeHtml(prodName)}</a></h3>
+          <p class="quiz-result-desc">${escapeHtml(quizDesc)}</p>
           <div class="quiz-result-actions">
-            <a href="product.html?id=${bestMatch.id}" class="button button-primary">
+            <a href="product.html?id=${encodeURIComponent(bestMatch.id)}" class="button button-primary">
               <span>${isAr ? 'استكشف هرم النوتات والتحليل' : 'Explore Scent DNA'}</span>
               <span class="arrow-icon">←</span>
             </a>

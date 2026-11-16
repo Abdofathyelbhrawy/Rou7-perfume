@@ -264,11 +264,35 @@
     if (p.notes && typeof p.notes === 'string' && (p.notes.trim().startsWith('{') || p.notes.trim().startsWith('['))) {
       try { meta = JSON.parse(p.notes); } catch (_) {}
     }
+
+    const isAr = currentLang === 'ar';
+    let localizedDesc = '';
+    let localizedTop = '';
+    let localizedMid = '';
+    let localizedBase = '';
+    if (window.PerfumeI18n) {
+      const loc = window.PerfumeI18n.getLocalizedProduct(p, currentLang);
+      if (loc) {
+        if (loc.desc) localizedDesc = loc.desc;
+        if (loc.top_notes) localizedTop = loc.top_notes;
+        if (loc.middle_notes) localizedMid = loc.middle_notes;
+        if (loc.base_notes) localizedBase = loc.base_notes;
+      }
+    }
+    if (!localizedDesc) {
+      if (isAr) {
+        localizedDesc = (meta.desc_ar && /[\u0600-\u06FF]/.test(meta.desc_ar)) ? meta.desc_ar : (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(meta.desc || p.notes || '', 'ar', p.id, p.name) : (meta.desc || p.notes || ''));
+      } else {
+        localizedDesc = (meta.desc_en && /[a-zA-Z]/.test(meta.desc_en)) ? meta.desc_en : (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(meta.desc || p.notes || '', 'en', p.id, p.latin || p.name) : (meta.desc || p.notes || ''));
+      }
+    }
+
     return {
-      desc:         meta.desc !== undefined ? meta.desc : (p.notes || ''),
-      top_notes:    p.top_notes || meta.top_notes || '',
-      middle_notes: p.middle_notes || meta.middle_notes || '',
-      base_notes:   p.base_notes || meta.base_notes || '',
+      desc:         localizedDesc || (meta.desc !== undefined ? meta.desc : (p.notes || '')),
+      notes:        localizedDesc || (meta.desc !== undefined ? meta.desc : (p.notes || '')),
+      top_notes:    localizedTop || p.top_notes || meta.top_notes || '',
+      middle_notes: localizedMid || p.middle_notes || meta.middle_notes || '',
+      base_notes:   localizedBase || p.base_notes || meta.base_notes || '',
       inspired_by:  p.inspired_by || meta.inspired_by || '',
       longevity:    parseInt(p.longevity || meta.longevity) || 4,
       sillage:      parseInt(p.sillage || meta.sillage) || 3,
