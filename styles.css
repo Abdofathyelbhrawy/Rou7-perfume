@@ -1821,6 +1821,192 @@ body.light .collection-sort-select {
   border-color: var(--pink);
 }
 
+/* ==========================================================
+   Bespoke Custom Perfume VIP Card (عطر مخصص بالطلب)
+   ========================================================== */
+.custom-perfume-section {
+  width: min(1200px, 100% - 36px);
+  margin: 20px auto 30px;
+}
+.custom-perfume-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(28, 42, 62, 0.95) 0%, rgba(19, 31, 48, 0.98) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 22px;
+  padding: 30px 36px;
+  overflow: hidden;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  transition: all .3s ease;
+}
+.custom-perfume-card:hover {
+  border-color: rgba(212, 175, 55, 0.55);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.38), 0 0 24px rgba(212, 175, 55, 0.12);
+}
+body.light .custom-perfume-card {
+  background: linear-gradient(135deg, #ffffff 0%, #faf6f0 100%);
+  border-color: rgba(184, 134, 11, 0.28);
+  box-shadow: 0 14px 38px rgba(92, 59, 0, 0.08);
+}
+.cp-ambient-aura {
+  position: absolute;
+  top: -40%;
+  inset-inline-start: -15%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+  filter: blur(24px);
+}
+body.light .cp-ambient-aura {
+  background: radial-gradient(circle, rgba(184, 134, 11, 0.12) 0%, transparent 70%);
+}
+.cp-layout {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.cp-info {
+  flex: 1.6;
+  min-width: min(100%, 320px);
+}
+.cp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(212, 175, 55, 0.14);
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffd166;
+  margin-bottom: 12px;
+  letter-spacing: .02em;
+}
+body.light .cp-eyebrow {
+  background: rgba(184, 134, 11, 0.1);
+  border-color: rgba(184, 134, 11, 0.25);
+  color: #8b5a00;
+}
+.cp-sparkle {
+  color: #ffd166;
+}
+.cp-main-title {
+  font-size: clamp(20px, 2.6vw, 28px);
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 0 10px;
+  color: var(--ink);
+}
+.cp-main-title em {
+  color: #ffd166;
+  font-style: normal;
+  text-decoration: underline;
+  text-decoration-color: rgba(212, 175, 55, 0.45);
+  text-underline-offset: 4px;
+}
+body.light .cp-main-title em {
+  color: #9c6700;
+  text-decoration-color: rgba(156, 103, 0, 0.35);
+}
+.cp-description {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin: 0 0 18px;
+  max-width: 660px;
+}
+.cp-features-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cp-feat-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 5px 12px;
+  border-radius: 8px;
+}
+body.light .cp-feat-item {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+.cp-feat-icon {
+  font-size: 14px;
+}
+.cp-action-col {
+  flex: 1;
+  min-width: min(100%, 260px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  background: rgba(212, 175, 55, 0.06);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 16px;
+  padding: 20px 22px;
+}
+body.light .cp-action-col {
+  background: rgba(184, 134, 11, 0.05);
+  border-color: rgba(184, 134, 11, 0.18);
+}
+.cp-badge-floating {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #ffd166;
+}
+body.light .cp-badge-floating {
+  color: #8b5a00;
+}
+.btn-custom-order {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 22px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  color: #0b111a !important;
+  font-weight: 700;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(212, 175, 55, 0.35);
+  transition: all .25s ease;
+  text-decoration: none;
+}
+.btn-custom-order:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(212, 175, 55, 0.5);
+  background: linear-gradient(135deg, #ffd166 0%, #d4af37 100%);
+}
+.cp-wa-icon {
+  display: inline-flex;
+  align-items: center;
+  color: #0b111a;
+}
+.cp-consult-note {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
 /* 4. Scent Finder Interactive Banner */
 .scent-finder-banner {
   background: linear-gradient(135deg, rgba(32, 47, 69, 0.85) 0%, rgba(25, 41, 64, 0.95) 100%);

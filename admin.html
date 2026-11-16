@@ -40,10 +40,14 @@
           <option value="women">نسائي</option>
           <option value="men">رجالي</option>
           <option value="unisex">للجميع</option>
+          <option value="__solar__">🪐 عطور المنظومة الشمسية فقط</option>
         </select>
         <select id="adminBrandFilter" class="admin-filter-select" aria-label="تصفية البراند">
           <option value="all">كل البراندات</option>
         </select>
+        <button type="button" class="btn-solar-quickfilter" id="btnSolarQuickFilter" title="تصفية عطور المنظومة الشمسية المدارية">
+          <span>🪐</span> <span id="solarQuickFilterLabel">المنظومة الشمسية</span> (<span id="solarCountBadge">0</span>)
+        </button>
       </div>
       <div class="table-wrap">
         <table>
@@ -691,10 +695,14 @@
               </small>
             </div>
           </div>
-          <div class="form-checks" style="margin-top: 4px;">
-            <label class="check-label">
+          <div class="form-checks" style="margin-top: 6px; display: flex; flex-direction: column; gap: 8px;">
+            <label class="check-label" style="display: flex; align-items: center; gap: 8px;">
               <input id="prodFeatured" name="is_featured" type="checkbox">
-              <span>إبراز كعطر مميز في واجهة المتجر (Hero)</span>
+              <span style="font-weight: 600;">⭐ إبراز كعطر مميز في واجهة المتجر (Featured Hero)</span>
+            </label>
+            <label class="check-label" style="display: flex; align-items: center; gap: 8px;">
+              <input id="prodInSolar" name="in_solar_system" type="checkbox">
+              <span style="font-weight: 600; color: #d4af37;">🪐 إظهار ككوكب في مدار المنظومة الشمسية (3D Solar Orbit)</span>
             </label>
           </div>
           <div class="form-actions">

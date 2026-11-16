@@ -71,6 +71,18 @@
       val_2: 'خامات مختارة بعناية',
       val_3: 'صُنع بحب في مصر',
       val_4: 'هدية تحكي عنك',
+      val_custom: 'متاح عندنا طلب عطر مخصص بالطلب',
+      cp_eyebrow: 'خدمة رُوح الخاصة للأصالة والفخامة ✦',
+      cp_title: 'متاح عندنا <em>طلب عطر مخصص</em> بالطلب',
+      cp_desc: 'هل تبحث عن توقيع عطري استثنائي يُصنع خصيصاً لك؟ نبتكر لك عطرك المفضل بتركيبة فريدة تناسب ذوقك ونوتاتك المرغوبة، مع تركيز إكستري دو بارفان فائق الثبات وإمكانية حفر اسمك أو إهدائك الفاخر بالذهب على الزجاجة.',
+      cp_feat_1: 'خامات وزيوت فرنسية وشرقية نقية معتمدة',
+      cp_feat_2: 'تركيز إكستري دو بارفان يدوم طويلاً',
+      cp_feat_3: 'تغليف ملكي مع حفر اسمك بالذهب',
+      cp_cta: 'اطلب عطرك المخصص عبر واتساب 💬',
+      cp_consult_note: 'استشارة فورية مجانية مع خبير العطور لتحديد نوتاتك',
+      nav_custom: 'عطر مخصص',
+      mood_nature_playing: 'همس الطبيعة: شغال 🍃',
+      mood_nature_paused: 'همس الطبيعة',
       coll_eyebrow: 'اكتشف عطرك',
       coll_title: 'مختارات <em>رُوح</em>',
       coll_all_link: 'كل العطور',
@@ -210,6 +222,18 @@
       val_2: 'Carefully selected essences',
       val_3: 'Crafted with love in Egypt',
       val_4: 'A gift that speaks of you',
+      val_custom: 'Custom Bespoke Perfumes Available on Demand',
+      cp_eyebrow: 'Rou7 Bespoke Signature Service ✦',
+      cp_title: 'Custom Bespoke Perfumes <em>Available on Demand</em>',
+      cp_desc: 'Seeking an exclusive signature scent crafted solely for you? We compose your custom fragrance with your favorite notes, supreme Extrait concentration, and personalized gold bottle engraving.',
+      cp_feat_1: '100% Pure Certified French & Oriental Oils',
+      cp_feat_2: 'Long-Lasting Extrait de Parfum Concentration',
+      cp_feat_3: 'Royal Presentation with Gold Name Engraving',
+      cp_cta: 'Order Your Bespoke Scent on WhatsApp 💬',
+      cp_consult_note: 'Free direct consultation with our master perfumer to pick your notes',
+      nav_custom: 'Bespoke Perfume',
+      mood_nature_playing: 'Nature Sounds: On 🍃',
+      mood_nature_paused: 'Nature Sounds',
       coll_eyebrow: 'Discover Your Scent',
       coll_title: 'Rou7 <em>Curations</em>',
       coll_all_link: 'All Fragrances',
@@ -692,6 +716,10 @@
     }
 
     stopAmbient() {
+      if (this.ambientTimers) {
+        this.ambientTimers.forEach(t => clearInterval(t));
+        this.ambientTimers = [];
+      }
       this.ambientNodes.forEach(n => {
         try {
           if (n.stop) n.stop();
@@ -702,6 +730,80 @@
       this.activeMood = null;
     }
 
+    createPinkNoiseBuffer(ctx, duration = 3.5) {
+      const total = Math.floor(ctx.sampleRate * duration);
+      const buffer = ctx.createBuffer(1, total, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < total; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.085;
+        b6 = white * 0.115926;
+      }
+      return buffer;
+    }
+
+    createBrownNoiseBuffer(ctx, duration = 3.5) {
+      const total = Math.floor(ctx.sampleRate * duration);
+      const buffer = ctx.createBuffer(1, total, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      let lastOut = 0.0;
+      for (let i = 0; i < total; i++) {
+        const white = Math.random() * 2 - 1;
+        data[i] = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = data[i];
+        data[i] *= 1.8;
+      }
+      return buffer;
+    }
+
+    createFireplaceCrackleBuffer(ctx, duration = 3.0) {
+      const total = Math.floor(ctx.sampleRate * duration);
+      const buffer = ctx.createBuffer(1, total, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < total; i++) {
+        data[i] = (Math.random() * 2 - 1) * 0.003;
+      }
+      const numPops = 70;
+      for (let p = 0; p < numPops; p++) {
+        const startIdx = Math.floor(Math.random() * (total - 500));
+        const popLen = Math.floor(ctx.sampleRate * (0.002 + Math.random() * 0.004));
+        const amp = 0.25 + Math.random() * 0.7;
+        const sign = Math.random() > 0.5 ? 1 : -1;
+        for (let j = 0; j < popLen; j++) {
+          const t = j / ctx.sampleRate;
+          const decay = Math.exp(-t * 1200);
+          data[startIdx + j] += (Math.random() * 2 - 1) * decay * amp * sign;
+        }
+      }
+      return buffer;
+    }
+
+    createCricketsBuffer(ctx, duration = 3.0) {
+      const total = Math.floor(ctx.sampleRate * duration);
+      const buffer = ctx.createBuffer(1, total, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      const chirpStarts = [0.25, 1.6];
+      chirpStarts.forEach(startSec => {
+        const startIdx = Math.floor(startSec * ctx.sampleRate);
+        const packetLen = Math.floor(0.32 * ctx.sampleRate);
+        for (let i = 0; i < packetLen; i++) {
+          const t = i / ctx.sampleRate;
+          const carrier = Math.sin(2 * Math.PI * 4500 * t);
+          const mod = Math.max(0, Math.sin(2 * Math.PI * 30 * t));
+          const env = Math.sin(Math.PI * (i / packetLen));
+          data[startIdx + i] += carrier * mod * env * 0.07;
+        }
+      });
+      return buffer;
+    }
+
     playMoodAmbient(moodKey) {
       this.stopAmbient();
       if (!moodKey) return;
@@ -710,90 +812,228 @@
         const ctx = this.ensureContext();
         if (!ctx) return;
         this.activeMood = moodKey;
+        this.ambientTimers = [];
 
         const masterGain = ctx.createGain();
         masterGain.gain.setValueAtTime(0.001, ctx.currentTime);
-        masterGain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.8);
+        masterGain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.9);
         masterGain.connect(ctx.destination);
         this.ambientNodes.push(masterGain);
 
+        // 1. Winter Cozy: Warm crackling wood fire + soft cozy rain
         if (moodKey === 'winter_cozy') {
-          [130.81, 196.00, 261.63].forEach(freq => {
-            const osc = ctx.createOscillator();
-            const g = ctx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq, ctx.currentTime);
-            g.gain.value = 0.25;
-            osc.connect(g);
-            g.connect(masterGain);
-            osc.start();
-            this.ambientNodes.push(osc);
-          });
+          const brownBuf = this.createBrownNoiseBuffer(ctx, 3.5);
+          const rumble = ctx.createBufferSource();
+          rumble.buffer = brownBuf;
+          rumble.loop = true;
+          const rumbleFilter = ctx.createBiquadFilter();
+          rumbleFilter.type = 'lowpass';
+          rumbleFilter.frequency.setValueAtTime(160, ctx.currentTime);
+          const rumbleGain = ctx.createGain();
+          rumbleGain.gain.value = 0.35;
+          rumble.connect(rumbleFilter);
+          rumbleFilter.connect(rumbleGain);
+          rumbleGain.connect(masterGain);
+          rumble.start();
+          this.ambientNodes.push(rumble);
+
+          const crackleBuf = this.createFireplaceCrackleBuffer(ctx, 3.0);
+          const crackleSrc = ctx.createBufferSource();
+          crackleSrc.buffer = crackleBuf;
+          crackleSrc.loop = true;
+          const crackleFilter = ctx.createBiquadFilter();
+          crackleFilter.type = 'highpass';
+          crackleFilter.frequency.setValueAtTime(900, ctx.currentTime);
+          const crackleGain = ctx.createGain();
+          crackleGain.gain.value = 0.55;
+          crackleSrc.connect(crackleFilter);
+          crackleFilter.connect(crackleGain);
+          crackleGain.connect(masterGain);
+          crackleSrc.start();
+          this.ambientNodes.push(crackleSrc);
+
+          const rainBuf = this.createPinkNoiseBuffer(ctx, 3.0);
+          const rainSrc = ctx.createBufferSource();
+          rainSrc.buffer = rainBuf;
+          rainSrc.loop = true;
+          const rainFilter = ctx.createBiquadFilter();
+          rainFilter.type = 'bandpass';
+          rainFilter.frequency.setValueAtTime(750, ctx.currentTime);
+          rainFilter.Q.value = 0.9;
+          const rainGain = ctx.createGain();
+          rainGain.gain.value = 0.22;
+          rainSrc.connect(rainFilter);
+          rainFilter.connect(rainGain);
+          rainGain.connect(masterGain);
+          rainSrc.start();
+          this.ambientNodes.push(rainSrc);
+
+        // 2. Majestic Power: Desert night breeze & serene wind over dunes
         } else if (moodKey === 'majestic_power') {
-          [98.0, 146.8, 220.0].forEach(freq => {
-            const osc = ctx.createOscillator();
-            osc.type = 'sawtooth';
-            const filter = ctx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.value = 380;
-            const g = ctx.createGain();
-            g.gain.value = 0.18;
-            osc.frequency.setValueAtTime(freq, ctx.currentTime);
-            osc.connect(filter);
-            filter.connect(g);
-            g.connect(masterGain);
-            osc.start();
-            this.ambientNodes.push(osc);
-          });
+          const windBuf = this.createBrownNoiseBuffer(ctx, 4.0);
+          const windSrc = ctx.createBufferSource();
+          windSrc.buffer = windBuf;
+          windSrc.loop = true;
+          const windFilter = ctx.createBiquadFilter();
+          windFilter.type = 'bandpass';
+          windFilter.frequency.setValueAtTime(220, ctx.currentTime);
+          windFilter.Q.value = 2.0;
+
+          const lfo = ctx.createOscillator();
+          lfo.frequency.setValueAtTime(0.07, ctx.currentTime);
+          const lfoFilterGain = ctx.createGain();
+          lfoFilterGain.gain.value = 90;
+          lfo.connect(lfoFilterGain);
+          lfoFilterGain.connect(windFilter.frequency);
+
+          const windGain = ctx.createGain();
+          windGain.gain.value = 0.45;
+          windSrc.connect(windFilter);
+          windFilter.connect(windGain);
+          windGain.connect(masterGain);
+          windSrc.start();
+          lfo.start();
+          this.ambientNodes.push(windSrc, lfo);
+
+        // 3. Morning Radiance: Fresh garden breeze + natural birdsong chirps
         } else if (moodKey === 'morning_radiance') {
-          [528, 792, 1056].forEach(freq => {
-            const osc = ctx.createOscillator();
-            osc.type = 'sine';
-            const g = ctx.createGain();
-            g.gain.value = 0.16;
-            osc.frequency.setValueAtTime(freq, ctx.currentTime);
-            osc.connect(g);
-            g.connect(masterGain);
-            osc.start();
-            this.ambientNodes.push(osc);
-          });
+          const breezeBuf = this.createPinkNoiseBuffer(ctx, 3.0);
+          const breezeSrc = ctx.createBufferSource();
+          breezeSrc.buffer = breezeBuf;
+          breezeSrc.loop = true;
+          const breezeFilter = ctx.createBiquadFilter();
+          breezeFilter.type = 'bandpass';
+          breezeFilter.frequency.setValueAtTime(1400, ctx.currentTime);
+          breezeFilter.Q.value = 0.7;
+          const breezeGain = ctx.createGain();
+          breezeGain.gain.value = 0.32;
+          breezeSrc.connect(breezeFilter);
+          breezeFilter.connect(breezeGain);
+          breezeGain.connect(masterGain);
+          breezeSrc.start();
+          this.ambientNodes.push(breezeSrc);
+
+          const triggerBirdChirp = () => {
+            if (!this.activeMood || this.activeMood !== 'morning_radiance') return;
+            try {
+              const now = ctx.currentTime;
+              const osc = ctx.createOscillator();
+              const g = ctx.createGain();
+              const dur = 0.075;
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(4300, now);
+              osc.frequency.exponentialRampToValueAtTime(2500, now + dur);
+              g.gain.setValueAtTime(0.001, now);
+              g.gain.linearRampToValueAtTime(0.045, now + 0.012);
+              g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+              osc.connect(g);
+              g.connect(masterGain);
+              osc.start(now);
+              osc.stop(now + dur + 0.02);
+
+              if (Math.random() > 0.35) {
+                const t2 = now + 0.11;
+                const dur2 = 0.06;
+                const osc2 = ctx.createOscillator();
+                const g2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(3600, t2);
+                osc2.frequency.exponentialRampToValueAtTime(2900, t2 + dur2);
+                g2.gain.setValueAtTime(0.001, t2);
+                g2.gain.linearRampToValueAtTime(0.035, t2 + 0.01);
+                g2.gain.exponentialRampToValueAtTime(0.0001, t2 + dur2);
+                osc2.connect(g2);
+                g2.connect(masterGain);
+                osc2.start(t2);
+                osc2.stop(t2 + dur2 + 0.02);
+              }
+            } catch (_) {}
+          };
+
+          setTimeout(triggerBirdChirp, 400);
+          const birdTimer = setInterval(triggerBirdChirp, 3200);
+          this.ambientTimers.push(birdTimer);
+
+        // 4. Romantic Twilight: Gentle rain patter on leaves & night garden crickets
         } else if (moodKey === 'romantic_twilight') {
-          [220, 277.18, 329.63].forEach(freq => {
-            const osc = ctx.createOscillator();
-            osc.type = 'sine';
-            const g = ctx.createGain();
-            g.gain.value = 0.2;
-            osc.frequency.setValueAtTime(freq, ctx.currentTime);
-            osc.connect(g);
-            g.connect(masterGain);
-            osc.start();
-            this.ambientNodes.push(osc);
-          });
+          const rainBuf = this.createPinkNoiseBuffer(ctx, 3.5);
+          const rainSrc = ctx.createBufferSource();
+          rainSrc.buffer = rainBuf;
+          rainSrc.loop = true;
+          const rainFilter = ctx.createBiquadFilter();
+          rainFilter.type = 'lowpass';
+          rainFilter.frequency.setValueAtTime(1100, ctx.currentTime);
+          const rainGain = ctx.createGain();
+          rainGain.gain.value = 0.38;
+          rainSrc.connect(rainFilter);
+          rainFilter.connect(rainGain);
+          rainGain.connect(masterGain);
+          rainSrc.start();
+          this.ambientNodes.push(rainSrc);
+
+          const cricketBuf = this.createCricketsBuffer(ctx, 3.0);
+          const cricketSrc = ctx.createBufferSource();
+          cricketSrc.buffer = cricketBuf;
+          cricketSrc.loop = true;
+          const cricketFilter = ctx.createBiquadFilter();
+          cricketFilter.type = 'bandpass';
+          cricketFilter.frequency.setValueAtTime(4500, ctx.currentTime);
+          cricketFilter.Q.value = 3.0;
+          const cricketGain = ctx.createGain();
+          cricketGain.gain.value = 0.35;
+          cricketSrc.connect(cricketFilter);
+          crackleFilter = null;
+          cricketFilter.connect(cricketGain);
+          cricketGain.connect(masterGain);
+          cricketSrc.start();
+          this.ambientNodes.push(cricketSrc);
+
+        // 5. Aquatic Freedom: Rolling ocean waves crashing softly and receding with sea foam
         } else if (moodKey === 'aquatic_freedom') {
-          const bufferSize = ctx.sampleRate * 2;
-          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-          const data = buffer.getChannelData(0);
-          let lastOut = 0.0;
-          for (let i = 0; i < bufferSize; i++) {
-            const white = Math.random() * 2 - 1;
-            data[i] = (lastOut + (0.02 * white)) / 1.02;
-            lastOut = data[i];
-            data[i] *= 1.4;
-          }
-          const noise = ctx.createBufferSource();
-          noise.buffer = buffer;
-          noise.loop = true;
-          const filter = ctx.createBiquadFilter();
-          filter.type = 'bandpass';
-          filter.frequency.setValueAtTime(350, ctx.currentTime);
-          filter.Q.value = 1.2;
-          noise.connect(filter);
-          filter.connect(masterGain);
-          noise.start();
-          this.ambientNodes.push(noise);
+          const oceanBuf = this.createBrownNoiseBuffer(ctx, 4.0);
+          const oceanSrc = ctx.createBufferSource();
+          oceanSrc.buffer = oceanBuf;
+          oceanSrc.loop = true;
+
+          const oceanFilter = ctx.createBiquadFilter();
+          oceanFilter.type = 'bandpass';
+          oceanFilter.frequency.setValueAtTime(320, ctx.currentTime);
+          oceanFilter.Q.value = 1.9;
+
+          const swellLfo = ctx.createOscillator();
+          swellLfo.frequency.setValueAtTime(0.12, ctx.currentTime);
+          const swellFreqMod = ctx.createGain();
+          swellFreqMod.gain.value = 240;
+          swellLfo.connect(swellFreqMod);
+          swellFreqMod.connect(oceanFilter.frequency);
+
+          const oceanGain = ctx.createGain();
+          oceanGain.gain.value = 0.38;
+
+          oceanSrc.connect(oceanFilter);
+          oceanFilter.connect(oceanGain);
+          oceanGain.connect(masterGain);
+          oceanSrc.start();
+          swellLfo.start();
+          this.ambientNodes.push(oceanSrc, swellLfo);
+
+          const foamBuf = this.createPinkNoiseBuffer(ctx, 3.0);
+          const foamSrc = ctx.createBufferSource();
+          foamSrc.buffer = foamBuf;
+          foamSrc.loop = true;
+          const foamFilter = ctx.createBiquadFilter();
+          foamFilter.type = 'highpass';
+          foamFilter.frequency.setValueAtTime(2600, ctx.currentTime);
+          const foamGain = ctx.createGain();
+          foamGain.gain.value = 0.08;
+          foamSrc.connect(foamFilter);
+          foamFilter.connect(foamGain);
+          foamGain.connect(masterGain);
+          foamSrc.start();
+          this.ambientNodes.push(foamSrc);
         }
       } catch (err) {
-        console.warn('Mood audio failed:', err);
+        console.warn('Mood nature audio failed:', err);
       }
     }
   }
@@ -1428,13 +1668,25 @@
       cosmicTimerId = null;
     }
 
-    const candidates = products.filter(p => p.name !== '__system_announcements__' && p.in_stock !== false);
+    const candidates = products.filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__' && p.name !== '__system_orders_meta__' && p.in_stock !== false);
     if (!candidates.length) {
       hero.innerHTML = `<div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="hero-product-empty"><span>✳</span><p>${currentLang === 'ar' ? 'المنتج المميز سيظهر هنا' : 'Featured fragrance will appear here'}</p></div>`;
       return;
     }
 
-    cosmicActivePlanets = candidates.slice(0, 6);
+    // Check if the admin selected specific perfumes for the 3D Cosmic Solar System
+    const adminSolar = candidates.filter(p => {
+      const d = unpackProduct(p);
+      return Boolean(d.in_solar_system || p.in_solar_system);
+    });
+
+    if (adminSolar.length > 0) {
+      // Admin chose exact perfumes for the Solar System (up to 8 planets)
+      cosmicActivePlanets = adminSolar.slice(0, 8);
+    } else {
+      // Automatic graceful fallback to top active perfumes
+      cosmicActivePlanets = candidates.slice(0, 6);
+    }
     const isLight = document.body.classList.contains('light');
     const sunLogoSrc = isLight ? 'assets/branding/1.svg' : 'assets/branding/2.svg';
 
@@ -1929,7 +2181,8 @@
       sale_price:   p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : (meta.sale_price !== undefined ? meta.sale_price : ''),
       discount_percent: p.discount_percent || meta.discount_percent || '',
       discount_badge:   p.discount_badge || meta.discount_badge || '',
-      stock_quantity:   p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : '')
+      stock_quantity:   p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : ''),
+      in_solar_system:  Boolean(p.in_solar_system !== undefined ? p.in_solar_system : meta.in_solar_system)
     };
   }
 
@@ -2450,11 +2703,11 @@
       if (isMoodAudioPlaying) {
         soundToggle.classList.add('playing');
         homeAudio.playMoodAmbient(activeMood || 'winter_cozy');
-        if (soundText) soundText.textContent = isAr ? 'همس الأجواء: شغال' : 'Audio: Playing';
+        if (soundText) soundText.textContent = isAr ? 'همس الطبيعة: شغال 🍃' : 'Nature: Playing 🍃';
       } else {
         soundToggle.classList.remove('playing');
         homeAudio.stopAmbient();
-        if (soundText) soundText.textContent = isAr ? 'همس الأجواء' : 'Atmosphere Audio';
+        if (soundText) soundText.textContent = isAr ? 'همس الطبيعة' : 'Nature Sounds';
       }
     });
   }

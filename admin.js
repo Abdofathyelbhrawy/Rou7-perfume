@@ -1026,6 +1026,8 @@
     }
   }
 
+  let isSolarQuickActive = false;
+
   function renderProductsTable(products) {
     if (products) {
       currentProducts = (products || []).filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__' && p.name !== '__system_orders_meta__');
@@ -1039,6 +1041,14 @@
     // Update Brand Filter dropdown options
     populateBrandSelects();
 
+    // Solar system count badge
+    const solarCount = currentProducts.filter(p => {
+      const d = unpackProductDetails(p);
+      return Boolean(p.in_solar_system || d.in_solar_system);
+    }).length;
+    const solarBadge = $('#solarCountBadge');
+    if (solarBadge) solarBadge.textContent = arabicNum(solarCount);
+
     const searchQuery = ($('#adminProdSearch')?.value || '').trim().toLowerCase();
     const catFilterVal = $('#adminCatFilter')?.value || 'all';
     const brandFilterVal = $('#adminBrandFilter')?.value || 'all';
@@ -1049,8 +1059,11 @@
       const brandName = (p.brand || d.brand || 'رُوح').toLowerCase();
       const pCat = (p.category || 'unisex').toLowerCase();
 
-      // Category matching
-      if (catFilterVal !== 'all') {
+      // Category & Solar matching
+      if (catFilterVal === '__solar__' || isSolarQuickActive) {
+        const inSolar = Boolean(p.in_solar_system || d.in_solar_system);
+        if (!inSolar) return false;
+      } else if (catFilterVal !== 'all') {
         const normCat = (pCat === 'women' || pCat.includes('نسائ')) ? 'women'
           : (pCat === 'men' || pCat.includes('رجال')) ? 'men' : 'unisex';
         if (normCat !== catFilterVal) return false;
@@ -1156,10 +1169,14 @@
               : (adminLang === 'ar' ? 'نفد من المخزون (0)' : 'Out of Stock (0)')}
           </span>
           ${p.is_featured ? `<span class="featured-mark" title="${adminLang === 'ar' ? 'عطر مميز في الواجهة' : 'Featured Hero Fragrance'}">⭐</span>` : ''}
+          ${(p.in_solar_system || d.in_solar_system) ? `<span class="solar-orbit-badge" title="${adminLang === 'ar' ? 'معروض ككوكب في مدار المنظومة الشمسية 🪐' : 'Orbiting in 3D Solar System 🪐'}">🪐 ${adminLang === 'ar' ? 'بالمدار' : 'Orbit'}</span>` : ''}
           ${p.tag ? `<span class="tag-badge">${escapeHtml(p.tag)}</span>` : ''}
         </td>
         <td>
           <div class="action-btns">
+            <button class="btn-action btn-orbit-toggle ${(p.in_solar_system || d.in_solar_system) ? 'in-orbit' : ''}" data-toggle-solar="${p.id}" title="${(p.in_solar_system || d.in_solar_system) ? (adminLang === 'ar' ? 'إزالة من مدار المنظومة الشمسية' : 'Remove from Solar Orbit') : (adminLang === 'ar' ? 'إضافة إلى مدار المنظومة الشمسية' : 'Add to Solar Orbit')}">
+              ${(p.in_solar_system || d.in_solar_system) ? (adminLang === 'ar' ? '🪐 بالمدار' : '🪐 Orbiting') : (adminLang === 'ar' ? '＋ للمدار' : '＋ To Orbit')}
+            </button>
             <button class="btn-action btn-edit" data-edit="${p.id}" title="${adminLang === 'ar' ? 'تعديل' : 'Edit'}">${adminLang === 'ar' ? 'تعديل ✎' : 'Edit ✎'}</button>
             <button class="btn-action btn-delete" data-del="${p.id}" title="${adminLang === 'ar' ? 'حذف' : 'Delete'}">${adminLang === 'ar' ? 'حذف 🗑' : 'Delete 🗑'}</button>
           </div>
@@ -1404,7 +1421,8 @@
       discount_percent: p.discount_percent || meta.discount_percent || '',
       discount_badge:   p.discount_badge || meta.discount_badge || '',
       stock_quantity:   p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : ''),
-      cost_price:       p.cost_price !== undefined && p.cost_price !== null ? p.cost_price : (meta.cost_price !== undefined && meta.cost_price !== null ? meta.cost_price : '')
+      cost_price:       p.cost_price !== undefined && p.cost_price !== null ? p.cost_price : (meta.cost_price !== undefined && meta.cost_price !== null ? meta.cost_price : ''),
+      in_solar_system:  Boolean(p.in_solar_system !== undefined ? p.in_solar_system : meta.in_solar_system)
     };
   }
 
@@ -1492,6 +1510,7 @@
       $('#prodLongevity').value   = details.longevity;
       $('#prodSillage').value     = details.sillage;
       $('#prodFeatured').checked  = Boolean(product.is_featured);
+      if ($('#prodInSolar')) $('#prodInSolar').checked = Boolean(product.in_solar_system || details.in_solar_system);
       $('#prodInStock').checked   = product.in_stock !== false;
       if ($('#prodStockQuantity')) {
         $('#prodStockQuantity').value = details.stock_quantity !== '' && details.stock_quantity !== undefined ? details.stock_quantity : '';
@@ -1523,6 +1542,8 @@
       $('#prodLongevity').value = '3';
       $('#prodSillage').value   = '2';
       $('#prodInStock').checked  = true;
+      if ($('#prodFeatured')) $('#prodFeatured').checked = false;
+      if ($('#prodInSolar')) $('#prodInSolar').checked = false;
       if ($('#prodStockQuantity')) $('#prodStockQuantity').value = '';
 
       if (saleInp) saleInp.value = '';
@@ -1770,8 +1791,50 @@
     }
   });
 
-  // Handle Edit & Delete button clicks inside table
+  // Handle Edit, Delete & Solar Orbit button clicks inside table
   $('#productsTable')?.addEventListener('click', async event => {
+    const solarToggleBtn = event.target.closest('[data-toggle-solar]');
+    if (solarToggleBtn) {
+      const id = solarToggleBtn.dataset.toggleSolar;
+      const product = currentProducts.find(p => String(p.id) === String(id));
+      if (!product) return;
+      const d = unpackProductDetails(product);
+      const currentVal = Boolean(product.in_solar_system || d.in_solar_system);
+      const newVal = !currentVal;
+
+      product.in_solar_system = newVal;
+      try {
+        let meta = {};
+        if (product.notes && typeof product.notes === 'string' && (product.notes.trim().startsWith('{') || product.notes.trim().startsWith('['))) {
+          meta = JSON.parse(product.notes);
+        }
+        meta.in_solar_system = newVal;
+        product.notes = JSON.stringify(meta);
+      } catch (_) {}
+
+      try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
+      renderProductsTable();
+
+      try {
+        try {
+          await supaFetch('products', {
+            method: 'PATCH',
+            filters: `&id=eq.${encodeURIComponent(id)}`,
+            body: { in_solar_system: newVal }
+          });
+        } catch (colErr) {
+          await supaFetch('products', {
+            method: 'PATCH',
+            filters: `&id=eq.${encodeURIComponent(id)}`,
+            body: { notes: product.notes }
+          });
+        }
+      } catch (err) {
+        console.warn('Could not sync solar orbit status to remote database:', err);
+      }
+      return;
+    }
+
     const editBtn = event.target.closest('[data-edit]');
     const delBtn  = event.target.closest('[data-del]');
 
@@ -1934,6 +1997,7 @@
       main_accord: $('#prodMainAccord')?.value || null,
       seasons:     $('#prodSeasons')?.value || null,
       is_featured: $('#prodFeatured').checked,
+      in_solar_system: Boolean($('#prodInSolar')?.checked),
       in_stock:    inStockVal,
       stock_quantity: stockQty,
     };
@@ -1957,7 +2021,7 @@
       } catch (colErr) {
         // إذا لم تكن الأعمدة الجديدة مضافة في Supabase بعد، نحفظها كـ JSON داخل notes تلقائياً
         const errMsg = String(colErr?.message || '');
-        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('cost_price') || errMsg.includes('top_notes') || errMsg.includes('brand') || errMsg.includes('main_accord') || errMsg.includes('seasons') || errMsg.includes('sale_price') || errMsg.includes('discount') || errMsg.includes('stock_quantity')) {
+        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('cost_price') || errMsg.includes('top_notes') || errMsg.includes('brand') || errMsg.includes('main_accord') || errMsg.includes('seasons') || errMsg.includes('sale_price') || errMsg.includes('discount') || errMsg.includes('stock_quantity') || errMsg.includes('in_solar')) {
           console.warn('Columns not yet in Supabase schema, falling back to JSON notes:', colErr);
           const fallbackPayload = {
             name:        payload.name,
@@ -1992,7 +2056,8 @@
               cost_price:   costPrice,
               discount_percent: payload.discount_percent,
               discount_badge: payload.discount_badge,
-              stock_quantity: stockQty
+              stock_quantity: stockQty,
+              in_solar_system: payload.in_solar_system
             }),
           };
           if (id) {
@@ -2608,8 +2673,19 @@
     calculateSalesAnalytics();
   });
   $('#adminProdSearch')?.addEventListener('input', () => renderProductsTable());
-  $('#adminCatFilter')?.addEventListener('change', () => renderProductsTable());
+  $('#adminCatFilter')?.addEventListener('change', () => {
+    isSolarQuickActive = $('#adminCatFilter')?.value === '__solar__';
+    $('#btnSolarQuickFilter')?.classList.toggle('active', isSolarQuickActive);
+    renderProductsTable();
+  });
   $('#adminBrandFilter')?.addEventListener('change', () => renderProductsTable());
+  $('#btnSolarQuickFilter')?.addEventListener('click', () => {
+    isSolarQuickActive = !isSolarQuickActive;
+    $('#btnSolarQuickFilter')?.classList.toggle('active', isSolarQuickActive);
+    const catSel = $('#adminCatFilter');
+    if (catSel) catSel.value = isSolarQuickActive ? '__solar__' : 'all';
+    renderProductsTable();
+  });
 
   // ── Sales Time Filter Buttons Listener ────────────────────────────────────
   $('#salesTimeFilters')?.addEventListener('click', e => {
