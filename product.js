@@ -258,7 +258,8 @@
       sale_price:   p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : (meta.sale_price !== undefined ? meta.sale_price : ''),
       discount_percent: p.discount_percent || meta.discount_percent || '',
       discount_badge:   p.discount_badge || meta.discount_badge || '',
-      brand:        p.brand || meta.brand || ''
+      brand:        p.brand || meta.brand || '',
+      stock_quantity: p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : '')
     };
   }
 
@@ -574,7 +575,56 @@
       if (prodDiscountPill) prodDiscountPill.style.display = 'none';
     }
 
-    $('#prodStockBadge').textContent = (p.in_stock !== false) ? t.stock_in : t.stock_out;
+    const isOutOfStock = (p.in_stock === false) || (d.stock_quantity !== '' && d.stock_quantity !== undefined && parseInt(d.stock_quantity) <= 0);
+    const stockBadge = $('#prodStockBadge');
+    if (stockBadge) {
+      if (isOutOfStock) {
+        stockBadge.textContent = t.stock_out;
+        stockBadge.style.color = '#ff4757';
+        stockBadge.style.background = 'rgba(255, 71, 87, 0.15)';
+      } else {
+        const stockNum = parseInt(d.stock_quantity);
+        if (!isNaN(stockNum) && stockNum <= 5 && stockNum > 0) {
+          stockBadge.textContent = currentLang === 'ar' ? `متبقي في المخزون ${arabicDigits(stockNum)} قطع فقط! ⏳` : `Only ${stockNum} left in stock! ⏳`;
+          stockBadge.style.color = '#ffa502';
+          stockBadge.style.background = 'rgba(255, 165, 2, 0.15)';
+        } else {
+          stockBadge.textContent = t.stock_in;
+          stockBadge.style.color = '';
+          stockBadge.style.background = '';
+        }
+      }
+    }
+
+    const pdpAddBagBtn = $('#pdpAddBagBtn');
+    const smAddBtn = $('#smAddBtn');
+    if (isOutOfStock) {
+      if (pdpAddBagBtn) {
+        pdpAddBagBtn.disabled = true;
+        pdpAddBagBtn.style.opacity = '0.65';
+        pdpAddBagBtn.style.cursor = 'not-allowed';
+        pdpAddBagBtn.innerHTML = `<span>${currentLang === 'ar' ? 'نفد من المخزون' : 'Out of Stock'}</span> <span>✕</span>`;
+      }
+      if (smAddBtn) {
+        smAddBtn.disabled = true;
+        smAddBtn.style.opacity = '0.65';
+        smAddBtn.style.cursor = 'not-allowed';
+        smAddBtn.innerHTML = `<span>${currentLang === 'ar' ? 'نفد من المخزون' : 'Out of Stock'}</span> <span>✕</span>`;
+      }
+    } else {
+      if (pdpAddBagBtn) {
+        pdpAddBagBtn.disabled = false;
+        pdpAddBagBtn.style.opacity = '';
+        pdpAddBagBtn.style.cursor = '';
+        pdpAddBagBtn.innerHTML = `<span data-i18n="add_to_bag">${t.add_to_bag}</span> <span>＋</span>`;
+      }
+      if (smAddBtn) {
+        smAddBtn.disabled = false;
+        smAddBtn.style.opacity = '';
+        smAddBtn.style.cursor = '';
+        smAddBtn.innerHTML = `<span data-i18n="add_to_bag">${t.add_to_bag}</span> <span>＋</span>`;
+      }
+    }
 
     // Inspired By Card
     const inspiredCard = $('#pdpInspiredCard');
@@ -989,9 +1039,25 @@
 
   function addToCart(p, qty = 1) {
     if (!p) return;
+    const d = unpackProduct(p);
+    const isOutOfStock = (p.in_stock === false) || (d.stock_quantity !== '' && d.stock_quantity !== undefined && parseInt(d.stock_quantity) <= 0);
+    if (isOutOfStock) {
+      showToast(currentLang === 'ar' ? 'عفواً، هذا العطر غير متوفر في المخزون حالياً' : 'Sorry, this fragrance is currently out of stock');
+      return;
+    }
+
     readCart();
-    const pricing = computeProductPrice(p, campaignSettings);
     const existing = cart.find(item => String(item.id) === String(p.id));
+    const currentQtyInCart = existing ? existing.qty : 0;
+    if (d.stock_quantity !== '' && d.stock_quantity !== undefined && d.stock_quantity !== null) {
+      const maxStock = parseInt(d.stock_quantity) || 0;
+      if (currentQtyInCart + qty > maxStock) {
+        showToast(currentLang === 'ar' ? `عفواً، أقصى كمية متاحة في المخزون هي ${arabicDigits(maxStock)} قطعة فقط` : `Sorry, only ${maxStock} items available in stock`);
+        return;
+      }
+    }
+
+    const pricing = computeProductPrice(p, campaignSettings);
     if (existing) {
       existing.qty += qty;
       existing.price = pricing.price;
@@ -1083,6 +1149,10 @@
     const t = I18N[lang];
     $$('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
+      if (key === 'announcement' && campaignSettings && campaignSettings.top_bar && campaignSettings.top_bar_active !== false) {
+        el.textContent = campaignSettings.top_bar;
+        return;
+      }
       if (t[key]) {
         if (t[key].includes('<') || t[key].includes('&')) {
           el.innerHTML = t[key];
@@ -1192,6 +1262,16 @@
     });
 
     $('#qtyPlus')?.addEventListener('click', () => {
+      if (currentProduct) {
+        const d = unpackProduct(currentProduct);
+        if (d.stock_quantity !== '' && d.stock_quantity !== undefined && d.stock_quantity !== null) {
+          const maxStock = parseInt(d.stock_quantity) || 0;
+          if (currentQty >= maxStock) {
+            showToast(currentLang === 'ar' ? `أقصى كمية متاحة في المخزون هي ${arabicDigits(maxStock)} قطعة` : `Maximum available quantity is ${maxStock}`);
+            return;
+          }
+        }
+      }
       currentQty++;
       $('#qtyDisplay').textContent = currentLang === 'ar' ? arabicDigits(currentQty) : currentQty;
       updateWaOrderLink();
@@ -1219,6 +1299,19 @@
         const step = parseInt(stepBtn.dataset.step) || 0;
         const item = cart.find(i => String(i.id) === String(id));
         if (item) {
+          if (step > 0) {
+            const prod = allProducts.find(p => String(p.id) === String(id));
+            if (prod) {
+              const d = unpackProduct(prod);
+              if (d.stock_quantity !== '' && d.stock_quantity !== undefined && d.stock_quantity !== null) {
+                const maxStock = parseInt(d.stock_quantity) || 0;
+                if (item.qty + step > maxStock) {
+                  showToast(currentLang === 'ar' ? `عفواً، أقصى كمية متاحة في المخزون هي ${arabicDigits(maxStock)} قطعة` : `Sorry, only ${maxStock} items available in stock`);
+                  return;
+                }
+              }
+            }
+          }
           item.qty += step;
           if (item.qty <= 0) cart = cart.filter(i => String(i.id) !== String(id));
           saveCart();

@@ -524,14 +524,26 @@
       } catch (_) {}
 
       try {
-        await supaFetch('products?name=eq.__system_announcements__', {
+        const updatedRows = await supaFetch('products', {
           method: 'PATCH',
+          filters: '&name=eq.__system_announcements__',
           body: {
             notes: JSON.stringify(updatedCampaign),
             category: 'unisex',
             in_stock: false
           }
         });
+        if (!updatedRows || !updatedRows.length) {
+          await supaFetch('products', {
+            method: 'POST',
+            body: {
+              name: '__system_announcements__',
+              category: 'unisex',
+              in_stock: false,
+              notes: JSON.stringify(updatedCampaign)
+            }
+          });
+        }
         if (status) {
           status.className = 'saved';
           status.textContent = 'تم حفظ ونشر الإعلانات وعطر اليوم بنجاح في المتجر! ✓';
@@ -795,7 +807,13 @@
         <td>${priceCellHtml}</td>
         <td><span style="font-size:10px;color:var(--muted);">${escapeHtml(displayNotes)}</span></td>
         <td>
-          <span class="stock-tag ${p.in_stock !== false ? 'in' : 'out'}">${p.in_stock !== false ? (adminLang === 'ar' ? 'متوفر ✓' : 'In Stock ✓') : (adminLang === 'ar' ? 'غير متوفر' : 'Out of Stock')}</span>
+          <span class="stock-tag ${p.in_stock !== false && (d.stock_quantity === '' || d.stock_quantity === undefined || parseInt(d.stock_quantity) > 0) ? 'in' : 'out'}">
+            ${p.in_stock !== false && (d.stock_quantity === '' || d.stock_quantity === undefined || parseInt(d.stock_quantity) > 0)
+              ? (d.stock_quantity !== '' && d.stock_quantity !== undefined
+                  ? `${adminLang === 'ar' ? 'متوفر' : 'In Stock'} (${arabicNum(d.stock_quantity)} ${adminLang === 'ar' ? 'قطعة' : 'pcs'})`
+                  : (adminLang === 'ar' ? 'متوفر ✓' : 'In Stock ✓'))
+              : (adminLang === 'ar' ? 'نفد من المخزون (0)' : 'Out of Stock (0)')}
+          </span>
           ${p.is_featured ? `<span class="featured-mark" title="${adminLang === 'ar' ? 'عطر مميز في الواجهة' : 'Featured Hero Fragrance'}">⭐</span>` : ''}
           ${p.tag ? `<span class="tag-badge">${escapeHtml(p.tag)}</span>` : ''}
         </td>
@@ -1043,7 +1061,8 @@
       seasons:      p.seasons || meta.seasons || '',
       sale_price:   p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : (meta.sale_price !== undefined ? meta.sale_price : ''),
       discount_percent: p.discount_percent || meta.discount_percent || '',
-      discount_badge:   p.discount_badge || meta.discount_badge || ''
+      discount_badge:   p.discount_badge || meta.discount_badge || '',
+      stock_quantity:   p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : '')
     };
   }
 
@@ -1105,6 +1124,9 @@
       $('#prodSillage').value     = details.sillage;
       $('#prodFeatured').checked  = Boolean(product.is_featured);
       $('#prodInStock').checked   = product.in_stock !== false;
+      if ($('#prodStockQuantity')) {
+        $('#prodStockQuantity').value = details.stock_quantity !== '' && details.stock_quantity !== undefined ? details.stock_quantity : '';
+      }
 
       // Discount inputs
       if (saleInp) saleInp.value = details.sale_price || '';
@@ -1130,6 +1152,7 @@
       $('#prodLongevity').value = '3';
       $('#prodSillage').value   = '2';
       $('#prodInStock').checked  = true;
+      if ($('#prodStockQuantity')) $('#prodStockQuantity').value = '';
 
       if (saleInp) saleInp.value = '';
       if (pctInp) pctInp.value = '';
@@ -1205,6 +1228,18 @@
         activeList.push(b.dataset.season);
       });
       if ($('#prodSeasons')) $('#prodSeasons').value = activeList.join(',');
+    }
+  });
+
+  $('#prodStockQuantity')?.addEventListener('input', e => {
+    const val = e.target.value.trim();
+    if (val !== '') {
+      const num = parseInt(val);
+      if (num <= 0) {
+        if ($('#prodInStock')) $('#prodInStock').checked = false;
+      } else {
+        if ($('#prodInStock')) $('#prodInStock').checked = true;
+      }
     }
   });
 
@@ -1474,6 +1509,9 @@
     const validSalePrice = (!isNaN(rawSale) && rawSale > 0 && rawSale < rawPrice) ? rawSale : null;
     const validBadge = $('#prodDiscountBadge')?.value.trim() || null;
     const validPercent = validSalePrice ? Math.round(((rawPrice - validSalePrice) / rawPrice) * 100) : null;
+    const rawStock = $('#prodStockQuantity')?.value.trim();
+    const stockQty = rawStock !== '' ? Math.max(0, parseInt(rawStock) || 0) : null;
+    const inStockVal = stockQty !== null ? (stockQty > 0 && $('#prodInStock').checked) : $('#prodInStock').checked;
 
     const payload = {
       name:        $('#prodName').value.trim(),
@@ -1497,7 +1535,8 @@
       main_accord: $('#prodMainAccord')?.value || null,
       seasons:     $('#prodSeasons')?.value || null,
       is_featured: $('#prodFeatured').checked,
-      in_stock:    $('#prodInStock').checked,
+      in_stock:    inStockVal,
+      stock_quantity: stockQty,
     };
 
     try {
@@ -1519,7 +1558,7 @@
       } catch (colErr) {
         // إذا لم تكن الأعمدة الجديدة مضافة في Supabase بعد، نحفظها كـ JSON داخل notes تلقائياً
         const errMsg = String(colErr?.message || '');
-        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('top_notes') || errMsg.includes('brand') || errMsg.includes('main_accord') || errMsg.includes('seasons') || errMsg.includes('sale_price') || errMsg.includes('discount')) {
+        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('top_notes') || errMsg.includes('brand') || errMsg.includes('main_accord') || errMsg.includes('seasons') || errMsg.includes('sale_price') || errMsg.includes('discount') || errMsg.includes('stock_quantity')) {
           console.warn('Columns not yet in Supabase schema, falling back to JSON notes:', colErr);
           const fallbackPayload = {
             name:        payload.name,
@@ -1544,7 +1583,8 @@
               seasons:      payload.seasons,
               sale_price:   payload.sale_price,
               discount_percent: payload.discount_percent,
-              discount_badge: payload.discount_badge
+              discount_badge: payload.discount_badge,
+              stock_quantity: stockQty
             }),
           };
           if (id) {

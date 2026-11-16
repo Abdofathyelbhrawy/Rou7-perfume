@@ -461,6 +461,10 @@
     // Apply translations across all tagged elements
     $$('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
+      if (key === 'announcement' && currentAnnouncements && currentAnnouncements.top_bar && currentAnnouncements.top_bar_active !== false) {
+        el.textContent = currentAnnouncements.top_bar;
+        return;
+      }
       if (t[key]) {
         if (t[key].includes('<') || t[key].includes('&')) {
           el.innerHTML = t[key];
@@ -1378,7 +1382,8 @@
       seasons:      p.seasons || meta.seasons || '',
       sale_price:   p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : (meta.sale_price !== undefined ? meta.sale_price : ''),
       discount_percent: p.discount_percent || meta.discount_percent || '',
-      discount_badge:   p.discount_badge || meta.discount_badge || ''
+      discount_badge:   p.discount_badge || meta.discount_badge || '',
+      stock_quantity:   p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : '')
     };
   }
 
@@ -1973,9 +1978,13 @@
           const prodSub  = currentLang === 'en' ? (product.latin ? product.name : '') : (product.latin || '');
           const prodBrand = d.brand || 'رُوح';
 
-          const tagHtml = pricing.hasDiscount
-            ? `<span class="product-tag tag-discount">${escapeHtml(pricing.discountBadge)}</span>`
-            : (product.tag ? `<span class="product-tag">${escapeHtml(product.tag)}</span>` : '');
+          const isOutOfStock = product.in_stock === false || (d.stock_quantity !== '' && d.stock_quantity !== undefined && parseInt(d.stock_quantity) <= 0);
+
+          const tagHtml = isOutOfStock
+            ? `<span class="product-tag out-of-stock" style="background:#ff4757; color:#fff;">${currentLang === 'ar' ? 'نفد من المخزون' : 'Out of Stock'}</span>`
+            : (pricing.hasDiscount
+                ? `<span class="product-tag tag-discount">${escapeHtml(pricing.discountBadge)}</span>`
+                : (product.tag ? `<span class="product-tag">${escapeHtml(product.tag)}</span>` : ''));
 
           const priceHtml = pricing.hasDiscount
             ? `<div class="product-price-wrap">
@@ -1983,6 +1992,10 @@
                 <del class="product-old-price">${money(pricing.originalPrice)}</del>
                </div>`
             : `<span class="product-price-val">${money(pricing.price)}</span>`;
+
+          const quickAddBtnHtml = isOutOfStock
+            ? `<button class="quick-add disabled" type="button" disabled style="opacity: 0.65; cursor: not-allowed; background: rgba(0,0,0,0.6);">${currentLang === 'ar' ? 'نفد من المخزون' : 'Out of Stock'} <span>✕</span></button>`
+            : `<button class="quick-add" data-add="${product.id}" type="button">${t.quick_add} <span>＋</span></button>`;
 
           // Key notes preview
           let notesPreview = '';
@@ -2006,7 +2019,7 @@
                 ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}" loading="lazy">` : ''}
               </a>
               ${tagHtml}
-              <button class="quick-add" data-add="${product.id}" type="button">${t.quick_add} <span>＋</span></button>
+              ${quickAddBtnHtml}
             </div>
             <div class="product-info">
               <span class="card-brand-badge" data-brand-filter="${escapeHtml(prodBrand)}">${escapeHtml(prodBrand)}</span>
@@ -2303,10 +2316,28 @@
 
   function addToCart(id, originBtn = null, customPrice = null) {
     const product = products.find(p => String(p.id) === String(id));
-    const pricing = product ? computeProductPrice(product) : null;
-    const finalPrice = customPrice !== null ? customPrice : (pricing && pricing.hasDiscount ? pricing.price : null);
+    if (!product) return;
+
+    const d = unpackProduct(product);
+    const isOutOfStock = product.in_stock === false || (d.stock_quantity !== '' && d.stock_quantity !== undefined && parseInt(d.stock_quantity) <= 0);
+    if (isOutOfStock) {
+      showToast(currentLang === 'ar' ? 'عفواً، هذا العطر غير متوفر في المخزون حالياً' : 'Sorry, this fragrance is currently out of stock');
+      return;
+    }
 
     const row = cart.find(item => String(item.id) === String(id));
+    const currentQtyInCart = row ? row.qty : 0;
+    if (d.stock_quantity !== '' && d.stock_quantity !== undefined) {
+      const maxStock = parseInt(d.stock_quantity) || 0;
+      if (currentQtyInCart + 1 > maxStock) {
+        showToast(currentLang === 'ar' ? `عفواً، أقصى كمية متاحة في المخزون هي ${formatDigits(maxStock)} قطعة فقط` : `Sorry, only ${maxStock} items available in stock`);
+        return;
+      }
+    }
+
+    const pricing = computeProductPrice(product);
+    const finalPrice = customPrice !== null ? customPrice : (pricing && pricing.hasDiscount ? pricing.price : null);
+
     if (row) {
       row.qty++;
       if (finalPrice) row.customPrice = finalPrice;
@@ -2529,7 +2560,22 @@
     const remove = event.target.closest('[data-remove]');
     if (qty) {
       const row = cart.find(item => item.id === qty.dataset.qty);
-      row.qty += Number(qty.dataset.step);
+      if (!row) return;
+      const step = Number(qty.dataset.step);
+      if (step > 0) {
+        const prod = products.find(p => String(p.id) === String(row.id));
+        if (prod) {
+          const d = unpackProduct(prod);
+          if (d.stock_quantity !== '' && d.stock_quantity !== undefined && d.stock_quantity !== null) {
+            const maxStock = parseInt(d.stock_quantity) || 0;
+            if (row.qty + step > maxStock) {
+              showToast(currentLang === 'ar' ? `عفواً، أقصى كمية متاحة في المخزون هي ${formatDigits(maxStock)} قطعة` : `Sorry, only ${maxStock} items available in stock`);
+              return;
+            }
+          }
+        }
+      }
+      row.qty += step;
       if (row.qty <= 0) cart = cart.filter(item => item !== row);
       updateCart();
     }
@@ -2743,6 +2789,45 @@
     } else {
       orderNumber = `RO-${Date.now().toString().slice(-6)}`;
     }
+
+    // Deduct stock for ordered items and mark as out-of-stock if depleted
+    for (const item of items) {
+      const prod = products.find(p => String(p.id) === String(item.id));
+      if (!prod) continue;
+      const d = unpackProduct(prod);
+      if (d.stock_quantity !== '' && d.stock_quantity !== undefined && d.stock_quantity !== null) {
+        const currentStock = parseInt(d.stock_quantity) || 0;
+        const newStock = Math.max(0, currentStock - (parseInt(item.qty) || 1));
+        const newInStock = newStock > 0;
+
+        prod.in_stock = newInStock;
+        if (prod.stock_quantity !== undefined) prod.stock_quantity = newStock;
+
+        let meta = {};
+        if (prod.notes && typeof prod.notes === 'string' && (prod.notes.trim().startsWith('{') || prod.notes.trim().startsWith('['))) {
+          try { meta = JSON.parse(prod.notes); } catch (_) {}
+        }
+        meta.stock_quantity = newStock;
+        prod.notes = JSON.stringify(meta);
+
+        if (!SUPABASE_URL.includes('YOUR_PROJECT_ID')) {
+          try {
+            await supaFetch('products', {
+              method: 'PATCH',
+              filters: `&id=eq.${encodeURIComponent(prod.id)}`,
+              body: {
+                in_stock: newInStock,
+                notes: prod.notes
+              }
+            });
+          } catch (stkErr) {
+            console.warn('Stock deduction error in Supabase:', stkErr);
+          }
+        }
+      }
+    }
+    try { localStorage.setItem('rooh-cached-products', JSON.stringify(products)); } catch (_) {}
+    renderProducts();
 
     try { localStorage.setItem('rooh-last-order', JSON.stringify({ id: orderNumber, createdAt: new Date().toISOString(), items, total })); } catch (_) {}
 

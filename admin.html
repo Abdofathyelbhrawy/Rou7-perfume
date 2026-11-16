@@ -463,14 +463,25 @@
               <input id="prodImageManual" type="url" placeholder="https://... رابط صورة">
             </label>
           </div>
-          <div class="form-checks">
+          <div class="form-section-title">📦 إدارة المخزون والكميات (Inventory & Stock)</div>
+          <div class="form-row">
+            <label>الكمية المتاحة في المخزون (عدد القطع)
+              <input id="prodStockQuantity" name="stock_quantity" type="number" min="0" step="1" placeholder="مثال: 15 (اتركه فارغاً لكمية مفتوحة)">
+            </label>
+            <div style="display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 6px;">
+              <label class="check-label" style="margin: 0; align-items: center; gap: 8px;">
+                <input id="prodInStock" name="in_stock" type="checkbox" checked>
+                <span style="font-weight: 600;">متوفر للطلب في المتجر (In Stock)</span>
+              </label>
+              <small style="color: var(--admin-muted); font-size: 11px; margin-top: 4px;">
+                💡 يتم تحويل العطر تلقائياً إلى (نفد من المخزون) عند وصول عدد القطع إلى 0 أو استنفاد الكمية بالطلبات.
+              </small>
+            </div>
+          </div>
+          <div class="form-checks" style="margin-top: 4px;">
             <label class="check-label">
               <input id="prodFeatured" name="is_featured" type="checkbox">
               <span>إبراز كعطر مميز في واجهة المتجر (Hero)</span>
-            </label>
-            <label class="check-label">
-              <input id="prodInStock" name="in_stock" type="checkbox" checked>
-              <span>متوفر في المخزون</span>
             </label>
           </div>
           <div class="form-actions">
