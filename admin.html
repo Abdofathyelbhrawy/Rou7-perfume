@@ -320,13 +320,21 @@
               </select>
             </label>
             <label>البراند / الماركة (Brand) *
-              <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px;">
-                <select id="prodBrand" name="brand" required style="flex: 1;">
+              <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap;">
+                <select id="prodBrand" name="brand" required style="flex: 1; min-width: 140px;">
                   <option value="">-- اختر البراند --</option>
                 </select>
-                <button type="button" class="button button-outline" id="quickAddBrandBtn" title="إضافة ماركة جديدة فوراً" style="padding: 9px 12px; font-size: 12px; white-space: nowrap; cursor: pointer;">
-                  <span>＋</span> جديد
-                </button>
+                <div style="display: inline-flex; gap: 4px; align-items: center;">
+                  <button type="button" class="button button-outline" id="quickAddBrandBtn" title="إضافة ماركة جديدة فوراً" style="padding: 7px 10px; font-size: 11.5px; white-space: nowrap; cursor: pointer;">
+                    <span>＋</span> جديد
+                  </button>
+                  <button type="button" class="button button-outline" id="quickEditBrandBtn" title="تعديل الماركة المحددة حالياً في القائمة" style="padding: 7px 10px; font-size: 11.5px; white-space: nowrap; cursor: pointer;">
+                    <span>✏️</span> تعديل
+                  </button>
+                  <button type="button" class="button button-outline" id="quickDeleteBrandBtn" title="حذف الماركة المحددة حالياً من القائمة" style="padding: 7px 10px; font-size: 11.5px; white-space: nowrap; cursor: pointer; color: #ff7675; border-color: rgba(255,118,117,0.35);">
+                    <span>🗑️</span> حذف
+                  </button>
+                </div>
               </div>
             </label>
           </div>
@@ -352,11 +360,25 @@
             </div>
             <div id="prodDiscountFeedback" style="font-size: 11.5px; color: var(--admin-accent); padding: 4px 6px; display: none;"></div>
           </div>
-          <label>الوصف العام للعطر
-            <textarea id="prodNotes" name="notes" rows="2" placeholder="مثال: عطر خشبي حلو، نوتات صالحة للأكل كالفانيليا والتونكا والكراميل. دافئ وإدماني."></textarea>
-          </label>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; margin-bottom: 4px;">
+            <label style="margin: 0; font-weight: 500;">الوصف العام للعطر (Description)</label>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="button button-outline" id="btnTranslateDescAr" style="padding: 4px 9px; font-size: 11px; cursor: pointer;" title="ترجمة الوصف المكتوب إلى العربية فورياً">
+                <span>🌐</span> ترجم للعربية
+              </button>
+              <button type="button" class="button button-outline" id="btnTranslateDescEn" style="padding: 4px 9px; font-size: 11px; cursor: pointer;" title="Translate description to English instantly">
+                <span>🌐</span> To English
+              </button>
+            </div>
+          </div>
+          <textarea id="prodNotes" name="notes" rows="3" placeholder="مثال: عطر خشبي حلو، نوتات صالحة للأكل كالفانيليا والتونكا والكراميل. دافئ وإدماني..."></textarea>
 
-          <div class="form-section-title">🔺 هرم النوتات العطرية (Scent Pyramid)</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; margin-bottom: 6px;">
+            <div class="form-section-title" style="margin: 0;">🔺 هرم النوتات العطرية (Scent Pyramid)</div>
+            <button type="button" class="button button-outline" id="btnTranslateNotesAll" style="padding: 4px 9px; font-size: 11px; cursor: pointer;" title="ترجمة نوتات القمة والقلب والقاعدة تلقائياً بين العربي والإنجليزي">
+              <span>🌐</span> ترجمة النوتات تلقائياً (AR ↔ EN)
+            </button>
+          </div>
           <label>نوتات القمة — Top Notes <small style="opacity:.6">(أول 15 دقيقة)</small>
             <input id="prodTopNotes" name="top_notes" placeholder="مثال: فواكه حمراء، توت، كونياك، جريب فروت (افصل بفاصلة)">
           </label>
@@ -642,6 +664,7 @@
     </div>
   </div>
 
+  <script src="perfume-i18n.js"></script>
   <script src="admin.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
 </body>

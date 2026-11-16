@@ -1626,6 +1626,22 @@
     const stockQty = rawStock !== '' ? Math.max(0, parseInt(rawStock) || 0) : null;
     const inStockVal = stockQty !== null ? (stockQty > 0 && $('#prodInStock').checked) : $('#prodInStock').checked;
 
+    const i18n = window.PerfumeI18n;
+    const rawNotesVal = $('#prodNotes').value.trim() || '';
+    const rawTopVal = $('#prodTopNotes').value.trim() || '';
+    const rawMidVal = $('#prodMiddleNotes').value.trim() || '';
+    const rawBaseVal = $('#prodBaseNotes').value.trim() || '';
+
+    const autoDescAr = i18n ? i18n.translateDesc(rawNotesVal, 'ar', id, $('#prodName').value) : rawNotesVal;
+    const autoDescEn = i18n ? i18n.translateDesc(rawNotesVal, 'en', id, $('#prodLatin').value || $('#prodName').value) : rawNotesVal;
+
+    const autoTopAr = i18n ? i18n.translateNotes(rawTopVal, 'ar') : rawTopVal;
+    const autoTopEn = i18n ? i18n.translateNotes(rawTopVal, 'en') : rawTopVal;
+    const autoMidAr = i18n ? i18n.translateNotes(rawMidVal, 'ar') : rawMidVal;
+    const autoMidEn = i18n ? i18n.translateNotes(rawMidVal, 'en') : rawMidVal;
+    const autoBaseAr = i18n ? i18n.translateNotes(rawBaseVal, 'ar') : rawBaseVal;
+    const autoBaseEn = i18n ? i18n.translateNotes(rawBaseVal, 'en') : rawBaseVal;
+
     const payload = {
       name:        $('#prodName').value.trim(),
       latin:       $('#prodLatin').value.trim() || null,
@@ -1635,12 +1651,12 @@
       discount_percent: validPercent,
       discount_badge:   validBadge,
       category:    $('#prodCategory').value,
-      notes:       $('#prodNotes').value.trim() || null,
+      notes:       rawNotesVal || null,
       image_url:   imageUrl,
       tag:         $('#prodTag').value.trim() || null,
-      top_notes:   $('#prodTopNotes').value.trim() || null,
-      middle_notes:$('#prodMiddleNotes').value.trim() || null,
-      base_notes:  $('#prodBaseNotes').value.trim() || null,
+      top_notes:   rawTopVal || null,
+      middle_notes:rawMidVal || null,
+      base_notes:  rawBaseVal || null,
       inspired_by: $('#prodInspiredBy').value.trim() || null,
       longevity:   parseInt($('#prodLongevity').value) || 3,
       sillage:     parseInt($('#prodSillage').value) || 2,
@@ -1685,9 +1701,17 @@
             notes:       JSON.stringify({
               brand:        payload.brand,
               desc:         payload.notes || '',
+              desc_ar:      autoDescAr,
+              desc_en:      autoDescEn,
               top_notes:    payload.top_notes,
+              top_notes_ar: autoTopAr,
+              top_notes_en: autoTopEn,
               middle_notes: payload.middle_notes,
+              middle_notes_ar: autoMidAr,
+              middle_notes_en: autoMidEn,
               base_notes:   payload.base_notes,
+              base_notes_ar: autoBaseAr,
+              base_notes_en: autoBaseEn,
               inspired_by:  payload.inspired_by,
               longevity:    payload.longevity,
               sillage:      payload.sillage,
@@ -2175,6 +2199,116 @@
   $('#cancelBrandBtn')?.addEventListener('click', closeBrandModal);
   $('#quickAddBrandBtn')?.addEventListener('click', () => openBrandModal());
   $('#refreshBrandsBtn')?.addEventListener('click', () => loadBrandsFromSupa(true));
+
+  // Quick Brand Edit from Product Form
+  $('#quickEditBrandBtn')?.addEventListener('click', () => {
+    const selVal = $('#prodBrand')?.value || '';
+    if (!selVal) {
+      alert(adminLang === 'ar' ? 'يرجى اختيار براند من القائمة أولاً لتعديله.' : 'Please select a brand from the list first to edit.');
+      return;
+    }
+    const bObj = findBrandObject(selVal);
+    if (bObj) {
+      openBrandModal(bObj);
+    } else {
+      alert(adminLang === 'ar' ? `تعذر العثور على بيانات البراند "${selVal}".` : `Brand "${selVal}" not found.`);
+    }
+  });
+
+  // Quick Brand Delete from Product Form
+  $('#quickDeleteBrandBtn')?.addEventListener('click', async () => {
+    const selVal = $('#prodBrand')?.value || '';
+    if (!selVal) {
+      alert(adminLang === 'ar' ? 'يرجى اختيار براند من القائمة أولاً لحذفه.' : 'Please select a brand from the list first to delete.');
+      return;
+    }
+    const bObj = findBrandObject(selVal);
+    const bName = bObj ? (adminLang === 'en' ? (bObj.name_en || bObj.name_ar) : (bObj.name_ar || bObj.name_en)) : selVal;
+    if (confirm(adminLang === 'ar' ? `هل أنت متأكد من حذف براند "${bName}" نهائياً من المتجر؟` : `Are you sure you want to permanently delete brand "${bName}"?`)) {
+      if (bObj) {
+        currentBrands = currentBrands.filter(b => b.id !== bObj.id && b.name_en !== bObj.name_en && b.name_ar !== bObj.name_ar);
+      } else {
+        currentBrands = currentBrands.filter(b => b.name_en.toLowerCase() !== selVal.toLowerCase() && b.name_ar.toLowerCase() !== selVal.toLowerCase());
+      }
+      await saveBrandsToSupa(currentBrands);
+      populateBrandSelects('');
+      renderBrandsTable();
+      const pBrand = $('#prodBrand');
+      if (pBrand) pBrand.value = '';
+      alert(adminLang === 'ar' ? `تم حذف براند "${bName}" بنجاح!` : `Brand "${bName}" deleted successfully!`);
+    }
+  });
+
+  // Auto-translate Description to Arabic
+  $('#btnTranslateDescAr')?.addEventListener('click', () => {
+    const notesEl = $('#prodNotes');
+    if (!notesEl || !notesEl.value.trim()) {
+      alert(adminLang === 'ar' ? 'يرجى كتابة وصف للعطر أولاً لترجمته.' : 'Please enter a description first to translate.');
+      return;
+    }
+    const i18n = window.PerfumeI18n;
+    if (i18n) {
+      const prodName = $('#prodName')?.value || '';
+      const prodId = $('#productId')?.value || '';
+      const translated = i18n.translateDesc(notesEl.value, 'ar', prodId, prodName);
+      if (translated) {
+        notesEl.value = translated;
+        const btn = $('#btnTranslateDescAr');
+        const prev = btn.innerHTML;
+        btn.innerHTML = '<span>✓</span> تم التعريب';
+        setTimeout(() => { btn.innerHTML = prev; }, 1800);
+      }
+    }
+  });
+
+  // Auto-translate Description to English
+  $('#btnTranslateDescEn')?.addEventListener('click', () => {
+    const notesEl = $('#prodNotes');
+    if (!notesEl || !notesEl.value.trim()) {
+      alert(adminLang === 'ar' ? 'يرجى كتابة وصف للعطر أولاً لترجمته.' : 'Please enter a description first to translate.');
+      return;
+    }
+    const i18n = window.PerfumeI18n;
+    if (i18n) {
+      const prodName = $('#prodName')?.value || $('#prodLatin')?.value || '';
+      const prodId = $('#productId')?.value || '';
+      const translated = i18n.translateDesc(notesEl.value, 'en', prodId, prodName);
+      if (translated) {
+        notesEl.value = translated;
+        const btn = $('#btnTranslateDescEn');
+        const prev = btn.innerHTML;
+        btn.innerHTML = '<span>✓</span> Translated';
+        setTimeout(() => { btn.innerHTML = prev; }, 1800);
+      }
+    }
+  });
+
+  // Auto-translate All Notes (Top, Heart, Base)
+  $('#btnTranslateNotesAll')?.addEventListener('click', () => {
+    const topInp = $('#prodTopNotes');
+    const midInp = $('#prodMiddleNotes');
+    const baseInp = $('#prodBaseNotes');
+    const i18n = window.PerfumeI18n;
+    if (!i18n) return;
+
+    const sample = (topInp?.value || '') + (midInp?.value || '') + (baseInp?.value || '');
+    if (!sample.trim()) {
+      alert(adminLang === 'ar' ? 'يرجى إدخال نوتات القمة أو القلب أو القاعدة لترجمتها.' : 'Please enter notes to translate.');
+      return;
+    }
+
+    const hasEnglish = /[a-zA-Z]/.test(sample);
+    const targetLang = hasEnglish ? 'ar' : 'en';
+
+    if (topInp && topInp.value) topInp.value = i18n.translateNotes(topInp.value, targetLang);
+    if (midInp && midInp.value) midInp.value = i18n.translateNotes(midInp.value, targetLang);
+    if (baseInp && baseInp.value) baseInp.value = i18n.translateNotes(baseInp.value, targetLang);
+
+    const btn = $('#btnTranslateNotesAll');
+    const prev = btn.innerHTML;
+    btn.innerHTML = targetLang === 'ar' ? '<span>✓</span> تم تعريب النوتات' : '<span>✓</span> Notes Translated';
+    setTimeout(() => { btn.innerHTML = prev; }, 1800);
+  });
 
   $('#brandsTable')?.addEventListener('click', e => {
     const editBtn = e.target.closest('[data-edit-brand]');

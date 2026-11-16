@@ -844,9 +844,12 @@
 
     if (descEl) {
       if (data.spotlight_desc && data.spotlight_active !== false) {
-        descEl.textContent = data.spotlight_desc;
+        descEl.textContent = currentLang === 'ar'
+          ? (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(data.spotlight_desc, 'ar', target.id, target.name) : data.spotlight_desc)
+          : (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(data.spotlight_desc, 'en', target.id, target.latin || target.name) : data.spotlight_desc);
       } else {
-        descEl.textContent = d.notes || I18N[currentLang].story_text;
+        const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(target, currentLang) : null;
+        descEl.textContent = (localized && localized.desc) ? localized.desc : (d.notes || I18N[currentLang].story_text);
       }
     }
 
@@ -1199,34 +1202,37 @@
     const floatingNotes = [];
     if (d.top_notes) {
       const firstTop = d.top_notes.split(/[,،]/)[0].trim();
+      const localizedTop = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(firstTop, currentLang) : firstTop;
       floatingNotes.push({
         pos: 'fn-pos-1',
         icon: '▲',
         iconClass: 'sp-top',
         phase: currentLang === 'ar' ? 'قمة العطر · Top' : 'TOP NOTE',
-        text: escapeHtml(firstTop),
+        text: escapeHtml(localizedTop),
         popup: currentLang === 'ar' ? 'نفحات افتتاحية منعشة في أول ربع ساعة 🍋' : 'Crisp opening note in first 15 mins'
       });
     }
     if (d.middle_notes) {
       const firstMid = d.middle_notes.split(/[,،]/)[0].trim();
+      const localizedMid = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(firstMid, currentLang) : firstMid;
       floatingNotes.push({
         pos: 'fn-pos-2',
         icon: '■',
         iconClass: 'sp-trapezoid',
         phase: currentLang === 'ar' ? 'قلب العطر · Heart' : 'HEART NOTE',
-        text: escapeHtml(firstMid),
+        text: escapeHtml(localizedMid),
         popup: currentLang === 'ar' ? 'قلب العطر الزهري الآسر حتى 3 ساعات 🌸' : 'Alluring heart note lasting up to 3h'
       });
     }
     if (d.base_notes) {
       const firstBase = d.base_notes.split(/[,،]/)[0].trim();
+      const localizedBase = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(firstBase, currentLang) : firstBase;
       floatingNotes.push({
         pos: 'fn-pos-3',
         icon: '◼',
         iconClass: 'sp-square',
         phase: currentLang === 'ar' ? 'قاعدة العطر · Base' : 'BASE NOTE',
-        text: escapeHtml(firstBase),
+        text: escapeHtml(localizedBase),
         popup: currentLang === 'ar' ? 'قاعدة دافئة غنية تثبت لأكثر من 10 ساعات ✨' : 'Deep warm base resting on skin for 10+ hours'
       });
     }
@@ -1530,7 +1536,8 @@
 
   function renderNotePills(notesStr, defaultColor = '#e2b38b') {
     if (!notesStr) return '';
-    return notesStr.split(',').map(n => n.trim()).filter(Boolean).map(n => {
+    const localizedStr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(notesStr, currentLang) : notesStr;
+    return localizedStr.split(/[,،]/).map(n => n.trim()).filter(Boolean).map(n => {
       const dotCol = getAccordDotColor(n) || defaultColor;
       return `<span class="note-pill"><span class="note-dot" style="background:${dotCol};"></span>${escapeHtml(n)}</span>`;
     }).join('');
@@ -1550,7 +1557,8 @@
 
   function renderAccordPills(accordsStr) {
     if (!accordsStr) return '';
-    return accordsStr.split(',').map(a => a.trim()).filter(Boolean).map(a => {
+    const localizedAccords = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(accordsStr, currentLang) : accordsStr;
+    return localizedAccords.split(/[,،]/).map(a => a.trim()).filter(Boolean).map(a => {
       const lower = a.toLowerCase();
       const isSeason = lower.includes('winter') || lower.includes('fall') || lower.includes('summer') || lower.includes('spring') || lower.includes('شتاء') || lower.includes('خريف') || lower.includes('صيف') || lower.includes('ربيع');
       const dotHtml = isSeason ? '' : `<span class="note-dot" style="background:${getAccordDotColor(a)};"></span>`;
@@ -2217,7 +2225,11 @@
         </div>
       </div>
 
-      ${d.notes ? `<div class="detail-desc-box"><p>${escapeHtml(d.notes)}</p></div>` : ''}
+      ${(() => {
+        const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(product, currentLang) : null;
+        const descText = (localized && localized.desc) ? localized.desc : d.notes;
+        return descText ? `<div class="detail-desc-box"><p>${escapeHtml(descText)}</p></div>` : '';
+      })()}
 
       <div class="detail-sections-grid">
         ${renderScentPyramidHtml(d)}

@@ -661,9 +661,11 @@
     }
 
     // Poetic Description
-    $('#prodDescriptionText').textContent = d.desc || (currentLang === 'ar'
+    const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(p, currentLang) : null;
+    const defaultDesc = currentLang === 'ar'
       ? 'عطر فاخر صُنع بعناية ليعكس حضورك المتميز ويترك أثراً لا يُنسى في كل لحظة.'
-      : 'An exquisite fragrance meticulously blended to reflect your unique presence and leave an indelible impression.');
+      : 'An exquisite fragrance meticulously blended to reflect your unique presence and leave an indelible impression.';
+    $('#prodDescriptionText').textContent = (localized && localized.desc) ? localized.desc : (d.desc || defaultDesc);
 
     // Quick Accords in Hero
     renderHeroAccords(d, p);
@@ -701,7 +703,9 @@
     const container = $('#prodFloatingNotes');
     if (!container) return;
 
-    const rawNotes = `${d.top_notes}, ${d.middle_notes}`.split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
+    const rawStr = `${d.top_notes}, ${d.middle_notes}`;
+    const localizedStr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(rawStr, currentLang) : rawStr;
+    const rawNotes = localizedStr.split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
     const notesToShow = rawNotes.slice(0, 4);
 
     if (!notesToShow.length) {
@@ -779,9 +783,14 @@
       }).join('');
     }
 
-    populateLevel('topPillsContainer', 'topLevelRow', d.top_notes, currentLang === 'ar' ? 'برغموت, هيل, زهور بيضاء' : 'Bergamot, Cardamom, White Flowers');
-    populateLevel('heartPillsContainer', 'heartLevelRow', d.middle_notes, currentLang === 'ar' ? 'فلفل وردي, خشب الأرز, ياسمين' : 'Pink Pepper, Cedarwood, Jasmine');
-    populateLevel('basePillsContainer', 'baseLevelRow', d.base_notes, currentLang === 'ar' ? 'فانيليا, عنبر, خشب الصندل' : 'Vanilla, Amber, Sandalwood');
+    const localized = window.PerfumeI18n && currentProduct ? window.PerfumeI18n.getLocalizedProduct(currentProduct, currentLang) : null;
+    const topNotesToRender = (localized && localized.top_notes) ? localized.top_notes : (window.PerfumeI18n ? window.PerfumeI18n.translateNotes(d.top_notes, currentLang) : d.top_notes);
+    const midNotesToRender = (localized && localized.middle_notes) ? localized.middle_notes : (window.PerfumeI18n ? window.PerfumeI18n.translateNotes(d.middle_notes, currentLang) : d.middle_notes);
+    const baseNotesToRender = (localized && localized.base_notes) ? localized.base_notes : (window.PerfumeI18n ? window.PerfumeI18n.translateNotes(d.base_notes, currentLang) : d.base_notes);
+
+    populateLevel('topPillsContainer', 'topLevelRow', topNotesToRender, currentLang === 'ar' ? 'برغموت، هيل، زهور بيضاء' : 'Bergamot, Cardamom, White Flowers');
+    populateLevel('heartPillsContainer', 'heartLevelRow', midNotesToRender, currentLang === 'ar' ? 'فلفل وردي، خشب الأرز، ياسمين' : 'Pink Pepper, Cedarwood, Jasmine');
+    populateLevel('basePillsContainer', 'baseLevelRow', baseNotesToRender, currentLang === 'ar' ? 'فانيليا، عنبر، خشب الصندل' : 'Vanilla, Amber, Sandalwood');
 
     // Attach click feedback on note pills
     $$('.note-pill').forEach(btn => {
