@@ -307,6 +307,8 @@
     currentBrands = [...DEFAULT_BRANDS];
   }
 
+  let isSolarQuickActive = false;
+
   const campaignKey = 'rooh-campaign-settings';
   const defaultCampaign = {
     top_bar: 'شحن لجميع المحافظات · دفع عند الاستلام · ضمان الثبات والفوحان',
@@ -1025,8 +1027,6 @@
       if (refreshBtn) refreshBtn.classList.remove('spinning');
     }
   }
-
-  let isSolarQuickActive = false;
 
   function renderProductsTable(products) {
     if (products) {
