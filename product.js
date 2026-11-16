@@ -1267,7 +1267,7 @@
     try {
       const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
       if (Array.isArray(cached) && cached.length) {
-        allProducts = cached.filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__');
+        allProducts = cached.filter(p => !p.name.startsWith('__system_'));
       }
     } catch (_) {}
 
@@ -1282,7 +1282,7 @@
     try {
       const liveProducts = await supaFetch('products', { filters: '&in_stock=eq.true&order=sort_order.asc,created_at.desc' });
       if (Array.isArray(liveProducts) && liveProducts.length) {
-        allProducts = liveProducts.filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__');
+        allProducts = liveProducts.filter(p => !p.name.startsWith('__system_'));
         localStorage.setItem(CACHE_KEY, JSON.stringify(liveProducts));
         const match = allProducts.find(p => String(p.id) === String(targetId)) || allProducts[0] || DEFAULT_FALLBACK_PRODUCT;
         renderProductDetails(match);

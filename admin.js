@@ -243,15 +243,30 @@
   }
 
   let currentOrders = [];
+  let deletedOrderIds = new Set();
+  let orderStatusMap = {};
+
   try {
+    const savedDel = JSON.parse(localStorage.getItem('rooh-deleted-orders') || '[]');
+    if (Array.isArray(savedDel)) deletedOrderIds = new Set(savedDel.map(String));
+    const savedStatuses = JSON.parse(localStorage.getItem('rooh-order-statuses') || '{}');
+    if (savedStatuses && typeof savedStatuses === 'object') orderStatusMap = savedStatuses;
+
     const cachedO = localStorage.getItem('rooh-cached-orders');
     if (cachedO) {
       const parsed = JSON.parse(cachedO);
-      if (Array.isArray(parsed) && parsed.length) currentOrders = parsed;
+      if (Array.isArray(parsed) && parsed.length) {
+        currentOrders = parsed
+          .filter(o => !deletedOrderIds.has(String(o.id)))
+          .map(o => {
+            if (orderStatusMap[o.id]) o.status = orderStatusMap[o.id];
+            return o;
+          });
+      }
     }
   } catch (_) {}
   if (!currentOrders.length) {
-    currentOrders = [...DEFAULT_ORDERS];
+    currentOrders = DEFAULT_ORDERS.filter(o => !deletedOrderIds.has(String(o.id)));
   }
 
   // ── Brands Registry Setup ────────────────────────────────────────────────
@@ -725,25 +740,79 @@
     }).join('');
   }
 
-  function loadOrders(isManual = false) {
+  async function persistOrdersMeta() {
+    try {
+      localStorage.setItem('rooh-deleted-orders', JSON.stringify([...deletedOrderIds]));
+      localStorage.setItem('rooh-order-statuses', JSON.stringify(orderStatusMap));
+
+      const metaPayload = {
+        deleted: [...deletedOrderIds],
+        statuses: orderStatusMap
+      };
+
+      if (!SUPABASE_URL.includes('YOUR_PROJECT_ID')) {
+        const updated = await supaFetch('products', {
+          method: 'PATCH',
+          filters: '&name=eq.__system_orders_meta__',
+          body: { notes: JSON.stringify(metaPayload), in_stock: false, price: 0, category: 'unisex' }
+        });
+        if (!updated || !updated.length) {
+          await supaFetch('products', {
+            method: 'POST',
+            body: { name: '__system_orders_meta__', notes: JSON.stringify(metaPayload), in_stock: false, price: 0, category: 'unisex' }
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('Orders meta persist notice:', err);
+    }
+  }
+
+  async function loadOrders(isManual = false) {
     const refreshBtn = $('#refreshOrdersBtn');
     if (refreshBtn && isManual) refreshBtn.classList.add('spinning');
-    supaFetch('orders', { filters: '&order=created_at.desc&limit=50' })
-      .then(renderOrders)
-      .catch(err => {
-        console.error('Admin orders:', err);
-        if (!currentOrders.length) {
-          $('#ordersTable').innerHTML = `<tr><td colspan="7" class="empty-table error">${adminLang === 'ar' ? 'تعذر تحميل الطلبات. تحقق من الاتصال.' : 'Failed to load orders. Check connection.'}</td></tr>`;
+
+    try {
+      // 1. Fetch remote orders metadata (deleted IDs & status overrides)
+      try {
+        const metaRows = await supaFetch('products', { filters: '&name=eq.__system_orders_meta__' });
+        if (metaRows && metaRows.length && metaRows[0].notes) {
+          const meta = JSON.parse(metaRows[0].notes);
+          if (meta.deleted && Array.isArray(meta.deleted)) {
+            meta.deleted.forEach(delId => deletedOrderIds.add(String(delId)));
+            localStorage.setItem('rooh-deleted-orders', JSON.stringify([...deletedOrderIds]));
+          }
+          if (meta.statuses && typeof meta.statuses === 'object') {
+            orderStatusMap = { ...orderStatusMap, ...meta.statuses };
+            localStorage.setItem('rooh-order-statuses', JSON.stringify(orderStatusMap));
+          }
         }
-      })
-      .finally(() => {
-        if (refreshBtn) refreshBtn.classList.remove('spinning');
-      });
+      } catch (_) {}
+
+      // 2. Fetch live orders from Supabase
+      const rawOrders = await supaFetch('orders', { filters: '&order=created_at.desc&limit=100' });
+      if (Array.isArray(rawOrders)) {
+        const filteredOrders = rawOrders
+          .filter(o => !deletedOrderIds.has(String(o.id)))
+          .map(o => {
+            if (orderStatusMap[o.id]) o.status = orderStatusMap[o.id];
+            return o;
+          });
+        renderOrders(filteredOrders);
+      }
+    } catch (err) {
+      console.error('Admin orders fetch error:', err);
+      if (!currentOrders.length) {
+        $('#ordersTable').innerHTML = `<tr><td colspan="7" class="empty-table error">${adminLang === 'ar' ? 'تعذر تحميل الطلبات. تحقق من الاتصال.' : 'Failed to load orders. Check connection.'}</td></tr>`;
+      }
+    } finally {
+      if (refreshBtn) refreshBtn.classList.remove('spinning');
+    }
   }
 
   function renderProductsTable(products) {
     if (products) {
-      currentProducts = (products || []).filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__');
+      currentProducts = (products || []).filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__' && p.name !== '__system_orders_meta__');
       try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
     }
     $('#statProducts').textContent = arabicNum(currentProducts.length);
@@ -1315,7 +1384,7 @@
   $('#btnApplyBulkDiscount')?.addEventListener('click', async () => {
     const rawPct = $('#storewideDiscountPercent')?.value;
     const pct = parseInt(rawPct) || 20;
-    const targetProds = currentProducts.filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__');
+    const targetProds = currentProducts.filter(p => !p.name.startsWith('__system_'));
     if (!targetProds.length) {
       alert('لا توجد عطور حالياً لتطبيق الخصم عليها.');
       return;
@@ -1381,7 +1450,7 @@
   });
 
   $('#btnRemoveBulkDiscounts')?.addEventListener('click', async () => {
-    const targetProds = currentProducts.filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__');
+    const targetProds = currentProducts.filter(p => !p.name.startsWith('__system_'));
     if (!confirm('هل أنت متأكد من إزالة جميع الخصومات من كافة العطور واستعادة أسعارها الأصلية؟')) {
       return;
     }
@@ -1726,17 +1795,22 @@
     select.disabled = true;
 
     try {
-      await supaFetch('orders', {
-        method: 'PATCH',
-        filters: `&id=eq.${encodeURIComponent(id)}`,
-        body: { status: newStatus },
-      });
+      orderStatusMap[id] = newStatus;
       const order = currentOrders.find(o => String(o.id) === String(id));
       if (order) order.status = newStatus;
+      try { localStorage.setItem('rooh-cached-orders', JSON.stringify(currentOrders)); } catch (_) {}
+
+      await persistOrdersMeta();
+
+      try {
+        await supaFetch('orders', {
+          method: 'PATCH',
+          filters: `&id=eq.${encodeURIComponent(id)}`,
+          body: { status: newStatus },
+        });
+      } catch (_) {}
     } catch (err) {
-      alert('تعذر تحديث حالة الطلب: ' + err.message);
-      select.className = previousClass;
-      loadOrders();
+      console.warn('Status change notice:', err);
     } finally {
       select.disabled = false;
     }
@@ -1766,15 +1840,20 @@
       delBtn.textContent = 'جاري الحذف…';
 
       try {
-        await supaFetch('orders', {
-          method: 'DELETE',
-          filters: `&id=eq.${encodeURIComponent(id)}`,
-        });
+        deletedOrderIds.add(String(id));
         currentOrders = currentOrders.filter(o => String(o.id) !== String(id));
         renderOrders(currentOrders);
+
+        await persistOrdersMeta();
+
+        try {
+          await supaFetch('orders', {
+            method: 'DELETE',
+            filters: `&id=eq.${encodeURIComponent(id)}`,
+          });
+        } catch (_) {}
       } catch (err) {
-        alert('تعذر حذف الطلب: ' + err.message);
-        loadOrders();
+        console.warn('Delete order notice:', err);
       }
     }
   });

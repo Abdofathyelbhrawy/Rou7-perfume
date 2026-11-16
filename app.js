@@ -785,7 +785,7 @@
     const storySection = $('#story');
     if (!storySection) return;
 
-    const available = (products || []).filter(p => p.name !== '__system_announcements__' && p.in_stock !== false);
+    const available = (products || []).filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__' && p.name !== '__system_orders_meta__' && p.in_stock !== false);
     if (!available.length) return;
 
     const data = currentAnnouncements || {};
@@ -857,42 +857,70 @@
     const currentPriceEl = $('#storyCurrentPrice');
     const oldPriceEl = $('#storyOldPrice');
     const discountTag = $('#storyDiscountTag');
+    const priceLabel = $('#storyPriceLabel');
+    const quickAddText = $('#storyQuickAddText');
 
     if (box) {
       const isActive = data.spotlight_active !== false;
       box.hidden = !isActive;
       if (isActive) {
-        const specialPrice = Number(data.spotlight_price);
-        const hasDiscount = Boolean(specialPrice && specialPrice < target.price);
-        const activePrice = hasDiscount ? specialPrice : target.price;
+        // Use pricing engine to account for product sale_price, storewide discount, and custom spotlight_price
+        const pricing = computeProductPrice(target, data);
+        const customSpotlightPrice = Number(data.spotlight_price);
+
+        let activePrice = pricing.price;
+        let originalPrice = pricing.originalPrice || target.price;
+        let hasDiscount = pricing.hasDiscount;
+        let discountBadge = pricing.discountBadge;
+        let savedAmount = pricing.savedAmount;
+
+        // Custom spotlight price takes precedence if lower than original price
+        if (customSpotlightPrice && customSpotlightPrice > 0 && customSpotlightPrice < originalPrice) {
+          activePrice = customSpotlightPrice;
+          hasDiscount = true;
+          savedAmount = originalPrice - customSpotlightPrice;
+          const pct = Math.round((savedAmount / originalPrice) * 100);
+          discountBadge = currentLang === 'ar' ? `خصم ${arabicDigits(pct)}%` : `${pct}% OFF`;
+        }
+
+        if (priceLabel) {
+          priceLabel.textContent = hasDiscount
+            ? (I18N[currentLang].spotlight_price_label || (currentLang === 'ar' ? 'السعر بالعرض:' : 'Offer Price:'))
+            : (currentLang === 'ar' ? 'السعر:' : 'Price:');
+        }
 
         if (currentPriceEl) currentPriceEl.textContent = money(activePrice);
 
         if (oldPriceEl) {
-          if (hasDiscount) {
-            oldPriceEl.style.display = '';
-            oldPriceEl.textContent = money(target.price);
+          if (hasDiscount && originalPrice > activePrice) {
+            oldPriceEl.style.display = 'inline-block';
+            oldPriceEl.textContent = money(originalPrice);
           } else {
             oldPriceEl.style.display = 'none';
           }
         }
 
         if (discountTag) {
-          if (hasDiscount) {
-            discountTag.style.display = '';
-            const diff = target.price - specialPrice;
-            const prefix = I18N[currentLang].spotlight_save_prefix || 'وفر';
-            discountTag.textContent = `${prefix} ${money(diff)}`;
+          if (hasDiscount && savedAmount > 0) {
+            discountTag.style.display = 'inline-flex';
+            const saveText = currentLang === 'ar' ? `وفر ${money(savedAmount)}` : `Save ${money(savedAmount)}`;
+            discountTag.textContent = discountBadge ? `${discountBadge} · ${saveText}` : saveText;
           } else {
             discountTag.style.display = 'none';
           }
+        }
+
+        if (quickAddText) {
+          quickAddText.textContent = hasDiscount
+            ? (I18N[currentLang].spotlight_quick_buy || (currentLang === 'ar' ? 'أضف للسلة بالعرض' : 'Add to Bag with Offer'))
+            : (I18N[currentLang].add_to_bag || (currentLang === 'ar' ? 'أضف للسلة' : 'Add to Bag'));
         }
 
         // Action Buttons
         if (quickAddBtn) {
           quickAddBtn.onclick = (e) => {
             e.stopPropagation();
-            addToCart(target.id, quickAddBtn, hasDiscount ? specialPrice : null);
+            addToCart(target.id, quickAddBtn, hasDiscount ? activePrice : null);
           };
         }
         if (detailsBtn) {
@@ -1947,7 +1975,7 @@
 
     const brandMap = new Map();
     products.forEach(p => {
-      if (p.name === '__system_announcements__' || p.name === '__system_brands__' || p.in_stock === false) return;
+      if (p.name.startsWith('__system_') || p.in_stock === false) return;
       const d = unpackProduct(p);
       const rawBrand = (d.brand || 'رُوح').trim();
       const bObj = findBrand(rawBrand);
@@ -1989,7 +2017,7 @@
     }
 
     const visible = products.filter(product => {
-      if (product.name === '__system_announcements__' || product.name === '__system_brands__' || product.in_stock === false) return false;
+      if (product.name.startsWith('__system_') || product.in_stock === false) return false;
       const d = unpackProduct(product);
       const bObj = findBrand(d.brand || product.brand);
       const prodBrandKey = bObj ? (bObj.name_en || bObj.name_ar) : (d.brand || 'رُوح');
@@ -2222,7 +2250,7 @@
 
   window.roohStore = {
     setProducts(rows) {
-      products = Array.isArray(rows) ? rows.filter(p => p.name !== '__system_announcements__' && p.name !== '__system_brands__') : [];
+      products = Array.isArray(rows) ? rows.filter(p => !p.name.startsWith('__system_')) : [];
       try { localStorage.setItem('rooh-cached-products', JSON.stringify(products)); } catch (_) {}
       renderProducts();
       renderHeroProduct();
