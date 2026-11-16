@@ -3284,3 +3284,916 @@ body.light .card-mood-match-pill {
     padding: 2px 6px;
   }
 }
+
+
+/* ==========================================================================
+   COSMIC SOLAR SYSTEM PERFUME SHOWCASE (المنظومة الشمسية العطرية)
+   Brand logo as central radiant sun + Perfumes revolving as celestial planets
+   ========================================================================== */
+
+.cosmic-solar-universe {
+  position: relative;
+  width: 100%;
+  max-width: 1320px;
+  min-height: 620px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  perspective: 1100px;
+  user-select: none;
+  border-radius: 36px;
+  background: radial-gradient(circle at center, rgba(32, 47, 69, 0.45) 0%, rgba(17, 29, 46, 0.25) 55%, transparent 80%);
+  transition: background .45s ease;
+}
+
+body.light .cosmic-solar-universe {
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.65) 0%, rgba(245, 240, 235, 0.4) 55%, transparent 80%);
+}
+
+/* 1. Celestial Star Dust & Nebulae */
+.cosmic-stars-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.c-star {
+  position: absolute;
+  color: var(--pink);
+  opacity: 0.35;
+  font-size: 14px;
+  animation: starTwinkle 4s ease-in-out infinite alternate;
+}
+
+body.light .c-star {
+  color: var(--burgundy);
+  opacity: 0.28;
+}
+
+.c-star.star-1 { top: 12%; right: 18%; font-size: 18px; animation-delay: 0s; }
+.c-star.star-2 { bottom: 18%; left: 14%; font-size: 20px; animation-delay: 1.2s; }
+.c-star.star-3 { top: 22%; left: 22%; font-size: 10px; animation-delay: 2.1s; }
+.c-star.star-4 { bottom: 25%; right: 15%; font-size: 16px; animation-delay: 0.8s; }
+.c-star.star-5 { top: 50%; left: 8%; font-size: 12px; animation-delay: 1.7s; }
+.c-star.star-6 { top: 15%; left: 45%; font-size: 15px; animation-delay: 2.6s; }
+.c-star.star-7 { bottom: 12%; right: 40%; font-size: 17px; animation-delay: 1.4s; }
+.c-star.star-8 { top: 68%; right: 8%; font-size: 11px; animation-delay: 3s; }
+
+@keyframes starTwinkle {
+  0% { transform: scale(0.8); opacity: 0.2; }
+  50% { transform: scale(1.2); opacity: 0.75; }
+  100% { transform: scale(0.9); opacity: 0.3; }
+}
+
+/* 2. Concentric Orbit Tracks */
+.cosmic-orbit-tracks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cosmic-track {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: border-color .4s ease;
+}
+
+.track-1 {
+  width: 420px;
+  height: 200px;
+  border: 1px dashed rgba(245, 165, 173, 0.28);
+  box-shadow: 0 0 20px rgba(245, 165, 173, 0.08);
+}
+
+.track-2 {
+  width: 660px;
+  height: 310px;
+  border: 1px solid rgba(245, 165, 173, 0.22);
+  box-shadow: 0 0 30px rgba(245, 165, 173, 0.06);
+}
+
+.track-3 {
+  width: 880px;
+  height: 410px;
+  border: 1px dashed rgba(245, 165, 173, 0.16);
+}
+
+body.light .track-1 {
+  border-color: rgba(129, 45, 53, 0.22);
+  box-shadow: 0 0 20px rgba(129, 45, 53, 0.06);
+}
+
+body.light .track-2 {
+  border-color: rgba(129, 45, 53, 0.18);
+  box-shadow: 0 0 25px rgba(129, 45, 53, 0.05);
+}
+
+body.light .track-3 {
+  border-color: rgba(129, 45, 53, 0.12);
+}
+
+/* 3. The Central Radiant Sun (شبه الشمس) */
+.cosmic-sun {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 170px;
+  height: 170px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Layer 1: Ambient pulsating solar corona */
+.sun-flare-aura {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 165, 173, 0.45) 0%, rgba(212, 175, 55, 0.26) 38%, rgba(245, 165, 173, 0.1) 60%, transparent 72%);
+  pointer-events: none;
+  animation: sunCoronaBreathe 4.5s ease-in-out infinite alternate;
+}
+
+body.light .sun-flare-aura {
+  background: radial-gradient(circle, rgba(224, 122, 95, 0.38) 0%, rgba(245, 165, 173, 0.28) 40%, rgba(212, 163, 115, 0.12) 62%, transparent 75%);
+}
+
+@keyframes sunCoronaBreathe {
+  0% { transform: scale(0.92); opacity: 0.75; filter: blur(4px); }
+  100% { transform: scale(1.18); opacity: 1; filter: blur(1px); }
+}
+
+/* Layer 2: Rotating solar ray halo */
+.sun-corona-rays {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(245, 165, 173, 0.35), transparent 45deg, rgba(212, 175, 55, 0.32) 90deg, transparent 135deg, rgba(245, 165, 173, 0.35) 180deg, transparent 225deg, rgba(212, 175, 55, 0.32) 270deg, transparent 315deg, rgba(245, 165, 173, 0.35) 360deg);
+  pointer-events: none;
+  animation: sunRaysSpin 28s linear infinite;
+  filter: blur(8px);
+}
+
+body.light .sun-corona-rays {
+  background: conic-gradient(from 0deg, rgba(224, 122, 95, 0.28), transparent 45deg, rgba(212, 163, 115, 0.25) 90deg, transparent 135deg, rgba(224, 122, 95, 0.28) 180deg, transparent 225deg, rgba(212, 163, 115, 0.25) 270deg, transparent 315deg, rgba(224, 122, 95, 0.28) 360deg);
+}
+
+@keyframes sunRaysSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.sun-solar-glow {
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 165, 173, 0.5) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+body.light .sun-solar-glow {
+  background: radial-gradient(circle, rgba(224, 122, 95, 0.35) 0%, transparent 70%);
+}
+
+/* Layer 3: Sun Core Disc */
+.sun-core {
+  position: relative;
+  width: 124px;
+  height: 124px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #24364f 25%, #152236 100%);
+  border: 2px solid rgba(245, 165, 173, 0.65);
+  box-shadow: 0 0 35px rgba(245, 165, 173, 0.55), inset 0 0 20px rgba(212, 175, 55, 0.3), 0 12px 30px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .3s ease, box-shadow .3s ease;
+  z-index: 3;
+}
+
+body.light .sun-core {
+  background: radial-gradient(circle, #ffffff 40%, #fcf7f3 100%);
+  border-color: rgba(129, 45, 53, 0.35);
+  box-shadow: 0 0 32px rgba(224, 122, 95, 0.3), inset 0 0 16px rgba(245, 165, 173, 0.25), 0 12px 28px rgba(66, 44, 36, 0.14);
+}
+
+.cosmic-sun:hover .sun-core {
+  transform: scale(1.08);
+  box-shadow: 0 0 50px rgba(245, 165, 173, 0.8), inset 0 0 25px rgba(212, 175, 55, 0.5);
+}
+
+.cosmic-sun-logo {
+  max-width: 82px;
+  max-height: 82px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: opacity .25s ease, transform .25s ease;
+}
+
+.sun-kicker-pill {
+  position: absolute;
+  top: calc(100% + 12px);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  background: rgba(25, 41, 64, 0.88);
+  border: 1px solid rgba(245, 165, 173, 0.4);
+  color: var(--cream);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  white-space: nowrap;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  transition: all .25s ease;
+  pointer-events: none;
+}
+
+body.light .sun-kicker-pill {
+  background: rgba(255, 253, 251, 0.94);
+  border-color: rgba(129, 45, 53, 0.22);
+  color: var(--navy);
+  box-shadow: 0 8px 22px rgba(66, 44, 36, 0.12);
+}
+
+.sun-kicker-spark {
+  color: var(--pink);
+  font-size: 10px;
+}
+
+body.light .sun-kicker-spark {
+  color: var(--burgundy);
+}
+
+/* 4. Planets Orbit Stage */
+.cosmic-planets-stage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* 5. Planet Element (The Orbiting Perfumes) */
+.cosmic-planet {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120px;
+  height: 175px;
+  margin-left: -60px;
+  margin-top: -87px;
+  pointer-events: auto;
+  cursor: pointer;
+  will-change: transform, opacity;
+  transition: opacity .4s ease, filter .4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.planet-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 6px;
+  transition: transform .35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cosmic-planet:hover .planet-inner {
+  transform: translateY(-8px) scale(1.08);
+}
+
+/* Planetary atmosphere glow */
+.planet-atmosphere {
+  position: absolute;
+  width: 105px;
+  height: 105px;
+  top: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--atm-color, #f5a5ad) 0%, transparent 72%);
+  opacity: 0.35;
+  filter: blur(12px);
+  pointer-events: none;
+  transition: opacity .35s ease, transform .35s ease;
+}
+
+.cosmic-planet:hover .planet-atmosphere {
+  opacity: 0.65;
+  transform: scale(1.25);
+}
+
+/* Perfume Bottle Inside Planet */
+.planet-bottle-wrap {
+  position: relative;
+  z-index: 2;
+  height: 120px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.planet-bottle-img {
+  max-height: 115px;
+  max-width: 82px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.55));
+  transition: transform .35s ease, filter .35s ease;
+  animation: planetHoverFloat 5s ease-in-out infinite alternate;
+}
+
+body.light .planet-bottle-img {
+  filter: drop-shadow(0 14px 22px rgba(66, 44, 36, 0.28));
+}
+
+.cosmic-planet:hover .planet-bottle-img {
+  filter: drop-shadow(0 18px 28px rgba(245, 165, 173, 0.45));
+}
+
+@keyframes planetHoverFloat {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-6px); }
+}
+
+/* Floating Planet Label Tag */
+.planet-tag {
+  position: relative;
+  z-index: 3;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(25, 41, 64, 0.92);
+  border: 1px solid rgba(245, 165, 173, 0.35);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+  max-width: 110px;
+  transition: all .25s ease;
+}
+
+body.light .planet-tag {
+  background: rgba(255, 253, 251, 0.95);
+  border-color: rgba(129, 45, 53, 0.22);
+  box-shadow: 0 6px 16px rgba(66, 44, 36, 0.12);
+}
+
+.planet-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 95px;
+}
+
+.planet-price {
+  font-size: 9.5px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.planet-inspect-hint {
+  position: absolute;
+  top: -24px;
+  opacity: 0;
+  transform: translateY(4px);
+  font-size: 9px;
+  color: var(--pink);
+  background: rgba(17, 29, 46, 0.94);
+  border: 1px solid rgba(245, 165, 173, 0.4);
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: all .25s ease;
+  z-index: 10;
+}
+
+body.light .planet-inspect-hint {
+  color: var(--burgundy);
+  background: rgba(255, 253, 251, 0.95);
+  border-color: rgba(129, 45, 53, 0.3);
+}
+
+.cosmic-planet:hover .planet-inspect-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Planet Dimmed & Focused States */
+.cosmic-planet.planet-dimmed {
+  opacity: 0.18 !important;
+  filter: blur(1.5px) grayscale(0.4);
+  pointer-events: none;
+}
+
+.cosmic-planet.planet-focused {
+  opacity: 1 !important;
+  z-index: 45 !important;
+  pointer-events: auto;
+}
+
+.cosmic-planet.planet-focused .planet-atmosphere {
+  opacity: 0.85;
+  transform: scale(1.6);
+}
+
+.cosmic-planet.planet-focused .planet-bottle-img {
+  filter: drop-shadow(0 24px 38px rgba(245, 165, 173, 0.55));
+}
+
+/* 6. Cosmic Inspector Card HUD (بطاقة فحص النوتات العطرية) */
+.cosmic-inspector-card {
+  position: absolute;
+  z-index: 50;
+  width: 390px;
+  max-width: calc(100vw - 32px);
+  background: rgba(20, 34, 54, 0.94);
+  border: 1px solid rgba(245, 165, 173, 0.42);
+  border-radius: 24px;
+  padding: 22px 24px 18px;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.65), 0 0 35px rgba(245, 165, 173, 0.22);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  color: var(--cream);
+  animation: inspectorSlideIn .38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: auto;
+}
+
+body.light .cosmic-inspector-card {
+  background: rgba(255, 253, 251, 0.96);
+  border-color: rgba(129, 45, 53, 0.25);
+  box-shadow: 0 28px 70px rgba(66, 44, 36, 0.16), 0 0 30px rgba(245, 165, 173, 0.25);
+  color: var(--navy);
+}
+
+@keyframes inspectorSlideIn {
+  from { opacity: 0; transform: scale(0.92) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Inspector Header */
+.inspector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.inspector-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.inspector-pill-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+  background: rgba(245, 165, 173, 0.18);
+  color: var(--pink);
+  border: 1px solid rgba(245, 165, 173, 0.35);
+}
+
+body.light .inspector-pill-badge {
+  background: rgba(129, 45, 53, 0.1);
+  color: var(--burgundy);
+  border-color: rgba(129, 45, 53, 0.25);
+}
+
+.inspector-pill-badge.sale-badge {
+  background: var(--pink);
+  color: var(--navy);
+  border-color: var(--pink);
+  font-weight: 700;
+}
+
+.btn-inspector-close {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.btn-inspector-close:hover {
+  background: var(--pink);
+  color: var(--navy);
+  border-color: var(--pink);
+  transform: rotate(90deg);
+}
+
+/* Inspector Body */
+.inspector-title-wrap {
+  margin-bottom: 14px;
+}
+
+.inspector-perfume-name {
+  font-size: 21px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.inspector-inspired-tag {
+  font-size: 11px;
+  color: var(--accent);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Scent DNA Pyramid Breakdown (نوتات العطر) */
+.inspector-notes-pyramid {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 14px 0 16px;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+}
+
+body.light .inspector-notes-pyramid {
+  background: rgba(25, 41, 64, 0.04);
+}
+
+.inspector-note-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.note-phase-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 90px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.note-phase-icon {
+  font-size: 12px;
+}
+
+.note-pills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  flex: 1;
+}
+
+.scent-note-chip {
+  font-size: 10.5px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+body.light .scent-note-chip {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(25, 41, 64, 0.14);
+}
+
+.note-box-top .note-phase-badge { color: #f5a5ad; }
+.note-box-heart .note-phase-badge { color: #ffd166; }
+.note-box-base .note-phase-badge { color: #64dfdf; }
+
+body.light .note-box-top .note-phase-badge { color: #812d35; }
+body.light .note-box-heart .note-phase-badge { color: #c88719; }
+body.light .note-box-base .note-phase-badge { color: #1e7b85; }
+
+/* Inspector Actions & Price */
+.inspector-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.inspector-price-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.inspector-current-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.inspector-orig-price {
+  font-size: 11px;
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.inspector-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-cosmic-explore {
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: all .25s ease;
+  white-space: nowrap;
+}
+
+.btn-cosmic-explore:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--pink);
+  color: var(--pink);
+}
+
+body.light .btn-cosmic-explore:hover {
+  border-color: var(--burgundy);
+  color: var(--burgundy);
+}
+
+.btn-cosmic-quickadd {
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: var(--pink);
+  color: var(--navy);
+  border: 1px solid var(--pink);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .25s ease;
+  white-space: nowrap;
+}
+
+.btn-cosmic-quickadd:hover {
+  background: #f8b9bf;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(245, 165, 173, 0.45);
+}
+
+/* 7. Inspector Countdown Timer HUD (لمدة معينة من زمن) */
+.inspector-timer-hud {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--line);
+}
+
+body.light .inspector-timer-hud {
+  background: rgba(25, 41, 64, 0.05);
+}
+
+.timer-hud-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.timer-countdown-num {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.cosmic-timer-track {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  position: relative;
+}
+
+body.light .cosmic-timer-track {
+  background: rgba(25, 41, 64, 0.15);
+}
+
+.cosmic-timer-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, var(--pink), #f8b9bf);
+  border-radius: 4px;
+  transition: width 0.05s linear;
+}
+
+body.light .cosmic-timer-bar {
+  background: linear-gradient(90deg, var(--burgundy), #e07a5f);
+}
+
+.btn-timer-hold {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 4px;
+  transition: color .2s ease;
+}
+
+.btn-timer-hold:hover {
+  color: var(--ink);
+}
+
+/* 8. Bottom Cosmic Controls Bar */
+.cosmic-controls-bar {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 95%;
+}
+
+.btn-orbit-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px;
+  border-radius: 20px;
+  background: rgba(25, 41, 64, 0.88);
+  border: 1px solid rgba(245, 165, 173, 0.35);
+  color: var(--cream);
+  font-size: 11px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  transition: all .25s ease;
+  white-space: nowrap;
+}
+
+body.light .btn-orbit-control {
+  background: rgba(255, 253, 251, 0.94);
+  border-color: rgba(129, 45, 53, 0.22);
+  color: var(--navy);
+  box-shadow: 0 6px 18px rgba(66, 44, 36, 0.12);
+}
+
+.btn-orbit-control:hover {
+  background: var(--pink);
+  color: var(--navy);
+  border-color: var(--pink);
+  transform: translateY(-2px);
+}
+
+.cosmic-planet-pills {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cosmic-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 16px;
+  background: rgba(25, 41, 64, 0.75);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: all .2s ease;
+  backdrop-filter: blur(8px);
+}
+
+body.light .cosmic-pill-btn {
+  background: rgba(255, 253, 251, 0.82);
+  color: var(--muted);
+}
+
+.cosmic-pill-btn:hover,
+.cosmic-pill-btn.active {
+  background: rgba(245, 165, 173, 0.25);
+  border-color: var(--pink);
+  color: var(--ink);
+  transform: translateY(-2px);
+}
+
+body.light .cosmic-pill-btn:hover,
+body.light .cosmic-pill-btn.active {
+  background: rgba(129, 45, 53, 0.12);
+  border-color: var(--burgundy);
+  color: var(--navy);
+}
+
+/* ==========================================================================
+   Responsive Adaptations for Cosmic Solar System
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .cosmic-solar-universe {
+    min-height: 560px;
+  }
+  .track-1 { width: 340px; height: 160px; }
+  .track-2 { width: 500px; height: 240px; }
+  .track-3 { width: 680px; height: 320px; }
+  .sun-core { width: 105px; height: 105px; }
+  .cosmic-sun-logo { max-width: 68px; max-height: 68px; }
+  .sun-flare-aura { width: 250px; height: 250px; }
+  .cosmic-planet { width: 100px; height: 150px; margin-left: -50px; margin-top: -75px; }
+  .planet-bottle-img { max-height: 95px; }
+  .cosmic-inspector-card { width: 340px; padding: 18px 20px 14px; }
+}
+
+@media (max-width: 600px) {
+  .cosmic-solar-universe {
+    min-height: 520px;
+    border-radius: 20px;
+  }
+  .track-1 { width: 260px; height: 120px; }
+  .track-2 { width: 360px; height: 170px; }
+  .track-3 { width: 440px; height: 210px; }
+  .sun-core { width: 88px; height: 88px; }
+  .cosmic-sun-logo { max-width: 58px; max-height: 58px; }
+  .sun-flare-aura { width: 200px; height: 200px; }
+  .sun-kicker-pill { font-size: 9.5px; padding: 3px 10px; }
+  .cosmic-planet { width: 80px; height: 130px; margin-left: -40px; margin-top: -65px; }
+  .planet-bottle-img { max-height: 80px; }
+  .planet-tag { padding: 2px 6px; font-size: 9px; }
+  .planet-name { font-size: 9.5px; max-width: 70px; }
+  .planet-price { font-size: 8.5px; }
+  .cosmic-inspector-card {
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
+    z-index: 100;
+    padding: 16px 18px 14px;
+    border-radius: 20px;
+  }
+  .inspector-perfume-name { font-size: 18px; }
+  .inspector-notes-pyramid { margin: 10px 0 12px; padding: 9px 11px; }
+  .note-phase-badge { min-width: 75px; font-size: 9px; }
+  .scent-note-chip { font-size: 9.5px; padding: 1px 6px; }
+  .cosmic-planet-pills { display: none; }
+}

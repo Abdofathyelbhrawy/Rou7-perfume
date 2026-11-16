@@ -569,7 +569,7 @@
 
     // Visual Stage
     const heroImg = $('#prodHeroImage');
-    heroImg.src = p.image_url || 'assets/branding/logo-dark.png';
+    heroImg.src = p.image_url || 'assets/branding/2.svg';
     heroImg.alt = prodName;
 
     const badgeTag = $('#prodBadgeTag');
@@ -698,7 +698,7 @@
     const smThumb = $('#smThumb');
     const smTitle = $('#smTitle');
     const smPrice = $('#smPrice');
-    if (smThumb) smThumb.src = p.image_url || 'assets/branding/logo-dark.png';
+    if (smThumb) smThumb.src = p.image_url || 'assets/branding/2.svg';
     if (smTitle) smTitle.textContent = prodName;
     if (smPrice) {
       smPrice.innerHTML = pricing.hasDiscount

@@ -43,7 +43,7 @@
     document.querySelector('meta[name="theme-color"]').content = next === 'light' ? '#f5f0eb' : '#192940';
     document.querySelectorAll('.brand-logo').forEach(image => {
       const asset = image.dataset[next];
-      if (image.getAttribute('src') === asset) return;
+      if (!asset || image.getAttribute('src') === asset) return;
       image.style.opacity = '0'; setTimeout(() => { image.src = asset; image.style.opacity = '1'; }, 120);
     });
     if (persist) localStorage.setItem('rooh-theme', next);
@@ -276,14 +276,14 @@
       id: 'ibraq',
       name_ar: 'إبراق',
       name_en: 'Ibraq',
-      logo_url: 'assets/branding/logo-dark.png',
+      logo_url: 'assets/branding/2.svg',
       description: 'دار عطور فاخرة تمزج بين الأصالة الشرقية والحداثة.'
     },
     {
       id: 'rooh',
       name_ar: 'رُوح',
       name_en: 'Rou7 Perfume',
-      logo_url: 'assets/branding/logo-dark.png',
+      logo_url: 'assets/branding/2.svg',
       description: 'العلامة الرسمية لمتجر رُوح - عطر يلامس أعماقك.'
     },
     {

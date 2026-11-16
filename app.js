@@ -90,6 +90,20 @@
       spotlight_quick_buy: 'أضف للسلة بالعرض',
       spotlight_explore_notes: 'تحليل النوتات',
       spotlight_save_prefix: 'وفر',
+      cosmic_sun_title: 'رُوح · مدار العطور الشمسي',
+      cosmic_orbit_hint: 'انقر على أي عطر لاستكشاف نوتاته ✦',
+      cosmic_top_title: 'قمة العطر · TOP',
+      cosmic_heart_title: 'قلب العطر · HEART',
+      cosmic_base_title: 'قاعدة العطر · BASE',
+      cosmic_inspired_prefix: 'مستوحى من:',
+      cosmic_explore_btn: 'استكشف هرم النوتات ✦',
+      cosmic_quick_add: 'أضف للسلة بالعرض',
+      cosmic_returning_in: 'العودة للمدار خلال',
+      cosmic_seconds: 'ثوانٍ',
+      cosmic_pause_orbit: 'إيقاف المدار',
+      cosmic_resume_orbit: 'استئناف المدار',
+      cosmic_hold_card: 'تثبيت العرض',
+      cosmic_resume_timer: 'متابعة العداد',
       quote_text: '“بعض الحكايات لا تُروى… <em>بل تُشمّ.</em>”',
       quote_caption: 'رُوح · عطر يلامس أعماقك',
       news_eyebrow: 'رسائل من رُوح',
@@ -215,6 +229,20 @@
       spotlight_quick_buy: 'Add to Bag with Offer',
       spotlight_explore_notes: 'Scent Analysis',
       spotlight_save_prefix: 'Save',
+      cosmic_sun_title: 'Rou7 · Scent Solar Orbit',
+      cosmic_orbit_hint: 'Click any perfume planet to inspect notes ✦',
+      cosmic_top_title: 'Top Notes · TOP',
+      cosmic_heart_title: 'Heart Notes · HEART',
+      cosmic_base_title: 'Base Notes · BASE',
+      cosmic_inspired_prefix: 'Inspired by:',
+      cosmic_explore_btn: 'Explore Scent DNA ✦',
+      cosmic_quick_add: 'Add to Bag',
+      cosmic_returning_in: 'Returning to orbit in',
+      cosmic_seconds: 'seconds',
+      cosmic_pause_orbit: 'Pause Orbit',
+      cosmic_resume_orbit: 'Resume Orbit',
+      cosmic_hold_card: 'Hold View',
+      cosmic_resume_timer: 'Resume Countdown',
       quote_text: '“Some stories aren\'t told… <em>they are smelled.</em>”',
       quote_caption: 'Rou7 · A Scent Touching Your Depths',
       news_eyebrow: 'Letters from Rou7',
@@ -495,7 +523,7 @@
     document.querySelector('meta[name="theme-color"]').content = light ? '#f5f0eb' : '#192940';
     $$('.brand-logo').forEach(image => {
       const next = image.dataset[light ? 'light' : 'dark'];
-      if (image.src.endsWith(next)) return;
+      if (!next || image.src.endsWith(next)) return;
       image.style.opacity = '0';
       window.setTimeout(() => { image.src = next; image.style.opacity = '1'; }, 150);
     });
@@ -1364,10 +1392,41 @@
     return isAr ? 'نوتة عطرية مميزة لشخصية العطر ✦' : 'Signature aromatic note';
   }
 
+  // ── Cosmic Solar System Fragrance Universe (المنظومة الشمسية العطرية) ─────────
+  let cosmicBaseAngle = 0;
+  let cosmicOrbitRunning = true;
+  let cosmicOrbitSpeed = 0.0065;
+  let cosmicRafId = null;
+  let cosmicInspectIndex = -1;
+  let cosmicTimerId = null;
+  let cosmicTimerProgress = 0;
+  let cosmicTimerPaused = false;
+  let cosmicActivePlanets = [];
+  const COSMIC_INSPECT_DURATION = 8000; // 8 seconds countdown
+  const COSMIC_TICK = 50;
+
+  const COSMIC_PLANET_COLORS = [
+    '#f5a5ad', // rose pink
+    '#d4af37', // imperial gold
+    '#64dfdf', // celestial cyan
+    '#e07a5f', // warm amber
+    '#b388ff', // royal violet
+    '#ffd166'  // radiant sunrise
+  ];
+
   function renderHeroProduct(targetIndex = null) {
     const hero = $('#heroProduct');
     if (!hero) return;
     const t = I18N[currentLang];
+
+    if (cosmicRafId) {
+      cancelAnimationFrame(cosmicRafId);
+      cosmicRafId = null;
+    }
+    if (cosmicTimerId) {
+      clearInterval(cosmicTimerId);
+      cosmicTimerId = null;
+    }
 
     const candidates = products.filter(p => p.name !== '__system_announcements__' && p.in_stock !== false);
     if (!candidates.length) {
@@ -1375,252 +1434,424 @@
       return;
     }
 
-    if (targetIndex !== null) {
-      heroCurrentIndex = ((targetIndex % candidates.length) + candidates.length) % candidates.length;
-    } else if (heroCurrentIndex >= candidates.length) {
-      const featIdx = candidates.findIndex(p => p.is_featured);
-      heroCurrentIndex = featIdx >= 0 ? featIdx : 0;
-    }
-
-    const currentProduct = candidates[heroCurrentIndex];
-    const heroPricing = computeProductPrice(currentProduct);
-    const d = unpackProduct(currentProduct);
-    const nameToDisplay = currentLang === 'en' ? (currentProduct.latin || currentProduct.name) : (currentProduct.name || currentProduct.latin);
-    const safeName = escapeHtml(nameToDisplay || 'Rou7');
-    const safeImage = escapeHtml(currentProduct.image_url || '');
-    const cleanDesc = escapeHtml(d.notes || '');
-
-    // Floating notes orbiting around the bottle
-    const floatingNotes = [];
-    if (d.top_notes) {
-      const firstTop = d.top_notes.split(/[,،]/)[0].trim();
-      const localizedTop = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(firstTop, currentLang) : firstTop;
-      floatingNotes.push({
-        pos: 'fn-pos-1',
-        icon: '▲',
-        iconClass: 'sp-top',
-        phase: currentLang === 'ar' ? 'قمة العطر · TOP' : 'TOP NOTE',
-        text: escapeHtml(localizedTop),
-        popup: getNoteContextualPopup(`${firstTop} ${localizedTop}`, 'top', currentLang)
-      });
-    }
-    if (d.middle_notes) {
-      const firstMid = d.middle_notes.split(/[,،]/)[0].trim();
-      const localizedMid = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(firstMid, currentLang) : firstMid;
-      floatingNotes.push({
-        pos: 'fn-pos-2',
-        icon: '■',
-        iconClass: 'sp-trapezoid',
-        phase: currentLang === 'ar' ? 'قلب العطر · HEART' : 'HEART NOTE',
-        text: escapeHtml(localizedMid),
-        popup: getNoteContextualPopup(`${firstMid} ${localizedMid}`, 'middle', currentLang)
-      });
-    }
-    if (d.base_notes) {
-      const firstBase = d.base_notes.split(/[,،]/)[0].trim();
-      const localizedBase = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(firstBase, currentLang) : firstBase;
-      floatingNotes.push({
-        pos: 'fn-pos-3',
-        icon: '◼',
-        iconClass: 'sp-square',
-        phase: currentLang === 'ar' ? 'قاعدة العطر · BASE' : 'BASE NOTE',
-        text: escapeHtml(localizedBase),
-        popup: getNoteContextualPopup(`${firstBase} ${localizedBase}`, 'base', currentLang)
-      });
-    }
-    if (d.inspired_by) {
-      floatingNotes.push({
-        pos: 'fn-pos-4',
-        icon: '✦',
-        iconClass: 'sp-spark',
-        phase: currentLang === 'ar' ? 'مستوحى من' : 'INSPIRED BY',
-        text: escapeHtml(d.inspired_by),
-        popup: currentLang === 'ar' ? 'مستوحى بنفس فخامة وإتقان العطر الأصلي 🏆' : 'Crafted with master inspiration'
-      });
-    } else if (d.accords) {
-      const firstAccord = d.accords.split(/[,،]/)[0].trim();
-      const localizedAccord = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(firstAccord, currentLang) : firstAccord;
-      floatingNotes.push({
-        pos: 'fn-pos-4',
-        icon: '●',
-        iconClass: 'sp-accord',
-        phase: currentLang === 'ar' ? 'الطابع العطري' : 'ACCORD',
-        text: escapeHtml(localizedAccord),
-        popup: getNoteContextualPopup(`${firstAccord} ${localizedAccord}`, 'accord', currentLang)
-      });
-    }
-
-    if (floatingNotes.length === 0 && d.notes) {
-      const parts = d.notes.split(/[,،]/).map(s => s.trim()).filter(Boolean);
-      const icons = ['▲', '■', '◼', '✦'];
-      const iconClasses = ['sp-top', 'sp-trapezoid', 'sp-square', 'sp-spark'];
-      const phases = [
-        currentLang === 'ar' ? 'قمة العطر · TOP' : 'TOP NOTE',
-        currentLang === 'ar' ? 'قلب العطر · HEART' : 'HEART NOTE',
-        currentLang === 'ar' ? 'قاعدة العطر · BASE' : 'BASE NOTE',
-        currentLang === 'ar' ? 'طابع العطر' : 'ACCORD'
-      ];
-      parts.slice(0, 4).forEach((part, idx) => {
-        const localizedPart = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(part, currentLang) : part;
-        const phaseKey = idx === 0 ? 'top' : (idx === 1 ? 'middle' : (idx === 2 ? 'base' : 'accord'));
-        floatingNotes.push({
-          pos: `fn-pos-${idx + 1}`,
-          icon: icons[idx] || '●',
-          iconClass: iconClasses[idx] || 'sp-accord',
-          phase: phases[idx] || 'NOTE',
-          text: escapeHtml(localizedPart),
-          popup: getNoteContextualPopup(`${part} ${localizedPart}`, phaseKey, currentLang)
-        });
-      });
-    }
-
-    const floatingNotesHtml = floatingNotes.map(fn => `
-      <div class="floating-note-badge ${fn.pos}" title="${fn.phase}: ${fn.text}">
-        <span class="fn-badge-icon ${fn.iconClass}">${fn.icon}</span>
-        <div class="fn-badge-text">
-          <small class="fn-badge-phase">${fn.phase}</small>
-          <strong class="fn-badge-name">${fn.text}</strong>
-        </div>
-        ${fn.popup ? `<span class="fn-badge-popup">${fn.popup}</span>` : ''}
-      </div>
-    `).join('');
-
-    const dotsHtml = candidates.length > 1 ? `
-      <div class="hero-carousel-dots" aria-label="${currentLang === 'ar' ? 'مؤشرات العطور' : 'Fragrance indicators'}">
-        ${candidates.map((_, i) => `<button type="button" class="hero-carousel-dot ${i === heroCurrentIndex ? 'active' : ''}" data-hero-dot="${i}" aria-label="${currentLang === 'ar' ? 'عطر ' + (i + 1) : 'Fragrance ' + (i + 1)}"></button>`).join('')}
-      </div>
-    ` : '';
-
-    const navArrowsHtml = candidates.length > 1 ? `
-      <button class="hero-nav-arrow hero-prev" id="heroPrevBtn" type="button" aria-label="${currentLang === 'ar' ? 'العطر السابق' : 'Previous Fragrance'}">‹</button>
-      <button class="hero-nav-arrow hero-next" id="heroNextBtn" type="button" aria-label="${currentLang === 'ar' ? 'العطر التالي' : 'Next Fragrance'}">›</button>
-    ` : '';
+    cosmicActivePlanets = candidates.slice(0, 6);
+    const isLight = document.body.classList.contains('light');
+    const sunLogoSrc = isLight ? 'assets/branding/1.svg' : 'assets/branding/2.svg';
 
     hero.innerHTML = `
-      <div class="hero-orbit orbit-one"></div>
-      <div class="hero-orbit orbit-two"></div>
-      <div class="hero-bottle-halo"></div>
-      <span class="hero-spark spark-one">✳</span>
-      <span class="hero-spark spark-two">✦</span>
+      <div class="cosmic-solar-universe" id="cosmicUniverse">
+        <!-- Celestial Star Dust Background -->
+        <div class="cosmic-stars-layer" aria-hidden="true">
+          <span class="c-star star-1">✦</span>
+          <span class="c-star star-2">✳</span>
+          <span class="c-star star-3">·</span>
+          <span class="c-star star-4">✦</span>
+          <span class="c-star star-5">·</span>
+          <span class="c-star star-6">✳</span>
+          <span class="c-star star-7">✦</span>
+          <span class="c-star star-8">·</span>
+        </div>
 
-      ${navArrowsHtml}
+        <!-- Concentric Orbit Tracks -->
+        <div class="cosmic-orbit-tracks" aria-hidden="true">
+          <div class="cosmic-track track-1"></div>
+          <div class="cosmic-track track-2"></div>
+          <div class="cosmic-track track-3"></div>
+        </div>
 
-      <div class="hero-slide-content hero-slide-fade" key="${currentProduct.id}">
-        <div class="hero-creative-showcase">
-          ${floatingNotesHtml}
-          
-          <div class="hero-bottle-center">
-            ${safeImage ? `<img class="hero-featured-image" src="${safeImage}" alt="${safeName}" fetchpriority="high">` : '<div class="hero-product-empty"><span>✳</span></div>'}
+        <!-- The Central Radiant Sun (شعار رُوح في المركز كالشمس الساطعة) -->
+        <div class="cosmic-sun" id="cosmicSunCenter" role="button" tabindex="0" title="${escapeHtml(t.cosmic_sun_title)}">
+          <div class="sun-flare-aura"></div>
+          <div class="sun-corona-rays"></div>
+          <div class="sun-solar-glow"></div>
+          <div class="sun-core">
+            <img id="cosmicSunLogo" class="brand-logo cosmic-sun-logo"
+                 src="${sunLogoSrc}"
+                 data-dark="assets/branding/2.svg"
+                 data-light="assets/branding/1.svg"
+                 alt="رُوح | Rou7 Perfume">
+          </div>
+          <div class="sun-kicker-pill">
+            <span class="sun-kicker-spark">✦</span>
+            <span data-i18n="cosmic_sun_title">${escapeHtml(t.cosmic_sun_title)}</span>
+            <span class="sun-kicker-spark">✦</span>
           </div>
         </div>
 
-        <div class="hero-product-caption">
-          <span class="hero-caption-kicker">${heroPricing.hasDiscount ? `<strong style="color:var(--pink);">${escapeHtml(heroPricing.discountBadge)}</strong> · ` : ''}${t.hero_featured_tag}</span>
-          <h2 class="hero-caption-title">${safeName}</h2>
-          ${cleanDesc ? `<p class="hero-caption-desc">${cleanDesc}</p>` : ''}
-          <div class="hero-caption-footer">
-            <a class="btn-hero-explore" href="product.html?id=${currentProduct.id}">
-              <span>✦</span> ${currentLang === 'ar' ? 'استكشف هرم النوتات والتحليل' : 'Explore Scent DNA & Notes'}
-            </a>
-            <button class="btn-hero-quickadd" data-add="${currentProduct.id}" type="button">
-              <span>＋</span> ${t.quick_add} · ${money(heroPricing.price)} ${heroPricing.hasDiscount ? `<del style="opacity:0.6; font-size:11px; margin-inline-start:4px;">${money(heroPricing.originalPrice)}</del>` : ''}
-            </button>
+        <!-- Planets Orbit Stage (العطور ككواكب تدور حول الشمس) -->
+        <div class="cosmic-planets-stage" id="cosmicPlanetsStage">
+          ${cosmicActivePlanets.map((p, idx) => {
+            const pPricing = computeProductPrice(p);
+            const pName = currentLang === 'en' ? (p.latin || p.name) : (p.name || p.latin);
+            const safeName = escapeHtml(pName || 'Rou7');
+            const safeImg = escapeHtml(p.image_url || 'assets/branding/2.svg');
+            const pColor = COSMIC_PLANET_COLORS[idx % COSMIC_PLANET_COLORS.length];
+            return `
+              <div class="cosmic-planet" data-planet-index="${idx}" data-product-id="${p.id}" role="button" tabindex="0" title="${safeName} - ${escapeHtml(t.cosmic_orbit_hint)}">
+                <div class="planet-inner">
+                  <div class="planet-atmosphere" style="--atm-color: ${pColor};"></div>
+                  <div class="planet-bottle-wrap">
+                    <img class="planet-bottle-img" src="${safeImg}" alt="${safeName}" loading="eager">
+                  </div>
+                  <div class="planet-tag">
+                    <strong class="planet-name">${safeName}</strong>
+                    <span class="planet-price">${money(pPricing.price)}</span>
+                  </div>
+                  <span class="planet-inspect-hint">${escapeHtml(t.cosmic_orbit_hint)}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- Cosmic Inspector Card HUD (بطاقة النوتات وتفاصيل العطر) -->
+        <div class="cosmic-inspector-card" id="cosmicInspectorCard" hidden></div>
+
+        <!-- Bottom Cosmic Controls Bar -->
+        <div class="cosmic-controls-bar">
+          <button type="button" class="btn-orbit-control" id="btnOrbitToggle" aria-label="${escapeHtml(t.cosmic_pause_orbit)}">
+            <span class="orbit-icon" id="orbitIcon">⏸</span>
+            <span class="orbit-text" id="orbitText">${escapeHtml(t.cosmic_pause_orbit)}</span>
+          </button>
+          <div class="cosmic-planet-pills" id="cosmicPlanetPills">
+            ${cosmicActivePlanets.map((p, idx) => {
+              const pName = currentLang === 'en' ? (p.latin || p.name) : (p.name || p.latin);
+              return `<button type="button" class="cosmic-pill-btn" data-pill-index="${idx}"><span>🪐</span> ${escapeHtml(pName || 'Rou7')}</button>`;
+            }).join('')}
           </div>
-          ${dotsHtml}
-          <div class="hero-timer-track"><div class="hero-timer-bar" id="heroTimerBar"></div></div>
         </div>
       </div>
     `;
 
-    // Event listeners on hero container
-    if (!heroListenersBound) {
-      heroListenersBound = true;
-      hero.addEventListener('mouseenter', () => { heroHovered = true; });
-      hero.addEventListener('mouseleave', () => {
-        heroHovered = false;
-        const bottle = hero.querySelector('.hero-bottle-center');
-        if (bottle) bottle.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1)';
-        const badges = hero.querySelectorAll('.floating-note-badge');
-        badges.forEach(b => { b.style.transform = ''; });
-      });
+    // ── Continuous Planetary Orbit Animation Loop ─────────────────────────────
+    function updateCosmicOrbit() {
+      if (cosmicOrbitRunning && cosmicInspectIndex === -1) {
+        cosmicBaseAngle += cosmicOrbitSpeed;
+      }
 
-      // Interactive 3D mouse parallax on the showcase
-      hero.addEventListener('mousemove', e => {
-        const showcase = hero.querySelector('.hero-creative-showcase');
-        const bottle = hero.querySelector('.hero-bottle-center');
-        if (!showcase || !bottle) return;
-        const rect = showcase.getBoundingClientRect();
-        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        bottle.style.transform = `perspective(1000px) rotateY(${x * 16}deg) rotateX(${-y * 16}deg) scale(1.02)`;
+      const stage = $('#cosmicPlanetsStage');
+      if (stage) {
+        const isMobile = window.innerWidth <= 600;
+        const isTablet = window.innerWidth <= 900;
+        const rx = isMobile ? 138 : (isTablet ? 230 : 330);
+        const ry = isMobile ? 68 : (isTablet ? 115 : 155);
 
-        const badges = showcase.querySelectorAll('.floating-note-badge');
-        badges.forEach((b, idx) => {
-          const mult = (idx % 2 === 0 ? 1 : -1) * ((idx + 1) * 7);
-          b.style.transform = `translate(${x * mult}px, ${y * mult}px)`;
-        });
-      });
+        const planetEls = stage.querySelectorAll('.cosmic-planet');
+        const total = planetEls.length;
 
-      hero.addEventListener('click', e => {
-        const prevBtn = e.target.closest('#heroPrevBtn');
-        if (prevBtn) {
-          e.preventDefault();
-          e.stopPropagation();
-          renderHeroProduct(heroCurrentIndex - 1);
-          return;
-        }
-        const nextBtn = e.target.closest('#heroNextBtn');
-        if (nextBtn) {
-          e.preventDefault();
-          e.stopPropagation();
-          renderHeroProduct(heroCurrentIndex + 1);
-          return;
-        }
-        const dot = e.target.closest('[data-hero-dot]');
-        if (dot) {
-          e.preventDefault();
-          e.stopPropagation();
-          const idx = parseInt(dot.getAttribute('data-hero-dot'), 10);
-          if (!isNaN(idx)) renderHeroProduct(idx);
-          return;
-        }
-      });
-
-      let touchStartX = 0;
-      hero.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
-      }, { passive: true });
-      hero.addEventListener('touchend', e => {
-        const touchEndX = e.changedTouches[0].screenX;
-        const diff = touchEndX - touchStartX;
-        if (Math.abs(diff) > 40) {
-          if (diff > 0) {
-            renderHeroProduct(document.dir === 'rtl' ? heroCurrentIndex + 1 : heroCurrentIndex - 1);
-          } else {
-            renderHeroProduct(document.dir === 'rtl' ? heroCurrentIndex - 1 : heroCurrentIndex + 1);
+        planetEls.forEach((el) => {
+          const pIdx = parseInt(el.dataset.planetIndex, 10);
+          if (cosmicInspectIndex === pIdx) {
+            // Focused planet glides to focal inspection zone
+            const isRtl = document.documentElement.dir === 'rtl';
+            if (isMobile) {
+              el.style.transform = 'translate3d(0, -96px, 0) scale(1.15)';
+            } else {
+              const focalX = isRtl ? 190 : -190;
+              el.style.transform = `translate3d(${focalX}px, 0, 0) scale(1.24)`;
+            }
+            el.style.zIndex = '45';
+            el.style.opacity = '1';
+            return;
           }
-        }
-      }, { passive: true });
+
+          const theta = cosmicBaseAngle + (pIdx * (2 * Math.PI / total));
+          const x = rx * Math.cos(theta);
+          const y = ry * Math.sin(theta);
+          const z = Math.sin(theta); // -1 (back of sun) to +1 (front of sun)
+          const scale = isMobile ? (0.75 + 0.25 * ((z + 1) / 2)) : (0.8 + 0.32 * ((z + 1) / 2));
+          const zIndex = Math.round(10 + z * 8);
+          const opacity = cosmicInspectIndex !== -1 ? 0.16 : (0.78 + 0.22 * ((z + 1) / 2));
+
+          el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(2)})`;
+          el.style.zIndex = String(zIndex);
+          el.style.opacity = String(opacity);
+        });
+      }
+
+      cosmicRafId = requestAnimationFrame(updateCosmicOrbit);
     }
 
-    // Auto rotate every 7 seconds with live timer progress bar
-    clearInterval(heroAutoTimer);
-    let heroProgress = 0;
-    const HERO_DURATION = 7000;
-    const TICK = 60;
-    if (candidates.length > 1) {
-      heroAutoTimer = setInterval(() => {
-        if (!heroHovered) {
-          heroProgress += TICK;
-          const bar = $('#heroTimerBar');
-          if (bar) bar.style.width = `${Math.min((heroProgress / HERO_DURATION) * 100, 100)}%`;
-          if (heroProgress >= HERO_DURATION) {
-            heroProgress = 0;
-            renderHeroProduct(heroCurrentIndex + 1);
+    cosmicRafId = requestAnimationFrame(updateCosmicOrbit);
+
+    // ── Inspection Management (فحص نوتات العطر ثم العودة للمدار) ─────────────
+    function cosmicSelectPlanet(index) {
+      if (index < 0 || index >= cosmicActivePlanets.length) return;
+      cosmicInspectIndex = index;
+      cosmicOrbitRunning = false;
+      cosmicTimerPaused = false;
+
+      const p = cosmicActivePlanets[index];
+      const d = unpackProduct(p);
+      const pPricing = computeProductPrice(p);
+      const isAr = currentLang === 'ar';
+      const pName = isAr ? p.name : (p.latin || p.name);
+      const safeName = escapeHtml(pName || 'Rou7');
+
+      // Update control button
+      const orbitIcon = $('#orbitIcon');
+      const orbitText = $('#orbitText');
+      if (orbitIcon) orbitIcon.textContent = '▶';
+      if (orbitText) orbitText.textContent = t.cosmic_resume_orbit;
+
+      // Update pills
+      $$('.cosmic-pill-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+      });
+
+      // Update planets state
+      $$('.cosmic-planet').forEach((el, i) => {
+        el.classList.toggle('planet-focused', i === index);
+        el.classList.toggle('planet-dimmed', i !== index);
+      });
+
+      // Extract & Translate Fragrance Notes
+      const topRaw = d.top_notes || '';
+      const midRaw = d.middle_notes || '';
+      const baseRaw = d.base_notes || '';
+
+      const topNotesList = topRaw ? topRaw.split(/[,،]/).map(s => s.trim()).filter(Boolean) : [];
+      const midNotesList = midRaw ? midRaw.split(/[,،]/).map(s => s.trim()).filter(Boolean) : [];
+      const baseNotesList = baseRaw ? baseRaw.split(/[,،]/).map(s => s.trim()).filter(Boolean) : [];
+
+      const transNote = raw => window.PerfumeI18n ? window.PerfumeI18n.translateNotes(raw, currentLang) : raw;
+
+      const topNotesHtml = topNotesList.map(n => `<span class="scent-note-chip">${escapeHtml(transNote(n))}</span>`).join('');
+      const midNotesHtml = midNotesList.map(n => `<span class="scent-note-chip">${escapeHtml(transNote(n))}</span>`).join('');
+      const baseNotesHtml = baseNotesList.map(n => `<span class="scent-note-chip">${escapeHtml(transNote(n))}</span>`).join('');
+
+      // Gender Category translation
+      let genderText = isAr ? 'للجميع (Unisex)' : 'Unisex';
+      if (p.gender === 'men' || p.category === 'men') genderText = isAr ? 'عطر رجالي 🎩' : 'For Men 🎩';
+      else if (p.gender === 'women' || p.category === 'women') genderText = isAr ? 'عطر نسائي 🌸' : 'For Her 🌸';
+
+      // Inspired by text
+      const inspiredText = d.inspired_by ? `${t.cosmic_inspired_prefix} ${escapeHtml(d.inspired_by)}` : (isAr ? 'تركيبة استثنائية من دار رُوح ✦' : 'Signature creation by Rou7 ✦');
+
+      // Build Inspector Card HTML
+      const card = $('#cosmicInspectorCard');
+      if (!card) return;
+
+      card.hidden = false;
+      card.innerHTML = `
+        <div class="inspector-header">
+          <div class="inspector-badges-row">
+            <span class="inspector-pill-badge">${genderText}</span>
+            ${pPricing.hasDiscount ? `<span class="inspector-pill-badge sale-badge">${escapeHtml(pPricing.discountBadge)}</span>` : ''}
+          </div>
+          <button type="button" class="btn-inspector-close" id="btnCosmicClose" aria-label="إغلاق والعودة للمدار">✕</button>
+        </div>
+
+        <div class="inspector-title-wrap">
+          <h3 class="inspector-perfume-name">${safeName}</h3>
+          <span class="inspector-inspired-tag"><span>✦</span> ${inspiredText}</span>
+        </div>
+
+        <div class="inspector-notes-pyramid">
+          ${topNotesHtml ? `
+            <div class="inspector-note-box note-box-top">
+              <span class="note-phase-badge"><span class="note-phase-icon">🌸</span> ${t.cosmic_top_title}:</span>
+              <div class="note-pills-list">${topNotesHtml}</div>
+            </div>
+          ` : ''}
+          ${midNotesHtml ? `
+            <div class="inspector-note-box note-box-heart">
+              <span class="note-phase-badge"><span class="note-phase-icon">💖</span> ${t.cosmic_heart_title}:</span>
+              <div class="note-pills-list">${midNotesHtml}</div>
+            </div>
+          ` : ''}
+          ${baseNotesHtml ? `
+            <div class="inspector-note-box note-box-base">
+              <span class="note-phase-badge"><span class="note-phase-icon">🌲</span> ${t.cosmic_base_title}:</span>
+              <div class="note-pills-list">${baseNotesHtml}</div>
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="inspector-footer-bar">
+          <div class="inspector-price-col">
+            <span class="inspector-current-price">${money(pPricing.price)}</span>
+            ${pPricing.hasDiscount ? `<del class="inspector-orig-price">${money(pPricing.originalPrice)}</del>` : ''}
+          </div>
+          <div class="inspector-btn-group">
+            <a class="btn-cosmic-explore" href="product.html?id=${p.id}">${t.cosmic_explore_btn}</a>
+            <button type="button" class="btn-cosmic-quickadd" data-add="${p.id}"><span>＋</span> ${t.cosmic_quick_add}</button>
+          </div>
+        </div>
+
+        <!-- 8-Second Countdown Timer Bar (العودة للمدار بعد مدة معينة) -->
+        <div class="inspector-timer-hud">
+          <div class="timer-hud-info">
+            <span>⏳</span>
+            <span>${t.cosmic_returning_in} <strong class="timer-countdown-num" id="cosmicCountdownNum">8</strong> ${t.cosmic_seconds}</span>
+          </div>
+          <div class="cosmic-timer-track">
+            <div class="cosmic-timer-bar" id="cosmicTimerBar"></div>
+          </div>
+          <button type="button" class="btn-timer-hold" id="btnTimerHold" title="${t.cosmic_hold_card}">⏸</button>
+        </div>
+      `;
+
+      // Position inspector card
+      const isMobile = window.innerWidth <= 600;
+      if (!isMobile) {
+        const isRtl = document.documentElement.dir === 'rtl';
+        card.style.top = '50%';
+        card.style.transform = 'translateY(-50%)';
+        if (isRtl) {
+          card.style.right = 'auto';
+          card.style.left = '40px';
+        } else {
+          card.style.left = 'auto';
+          card.style.right = '40px';
+        }
+      }
+
+      // Start 8-second countdown timer
+      if (cosmicTimerId) clearInterval(cosmicTimerId);
+      cosmicTimerProgress = 0;
+      const timerBar = $('#cosmicTimerBar');
+      const countNum = $('#cosmicCountdownNum');
+
+      cosmicTimerId = setInterval(() => {
+        if (!cosmicTimerPaused) {
+          cosmicTimerProgress += COSMIC_TICK;
+          const remaining = Math.max(0, COSMIC_INSPECT_DURATION - cosmicTimerProgress);
+          const remainingSec = Math.ceil(remaining / 1000);
+          if (countNum) countNum.textContent = String(remainingSec);
+          if (timerBar) {
+            const pct = Math.max(0, (remaining / COSMIC_INSPECT_DURATION) * 100);
+            timerBar.style.width = `${pct}%`;
+          }
+          if (cosmicTimerProgress >= COSMIC_INSPECT_DURATION) {
+            clearInterval(cosmicTimerId);
+            cosmicTimerId = null;
+            cosmicCloseInspection();
           }
         }
-      }, TICK);
+      }, COSMIC_TICK);
+
+      // Card Close Button
+      $('#btnCosmicClose')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        cosmicCloseInspection();
+      });
+
+      // Timer Hold/Pause toggle
+      $('#btnTimerHold')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        cosmicTimerPaused = !cosmicTimerPaused;
+        const btn = $('#btnTimerHold');
+        if (btn) btn.textContent = cosmicTimerPaused ? '▶' : '⏸';
+      });
+
+      // Quick add to cart
+      card.querySelector('.btn-cosmic-quickadd')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        addToCart(p.id, e.currentTarget);
+      });
+    }
+
+    function cosmicCloseInspection() {
+      if (cosmicTimerId) {
+        clearInterval(cosmicTimerId);
+        cosmicTimerId = null;
+      }
+      cosmicInspectIndex = -1;
+      cosmicOrbitRunning = true;
+
+      const card = $('#cosmicInspectorCard');
+      if (card) card.hidden = true;
+
+      // Update control button
+      const orbitIcon = $('#orbitIcon');
+      const orbitText = $('#orbitText');
+      if (orbitIcon) orbitIcon.textContent = '⏸';
+      if (orbitText) orbitText.textContent = t.cosmic_pause_orbit;
+
+      // Remove active classes
+      $$('.cosmic-planet').forEach(el => {
+        el.classList.remove('planet-focused', 'planet-dimmed');
+      });
+      $$('.cosmic-pill-btn').forEach(btn => btn.classList.remove('active'));
+    }
+
+    // ── Bind Interactive Event Listeners ─────────────────────────────────────
+    const universe = $('#cosmicUniverse');
+    if (universe) {
+      // Planet Click Listener
+      universe.addEventListener('click', (e) => {
+        const planet = e.target.closest('.cosmic-planet');
+        if (planet) {
+          e.preventDefault();
+          e.stopPropagation();
+          const idx = parseInt(planet.dataset.planetIndex, 10);
+          if (!isNaN(idx)) {
+            if (cosmicInspectIndex === idx) {
+              cosmicCloseInspection();
+            } else {
+              cosmicSelectPlanet(idx);
+            }
+          }
+          return;
+        }
+
+        const pill = e.target.closest('.cosmic-pill-btn');
+        if (pill) {
+          e.preventDefault();
+          e.stopPropagation();
+          const idx = parseInt(pill.dataset.pillIndex, 10);
+          if (!isNaN(idx)) {
+            if (cosmicInspectIndex === idx) {
+              cosmicCloseInspection();
+            } else {
+              cosmicSelectPlanet(idx);
+            }
+          }
+          return;
+        }
+
+        const orbitToggle = e.target.closest('#btnOrbitToggle');
+        if (orbitToggle) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (cosmicInspectIndex !== -1) {
+            cosmicCloseInspection();
+          } else {
+            cosmicOrbitRunning = !cosmicOrbitRunning;
+            const orbitIcon = $('#orbitIcon');
+            const orbitText = $('#orbitText');
+            if (orbitIcon) orbitIcon.textContent = cosmicOrbitRunning ? '⏸' : '▶';
+            if (orbitText) orbitText.textContent = cosmicOrbitRunning ? t.cosmic_pause_orbit : t.cosmic_resume_orbit;
+          }
+          return;
+        }
+
+        const sunCenter = e.target.closest('#cosmicSunCenter');
+        if (sunCenter) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (cosmicInspectIndex !== -1) {
+            cosmicCloseInspection();
+          } else {
+            // Pulse the sun aura!
+            const aura = sunCenter.querySelector('.sun-flare-aura');
+            if (aura) {
+              aura.style.transform = 'scale(1.4)';
+              setTimeout(() => { aura.style.transform = ''; }, 450);
+            }
+          }
+          return;
+        }
+      });
+    }
+
+    // If specific target index requested, inspect it immediately
+    if (targetIndex !== null && targetIndex >= 0 && targetIndex < cosmicActivePlanets.length) {
+      cosmicSelectPlanet(targetIndex);
     }
   }
 
@@ -1990,7 +2221,7 @@
           const pName = isAr ? p.name : (p.latin || p.name);
           const pSub  = isAr ? (p.latin || '') : (p.latin ? p.name : '');
           const pBrand = d.brand || 'رُوح';
-          const pImg = p.image_url || 'assets/branding/logo-dark.png';
+          const pImg = p.image_url || 'assets/branding/2.svg';
           const pricing = computeProductPrice(p);
 
           const priceHtml = pricing.hasDiscount
