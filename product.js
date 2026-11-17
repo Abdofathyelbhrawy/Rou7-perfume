@@ -226,9 +226,39 @@
     seasons: 'winter,fall,night'
   };
 
-  // ── DOM Helpers ──────────────────────────────────────────────
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => document.querySelectorAll(sel);
+  // ── Safe Fault-Tolerant DOM & Event Helpers ───────────────────
+  const $ = sel => {
+    try { return document.querySelector(sel); } catch (_) { return null; }
+  };
+  const $$ = sel => {
+    try { return [...document.querySelectorAll(sel)]; } catch (_) { return []; }
+  };
+
+  function safeOn(target, event, handler, options) {
+    if (!target) return;
+    try {
+      const elements = typeof target === 'string'
+        ? $$(target)
+        : (target instanceof NodeList || Array.isArray(target) ? target : [target]);
+      elements.forEach(el => {
+        if (el && typeof el.addEventListener === 'function') {
+          el.addEventListener(event, function(e) {
+            try {
+              return handler.call(this, e);
+            } catch (err) {
+              console.warn(`[Product Page Event Notice (${event})]:`, err);
+            }
+          }, options);
+        }
+      });
+    } catch (_) {}
+  }
+
+  // Early loader dismissal failsafe
+  setTimeout(() => {
+    const ldr = document.getElementById('loader');
+    if (ldr && !ldr.classList.contains('done')) ldr.classList.add('done');
+  }, 400);
 
   function escapeHtml(str) {
     return String(str || '')

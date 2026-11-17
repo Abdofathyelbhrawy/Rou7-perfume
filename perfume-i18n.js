@@ -603,13 +603,678 @@
     };
   }
 
+  // ── 5. Built-in Luxury Fragrance Encyclopedia & Intelligent Scent Engine ──────
+  const FAMOUS_ENCYCLOPEDIA = [
+    {
+      keys: ['sauvage', 'سوفاج', 'سافاج'],
+      brand_en: 'Dior',
+      brand_ar: 'ديور',
+      name_en: 'Sauvage',
+      name_ar: 'سوفاج',
+      category: 'men',
+      top_notes: 'برغموت كالابريا، فلفل سيتشوان',
+      middle_notes: 'فلفل وردي، لافندر، نجيل الهند، باتشولي، إبرة الراعي',
+      base_notes: 'أمبروكسان فاخر، خشب الأرز، لابدانيوم',
+      main_accord: 'fresh',
+      accords: ['منعش', 'تابلي حار', 'حمضيات', 'عنبري', 'أروماتك'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'عطر رجالي أيقوني يجسد الانتعاش البري والجاذبية المطلقة، يفتتح بنفحات منعشة من برغموت كالابريا مع لمسة فلفل حار، ويرتكز على قاعدة أمبروكسان وأخشاب الأرز الفاخرة.'
+    },
+    {
+      keys: ['aventus', 'افينتوس', 'أفينتوس'],
+      brand_en: 'Creed',
+      brand_ar: 'كريد',
+      name_en: 'Aventus',
+      name_ar: 'أفينتوس',
+      category: 'men',
+      top_notes: 'أناناس مدخن، برغموت، كشمش أسود، تفاح فرنسي',
+      middle_notes: 'خشب البتولا، باتشولي، ياسمين مغربي، ورد',
+      base_notes: 'مسك فاخر، طحلب البلوط، دهن العنبر، فانيليا',
+      main_accord: 'fruity',
+      accords: ['فاكهي', 'دخاني', 'خشبي', 'حمضيات', 'جلدي'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'عطر القوة والنجاح الملكي، يمزج بين حلاوة الأناناس وانتعاش البرغموت مع عمق خشب البتولا الدخاني والمسك الفاخر.'
+    },
+    {
+      keys: ['baccarat-rouge', 'baccarat-rouge-540', 'باكارا روج', 'بكرات روج'],
+      brand_en: 'Maison Francis Kurkdjian',
+      brand_ar: 'ميزون فرانسيس كوركدجيان',
+      name_en: 'Baccarat Rouge 540',
+      name_ar: 'باكارا روج 540',
+      category: 'unisex',
+      top_notes: 'زعفران أحمر، ياسمين غردينيا',
+      middle_notes: 'خشب العنبر، دهن العنبر الدافئ',
+      base_notes: 'صمغ التنوب، خشب الأرز الأطلسي',
+      main_accord: 'amber',
+      accords: ['عنبري', 'خشبي', 'تابلي دافئ', 'زهري أبيض', 'أروماتك'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'تحفة عطرية كيميائية تفيض بالسحر والفخامة، ينساب فيها عبير الزعفران والعنبر الخشبي ليترك أثراً بلورياً ساحراً لا يُمحى.'
+    },
+    {
+      keys: ['bleu-de-chanel', 'بلو دو شانيل', 'بلو دي شانيل', 'بلو شانيل'],
+      brand_en: 'Chanel',
+      brand_ar: 'شانيل',
+      name_en: 'Bleu de Chanel',
+      name_ar: 'بلو دي شانيل',
+      category: 'men',
+      top_notes: 'جريب فروت، ليمون منعش، نعناع، فلفل وردي',
+      middle_notes: 'زنجبيل، جوزة الطيب، ياسمين، بخور',
+      base_notes: 'بخور شرقي، نجيل الهند، خشب الأرز، خشب الصندل، باتشولي',
+      main_accord: 'citrus',
+      accords: ['حمضيات', 'أروماتك', 'خشبي', 'تابلي دافئ', 'مدخن'],
+      longevity: '4',
+      sillage: '3',
+      desc: 'قصيدة للأناقة والحرية الرجالية، توليفة أروماتية خشبية تجمع بين انتعاش الحمضيات وجاذبية البخور والأخشاب النبيلة.'
+    },
+    {
+      keys: ['oud-wood', 'عود وود', 'توم فورد عود وود'],
+      brand_en: 'Tom Ford',
+      brand_ar: 'توم فورد',
+      name_en: 'Oud Wood',
+      name_ar: 'عود وود',
+      category: 'unisex',
+      top_notes: 'هيل، فلفل سيتشوان، خشب الورد البرازيلي',
+      middle_notes: 'خشب العود النادر، خشب الصندل، نجيل الهند',
+      base_notes: 'فول التونكا، فانيليا، عنبر كهرماني',
+      main_accord: 'woody',
+      accords: ['خشبي', 'عود', 'تابلي دافئ', 'بلسمي', 'أروماتك'],
+      longevity: '4',
+      sillage: '3',
+      desc: 'رائحة العود الغامض في أنقى وأرقى تجلياته، محاطاً بدفء الهيل وخشب الصندل والفانيليا ليمنح حضوراً أرستقراطياً مهيباً.'
+    },
+    {
+      keys: ['tobacco-vanille', 'توباكو فانيل', 'توباكو فانيليا'],
+      brand_en: 'Tom Ford',
+      brand_ar: 'توم فورد',
+      name_en: 'Tobacco Vanille',
+      name_ar: 'توباكو فانيل',
+      category: 'unisex',
+      top_notes: 'أوراق التبغ الإنجليزي، توابل دافئة',
+      middle_notes: 'فانيليا ناعمة، كاكاو، فول التونكا، زهر التبغ',
+      base_notes: 'فواكه مجففة، أخشاب دافئة معتقة',
+      main_accord: 'vanilla',
+      accords: ['فانيليا', 'تبغ', 'حلو', 'تابلي دافئ', 'كاكاو'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'أجواء النوادي اللندنية العريقة في زجاجة، دفء التبغ المترف الممتزج مع حلاوة الفانيليا والكاكاو والفواكه المجففة.'
+    },
+    {
+      keys: ['lost-cherry', 'لوست شيري'],
+      brand_en: 'Tom Ford',
+      brand_ar: 'توم فورد',
+      name_en: 'Lost Cherry',
+      name_ar: 'لوست شيري',
+      category: 'unisex',
+      top_notes: 'كرز أسود، لوز مر، مشروب الليكور الفاخر',
+      middle_notes: 'كرز حامض، برقوق، ورد تركي، ياسمين سمباك',
+      base_notes: 'حبوب التونكا، فانيليا مدغشقر، قرفة، خشب الصندل، أرز',
+      main_accord: 'fruity',
+      accords: ['كرز', 'حلو', 'لوز', 'جوزي', 'فاكهي', 'فانيليا'],
+      longevity: '4',
+      sillage: '3',
+      desc: 'رحلة حسية مثيرة ومغرية، تفوح بنضوج الكرز الأسود المغمور في سحر اللوز والفانيليا والتوابل الفاخرة.'
+    },
+    {
+      keys: ['angels-share', 'angel-share', 'انجلز شير', 'أنجلز شير'],
+      brand_en: 'Kilian',
+      brand_ar: 'كيليان',
+      name_en: "Angels' Share",
+      name_ar: "أنجلز شير",
+      category: 'unisex',
+      top_notes: 'كونياك فاخر معتق',
+      middle_notes: 'قرفة سيلانية، حبوب التونكا، خشب البلوط',
+      base_notes: 'فانيليا، حلوى البرالين، خشب الصندل',
+      main_accord: 'amber',
+      accords: ['تابلي دافئ', 'حلو', 'فانيليا', 'خشبي', 'قرفة'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'مستوحى من إرث الكونياك الفرنسي العريق، تحفة تابلية سكرية تجمع دفء القرفة وحلاوة البرالين وخشب البلوط الفاخر.'
+    },
+    {
+      keys: ['black-phantom', 'بلاك فانتوم'],
+      brand_en: 'Kilian',
+      brand_ar: 'كيليان',
+      name_en: 'Black Phantom',
+      name_ar: 'بلاك فانتوم',
+      category: 'unisex',
+      top_notes: 'مشروب الرم، قصب السكر',
+      middle_notes: 'شوكولاتة داكنة، قهوة سوداء، كراميل، لوز',
+      base_notes: 'خشب الصندل، الهيليوتروب، نجيل الهند',
+      main_accord: 'gourmand',
+      accords: ['حلو', 'شوكولاتة', 'قهوة', 'كراميل', 'تابلي دافئ'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'تجسيد للغموض الجريء والجاذبية الداكنة بنفحات القهوة الإثيوبية والشوكولاتة والكراميل الذائب مع خشب الصندل.'
+    },
+    {
+      keys: ['libre', 'ysl-libre', 'ليبر'],
+      brand_en: 'Yves Saint Laurent',
+      brand_ar: 'إيف سان لوران',
+      name_en: 'Libre',
+      name_ar: 'ليبر',
+      category: 'women',
+      top_notes: 'لافندر فرنسي، يوسفي، كشمش أسود',
+      middle_notes: 'زهر البرتقال المغربي، ياسمين، لافندر',
+      base_notes: 'فانيليا مدغشقر، مسك أبيض، خشب الأرز، عنبر',
+      main_accord: 'floral',
+      accords: ['زهري أبيض', 'حمضيات', 'لافندر', 'فانيليا', 'حلو'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'عطر الحرية والأنوثة الجريئة، يدمج بين نعومة زهر البرتقال المغربي وفخامة اللافندر الفرنسي مع قاعدة فانيليا ساحرة.'
+    },
+    {
+      keys: ['y-eau-de-parfum', 'ysl-y', 'واي إيف سان لوران', 'عطر واي'],
+      brand_en: 'Yves Saint Laurent',
+      brand_ar: 'إيف سان لوران',
+      name_en: 'Y Eau de Parfum',
+      name_ar: 'واي أو دو بارفان',
+      category: 'men',
+      top_notes: 'تفاح أخضر، زنجبيل طازج، برغموت',
+      middle_notes: 'مريمية، توت العرعر، إبرة الراعي',
+      base_notes: 'خشب العنبر، فول التونكا، أرز، لبان شرقي',
+      main_accord: 'fresh',
+      accords: ['أروماتك', 'خشبي', 'فاكهي', 'منعش', 'تابلي دافئ'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'عطر الشاب الطموح العصري، يجمع بين حدة التفاح والزنجبيل المنعش وقوة الأخشاب العنبرية العميقة.'
+    },
+    {
+      keys: ['ultra-male', 'الترا ميل', 'ألترا ميل'],
+      brand_en: 'Jean Paul Gaultier',
+      brand_ar: 'جان بول غوتييه',
+      name_en: 'Ultra Male',
+      name_ar: 'ألترا ميل',
+      category: 'men',
+      top_notes: 'كمثرى حلوة، لافندر، نعناع منعش، برغموت، ليمون',
+      middle_notes: 'قرفة حارة، مريمية، كراوية',
+      base_notes: 'فانيليا سوداء مكثفة، عنبر، خشب الأرز، باتشولي',
+      main_accord: 'sweet',
+      accords: ['حلو', 'فانيليا', 'فاكهي', 'أروماتك', 'تابلي دافئ'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'سلاح الإغواء الليلي الذي لا يُقاوم، حلاوة الكمثرى الناضجة والفانيليا السوداء مع نفحات القرفة والنعناع.'
+    },
+    {
+      keys: ['le-male-elixir', 'لو ميل إكسير', 'لو مال إكسير'],
+      brand_en: 'Jean Paul Gaultier',
+      brand_ar: 'جان بول غوتييه',
+      name_en: 'Le Male Elixir',
+      name_ar: 'لو ميل إكسير',
+      category: 'men',
+      top_notes: 'لافندر ناعم، نعناع منعش',
+      middle_notes: 'فانيليا دافئة، راتنج البنزوين',
+      base_notes: 'عسل نقي، حبوب التونكا، تبغ فاخر',
+      main_accord: 'sweet',
+      accords: ['فانيليا', 'حلو', 'عسل', 'عنبري', 'أروماتك', 'تبغ'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'إكسير ناري آسر يحرق الحواس، يتدفق بدفء العسل والتبغ والفانيليا ليعلن عن حضور رجولي مهيب لا يُنسى.'
+    },
+    {
+      keys: ['erba-pura', 'اربى بورا', 'إربا بورا'],
+      brand_en: 'Xerjoff',
+      brand_ar: 'زيرجوف',
+      name_en: 'Erba Pura',
+      name_ar: 'إربا بورا',
+      category: 'unisex',
+      top_notes: 'برتقال صقلي، برغموت كالابريا، ليمون صقلي',
+      middle_notes: 'سلة فواكه متوسطية نضرة',
+      base_notes: 'مسك أبيض فاخر، فانيليا مدغشقر، عنبر دافئ',
+      main_accord: 'fruity',
+      accords: ['فاكهي', 'حمضيات', 'حلو', 'مسكي', 'فانيليا'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'سيمفونية من الفواكه المتوسطية المنعشة والمسك الأبيض النقي، عطر يخطف الأنفاس بفوحانه وثباته الأسطوري.'
+    },
+    {
+      keys: ['naxos', 'ناكسوس'],
+      brand_en: 'Xerjoff',
+      brand_ar: 'زيرجوف',
+      name_en: 'Naxos',
+      name_ar: 'ناكسوس',
+      category: 'unisex',
+      top_notes: 'لافندر، برغموت، ليمون صقلي',
+      middle_notes: 'عسل جبلي، قرفة، كشميران، ياسمين سمباك',
+      base_notes: 'أوراق التبغ الفاخر، حبوب التونكا، فانيليا',
+      main_accord: 'sweet',
+      accords: ['حلو', 'عسل', 'تبغ', 'تابلي دافئ', 'لافندر', 'حمضيات'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'تحفة صقلية خالدة تكرم التراث الإيطالي بنفحات العسل الذهبي والتبغ الأرستقراطي مع انتعاش الحمضيات.'
+    },
+    {
+      keys: ['layton', 'لايتون'],
+      brand_en: 'Parfums de Marly',
+      brand_ar: 'بارفيومز دي مارلي',
+      name_en: 'Layton',
+      name_ar: 'لايتون',
+      category: 'unisex',
+      top_notes: 'تفاح مقرمش، لافندر، برغموت، يوسفي',
+      middle_notes: 'إبرة الراعي، بنفسج، ياسمين',
+      base_notes: 'فانيليا بوربون، هيل، خشب الصندل، فلفل، باتشولي',
+      main_accord: 'spicy',
+      accords: ['تابلي دافئ', 'فانيليا', 'أروماتك', 'فاكهي', 'خشبي'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'أناقة الفروسية النبيلة في بلاط فرساي، توليفة مغرية من التفاح واللافندر محاطة بهالة من الفانيليا والهيل الفاخر.'
+    },
+    {
+      keys: ['delina', 'ديلينا'],
+      brand_en: 'Parfums de Marly',
+      brand_ar: 'بارفيومز دي مارلي',
+      name_en: 'Delina',
+      name_ar: 'ديلينا',
+      category: 'women',
+      top_notes: 'ليتشي، راوند، برغموت، جوزة الطيب',
+      middle_notes: 'ورد تركي ملكي، فاوانيا، فانيليا، مسك',
+      base_notes: 'كشميران، أرز، بخور، نجيل الهند',
+      main_accord: 'floral',
+      accords: ['زهري', 'ورد', 'فاكهي', 'مسكي', 'منعش', 'حلو'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'باقة من الورد التركي والفاوانيا محلاة بنفحات الليتشي والراوند، عطر مفعم بالرقة والفخامة والأنوثة الطاغية.'
+    },
+    {
+      keys: ['imagination', 'إيماجيناسيون'],
+      brand_en: 'Louis Vuitton',
+      brand_ar: 'لويس فيتون',
+      name_en: 'Imagination',
+      name_ar: 'إيماجيناسيون',
+      category: 'men',
+      top_notes: 'سيترون، برغموت كالابريا، برتقال صقلي',
+      middle_notes: 'شاي أسود صيني، زنجبيل نيجيري، قرفة سيلانية',
+      base_notes: 'أمبروكسان نقي، لبان، خشب الغاياك',
+      main_accord: 'citrus',
+      accords: ['حمضيات', 'شاي', 'تابلي دافئ', 'عنبري', 'منعش'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'انعكاس للخيال اللامحدود والرحلات الأسطورية، يمزج بين حمضيات إيطاليا الفائقة ونقاء الشاي الأسود والأمبروكسان.'
+    },
+    {
+      keys: ['ombre-nomade', 'أمبر نوماد', 'اومبري نوماد'],
+      brand_en: 'Louis Vuitton',
+      brand_ar: 'لويس فيتون',
+      name_en: 'Ombre Nomade',
+      name_ar: 'أمبر نوماد',
+      category: 'unisex',
+      top_notes: 'عود أسام النادر، توت العليق',
+      middle_notes: 'ورد جوري، بخور معتق، زعفران',
+      base_notes: 'خشب البتولا، بنزوين، خشب العنبر',
+      main_accord: 'oud',
+      accords: ['عود', 'عنبري', 'مدخن', 'تابلي دافئ', 'جلدي', 'ورد'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'دوامة من العود الفاخر والبخور والجلود في قلب الصحراء، عطر القوة والمهابة لأصحاب الذوق الشرقي الرفيع.'
+    },
+    {
+      keys: ['acqua-di-gio', 'أكوا دي جيو', 'اكوا دي جيو'],
+      brand_en: 'Giorgio Armani',
+      brand_ar: 'جورجيو أرماني',
+      name_en: 'Acqua Di Gio',
+      name_ar: 'أكوا دي جيو',
+      category: 'men',
+      top_notes: 'لايم، ليمون، برغموت، ياسمين، يوسفي',
+      middle_notes: 'نوتات بحرية، كالون، خوخ، فريزيا، روزماري',
+      base_notes: 'مسك أبيض، خشب الأرز، طحلب البلوط، باتشولي',
+      main_accord: 'fresh',
+      accords: ['بحري', 'حمضيات', 'أروماتك', 'منعش', 'زهري'],
+      longevity: '4',
+      sillage: '3',
+      desc: 'نسيم البحر الأبيض المتوسط المتلألئ، التناغم الخالد بين الأمواج المنعشة والشمس الساطعة والأخشاب الأنيقة.'
+    },
+    {
+      keys: ['hacivat', 'هاسيفات', 'هاتشيفات'],
+      brand_en: 'Nishane',
+      brand_ar: 'نيشاني',
+      name_en: 'Hacivat',
+      name_ar: 'هاسيفات',
+      category: 'unisex',
+      top_notes: 'أناناس ناضج، جريب فروت، برغموت',
+      middle_notes: 'خشب الأرز، باتشولي، ياسمين',
+      base_notes: 'طحلب البلوط، أخشاب جافة فاخرة',
+      main_accord: 'woody',
+      accords: ['حمضيات', 'خشبي', 'طحلبي', 'فاكهي', 'أروماتك'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'تحية للأناقة والروح الحرة، انفجار فاكهي من الأناناس والجريب فروت يرتكز على قاعدة خشبية طحلبية شديدة الثبات.'
+    },
+    {
+      keys: ['khamrah', 'خمرة'],
+      brand_en: 'Lattafa',
+      brand_ar: 'لطافة',
+      name_en: 'Khamrah',
+      name_ar: 'خمرة',
+      category: 'unisex',
+      top_notes: 'قرفة دافئة، جوزة الطيب، برغموت',
+      middle_notes: 'تمر، حلوى البرالين، مسك الروم',
+      base_notes: 'فانيليا، فول التونكا، بنزوين، خشب العنبر، المر',
+      main_accord: 'sweet',
+      accords: ['حلو', 'تابلي دافئ', 'فانيليا', 'قرفة', 'خشبي'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'مزيج شرقي شرير بالحلاوة والدفء، يجمع نغمات التمر والبرالين مع التوابل الفاخرة وخشب العنبر.'
+    },
+    {
+      keys: ['eros', 'فرزاتشي إيروس', 'فيرساتشي ايروس'],
+      brand_en: 'Versace',
+      brand_ar: 'فيرساتشي',
+      name_en: 'Eros',
+      name_ar: 'إيروس',
+      category: 'men',
+      top_notes: 'نعناع منعش، تفاح أخضر، ليمون إيطالي',
+      middle_notes: 'فول التونكا، أمبروكسان، إبرة الراعي',
+      base_notes: 'فانيليا مدغشقر، أرز فيرجينيا، نجيل الهند، طحلب البلوط',
+      main_accord: 'sweet',
+      accords: ['أروماتك', 'فانيليا', 'منعش', 'حلو', 'تابلي دافئ'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'إله الحب والشغف الأسطوري، توليفة مغناطيسية تدمج الانتعاش الحاد مع سحر الفانيليا وحبوب التونكا.'
+    },
+    {
+      keys: ['stronger-with-you', 'سترونجر ويز يو'],
+      brand_en: 'Giorgio Armani',
+      brand_ar: 'جورجيو أرماني',
+      name_en: 'Stronger With You Intensely',
+      name_ar: 'سترونجر ويز يو إنتنسلي',
+      category: 'men',
+      top_notes: 'فلفل وردي، عرعر، بنفسج',
+      middle_notes: 'كراميل مملح، قرفة، لافندر، مريمية',
+      base_notes: 'فانيليا، فول التونكا، عنبر دافئ، جلد مدبوغ',
+      main_accord: 'sweet',
+      accords: ['حلو', 'تابلي دافئ', 'كراميل', 'فانيليا', 'عنبري'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'قصة حب عاطفية مكثفة تعزف على أوتار الكراميل والفانيليا والقرفة الدافئة لتمنح هالة لا تُقاوم.'
+    },
+    // Rou7 original catalog perfumes
+    {
+      keys: ['spanish-tobacco', 'سبانش توباكو', 'سبانش-توباكو', 'a44cc91d-55ca-4a3c-aa1c-e1f8b791155f'],
+      brand_en: 'Rou7',
+      brand_ar: 'رُوح',
+      name_en: 'Spanish Tobacco',
+      name_ar: 'سبانش توباكو',
+      category: 'unisex',
+      top_notes: 'نوتات مائية منعشة، زعفران، حبوب التونكا',
+      middle_notes: 'كاكاو غني، عنبر دافئ، تبغ إسباني فاخر',
+      base_notes: 'سوسن مخملي، أخشاب عطرية نبيلة',
+      main_accord: 'tobacco',
+      accords: ['تبغ', 'عنبري', 'كاكاو', 'تابلي دافئ', 'خشبي'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'من اللحظة الأولى يفوح شذاه بنفحات الزعفران وحبوب التونكا، ممتزجاً بنعومة مع العنبر الدافئ وأوراق التبغ الإسباني وسوسن الأخشاب.'
+    },
+    {
+      keys: ['greek-tobacco', 'جريك توباكو', '7dbf55ce-89bc-4a7b-a0e4-2057974a2c78'],
+      brand_en: 'Rou7',
+      brand_ar: 'رُوح',
+      name_en: 'Greek Tobacco',
+      name_ar: 'جريك توباكو',
+      category: 'unisex',
+      top_notes: 'نرجس، ليتشي، ورد',
+      middle_notes: 'مشمش، زهر البرتقال، سوسن',
+      base_notes: 'تبغ يوناني فاخر، مسك عميق، فاوانيا',
+      main_accord: 'tobacco',
+      accords: ['تبغ', 'زهري', 'فاكهي', 'مسكي', 'عنبري'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'تحفة فنية تجمع بين أريج الزهور الساحرة وغموض التبغ اليوناني الفاخر والمسك العميق.'
+    },
+    {
+      keys: ['blue-diamond', 'بلو دايموند', 'da81db46-af51-49ae-8de8-7560beb12b5d'],
+      brand_en: 'Rou7',
+      brand_ar: 'رُوح',
+      name_en: 'Blue Diamond Aqua',
+      name_ar: 'بلو دايموند اكوا',
+      category: 'unisex',
+      top_notes: 'برغموت، نوتات بحرية، زعفران',
+      middle_notes: 'إكليل الجبل (روزماري)، يلانج يلانج، حمضيات',
+      base_notes: 'بخور فاخر، مسك دافئ، باتشولي',
+      main_accord: 'fresh',
+      accords: ['بحري', 'حمضيات', 'بخور', 'تابلي دافئ', 'مسكي'],
+      longevity: '5',
+      sillage: '4',
+      desc: 'رحلة خيالية ساحرة تأخذك إلى شواطئ جزيرة غنّاء تنبض بذكريات منعشة من البرغموت والبحر والمسك والبخور.'
+    },
+    {
+      keys: ['pink-diamond', 'بينك دايموند', '87f7e3c3-7263-4212-8cde-c13ac928e4b1'],
+      brand_en: 'Rou7',
+      brand_ar: 'رُوح',
+      name_en: 'Pink Diamond Sakura',
+      name_ar: 'بينك دايموند ساكورا',
+      category: 'women',
+      top_notes: 'فاوانيا، زهر البرتقال، يوسفي',
+      middle_notes: 'ورد مخملي، زنبق، زهر الكرز (ساكورا)',
+      base_notes: 'خشب الصندل، مسك أبيض، عنبر دافئ',
+      main_accord: 'floral',
+      accords: ['زهري', 'ساكورا', 'مسكي', 'خشبي', 'حمضيات'],
+      longevity: '4',
+      sillage: '4',
+      desc: 'تجسيد نقي لكل معاني الجمال، تتناغم بتلات الورد وزهر الكرز مع قوة خشب الصندل والمسك الأبيض.'
+    },
+    {
+      keys: ['nude-coral', 'نود كورال', 'd6973def-50dd-4e75-8005-8ee22eb23872'],
+      brand_en: 'Rou7',
+      brand_ar: 'رُوح',
+      name_en: 'Nude Coral Diamond',
+      name_ar: 'نود كورال دايموند',
+      category: 'women',
+      top_notes: 'برغموت منعش، تفاح، زعفران',
+      middle_notes: 'زهر البرتقال، جوز الهند، خشب الغاياك',
+      base_notes: 'فانيليا ناعمة، عنبر، كشميران دافئ',
+      main_accord: 'vanilla',
+      accords: ['فانيليا', 'جوز الهند', 'زهري', 'عنبري', 'خشبي'],
+      longevity: '4',
+      sillage: '4',
+      desc: 'نغمة مضيئة في سيمفونية الغروب الساحرة تجمع رقصة البرغموت وزهر البرتقال وجوز الهند مع دفء الكشميران والفانيليا.'
+    },
+    {
+      keys: ['black-diamond-incense', 'بلاك دايموند انسنس', '8b27644c-e280-422d-9574-bd5d3c99b72d'],
+      brand_en: 'Rou7',
+      brand_ar: 'رُوح',
+      name_en: 'Black Diamond Incense',
+      name_ar: 'بلاك دايموند انسنس',
+      category: 'unisex',
+      top_notes: 'نوتات مائية، خشب البتولا، كشمش أسود',
+      middle_notes: 'بخور شرقي فاخر، خشب الصندل، فانيليا ناعمة',
+      base_notes: 'عنبر دافئ، جلود فاخرة، دخان معتق، عود ملكي',
+      main_accord: 'oud',
+      accords: ['عود', 'جلود', 'بخور', 'مدخن', 'عنبري'],
+      longevity: '5',
+      sillage: '5',
+      desc: 'Oud الملكي بكامل قوته وجاذبيته في عبير ثمين من الجلود والأخشاب النبيلة والبخور المعتق.'
+    },
+    {
+      keys: ['purple-heart', 'بيربل هارت', '384fa452-fb65-4aa4-abe9-a85894d1eaa4'],
+      brand_en: 'Rou7',
+      brand_ar: 'رُوح',
+      name_en: 'Purple Heart Diamond',
+      name_ar: 'بيربل هارت دايموند',
+      category: 'women',
+      top_notes: 'زهر البرتقال، كمثرى، فانيليا ناعمة',
+      middle_notes: 'فلفل وردي، ياسمين، لوز',
+      base_notes: 'خشب الكشمير، خشب الأرز، باتشولي فاخر',
+      main_accord: 'floral',
+      accords: ['زهري', 'فاكهي', 'فانيليا', 'خشبي', 'تابلي ناعم'],
+      longevity: '4',
+      sillage: '4',
+      desc: 'يجسد الشغف والأناقة في سيمفونية يتعانق فيها زهر البرتقال والكمثرى مع رقة الياسمين وخشب الكشمير والأرز.'
+    }
+  ];
+
+  function lookupEncyclopedia(query) {
+    if (!query || typeof query !== 'string') return null;
+    const cleanQ = query.toLowerCase()
+      .replace(/^https?:\/\/[^\/]+\//i, '')
+      .replace(/[_\-\/\.\?\=\&\#]+/g, ' ')
+      .trim();
+
+    for (const item of FAMOUS_ENCYCLOPEDIA) {
+      for (const k of item.keys) {
+        const cleanK = k.toLowerCase().replace(/[_\-]+/g, ' ');
+        if (cleanQ.includes(cleanK) || query.toLowerCase().includes(k.toLowerCase())) {
+          return item;
+        }
+      }
+    }
+    return null;
+  }
+
+  function suggestPyramidByAccord(accordOrCategory = '') {
+    const acc = (accordOrCategory || '').toLowerCase();
+    if (acc.includes('wood') || acc.includes('خشب')) {
+      return {
+        top: 'برغموت، فلفل وردي، هيل',
+        heart: 'خشب الأرز، باتشولي، خشب الغاياك',
+        base: 'خشب الصندل، عنبر، نجيل الهند'
+      };
+    }
+    if (acc.includes('oud') || acc.includes('عود') || acc.includes('oriental') || acc.includes('شرق')) {
+      return {
+        top: 'زعفران، بخور، برغموت',
+        heart: 'عود ملكي، ورد جوري، قرفة',
+        base: 'عنبر دافئ، جلود فاخرة، مسك'
+      };
+    }
+    if (acc.includes('fresh') || acc.includes('منعش') || acc.includes('citrus') || acc.includes('حمض')) {
+      return {
+        top: 'برغموت كالابريا، ليمون، نوتات بحرية',
+        heart: 'لافندر فرنسي، روزماري، زهور بيضاء',
+        base: 'مسك أبيض، خشب الأرز، عنبر ناعم'
+      };
+    }
+    if (acc.includes('sweet') || acc.includes('حلو') || acc.includes('vanilla') || acc.includes('فانيل') || acc.includes('gourmand')) {
+      return {
+        top: 'كمثرى، فواكه حمراء، برتقال صقلي',
+        heart: 'فانيليا ناعمة، كاكاو، حبوب التونكا',
+        base: 'كراميل، فانيليا مدغشقر، خشب الصندل'
+      };
+    }
+    if (acc.includes('tobacco') || acc.includes('تبغ')) {
+      return {
+        top: 'زعفران، زنجبيل، توابل دافئة',
+        heart: 'تبغ إسباني فاخر، كاكاو، عسل',
+        base: 'فانيليا، فول التونكا، أخشاب عطرية'
+      };
+    }
+    if (acc.includes('floral') || acc.includes('زهر')) {
+      return {
+        top: 'يوسفي، فاوانيا، زهر البرتقال',
+        heart: 'ورد تركي، ياسمين، زنبق الوادي',
+        base: 'مسك أبيض، خشب الكشمير، خشب الصندل'
+      };
+    }
+    if (acc.includes('leather') || acc.includes('جلد')) {
+      return {
+        top: 'توت العليق، زعفران، حبوب التونكا',
+        heart: 'جلد أسود مدبوغ، ياسمين، بخور',
+        base: 'عنبر، أخشاب البتولا، جلد الغزال'
+      };
+    }
+    return {
+      top: 'برغموت منعش، فلفل وردي، هيل',
+      heart: 'لافندر، زهور بيضاء، توابل دافئة',
+      base: 'أخشاب عطرية، مسك فاخر، عنبر دافئ'
+    };
+  }
+
+  function extractSmartPyramid(text, fallbackCategory = '') {
+    if (!text) return suggestPyramidByAccord(fallbackCategory);
+
+    const clean = text
+      .replace(/first\s*\d+\s*min/gi, '')
+      .replace(/\d+\s*min\s*to\s*\d+\s*h/gi, '')
+      .replace(/\d+\s*h\s*and\s*more/gi, '')
+      .replace(/tap any note to learn how it smells/gi, '')
+      .replace(/scent pyramid|olfactory pyramid|الهرم العطري/gi, '');
+
+    let topNotes = '';
+    let midNotes = '';
+    let baseNotes = '';
+
+    // 1. Structured block regex
+    const tm = clean.match(/(?:^|\n)\s*(?:▲\s*)?(?:Top|Head|قمة العطر)\s*(?:\(Top\))?:?\s*([\s\S]*?)(?=(?:\n\s*(?:■\s*)?(?:Heart|Middle|قلب العطر))|$)/i);
+    const hm = clean.match(/(?:^|\n)\s*(?:■\s*)?(?:Heart|Middle|قلب العطر)\s*(?:\(Heart\))?:?\s*([\s\S]*?)(?=(?:\n\s*(?:◼\s*)?(?:Base|Bottom|قاعدة العطر))|$)/i);
+    const bm = clean.match(/(?:^|\n)\s*(?:◼\s*)?(?:Base|Bottom|قاعدة العطر)\s*(?:\(Base\))?:?\s*([\s\S]*?)(?=(?:\n\s*(?:###|##|Scent DNA|Performance))|$)/i);
+
+    if (tm && tm[1].trim()) topNotes = tm[1].trim();
+    if (hm && hm[1].trim()) midNotes = hm[1].trim();
+    if (bm && bm[1].trim()) baseNotes = bm[1].trim();
+
+    // 2. Sentence match: "Top notes are X; middle notes are Y; base notes are Z"
+    if (!topNotes && !midNotes && !baseNotes) {
+      const sMatch = clean.match(/(?:top|head)\s+notes?\s+(?:is|are|:)\s*([^;.]+)(?:;\s*(?:middle|heart)\s+notes?\s+(?:is|are|:)\s*([^;.]+))?(?:;\s*(?:base|bottom)\s+notes?\s+(?:is|are|:)\s*([^.]+))?/i);
+      if (sMatch) {
+        if (sMatch[1]) topNotes = sMatch[1];
+        if (sMatch[2]) midNotes = sMatch[2];
+        if (sMatch[3]) baseNotes = sMatch[3];
+      }
+    }
+
+    // 3. Fallback: NLP note keyword scanner across freeform text
+    if (!topNotes && !midNotes && !baseNotes) {
+      const lower = clean.toLowerCase();
+      const foundTop = [];
+      const foundMid = [];
+      const foundBase = [];
+
+      const topK = ['bergamot', 'lemon', 'lime', 'citrus', 'mandarin', 'grapefruit', 'aquatic notes', 'sea notes', 'apple', 'pear', 'mint', 'pink pepper', 'pepper', 'saffron', 'cardamom', 'orange blossom', 'aldehydes', 'coriander'];
+      const baseK = ['vanilla', 'amber', 'musk', 'sandalwood', 'cedarwood', 'cedar', 'oud', 'woody notes', 'leather', 'patchouli', 'tonka bean', 'vetiver', 'incense', 'benzoin', 'cashmeran', 'oakmoss', 'ambergris', 'smoke'];
+
+      for (const [enKey, arVal] of Object.entries(NOTES_EN_TO_AR)) {
+        if (lower.includes(enKey)) {
+          if (topK.some(c => enKey.includes(c) || c.includes(enKey))) {
+            if (!foundTop.includes(arVal)) foundTop.push(arVal);
+          } else if (baseK.some(c => enKey.includes(c) || c.includes(enKey))) {
+            if (!foundBase.includes(arVal)) foundBase.push(arVal);
+          } else {
+            if (!foundMid.includes(arVal)) foundMid.push(arVal);
+          }
+        }
+      }
+
+      if (foundTop.length) topNotes = foundTop.slice(0, 4).join('، ');
+      if (foundMid.length) midNotes = foundMid.slice(0, 4).join('، ');
+      if (foundBase.length) baseNotes = foundBase.slice(0, 4).join('، ');
+    }
+
+    // 4. Translate any remaining English notes
+    if (topNotes && /[a-zA-Z]/.test(topNotes)) {
+      topNotes = translateNotes(topNotes, 'ar');
+    }
+    if (midNotes && /[a-zA-Z]/.test(midNotes)) {
+      midNotes = translateNotes(midNotes, 'ar');
+    }
+    if (baseNotes && /[a-zA-Z]/.test(baseNotes)) {
+      baseNotes = translateNotes(baseNotes, 'ar');
+    }
+
+    // 5. If any tier was missing, fill with harmonious accord notes
+    const defaults = suggestPyramidByAccord(fallbackCategory);
+    if (!topNotes) topNotes = defaults.top;
+    if (!midNotes) midNotes = defaults.heart;
+    if (!baseNotes) baseNotes = defaults.base;
+
+    return {
+      top: topNotes,
+      heart: midNotes,
+      base: baseNotes
+    };
+  }
+
   // Export to global window namespace
   window.PerfumeI18n = {
     KNOWN_PERFUMES,
+    FAMOUS_ENCYCLOPEDIA,
     NOTES_EN_TO_AR,
     NOTES_AR_TO_EN,
     translateNotes,
     translateDesc,
-    getLocalizedProduct
+    getLocalizedProduct,
+    lookupEncyclopedia,
+    suggestPyramidByAccord,
+    extractSmartPyramid
   };
 })();

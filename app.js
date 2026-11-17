@@ -37,8 +37,49 @@
   }
   // ─────────────────────────────────────────────────────────────────────────
 
-  const $ = selector => document.querySelector(selector);
-  const $$ = selector => [...document.querySelectorAll(selector)];
+  // ── Fault-Tolerant Architectural Primitives ──────────────────────────────
+  const $ = selector => {
+    try { return document.querySelector(selector); } catch (_) { return null; }
+  };
+  const $$ = selector => {
+    try { return [...document.querySelectorAll(selector)]; } catch (_) { return []; }
+  };
+
+  function safeOn(selectorOrEl, event, handler, options) {
+    if (!selectorOrEl) return;
+    try {
+      const elements = typeof selectorOrEl === 'string'
+        ? $$(selectorOrEl)
+        : (selectorOrEl instanceof NodeList || Array.isArray(selectorOrEl) ? selectorOrEl : [selectorOrEl]);
+      elements.forEach(el => {
+        if (el && typeof el.addEventListener === 'function') {
+          el.addEventListener(event, function(e) {
+            try {
+              return handler.call(this, e);
+            } catch (err) {
+              console.warn(`[Event notice on ${event} (${selectorOrEl})]:`, err);
+            }
+          }, options);
+        }
+      });
+    } catch (err) {
+      console.warn(`[safeOn notice for ${selectorOrEl}]:`, err);
+    }
+  }
+
+  function safeModule(name, initFn) {
+    try {
+      initFn();
+    } catch (err) {
+      console.warn(`[Module skipped safely: ${name}]:`, err);
+    }
+  }
+
+  // Early loader dismissal failsafe
+  setTimeout(() => {
+    const ldr = document.getElementById('loader');
+    if (ldr && !ldr.classList.contains('done')) ldr.classList.add('done');
+  }, 400);
 
   // ── Bilingual / i18n Translations ─────────────────────────────────────────
   const I18N = {

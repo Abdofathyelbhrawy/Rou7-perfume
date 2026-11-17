@@ -614,21 +614,61 @@
           </div>
           <textarea id="prodNotes" name="notes" rows="3" placeholder="مثال: عطر خشبي حلو، نوتات صالحة للأكل كالفانيليا والتونكا والكراميل. دافئ وإدماني..."></textarea>
 
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
             <div class="form-section-title" style="margin: 0;">🔺 هرم النوتات العطرية (Scent Pyramid)</div>
-            <button type="button" class="button button-outline" id="btnTranslateNotesAll" style="padding: 4px 9px; font-size: 11px; cursor: pointer;" title="ترجمة نوتات القمة والقلب والقاعدة تلقائياً بين العربي والإنجليزي">
-              <span>🌐</span> ترجمة النوتات تلقائياً (AR ↔ EN)
-            </button>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="button button-outline" id="btnAutoSuggestPyramid" style="padding: 4px 9px; font-size: 11px; cursor: pointer; color: var(--gold-deep); border-color: var(--gold-deep);" title="اقتراح وتوليد هرم عطري متناسق تلقائياً بناءً على العائلة العطرية والأكوردات">
+                <span>🪄</span> توليد هرم متناسق
+              </button>
+              <button type="button" class="button button-outline" id="btnTranslateNotesAll" style="padding: 4px 9px; font-size: 11px; cursor: pointer;" title="ترجمة نوتات القمة والقلب والقاعدة تلقائياً بين العربي والإنجليزي">
+                <span>🌐</span> ترجمة النوتات تلقائياً (AR ↔ EN)
+              </button>
+            </div>
           </div>
           <label>نوتات القمة — Top Notes <small style="opacity:.6">(أول 15 دقيقة)</small>
-            <input id="prodTopNotes" name="top_notes" placeholder="مثال: فواكه حمراء، توت، كونياك، جريب فروت (افصل بفاصلة)">
+            <input id="prodTopNotes" name="top_notes" placeholder="مثال: برغموت، فواكه حمراء، زعفران، نوتات بحرية (افصل بفاصلة)">
           </label>
+          <div class="quick-note-chips" data-target="prodTopNotes" title="انقر لإضافة النوتة إلى حقل قمة العطر">
+            <span class="quick-note-chip">+ برغموت</span>
+            <span class="quick-note-chip">+ حمضيات منعشة</span>
+            <span class="quick-note-chip">+ نوتات بحرية</span>
+            <span class="quick-note-chip">+ زعفران</span>
+            <span class="quick-note-chip">+ تفاح</span>
+            <span class="quick-note-chip">+ هيل</span>
+            <span class="quick-note-chip">+ فلفل وردي</span>
+            <span class="quick-note-chip">+ لافندر</span>
+            <span class="quick-note-chip">+ كشمش أسود</span>
+          </div>
+
           <label>نوتات القلب — Middle / Heart Notes <small style="opacity:.6">(15 دقيقة - 3 ساعات)</small>
-            <input id="prodMiddleNotes" name="middle_notes" placeholder="مثال: زنجبيل، فلفل، سرو (افصل بفاصلة)">
+            <input id="prodMiddleNotes" name="middle_notes" placeholder="مثال: زهر البرتقال، ياسمين، قرفة، كاكاو، تبغ (افصل بفاصلة)">
           </label>
+          <div class="quick-note-chips" data-target="prodMiddleNotes" title="انقر لإضافة النوتة إلى حقل قلب العطر">
+            <span class="quick-note-chip">+ زهر البرتقال</span>
+            <span class="quick-note-chip">+ ياسمين</span>
+            <span class="quick-note-chip">+ ورد تركي</span>
+            <span class="quick-note-chip">+ قرفة</span>
+            <span class="quick-note-chip">+ كاكاو غني</span>
+            <span class="quick-note-chip">+ تبغ فاخر</span>
+            <span class="quick-note-chip">+ قهوة</span>
+            <span class="quick-note-chip">+ سوسن</span>
+            <span class="quick-note-chip">+ كشميران</span>
+          </div>
+
           <label>نوتات القاعدة — Base Notes <small style="opacity:.6">(3 ساعات وأكثر)</small>
-            <input id="prodBaseNotes" name="base_notes" placeholder="مثال: فانيليا، عنبر، صندل، باتشولي، قرفة (افصل بفاصلة)">
+            <input id="prodBaseNotes" name="base_notes" placeholder="مثال: فانيليا، عنبر دافئ، خشب الصندل، باتشولي، عود (افصل بفاصلة)">
           </label>
+          <div class="quick-note-chips" data-target="prodBaseNotes" title="انقر لإضافة النوتة إلى حقل قاعدة العطر">
+            <span class="quick-note-chip">+ فانيليا ناعمة</span>
+            <span class="quick-note-chip">+ عنبر دافئ</span>
+            <span class="quick-note-chip">+ خشب الصندل</span>
+            <span class="quick-note-chip">+ خشب الأرز</span>
+            <span class="quick-note-chip">+ مسك أبيض</span>
+            <span class="quick-note-chip">+ باتشولي</span>
+            <span class="quick-note-chip">+ عود ملكي</span>
+            <span class="quick-note-chip">+ حبوب التونكا</span>
+            <span class="quick-note-chip">+ جلود فاخرة</span>
+          </div>
 
           <div class="form-section-title">✳ الأداء والطابع</div>
           <div class="form-row">

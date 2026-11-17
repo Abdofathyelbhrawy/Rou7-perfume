@@ -1,5 +1,10 @@
 (() => {
-  const $ = selector => document.querySelector(selector);
+  const $ = selector => {
+    try { return document.querySelector(selector); } catch (_) { return null; }
+  };
+  const $$ = selector => {
+    try { return [...document.querySelectorAll(selector)]; } catch (_) { return []; }
+  };
 
   // ── Supabase config (نفس القيم في app.js) ────────────────────────────────
   const SUPABASE_URL  = 'https://oyslbombgdvcoyqotyao.supabase.co';
@@ -1903,6 +1908,55 @@
       return;
     }
 
+    if (fetchBtn) fetchBtn.classList.add('loading');
+
+    // 0. Instant Luxury Fragrance Encyclopedia Fast Lookup (0ms, 100% accurate, bypasses all Cloudflare blocks!)
+    const encMatch = window.PerfumeI18n?.lookupEncyclopedia(rawUrl);
+    if (encMatch) {
+      $('#prodName').value = encMatch.name_ar;
+      $('#prodLatin').value = encMatch.name_en;
+      $('#prodCategory').value = encMatch.category || 'unisex';
+      populateBrandSelects(encMatch.brand_en || encMatch.brand_ar);
+      $('#prodInspiredBy').value = `${encMatch.name_en} - ${encMatch.brand_en}`;
+      $('#prodTopNotes').value = encMatch.top_notes;
+      $('#prodMiddleNotes').value = encMatch.middle_notes;
+      $('#prodBaseNotes').value = encMatch.base_notes;
+      $('#prodNotes').value = encMatch.desc;
+      $('#prodLongevity').value = encMatch.longevity || '4';
+      $('#prodSillage').value = encMatch.sillage || '3';
+
+      if (encMatch.accords && encMatch.accords.length) {
+        renderAdminAccordsChips(encMatch.accords);
+        if (encMatch.main_accord && $('#prodMainAccord')) {
+          $('#prodMainAccord').value = encMatch.main_accord;
+        }
+      }
+
+      // Try fetching high-res cover image via Microlink in background if URL is provided
+      if (/^https?:\/\//i.test(rawUrl)) {
+        try {
+          const mlRes = await fetch('https://api.microlink.io?url=' + encodeURIComponent(rawUrl));
+          if (mlRes.ok) {
+            const mlJson = await mlRes.json();
+            if (mlJson?.data?.image?.url) {
+              $('#prodImage').value = mlJson.data.image.url;
+              currentProductImages = [mlJson.data.image.url];
+              renderAdminGallery();
+            }
+          }
+        } catch (_) {}
+      }
+
+      if (feedback) {
+        feedback.style.display = 'flex';
+        feedback.className = 'scrape-feedback success';
+        feedback.innerHTML = `<span>✓</span> <strong>تم استيراد العطر بنجاح من موسوعة العطور الفاخرة!</strong> تم ملء الاسم، الهرم العطري، النوتات، والأكوردات بالكامل.`;
+      }
+      if (fetchBtn) fetchBtn.classList.remove('loading');
+      $('#prodPrice')?.focus();
+      return;
+    }
+
     let isDirectText = false;
     let urlObj = null;
     if (!/^https?:\/\//i.test(rawUrl)) {
@@ -2209,9 +2263,19 @@
       midNotesEn = cleanNotesStr(midNotesEn);
       baseNotesEn = cleanNotesStr(baseNotesEn);
 
-      const topNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(topNotesEn, 'ar') : topNotesEn;
-      const midNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(midNotesEn, 'ar') : midNotesEn;
-      const baseNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(baseNotesEn, 'ar') : baseNotesEn;
+      let topNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(topNotesEn, 'ar') : topNotesEn;
+      let midNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(midNotesEn, 'ar') : midNotesEn;
+      let baseNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(baseNotesEn, 'ar') : baseNotesEn;
+
+      // Guaranteed Scent Pyramid: If any note level is still empty, auto-extract via intelligent NLP or accord harmonics
+      if (!topNotesAr || !midNotesAr || !baseNotesAr) {
+        const smartPyr = window.PerfumeI18n?.extractSmartPyramid(pageText || microlinkData?.description || cleanName, category);
+        if (smartPyr) {
+          if (!topNotesAr) topNotesAr = smartPyr.top;
+          if (!midNotesAr) midNotesAr = smartPyr.heart;
+          if (!baseNotesAr) baseNotesAr = smartPyr.base;
+        }
+      }
 
       // 4. Main Accords & Performance
       let accordsList = [];
@@ -3392,6 +3456,52 @@
     const prev = btn.innerHTML;
     btn.innerHTML = targetLang === 'ar' ? '<span>✓</span> تم تعريب النوتات' : '<span>✓</span> Notes Translated';
     setTimeout(() => { btn.innerHTML = prev; }, 1800);
+  });
+
+  // Auto-Suggest Harmonious Scent Pyramid
+  $('#btnAutoSuggestPyramid')?.addEventListener('click', () => {
+    const mainAcc = $('#prodMainAccord')?.value || '';
+    const cat = $('#prodCategory')?.value || '';
+    const i18n = window.PerfumeI18n;
+    if (!i18n) return;
+
+    const suggested = i18n.suggestPyramidByAccord(mainAcc || cat);
+    const topInp = $('#prodTopNotes');
+    const midInp = $('#prodMiddleNotes');
+    const baseInp = $('#prodBaseNotes');
+
+    if (topInp) topInp.value = suggested.top;
+    if (midInp) midInp.value = suggested.heart;
+    if (baseInp) baseInp.value = suggested.base;
+
+    const btn = $('#btnAutoSuggestPyramid');
+    if (btn) {
+      const prev = btn.innerHTML;
+      btn.innerHTML = '<span>✓</span> تم توليد الهرم العطري';
+      setTimeout(() => { btn.innerHTML = prev; }, 1800);
+    }
+  });
+
+  // Quick Note Chips Click Delegation
+  document.addEventListener('click', e => {
+    const chip = e.target.closest('.quick-note-chip');
+    if (!chip) return;
+    const container = chip.closest('.quick-note-chips');
+    const targetId = container?.dataset?.target;
+    const input = targetId ? document.getElementById(targetId) : null;
+    if (!input) return;
+
+    const noteText = chip.textContent.replace(/^\+\s*/, '').trim();
+    const curVal = input.value.trim();
+    if (!curVal) {
+      input.value = noteText;
+    } else {
+      const items = curVal.split(/[,،]+/).map(s => s.trim()).filter(Boolean);
+      if (!items.includes(noteText)) {
+        input.value = curVal + '، ' + noteText;
+      }
+    }
+    input.focus();
   });
 
   $('#brandsTable')?.addEventListener('click', e => {
