@@ -1506,6 +1506,16 @@
     formStatus.className   = '';
     clearImagePreview();
 
+    // Reset URL Importer inputs
+    if ($('#perfumeUrlInput')) $('#perfumeUrlInput').value = '';
+    if ($('#btnClearUrl')) $('#btnClearUrl').style.display = 'none';
+    const sFeedback = $('#scrapeFeedback');
+    if (sFeedback) {
+      sFeedback.style.display = 'none';
+      sFeedback.textContent = '';
+      sFeedback.className = 'scrape-feedback';
+    }
+
     const saleInp = $('#prodSalePrice');
     const badgeInp = $('#prodDiscountBadge');
     const pctInp = $('#prodDiscountPercent');
@@ -1673,6 +1683,427 @@
   $('#productModalClose')?.addEventListener('click', closeProductModal);
   $('#cancelProdBtn')?.addEventListener('click', closeProductModal);
   prodModal?.addEventListener('click', e => { if (e.target === prodModal) closeProductModal(); });
+
+  // ── 🪄 Magic URL Scent Extractor (سحب بيانات العطر عبر الرابط) ────────────
+  const FAMOUS_PERFUME_NAMES_AR = {
+    'sauvage': 'سوفاج',
+    'baccarat rouge': 'باكارات روج 540',
+    'baccarat rouge 540': 'باكارات روج 540',
+    'angels share': 'أنجلز شير',
+    'angels\' share': 'أنجلز شير',
+    'bleu de chanel': 'بلو دي شانيل',
+    'aventus': 'أفينتوس',
+    'black phantom': 'بلاك فانتوم',
+    'lost cherry': 'لوست شيري',
+    'tobacco vanille': 'توباكو فانيلا',
+    'ombre nomade': 'أومبري نوماد',
+    'grand soir': 'جراند سوار',
+    'layton': 'لايتون',
+    'herod': 'هيرود',
+    'naxos': 'ناكسوس',
+    'erba pura': 'إربا بورا',
+    'khamrah': 'خمرة',
+    'club de nuit': 'كلوب دي نوي',
+    'interlude': 'إنترلود',
+    'reflection': 'رفلكشن',
+    'delina': 'ديلينا',
+    'libre': 'ليبر',
+    'black opium': 'بلاك أوبيوم',
+    'si': 'سي',
+    'jadore': 'جادور',
+    'j\'adore': 'جادور',
+    'coco mademoiselle': 'كوكو مادموزيل',
+    'alien': 'إيلين',
+    'angel': 'أنجل',
+    'good girl': 'جود جيرل',
+    'oud wood': 'عود وود',
+    'silver mountain water': 'سيلفر ماونتن ووتر',
+    'green irish tweed': 'جرين أيريش تويد',
+    'fabulous': 'فابيولوس',
+    'fucking fabulous': 'فابيولوس',
+    'soleil blanc': 'سولاي بلانك',
+    'grey vetiver': 'جري فيتيفر',
+    'bitter peach': 'بيتر بيتش',
+    'invictus': 'إنفكتوس',
+    'one million': 'ون مليون',
+    '1 million': 'ون مليون',
+    'le male': 'لو مال',
+    'ultra male': 'ألترا مال',
+    'stronger with you': 'سترونجر وذ يو',
+    'acqua di gio': 'أكوا دي جيو',
+    'eros': 'إيروس',
+    'dylan blue': 'ديلان بلو',
+    'allure homme sport': 'ألور هوم سبورت',
+    'la nuit de lhomme': 'لا نوي دي لوم',
+    'y edp': 'واي أو دو بارفان'
+  };
+
+  const FAMOUS_BRANDS_MAP = {
+    'dior': { ar: 'ديور', en: 'Dior' },
+    'chanel': { ar: 'شانيل', en: 'Chanel' },
+    'tom ford': { ar: 'توم فورد', en: 'Tom Ford' },
+    'creed': { ar: 'كريد', en: 'Creed' },
+    'kilian': { ar: 'كيليان', en: 'Kilian' },
+    'by kilian': { ar: 'كيليان', en: 'By Kilian' },
+    'maison francis kurkdjian': { ar: 'ميزون فرانسيس كوركدجيان', en: 'Maison Francis Kurkdjian' },
+    'parfums de marly': { ar: 'مارلي', en: 'Parfums de Marly' },
+    'xerjoff': { ar: 'زيرجوف', en: 'Xerjoff' },
+    'roja': { ar: 'روجا', en: 'Roja Parfums' },
+    'roja dove': { ar: 'روجا', en: 'Roja Dove' },
+    'amouage': { ar: 'أمواج', en: 'Amouage' },
+    'initio': { ar: 'إنيشيو', en: 'Initio Parfums Prives' },
+    'initio parfums prives': { ar: 'إنيشيو', en: 'Initio Parfums Prives' },
+    'mancera': { ar: 'مانسيرا', en: 'Mancera' },
+    'montale': { ar: 'مونتال', en: 'Montale' },
+    'yves saint laurent': { ar: 'إيف سان لوران', en: 'Yves Saint Laurent' },
+    'ysl': { ar: 'إيف سان لوران', en: 'Yves Saint Laurent' },
+    'giorgio armani': { ar: 'جورجيو أرماني', en: 'Giorgio Armani' },
+    'armani': { ar: 'جورجيو أرماني', en: 'Giorgio Armani' },
+    'versace': { ar: 'فرزاتشي', en: 'Versace' },
+    'prada': { ar: 'برادا', en: 'Prada' },
+    'gucci': { ar: 'غوتشي', en: 'Gucci' },
+    'lattafa': { ar: 'لطافة', en: 'Lattafa Perfumes' },
+    'afnan': { ar: 'أفنان', en: 'Afnan' },
+    'al haramain': { ar: 'الحرمين', en: 'Al Haramain' },
+    'rasasi': { ar: 'الرصاصي', en: 'Rasasi' },
+    'carolina herrera': { ar: 'كارولينا هيريرا', en: 'Carolina Herrera' },
+    'jean paul gaultier': { ar: 'جان بول غوتييه', en: 'Jean Paul Gaultier' },
+    'paco rabanne': { ar: 'باكو رابان', en: 'Paco Rabanne' },
+    'le labo': { ar: 'لو لابو', en: 'Le Labo' },
+    'byredo': { ar: 'بايريدو', en: 'Byredo' },
+    'diptyque': { ar: 'ديبتيك', en: 'Diptyque' },
+    'jo malone': { ar: 'جو مالون', en: 'Jo Malone London' }
+  };
+
+  async function handleScrapePerfumeUrl() {
+    const input = $('#perfumeUrlInput');
+    const feedback = $('#scrapeFeedback');
+    const fetchBtn = $('#btnScrapeUrl');
+    const rawUrl = (input?.value || '').trim();
+
+    if (!rawUrl) {
+      if (feedback) {
+        feedback.style.display = 'flex';
+        feedback.className = 'scrape-feedback error';
+        feedback.innerHTML = '<span>⚠️</span> رجاءً ضع رابط العطر أولاً (مثال: رابط من Fragrantica أو Parfumo أو غيرها).';
+      }
+      input?.focus();
+      return;
+    }
+
+    let urlObj;
+    try {
+      urlObj = new URL(rawUrl);
+    } catch (_) {
+      if (feedback) {
+        feedback.style.display = 'flex';
+        feedback.className = 'scrape-feedback error';
+        feedback.innerHTML = '<span>⚠️</span> الرابط غير صالح. يرجى نسخ الرابط كاملاً يبدأ بـ https://';
+      }
+      return;
+    }
+
+    if (fetchBtn) fetchBtn.classList.add('loading');
+    if (feedback) {
+      feedback.style.display = 'flex';
+      feedback.className = 'scrape-feedback info';
+      feedback.innerHTML = '<span>⏳</span> جاري الاتصال وسحب بيانات العطر من الرابط وتحليل النوتات...';
+    }
+
+    try {
+      let pageText = '';
+      let microlinkData = null;
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 14000);
+
+      try {
+        const jinaUrl = 'https://r.jina.ai/' + encodeURIComponent(rawUrl);
+        const res = await fetch(jinaUrl, {
+          signal: controller.signal,
+          headers: { 'Accept': 'text/plain' }
+        });
+        if (res.ok) {
+          pageText = await res.text();
+        }
+      } catch (jinaErr) {
+        console.warn('Jina reader notice:', jinaErr);
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
+      // Parallel query to Microlink API for high-res OG images and clean title fallback
+      try {
+        const mlRes = await fetch('https://api.microlink.io?url=' + encodeURIComponent(rawUrl));
+        if (mlRes.ok) {
+          const mlJson = await mlRes.json();
+          if (mlJson && mlJson.data) {
+            microlinkData = mlJson.data;
+          }
+        }
+      } catch (mlErr) {
+        console.warn('Microlink notice:', mlErr);
+      }
+
+      if (!pageText && !microlinkData) {
+        throw new Error('لم نتمكن من الوصول لصفحة الرابط. تأكد من صحة الرابط واتصالك بالإنترنت.');
+      }
+
+      // 1. Extract Title and Clean Name
+      let extractedTitle = '';
+      if (pageText) {
+        const titleMatch = pageText.match(/Title:\s*(.+)/i);
+        if (titleMatch) extractedTitle = titleMatch[1].trim();
+      }
+      if (!extractedTitle && microlinkData && microlinkData.title) {
+        extractedTitle = microlinkData.title.trim();
+      }
+
+      let cleanName = extractedTitle
+        .replace(/^Title:\s*/i, '')
+        .replace(/\s*-\s*a fragrance for.*$/i, '')
+        .replace(/\s*-\s*Fragrantica.*$/i, '')
+        .replace(/\s*-\s*Parfumo.*$/i, '')
+        .replace(/\s*\(Eau de Parfum\).*$/i, '')
+        .replace(/\s*\(Eau de Toilette\).*$/i, '')
+        .replace(/\s*\(Extrait de Parfum\).*$/i, '')
+        .replace(/\s*cologne.*$/i, '')
+        .replace(/\s*perfume.*$/i, '')
+        .trim();
+
+      // Detect Brand
+      let detectedBrand = '';
+      const textToSearchBrand = `${rawUrl} ${extractedTitle} ${cleanName}`.toLowerCase();
+      for (const [brandKey, brandObj] of Object.entries(FAMOUS_BRANDS_MAP)) {
+        if (textToSearchBrand.includes(brandKey)) {
+          detectedBrand = brandObj.en;
+          break;
+        }
+      }
+
+      // If cleanName contains the brand, remove it for clean fragrance name
+      if (detectedBrand) {
+        const brandRegex = new RegExp(`\\b${detectedBrand}\\b`, 'i');
+        const strippedName = cleanName.replace(brandRegex, '').replace(/\bby\b/i, '').replace(/\s+/g, ' ').trim();
+        if (strippedName.length >= 2) {
+          cleanName = strippedName;
+        }
+      }
+
+      // Arabic Name Lookup
+      let arabicName = '';
+      const normCheck = cleanName.toLowerCase().replace(/['"’]/g, '').trim();
+      for (const [k, arVal] of Object.entries(FAMOUS_PERFUME_NAMES_AR)) {
+        if (normCheck === k || normCheck.includes(k)) {
+          arabicName = arVal;
+          break;
+        }
+      }
+      if (!arabicName) {
+        arabicName = cleanName;
+      }
+
+      // 2. Gender / Category
+      let category = 'unisex';
+      const catCheckText = (pageText + ' ' + (microlinkData?.description || '')).toLowerCase();
+      if (/for women and men|unisex/i.test(catCheckText)) {
+        category = 'unisex';
+      } else if (/for men|men 20\d\d|cologne for men/i.test(catCheckText)) {
+        category = 'men';
+      } else if (/for women|women 20\d\d|perfume for women/i.test(catCheckText)) {
+        category = 'women';
+      }
+
+      // 3. Notes Extraction
+      let topNotesEn = '';
+      let midNotesEn = '';
+      let baseNotesEn = '';
+
+      if (pageText) {
+        const notesBlock = pageText.match(/top notes? (?:are|:)?\s*([^\n\.]+)/i);
+        if (notesBlock) {
+          const rawAll = notesBlock[1];
+          const parts = rawAll.split(/;\s*/);
+          parts.forEach(p => {
+            if (/middle notes? (?:are|:)?/i.test(p)) {
+              midNotesEn = p.replace(/middle notes? (?:are|:)?/i, '').trim();
+            } else if (/base notes? (?:are|:)?/i.test(p)) {
+              baseNotesEn = p.replace(/base notes? (?:are|:)?/i, '').trim();
+            } else {
+              topNotesEn = p.replace(/top notes? (?:are|:)?/i, '').trim();
+            }
+          });
+        }
+
+        if (!topNotesEn) {
+          const m = pageText.match(/top notes?:\s*([^\n\.]+)/i);
+          if (m) topNotesEn = m[1].trim();
+        }
+        if (!midNotesEn) {
+          const m = pageText.match(/(?:middle|heart) notes?:\s*([^\n\.]+)/i);
+          if (m) midNotesEn = m[1].trim();
+        }
+        if (!baseNotesEn) {
+          const m = pageText.match(/base notes?:\s*([^\n\.]+)/i);
+          if (m) baseNotesEn = m[1].trim();
+        }
+      }
+
+      topNotesEn = topNotesEn.replace(/\s+and\s+/gi, ', ');
+      midNotesEn = midNotesEn.replace(/\s+and\s+/gi, ', ');
+      baseNotesEn = baseNotesEn.replace(/\s+and\s+/gi, ', ');
+
+      const topNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(topNotesEn, 'ar') : topNotesEn;
+      const midNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(midNotesEn, 'ar') : midNotesEn;
+      const baseNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(baseNotesEn, 'ar') : baseNotesEn;
+
+      // 4. Main Accords
+      let accordsList = [];
+      if (pageText) {
+        const accordsMatch = pageText.match(/main accords\s*\n+([\s\S]*?)(?=\n\s*\n|###|---|\*\*)/i);
+        if (accordsMatch) {
+          accordsList = accordsMatch[1].split(/\n+/).map(s => s.trim().replace(/^[-*•]\s*/, '')).filter(Boolean).slice(0, 5);
+        }
+      }
+
+      // 5. Bottle Image
+      let bottleImageUrl = '';
+      if (pageText) {
+        const fMatches = [...pageText.matchAll(/!\[(?:[^\]]*)\]\((https:\/\/fimgs\.net\/mdimg\/perfume-thumbs\/375x500\.[^)]+)\)/gi)];
+        if (fMatches.length) {
+          bottleImageUrl = fMatches[0][1];
+        } else {
+          const generalMatches = [...pageText.matchAll(/!\[(?:[^\]]*)\]\((https:\/\/fimgs\.net\/mdimg\/[a-z-]+\/[^)]+\.(?:jpg|jpeg|webp|png))\)/gi)];
+          if (generalMatches.length) bottleImageUrl = generalMatches[0][1];
+        }
+      }
+      if (!bottleImageUrl && microlinkData && microlinkData.image && microlinkData.image.url) {
+        bottleImageUrl = microlinkData.image.url;
+      }
+
+      // 6. Description
+      let descText = '';
+      if (topNotesAr || midNotesAr || baseNotesAr) {
+        descText = `عطر فاخر ومميز، يفتتح بنفحات منعشة من ${topNotesAr || 'الحمضيات والأزهار النضرة'}، يتوسطه قلب عطري ينبض بـ ${midNotesAr || 'التوابل الدافئة والأخشاب'}، ويرتكز على قاعدة أصيلة تدوم طويلاً من ${baseNotesAr || 'المسك الفاخر والعنبر'}.`;
+      } else if (microlinkData && microlinkData.description) {
+        descText = microlinkData.description.slice(0, 250);
+      } else {
+        descText = `عطر استثنائي يجمع بين الفخامة والجاذبية والثبات العالي، مصمم ليعبر عن حضورك الآسر في كل مناسبة.`;
+      }
+
+      // 7. Populate Form Fields
+      $('#prodName').value = arabicName || cleanName;
+      $('#prodLatin').value = cleanName;
+      $('#prodCategory').value = category;
+
+      // Brand matching or creation
+      if (detectedBrand) {
+        let bExists = currentBrands.find(b =>
+          (b.name_en && b.name_en.toLowerCase() === detectedBrand.toLowerCase()) ||
+          (b.name_ar && b.name_ar === detectedBrand) ||
+          (b.id && b.id.toLowerCase() === detectedBrand.toLowerCase())
+        );
+        if (!bExists) {
+          const brandObj = Object.values(FAMOUS_BRANDS_MAP).find(bo => bo.en.toLowerCase() === detectedBrand.toLowerCase()) || { ar: detectedBrand, en: detectedBrand };
+          const newBrand = {
+            id: detectedBrand.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+            name_ar: brandObj.ar,
+            name_en: brandObj.en,
+            logo_url: ''
+          };
+          currentBrands.push(newBrand);
+          try { localStorage.setItem('rooh-cached-brands', JSON.stringify(currentBrands)); } catch (_) {}
+          renderBrandsTable();
+        }
+        populateBrandSelects(detectedBrand);
+      }
+
+      // Inspired By
+      const inspiredText = detectedBrand ? `${cleanName} - ${detectedBrand}` : cleanName;
+      $('#prodInspiredBy').value = inspiredText;
+
+      // Pyramid Notes
+      $('#prodTopNotes').value = topNotesAr;
+      $('#prodMiddleNotes').value = midNotesAr;
+      $('#prodBaseNotes').value = baseNotesAr;
+
+      // Accords
+      if (accordsList.length) {
+        renderAdminAccordsChips(accordsList);
+        const mainAccSelect = $('#prodMainAccord');
+        if (mainAccSelect) {
+          const firstAcc = accordsList[0].toLowerCase();
+          for (let opt of mainAccSelect.options) {
+            if (opt.value && firstAcc.includes(opt.value.toLowerCase())) {
+              mainAccSelect.value = opt.value;
+              break;
+            }
+          }
+        }
+      }
+
+      // Image
+      if (bottleImageUrl) {
+        $('#prodImage').value = bottleImageUrl;
+        if (manualImg) manualImg.value = bottleImageUrl;
+        showImagePreview(bottleImageUrl);
+      }
+
+      // Description
+      $('#prodNotes').value = descText;
+
+      // Longevity & Sillage
+      $('#prodLongevity').value = '4';
+      $('#prodSillage').value = '3';
+
+      // Feedback
+      if (feedback) {
+        feedback.style.display = 'flex';
+        feedback.className = 'scrape-feedback success';
+        feedback.innerHTML = `<span>✓</span> <strong>تم سحب البيانات بنجاح!</strong> تم ملء الاسم، النوتات، الصورة، والوصف. ضع سعر البيع والتكلفة ثم اضغط حفظ.`;
+      }
+
+      $('#prodPrice')?.focus();
+
+    } catch (err) {
+      console.error('URL Scraper Error:', err);
+      if (feedback) {
+        feedback.style.display = 'flex';
+        feedback.className = 'scrape-feedback error';
+        feedback.innerHTML = `<span>⚠️</span> تعذر سحب البيانات تلقائياً: ${escapeHtml(err.message || 'تأكد من صحة الرابط')}`;
+      }
+    } finally {
+      if (fetchBtn) fetchBtn.classList.remove('loading');
+    }
+  }
+
+  // URL Importer Event Handlers
+  $('#btnScrapeUrl')?.addEventListener('click', handleScrapePerfumeUrl);
+  $('#perfumeUrlInput')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleScrapePerfumeUrl();
+    }
+  });
+  $('#perfumeUrlInput')?.addEventListener('input', e => {
+    const clearBtn = $('#btnClearUrl');
+    if (clearBtn) clearBtn.style.display = e.target.value ? 'block' : 'none';
+  });
+  $('#btnClearUrl')?.addEventListener('click', () => {
+    const input = $('#perfumeUrlInput');
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+    const clearBtn = $('#btnClearUrl');
+    if (clearBtn) clearBtn.style.display = 'none';
+    const feedback = $('#scrapeFeedback');
+    if (feedback) {
+      feedback.style.display = 'none';
+      feedback.textContent = '';
+      feedback.className = 'scrape-feedback';
+    }
+  });
 
   // Live sync between Price, Sale Price, Cost Price, and Discount Percent in product modal
   $('#prodCostPrice')?.addEventListener('input', () => syncProfitFeedback());

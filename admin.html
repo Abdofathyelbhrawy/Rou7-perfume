@@ -477,6 +477,31 @@
         <h2 id="modalProductTitle">إضافة <em>عطر جديد</em></h2>
         <form id="productForm">
           <input type="hidden" id="productId" name="id">
+
+          <!-- 🪄 Quick URL Importer (سحب بيانات العطر عبر الرابط) -->
+          <div class="url-importer-box" id="urlImporterBox">
+            <div class="url-importer-header">
+              <div class="url-importer-title-group">
+                <span class="url-importer-icon">⚡</span>
+                <div>
+                  <strong>الاستيراد الذكي برابط العطر (Auto Scent Extractor)</strong>
+                  <p>ضع رابط العطر من Fragrantica أو Parfumo أو أي موقع وسنسحب الاسم، النوتات، الصورة، والوصف تلقائياً!</p>
+                </div>
+              </div>
+            </div>
+            <div class="url-importer-row">
+              <div class="url-input-wrap">
+                <input type="url" id="perfumeUrlInput" placeholder="ضع رابط العطر هنا... (مثال: https://www.fragrantica.com/perfume/Dior/Sauvage-31861.html)" autocomplete="off">
+                <button type="button" class="btn-clear-url" id="btnClearUrl" title="مسح الرابط">✕</button>
+              </div>
+              <button type="button" class="button button-gold btn-fetch-url" id="btnScrapeUrl">
+                <span class="btn-fetch-icon">🪄</span>
+                <span class="btn-fetch-text">سحب البيانات</span>
+              </button>
+            </div>
+            <div id="scrapeFeedback" class="scrape-feedback" style="display:none;"></div>
+          </div>
+
           <div class="form-row">
             <label>اسم العطر (عربي) *
               <input id="prodName" name="name" required placeholder="مثال: رُوح الورد">

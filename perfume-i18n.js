@@ -227,11 +227,27 @@
     'marine notes': 'نوتات بحرية',
     'green notes': 'نوتات خضراء',
     'ozonic notes': 'نوتات أوزونية',
+    'cherry': 'كرز حلو',
+    'black cherry': 'كرز أسود فاخر',
+    'sour cherry': 'كرز بري حامض',
+    'cherry liqueur': 'ليكور الكرز المسكر',
+    'liqueur': 'ليكور عطري',
+    'peru balsam': 'بلسم بيرو العطري',
+    'balsam': 'بلسم عطري',
     'cognac': 'كونياك',
     'rum': 'روم فاخر',
     'tea': 'شاي',
     'black tea': 'شاي أسود',
-    'green tea': 'شاي أخضر'
+    'green tea': 'شاي أخضر',
+    'ambroxan': 'أمبروكسان',
+    'geranium': 'إبرة الراعي (جيرانيوم)',
+    'sichuan pepper': 'فلفل سيتشوان',
+    'calabrian bergamot': 'برغموت كالابريا',
+    'oakmoss': 'طحلب السنديان (أوكموس)',
+    'iso e super': 'آيزو إي سوبر',
+    'aldehydes': 'ألدهيدات',
+    'aldehyde': 'ألدهيدات',
+    'petitgrain': 'بيتي غران'
   };
 
   // Reverse mapping (Arabic to English)
