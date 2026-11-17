@@ -14,6 +14,17 @@
 </head>
 <body class="light">
   <div class="loader" id="loader" aria-label="جاري تحميل رُوح"><img src="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"><span class="loader-line"></span></div>
+  <script>
+    (function(){
+      function hideLoader(){
+        var l = document.getElementById('loader');
+        if (l && !l.classList.contains('done')) l.classList.add('done');
+      }
+      setTimeout(hideLoader, 350);
+      window.addEventListener('load', hideLoader);
+      document.addEventListener('DOMContentLoaded', hideLoader);
+    })();
+  </script>
   <div class="announcement" id="topAnnouncement">
     <span class="announcement-star">✳</span>
     <span data-i18n="announcement" id="topAnnouncementText">شحن لجميع المحافظات · دفع عند الاستلام · ضمان الثبات والفوحان · ✦ لو في عطر مش موجود ومحتاجه نقدر نوفرهولك</span>

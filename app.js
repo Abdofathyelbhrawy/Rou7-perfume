@@ -3673,7 +3673,7 @@
     if (e.target === giftModal) closeGiftBuilderModal();
   });
 
-  $('#productGrid').addEventListener('click', event => {
+  $('#productGrid')?.addEventListener('click', event => {
     const qvBtn = event.target.closest('[data-quickview], [data-explore]');
     if (qvBtn) {
       event.preventDefault();
@@ -3688,7 +3688,7 @@
   });
 
   // Hero section add-to-bag with button animation
-  $('#heroProduct').addEventListener('click', event => {
+  $('#heroProduct')?.addEventListener('click', event => {
     const button = event.target.closest('.btn-hero-quickadd');
     if (button && button.dataset.add) {
       event.preventDefault();
@@ -3874,7 +3874,7 @@
   $('#openQuizBtn')?.addEventListener('click', openScentQuiz);
   $('#quizModalClose')?.addEventListener('click', closeScentQuiz);
 
-  $('#cartItems').addEventListener('click', event => {
+  $('#cartItems')?.addEventListener('click', event => {
     const qty = event.target.closest('[data-qty]');
     const remove = event.target.closest('[data-remove]');
     if (qty) {
@@ -3910,15 +3910,15 @@
     document.body.classList.toggle('drawer-open', open);
   }
 
-  $('#cartToggle').addEventListener('click', () => drawer(true));
-  $('#cartClose').addEventListener('click', () => drawer(false));
-  $('#overlay').addEventListener('click', () => drawer(false));
-  $('#continueShopping').addEventListener('click', () => drawer(false));
+  $('#cartToggle')?.addEventListener('click', () => drawer(true));
+  $('#cartClose')?.addEventListener('click', () => drawer(false));
+  $('#overlay')?.addEventListener('click', () => drawer(false));
+  $('#continueShopping')?.addEventListener('click', () => drawer(false));
 
-  themeButton.addEventListener('click', () => setTheme(document.body.classList.contains('light') ? 'dark' : 'light'));
-  $('#mobileThemeToggle').addEventListener('click', () => {
-    setTheme(document.body.classList.contains('light') ? 'dark' : 'light');
-    $('#mobileMenu').classList.remove('open');
+  themeButton?.addEventListener('click', () => setTheme('light'));
+  $('#mobileThemeToggle')?.addEventListener('click', () => {
+    setTheme('light');
+    $('#mobileMenu')?.classList.remove('open');
   });
 
   // Language switcher listeners
@@ -3931,7 +3931,7 @@
     $('#mobileMenu')?.classList.remove('open');
   });
 
-  $('#menuToggle').addEventListener('click', () => $('#mobileMenu').classList.toggle('open'));
+  $('#menuToggle')?.addEventListener('click', () => $('#mobileMenu')?.classList.toggle('open'));
   $$('#mobileMenu a').forEach(link => link.addEventListener('click', () => $('#mobileMenu').classList.remove('open')));
 
   // ── Search Bar & Live Dropdown Event Handlers ─────────────────────────────
@@ -4035,7 +4035,7 @@
     }
   });
 
-  $('#newsletterForm').addEventListener('submit', async event => {
+  $('#newsletterForm')?.addEventListener('submit', async event => {
     event.preventDefault();
     const email = $('#emailInput').value.trim();
     if (!SUPABASE_URL.includes('YOUR_PROJECT_ID')) {
@@ -4049,20 +4049,23 @@
     showToast(I18N[currentLang].toast_newsletter);
   });
 
-  $('#checkoutButton').addEventListener('click', () => {
+  $('#checkoutButton')?.addEventListener('click', () => {
     if (!cart.length) return;
     drawer(false);
-    $('#checkoutModal').classList.add('open');
-    $('#checkoutFormView').hidden = false;
-    $('#orderSuccess').hidden = true;
+    const modal = $('#checkoutModal');
+    if (modal) modal.classList.add('open');
+    const formView = $('#checkoutFormView');
+    if (formView) formView.hidden = false;
+    const successView = $('#orderSuccess');
+    if (successView) successView.hidden = true;
   });
 
-  $('#checkoutClose').addEventListener('click', () => $('#checkoutModal').classList.remove('open'));
-  $('#checkoutModal').addEventListener('click', event => {
-    if (event.target.id === 'checkoutModal') $('#checkoutModal').classList.remove('open');
+  $('#checkoutClose')?.addEventListener('click', () => $('#checkoutModal')?.classList.remove('open'));
+  $('#checkoutModal')?.addEventListener('click', event => {
+    if (event.target.id === 'checkoutModal') $('#checkoutModal')?.classList.remove('open');
   });
 
-  $('#checkoutForm').addEventListener('submit', async event => {
+  $('#checkoutForm')?.addEventListener('submit', async event => {
     event.preventDefault();
 
     let waWindow = null;
@@ -4237,23 +4240,24 @@ ${itemsTextAr}
     updateCart();
   });
 
-  $('#finishOrder').addEventListener('click', () => {
-    $('#checkoutModal').classList.remove('open');
-    $('#checkoutForm').reset();
+  $('#finishOrder')?.addEventListener('click', () => {
+    $('#checkoutModal')?.classList.remove('open');
+    $('#checkoutForm')?.reset();
     window.scrollTo({top:0, behavior:'smooth'});
   });
 
-  $('#trackingLink').addEventListener('click', event => {
+  $('#trackingLink')?.addEventListener('click', event => {
     event.preventDefault();
-    $('#trackingModal').classList.add('open');
-    $('#trackingResult').textContent = '';
+    $('#trackingModal')?.classList.add('open');
+    const tr = $('#trackingResult');
+    if (tr) tr.textContent = '';
   });
-  $('#trackingClose').addEventListener('click', () => $('#trackingModal').classList.remove('open'));
-  $('#trackingModal').addEventListener('click', event => {
-    if (event.target.id === 'trackingModal') $('#trackingModal').classList.remove('open');
+  $('#trackingClose')?.addEventListener('click', () => $('#trackingModal')?.classList.remove('open'));
+  $('#trackingModal')?.addEventListener('click', event => {
+    if (event.target.id === 'trackingModal') $('#trackingModal')?.classList.remove('open');
   });
 
-  $('#trackingForm').addEventListener('submit', async event => {
+  $('#trackingForm')?.addEventListener('submit', async event => {
     event.preventDefault();
     const input   = $('#trackingInput').value.trim().toUpperCase();
     const result  = $('#trackingResult');

@@ -1903,111 +1903,117 @@
       return;
     }
 
-    let urlObj;
-    try {
-      urlObj = new URL(rawUrl);
-    } catch (_) {
-      if (feedback) {
-        feedback.style.display = 'flex';
-        feedback.className = 'scrape-feedback error';
-        feedback.innerHTML = '<span>⚠️</span> الرابط غير صالح. يرجى نسخ الرابط كاملاً يبدأ بـ https://';
+    let isDirectText = false;
+    let urlObj = null;
+    if (!/^https?:\/\//i.test(rawUrl)) {
+      isDirectText = true;
+    } else {
+      try {
+        urlObj = new URL(rawUrl);
+      } catch (_) {
+        isDirectText = true;
       }
-      return;
     }
 
     if (fetchBtn) fetchBtn.classList.add('loading');
     if (feedback) {
       feedback.style.display = 'flex';
       feedback.className = 'scrape-feedback info';
-      feedback.innerHTML = '<span>⏳</span> جاري الاتصال وسحب بيانات العطر من الرابط وتحليل النوتات...';
+      feedback.innerHTML = isDirectText
+        ? '<span>⏳</span> جاري تحليل النص واستخراج الهرم العطري والنوتات...'
+        : '<span>⏳</span> جاري الاتصال وسحب بيانات العطر من الرابط وتحليل النوتات...';
     }
 
     // Check for internal ID parameter (?id=...) from Rou7 store
-    let internalId = urlObj.searchParams.get('id');
-    if (internalId) {
-      let localProd = (currentProducts || []).find(p => String(p.id) === String(internalId));
-      if (!localProd) {
-        try {
-          const fetchedRows = await supaFetch('products', { filters: `&id=eq.${encodeURIComponent(internalId)}` });
-          if (fetchedRows && fetchedRows.length) localProd = fetchedRows[0];
-        } catch (_) {}
-      }
-      if (localProd) {
-        const details = unpackProductDetails(localProd);
-        $('#prodName').value = localProd.name || '';
-        $('#prodLatin').value = localProd.latin || '';
-        $('#prodCategory').value = localProd.category || 'unisex';
-        populateBrandSelects(details.brand || localProd.brand || '');
-        $('#prodInspiredBy').value = details.inspired_by || '';
-        $('#prodTopNotes').value = details.top_notes || '';
-        $('#prodMiddleNotes').value = details.middle_notes || '';
-        $('#prodBaseNotes').value = details.base_notes || '';
-        $('#prodNotes').value = details.notes || '';
-        $('#prodPrice').value = localProd.price || '';
-        if (details.sale_price && $('#prodSalePrice')) $('#prodSalePrice').value = details.sale_price;
-        if (details.cost_price && $('#prodCostPrice')) $('#prodCostPrice').value = details.cost_price;
-        $('#prodLongevity').value = details.longevity || '4';
-        $('#prodSillage').value = details.sillage || '3';
-
-        let accordsList = (details.accords || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
-        if (accordsList.length) {
-          renderAdminAccordsChips(accordsList);
-          if (details.main_accord && $('#prodMainAccord')) $('#prodMainAccord').value = details.main_accord;
+    if (urlObj) {
+      let internalId = urlObj.searchParams.get('id');
+      if (internalId) {
+        let localProd = (currentProducts || []).find(p => String(p.id) === String(internalId));
+        if (!localProd) {
+          try {
+            const fetchedRows = await supaFetch('products', { filters: `&id=eq.${encodeURIComponent(internalId)}` });
+            if (fetchedRows && fetchedRows.length) localProd = fetchedRows[0];
+          } catch (_) {}
         }
+        if (localProd) {
+          const details = unpackProductDetails(localProd);
+          $('#prodName').value = localProd.name || '';
+          $('#prodLatin').value = localProd.latin || '';
+          $('#prodCategory').value = localProd.category || 'unisex';
+          populateBrandSelects(details.brand || localProd.brand || '');
+          $('#prodInspiredBy').value = details.inspired_by || '';
+          $('#prodTopNotes').value = details.top_notes || '';
+          $('#prodMiddleNotes').value = details.middle_notes || '';
+          $('#prodBaseNotes').value = details.base_notes || '';
+          $('#prodNotes').value = details.notes || '';
+          $('#prodPrice').value = localProd.price || '';
+          if (details.sale_price && $('#prodSalePrice')) $('#prodSalePrice').value = details.sale_price;
+          if (details.cost_price && $('#prodCostPrice')) $('#prodCostPrice').value = details.cost_price;
+          $('#prodLongevity').value = details.longevity || '4';
+          $('#prodSillage').value = details.sillage || '3';
 
-        currentProductImages = Array.isArray(details.images) && details.images.length
-          ? [...details.images]
-          : (localProd.image_url ? [localProd.image_url] : []);
-        renderAdminGallery();
+          let accordsList = (details.accords || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
+          if (accordsList.length) {
+            renderAdminAccordsChips(accordsList);
+            if (details.main_accord && $('#prodMainAccord')) $('#prodMainAccord').value = details.main_accord;
+          }
 
-        if (feedback) {
-          feedback.style.display = 'flex';
-          feedback.className = 'scrape-feedback success';
-          feedback.innerHTML = `<span>✓</span> <strong>تم سحب بيانات العطر بنجاح!</strong> تم استيراد النوتات، والصور، وكافة التفاصيل.`;
+          currentProductImages = Array.isArray(details.images) && details.images.length
+            ? [...details.images]
+            : (localProd.image_url ? [localProd.image_url] : []);
+          renderAdminGallery();
+
+          if (feedback) {
+            feedback.style.display = 'flex';
+            feedback.className = 'scrape-feedback success';
+            feedback.innerHTML = `<span>✓</span> <strong>تم سحب بيانات العطر بنجاح!</strong> تم استيراد النوتات، والصور، وكافة التفاصيل.`;
+          }
+          if (fetchBtn) fetchBtn.classList.remove('loading');
+          $('#prodPrice')?.focus();
+          return;
         }
-        if (fetchBtn) fetchBtn.classList.remove('loading');
-        $('#prodPrice')?.focus();
-        return;
       }
     }
 
     try {
-      let pageText = '';
+      let pageText = isDirectText ? rawUrl : '';
       let microlinkData = null;
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 14000);
+      if (!isDirectText && urlObj) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 14000);
 
-      try {
-        const jinaUrl = 'https://r.jina.ai/' + encodeURIComponent(rawUrl);
-        const res = await fetch(jinaUrl, {
-          signal: controller.signal,
-          headers: { 'Accept': 'text/plain' }
-        });
-        if (res.ok) {
-          pageText = await res.text();
-        }
-      } catch (jinaErr) {
-        console.warn('Jina reader notice:', jinaErr);
-      } finally {
-        clearTimeout(timeoutId);
-      }
-
-      // Parallel query to Microlink API for high-res OG images and clean title fallback
-      try {
-        const mlRes = await fetch('https://api.microlink.io?url=' + encodeURIComponent(rawUrl));
-        if (mlRes.ok) {
-          const mlJson = await mlRes.json();
-          if (mlJson && mlJson.data) {
-            microlinkData = mlJson.data;
+        try {
+          const jinaUrl = 'https://r.jina.ai/' + encodeURIComponent(rawUrl);
+          const res = await fetch(jinaUrl, {
+            signal: controller.signal,
+            headers: { 'Accept': 'text/plain' }
+          });
+          if (res.ok) {
+            pageText = await res.text();
           }
+        } catch (jinaErr) {
+          console.warn('Jina reader notice:', jinaErr);
+        } finally {
+          clearTimeout(timeoutId);
         }
-      } catch (mlErr) {
-        console.warn('Microlink notice:', mlErr);
+
+        // Parallel query to Microlink API for high-res OG images and clean title fallback
+        try {
+          const mlRes = await fetch('https://api.microlink.io?url=' + encodeURIComponent(rawUrl));
+          if (mlRes.ok) {
+            const mlJson = await mlRes.json();
+            if (mlJson && mlJson.data) {
+              microlinkData = mlJson.data;
+            }
+          }
+        } catch (mlErr) {
+          console.warn('Microlink notice:', mlErr);
+        }
       }
 
       if (!pageText && !microlinkData) {
-        throw new Error('لم نتمكن من الوصول لصفحة الرابط. تأكد من صحة الرابط واتصالك بالإنترنت.');
+        throw new Error('لم نتمكن من الوصول لصفحة الرابط (حماية من الموقع مثل Cloudflare). يمكنك نسخ نص صفحة العطر أو النوتات ولصقها هنا مباشرة وسيقوم النظام باستخراجها فوراً!');
       }
 
       // 1. Extract Title and Clean Name
@@ -2185,9 +2191,18 @@
       }
 
       const cleanNotesStr = s => (s || '')
+        .replace(/first\s*\d+\s*min/gi, '')
+        .replace(/\d+\s*min\s*to\s*\d+\s*h/gi, '')
+        .replace(/\d+\s*h\s*and\s*more/gi, '')
+        .replace(/tap any note to learn how it smells/gi, '')
+        .replace(/scent pyramid|olfactory pyramid|الهرم العطري/gi, '')
         .replace(/\s+and\s+/gi, ', ')
+        .replace(/[\r\n]+/g, ', ')
         .replace(/[.;]+$/, '')
-        .replace(/\s*,\s*/g, ', ')
+        .split(/[,،;|\n]+/)
+        .map(x => x.trim().replace(/^[-*•]\s*/, ''))
+        .filter(x => x && !/^(top|heart|base|middle|bottom|قمة|قلب|قاعدة)$/i.test(x))
+        .join(', ')
         .trim();
 
       topNotesEn = cleanNotesStr(topNotesEn);
@@ -2318,7 +2333,9 @@
       if (feedback) {
         feedback.style.display = 'flex';
         feedback.className = 'scrape-feedback success';
-        feedback.innerHTML = `<span>✓</span> <strong>تم سحب البيانات بنجاح!</strong> تم ملء الاسم، النوتات، الصورة، والوصف. ضع سعر البيع والتكلفة ثم اضغط حفظ.`;
+        feedback.innerHTML = isDirectText
+          ? `<span>✓</span> <strong>تم استخراج البيانات من النص بنجاح!</strong> تم ملء الاسم، الهرم العطري، النوتات، والأكوردات. ضع سعر البيع والتكلفة ثم اضغط حفظ.`
+          : `<span>✓</span> <strong>تم سحب البيانات بنجاح!</strong> تم ملء الاسم، النوتات، الصورة، والوصف. ضع سعر البيع والتكلفة ثم اضغط حفظ.`;
       }
 
       $('#prodPrice')?.focus();
