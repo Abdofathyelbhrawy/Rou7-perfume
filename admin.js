@@ -36,20 +36,18 @@
   }
   // ─────────────────────────────────────────────────────────────────────────
 
-  let theme = 'dark';
-  try { theme = localStorage.getItem('rooh-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'); } catch (_) {}
-  function setTheme(next, persist = true) {
-    theme = next; document.body.classList.toggle('light', next === 'light');
-    document.querySelector('meta[name="theme-color"]').content = next === 'light' ? '#f5f0eb' : '#192940';
+  let theme = 'light';
+  function setTheme() {
+    theme = 'light';
+    document.body.classList.add('light');
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = '#f5f0eb';
     document.querySelectorAll('.brand-logo').forEach(image => {
-      const asset = image.dataset[next];
-      if (!asset || image.getAttribute('src') === asset) return;
-      image.style.opacity = '0'; setTimeout(() => { image.src = asset; image.style.opacity = '1'; }, 120);
+      image.src = 'assets/branding/1.svg';
     });
-    if (persist) localStorage.setItem('rooh-theme', next);
+    try { localStorage.setItem('rooh-theme', 'light'); } catch (_) {}
   }
-  setTheme(theme, false);
-  $('#adminTheme').addEventListener('click', () => setTheme(theme === 'light' ? 'dark' : 'light'));
+  setTheme();
 
   // ── Language & State Setup ────────────────────────────────────────────────
   let adminLang = 'ar';
@@ -1924,6 +1922,55 @@
       feedback.innerHTML = '<span>⏳</span> جاري الاتصال وسحب بيانات العطر من الرابط وتحليل النوتات...';
     }
 
+    // Check for internal ID parameter (?id=...) from Rou7 store
+    let internalId = urlObj.searchParams.get('id');
+    if (internalId) {
+      let localProd = (currentProducts || []).find(p => String(p.id) === String(internalId));
+      if (!localProd) {
+        try {
+          const fetchedRows = await supaFetch('products', { filters: `&id=eq.${encodeURIComponent(internalId)}` });
+          if (fetchedRows && fetchedRows.length) localProd = fetchedRows[0];
+        } catch (_) {}
+      }
+      if (localProd) {
+        const details = unpackProductDetails(localProd);
+        $('#prodName').value = localProd.name || '';
+        $('#prodLatin').value = localProd.latin || '';
+        $('#prodCategory').value = localProd.category || 'unisex';
+        populateBrandSelects(details.brand || localProd.brand || '');
+        $('#prodInspiredBy').value = details.inspired_by || '';
+        $('#prodTopNotes').value = details.top_notes || '';
+        $('#prodMiddleNotes').value = details.middle_notes || '';
+        $('#prodBaseNotes').value = details.base_notes || '';
+        $('#prodNotes').value = details.notes || '';
+        $('#prodPrice').value = localProd.price || '';
+        if (details.sale_price && $('#prodSalePrice')) $('#prodSalePrice').value = details.sale_price;
+        if (details.cost_price && $('#prodCostPrice')) $('#prodCostPrice').value = details.cost_price;
+        $('#prodLongevity').value = details.longevity || '4';
+        $('#prodSillage').value = details.sillage || '3';
+
+        let accordsList = (details.accords || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
+        if (accordsList.length) {
+          renderAdminAccordsChips(accordsList);
+          if (details.main_accord && $('#prodMainAccord')) $('#prodMainAccord').value = details.main_accord;
+        }
+
+        currentProductImages = Array.isArray(details.images) && details.images.length
+          ? [...details.images]
+          : (localProd.image_url ? [localProd.image_url] : []);
+        renderAdminGallery();
+
+        if (feedback) {
+          feedback.style.display = 'flex';
+          feedback.className = 'scrape-feedback success';
+          feedback.innerHTML = `<span>✓</span> <strong>تم سحب بيانات العطر بنجاح!</strong> تم استيراد النوتات، والصور، وكافة التفاصيل.`;
+        }
+        if (fetchBtn) fetchBtn.classList.remove('loading');
+        $('#prodPrice')?.focus();
+        return;
+      }
+    }
+
     try {
       let pageText = '';
       let microlinkData = null;
@@ -2110,6 +2157,31 @@
             }
           }
         }
+
+        // 5. 'Scent pyramid' format (Top / Heart / Base with time indicators)
+        if (!topNotesEn || !midNotesEn || !baseNotesEn) {
+          const pyrBlock = pageText.match(/(?:scent\s+pyramid|olfactory\s+pyramid|الهرم العطري)[\s\S]*?(?=(?:scent\s+dna|performance|###|##|$))/i);
+          const pArea = pyrBlock ? pyrBlock[0] : pageText;
+
+          if (!topNotesEn) {
+            const tm = pArea.match(/(?:^|\n)\s*(?:▲\s*)?(?:Top|قمة العطر)(?:\s*\(Top\))?(?:\s*First\s*\d+\s*min)?\s*\n([\s\S]*?)(?=(?:\n\s*(?:■\s*)?(?:Heart|Middle|قلب العطر))|$)/i);
+            if (tm) {
+              topNotesEn = tm[1].replace(/First\s*\d+\s*min/gi, '').trim().split(/\n+/).map(s => s.trim().replace(/^[-*•]\s*/, '')).filter(Boolean).join(', ');
+            }
+          }
+          if (!midNotesEn) {
+            const hm = pArea.match(/(?:^|\n)\s*(?:■\s*)?(?:Heart|Middle|قلب العطر)(?:\s*\(Heart\))?(?:\s*\d+\s*min[^\n]*)?\s*\n([\s\S]*?)(?=(?:\n\s*(?:◼\s*)?(?:Base|Bottom|قاعدة العطر))|$)/i);
+            if (hm) {
+              midNotesEn = hm[1].replace(/\d+\s*min\s*to\s*\d+\s*h/gi, '').trim().split(/\n+/).map(s => s.trim().replace(/^[-*•]\s*/, '')).filter(Boolean).join(', ');
+            }
+          }
+          if (!baseNotesEn) {
+            const bm = pArea.match(/(?:^|\n)\s*(?:◼\s*)?(?:Base|Bottom|قاعدة العطر)(?:\s*\(Base\))?(?:\s*\d+\s*h[^\n]*)?\s*\n([\s\S]*?)(?=(?:\n\s*(?:###|##|Scent DNA|Performance))|$)/i);
+            if (bm) {
+              baseNotesEn = bm[1].replace(/\d+\s*h\s*and\s*more/gi, '').trim().split(/\n+/).map(s => s.trim().replace(/^[-*•]\s*/, '')).filter(Boolean).join(', ');
+            }
+          }
+        }
       }
 
       const cleanNotesStr = s => (s || '')
@@ -2126,13 +2198,18 @@
       const midNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(midNotesEn, 'ar') : midNotesEn;
       const baseNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(baseNotesEn, 'ar') : baseNotesEn;
 
-      // 4. Main Accords
+      // 4. Main Accords & Performance
       let accordsList = [];
+      let scrapedLongevity = '4';
+      let scrapedSillage = '3';
       if (pageText) {
-        const accordsMatch = pageText.match(/main accords\s*\n+([\s\S]*?)(?=\n\s*\n|###|---|\*\*)/i);
+        const accordsMatch = pageText.match(/(?:main accords|scent dna|الأكوردات)\s*\n+([\s\S]*?)(?=\n\s*\n|###|---|\*\*|Performance|$)/i);
         if (accordsMatch) {
-          accordsList = accordsMatch[1].split(/\n+/).map(s => s.trim().replace(/^[-*•]\s*/, '')).filter(Boolean).slice(0, 5);
+          accordsList = accordsMatch[1].split(/\n+/).map(s => s.trim().replace(/^(?:[-*•]|built from[^\n]*)\s*/i, '')).filter(s => s && !s.toLowerCase().includes('built from') && !s.toLowerCase().includes('main accord')).slice(0, 5);
         }
+        if (/beast mode|12\+|10\+|very long lasting/i.test(pageText)) scrapedLongevity = '5';
+        else if (/moderate/i.test(pageText)) scrapedLongevity = '3';
+        if (/beast mode|enormous|strong/i.test(pageText)) scrapedSillage = '4';
       }
 
       // 5. Bottle Images Extraction (Cover + Secondary Photos)
@@ -2234,8 +2311,8 @@
       $('#prodNotes').value = descText;
 
       // Longevity & Sillage
-      $('#prodLongevity').value = '4';
-      $('#prodSillage').value = '3';
+      $('#prodLongevity').value = scrapedLongevity;
+      $('#prodSillage').value = scrapedSillage;
 
       // Feedback
       if (feedback) {

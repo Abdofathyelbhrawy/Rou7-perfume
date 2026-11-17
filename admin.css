@@ -5,40 +5,35 @@
   --burgundy: #812d35;
   --cream: #f5f0eb;
   --white: #fffdfb;
-  --muted: #a6a7ac;
-  --line: rgba(245,240,235,.14);
-  --bg: #192940;
-  --ink: #f5f0eb;
-  --card: #202f45;
+  --muted: #716d6c;
+  --line: rgba(25,41,64,.14);
+  --bg: #f5f0eb;
+  --ink: #192940;
+  --card: #fffdfb;
   font-family: 'IBM Plex Sans Arabic','DM Sans',sans-serif;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
   box-sizing: border-box;
 }
 
-body {
-  --bg: #192940;
-  --ink: #f5f0eb;
-  --card: #202f45;
-  --line: rgba(245,240,235,.14);
-  --muted: #a6a7ac;
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: inherit;
-  min-height: 100vh;
-  transition: .3s;
-}
-
-body.light {
-  color-scheme: light;
+body, body.light {
   --bg: #f5f0eb;
   --ink: #192940;
   --card: #fffdfb;
   --line: rgba(25,41,64,.14);
   --muted: #716d6c;
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: inherit;
+  min-height: 100vh;
+  color-scheme: light;
+}
+
+#adminTheme {
+  display: none !important;
 }
 
 .admin-sidebar {
@@ -47,12 +42,13 @@ body.light {
   inset-inline-start: 0;
   width: 238px;
   padding: 25px 20px;
-  background: var(--navy-deep);
+  background: #ffffff !important;
   display: flex;
   flex-direction: column;
   z-index: 2;
-  color: var(--cream);
-  transition: background .3s ease, color .3s ease, border-color .3s ease;
+  color: var(--ink) !important;
+  border-inline-end: 1px solid var(--line);
+  box-shadow: -4px 0 24px rgba(66, 44, 36, 0.05);
 }
 
 body.light .admin-sidebar {

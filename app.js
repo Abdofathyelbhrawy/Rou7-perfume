@@ -628,21 +628,17 @@
   const themeButton = $('#themeToggle');
 
   function setTheme(theme, persist = true) {
-    const light = theme === 'light';
-    document.body.classList.toggle('light', light);
-    document.querySelector('meta[name="theme-color"]').content = light ? '#f5f0eb' : '#192940';
+    document.body.classList.add('light');
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = '#f5f0eb';
     $$('.brand-logo').forEach(image => {
-      const next = image.dataset[light ? 'light' : 'dark'];
-      if (!next || image.src.endsWith(next)) return;
-      image.style.opacity = '0';
-      window.setTimeout(() => { image.src = next; image.style.opacity = '1'; }, 150);
+      image.src = 'assets/branding/1.svg';
     });
-    themeButton?.setAttribute('aria-label', light ? (currentLang === 'ar' ? 'التبديل للمظهر الداكن' : 'Switch to Dark Mode') : (currentLang === 'ar' ? 'التبديل للمظهر الفاتح' : 'Switch to Light Mode'));
-    if (persist) localStorage.setItem('rooh-theme', theme);
+    if (persist) {
+      try { localStorage.setItem('rooh-theme', 'light'); } catch (_) {}
+    }
   }
-  let initialTheme = 'dark';
-  try { initialTheme = localStorage.getItem('rooh-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'); } catch (_) {}
-  setTheme(initialTheme, false);
+  setTheme('light', true);
 
   function setLanguage(lang, persist = true) {
     currentLang = lang === 'en' ? 'en' : 'ar';

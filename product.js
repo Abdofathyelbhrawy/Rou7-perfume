@@ -1268,13 +1268,13 @@
     updateCartUI();
   }
 
-  function setTheme(isLight) {
-    document.body.classList.toggle('light', isLight);
-    localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
-
-    const brandLogos = $$('.brand-logo');
-    brandLogos.forEach(img => {
-      img.src = isLight ? (img.dataset.light || img.src) : (img.dataset.dark || img.src);
+  function setTheme() {
+    document.body.classList.add('light');
+    try { localStorage.setItem(THEME_KEY, 'light'); } catch (_) {}
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = '#f5f0eb';
+    $$('.brand-logo').forEach(img => {
+      img.src = 'assets/branding/1.svg';
     });
   }
 
@@ -1282,8 +1282,7 @@
   async function init() {
     // 1. Language & Theme
     setLanguage(currentLang);
-    const savedTheme = localStorage.getItem(THEME_KEY);
-    if (savedTheme === 'light') setTheme(true);
+    setTheme();
 
     // 1.1 Load top announcement bar settings
     function applyAnnouncements(data) {

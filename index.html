@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#192940">
+  <meta name="theme-color" content="#f5f0eb">
   <meta name="description" content="رُوح | Rou7 Perfume — اكتشف عطرك، واترك أثراً لا يُنسى.">
   <title>رُوح | Rou7 Perfume — عطر يلامس أعماقك</title>
   <link rel="icon" type="image/png" href="assets/branding/favicon.png">
@@ -12,8 +12,8 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <div class="loader" id="loader" aria-label="جاري تحميل رُوح"><img src="assets/branding/2.svg" alt="رُوح | Rou7 Perfume"><span class="loader-line"></span></div>
+<body class="light">
+  <div class="loader" id="loader" aria-label="جاري تحميل رُوح"><img src="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"><span class="loader-line"></span></div>
   <div class="announcement" id="topAnnouncement">
     <span class="announcement-star">✳</span>
     <span data-i18n="announcement" id="topAnnouncementText">شحن لجميع المحافظات · دفع عند الاستلام · ضمان الثبات والفوحان · ✦ لو في عطر مش موجود ومحتاجه نقدر نوفرهولك</span>
@@ -28,11 +28,10 @@
         <a href="#customPerfumeSection" data-i18n="nav_custom">طلب توفير عطر</a>
         <a href="#story" data-i18n="nav_story">حكايتنا</a>
       </nav>
-      <a class="brand" href="#home" aria-label="رُوح | Rou7 Perfume"><img class="brand-logo" src="assets/branding/2.svg" data-dark="assets/branding/2.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></a>
+      <a class="brand" href="#home" aria-label="رُوح | Rou7 Perfume"><img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></a>
       <div class="header-actions">
         <button class="icon-btn lang-toggle" id="langToggle" aria-label="تغيير اللغة | Switch Language" title="تغيير اللغة"><span class="lang-globe">🌐</span> <span id="langText">EN</span></button>
         <button class="icon-btn search-toggle" id="searchToggle" aria-label="بحث"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></button>
-        <button class="icon-btn theme-toggle" id="themeToggle" aria-label="تغيير المظهر"><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
         <button class="icon-btn cart-toggle" id="cartToggle" aria-label="سلة التسوق"><svg viewBox="0 0 24 24"><path d="M4 8h16l-1.5 13h-13L4 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg><span class="cart-count" id="cartCount">0</span></button>
       </div>
     </div>
@@ -42,7 +41,6 @@
       <a href="#customPerfumeSection" data-i18n="nav_custom">طلب توفير عطر</a>
       <a href="#story" data-i18n="nav_story">حكايتنا</a>
       <button id="mobileLangToggle" class="mobile-lang-btn">🌐 <span id="mobileLangText">English</span></button>
-      <button id="mobileThemeToggle" data-i18n="theme_toggle_mobile">تغيير المظهر</button>
     </div>
     <div class="search-bar" id="searchBar">
       <div class="search-bar-inner">
@@ -338,7 +336,7 @@
 
   <footer class="site-footer">
     <div class="footer-top">
-      <a class="footer-brand" href="#home"><img class="brand-logo" src="assets/branding/2.svg" data-dark="assets/branding/2.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></a>
+      <a class="footer-brand" href="#home"><img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></a>
       <p data-i18n-html="footer_tagline">عطر يلامس أعماقك.<br>رائحة تُشبهك، وذكرى تبقى.</p>
       <div class="footer-links">
         <a href="#collection" data-i18n="nav_collection">تسوق العطور</a>
@@ -404,7 +402,7 @@
   <div class="modal" id="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
     <div class="modal-card">
       <button class="modal-close" id="checkoutClose" aria-label="إغلاق">×</button>
-      <div class="modal-brand"><img class="brand-logo" src="assets/branding/2.svg" data-dark="assets/branding/2.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></div>
+      <div class="modal-brand"><img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></div>
       <div class="checkout-form-view" id="checkoutFormView">
         <p class="eyebrow"><span></span> <span data-i18n="checkout_eyebrow">خطوة أخيرة</span></p>
         <h2 id="checkoutTitle" data-i18n-html="checkout_title">بيانات <em>التوصيل</em></h2>
@@ -435,7 +433,7 @@
   <div class="modal" id="trackingModal" role="dialog" aria-modal="true" aria-labelledby="trackingTitle">
     <div class="modal-card">
       <button class="modal-close" id="trackingClose" aria-label="إغلاق">×</button>
-      <div class="modal-brand"><img class="brand-logo" src="assets/branding/2.svg" data-dark="assets/branding/2.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></div>
+      <div class="modal-brand"><img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></div>
       <div>
         <p class="eyebrow"><span></span> <span data-i18n="track_eyebrow">خليك قريب</span></p>
         <h2 id="trackingTitle" data-i18n-html="track_title">تتبع <em>طلبك</em></h2>
