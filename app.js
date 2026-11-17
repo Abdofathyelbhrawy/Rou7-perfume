@@ -113,9 +113,12 @@
       val_3: 'صُنع بحب في مصر',
       val_4: 'هدية تحكي عنك',
       val_custom: 'لو في عطر مش موجود ومحتاجه نقدر نوفرهولك',
-      cp_eyebrow: 'خدمة رُوح الخاصة ✦',
+      cp_eyebrow: 'خدمة رُوح الخاصة للأصالة والفخامة ✦',
       cp_title: 'لو في عطر مش موجود ومحتاجه… <em>نقدر نوفرهولك</em>',
-      cp_desc: 'بتدور على عطر معين ومش لاقيه في المتجر؟ ابعتلنا اسمه أو صورته على واتساب وهنوفرهولك فوراً بأفضل سعر وأعلى جودة وأصلية مضمونة 100%.',
+      cp_desc: 'بتدور على عطر معين (ماركة عالمية، نيش، أو نادر) ومش لاقيه في متجرنا؟ ابعتلنا اسمه أو صورته على واتساب وهنوفرهولك فوراً بأفضل سعر وأعلى جودة وأصلية مضمونة 100%.',
+      cp_feat_1: 'نوفر لك أي عطر أصلي غير متوفر بالمتجر',
+      cp_feat_2: 'ضمان أعلى ثبات وجودة وأفضل سعر فوري',
+      cp_feat_3: 'شحن سريع وتغليف فاخر حتى باب بيتك',
       cp_cta: 'اطلب توفير عطرك عبر واتساب 💬',
       cp_consult_note: 'رد وتأكيد فوري على مدار الساعة',
       nav_custom: 'طلب توفير عطر',
@@ -275,9 +278,12 @@
       val_3: 'Crafted with love in Egypt',
       val_4: 'A gift that speaks of you',
       val_custom: 'Looking for a scent not listed? We can provide it for you',
-      cp_eyebrow: 'Rou7 Special Sourcing Service ✦',
+      cp_eyebrow: 'Rou7 Exclusive Luxury Sourcing ✦',
       cp_title: 'Can’t find your favorite perfume? <em>We can provide it for you</em>',
-      cp_desc: 'Searching for a specific fragrance that is not listed in our store? Message us on WhatsApp with its name or photo and we will source it for you at the best price with 100% authenticity guaranteed.',
+      cp_desc: 'Searching for a specific fragrance (designer, niche, or rare) not listed in our store? Message us on WhatsApp with its name or photo and we will source it for you at the best price with 100% authenticity guaranteed.',
+      cp_feat_1: 'We source any authentic perfume not listed',
+      cp_feat_2: 'Guaranteed highest longevity & best instant price',
+      cp_feat_3: 'Express shipping & luxury royal packaging',
       cp_cta: 'Request Your Perfume on WhatsApp 💬',
       cp_consult_note: 'Instant 24/7 response & inquiry confirmation',
       nav_custom: 'Request a Scent',
@@ -3510,11 +3516,17 @@
     giftSelectedPerfumeIds = [];
     giftCardMessage = '';
     renderGiftBuilder();
-    if (giftModal) giftModal.classList.add('open');
+    if (giftModal) {
+      giftModal.classList.add('open');
+      document.body.classList.add('modal-open');
+    }
   }
 
   function closeGiftBuilderModal() {
-    if (giftModal) giftModal.classList.remove('open');
+    if (giftModal) {
+      giftModal.classList.remove('open');
+      document.body.classList.remove('modal-open');
+    }
   }
 
   function renderGiftBuilder() {

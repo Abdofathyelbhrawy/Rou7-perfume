@@ -1962,6 +1962,43 @@ body.light .cp-main-title em {
   margin: 0;
   max-width: 660px;
 }
+.cp-features-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+.cp-feat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(184, 134, 11, 0.18);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+.cp-feat-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.cp-badge-floating {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(184, 134, 11, 0.12);
+  border: 1px solid rgba(184, 134, 11, 0.28);
+  color: #8b5a00;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  margin-bottom: 6px;
+}
 .cp-action-col {
   flex: 0 0 auto;
   min-width: min(100%, 250px);
@@ -3922,10 +3959,10 @@ body.light .planet-inspect-hint {
 
 /* Dim background 3D scene when inspecting */
 .cosmic-solar-universe.inspecting .cosmic-3d-scene {
-  opacity: 0.12 !important;
-  filter: blur(8px) !important;
+  opacity: 0.04 !important;
+  filter: blur(10px) !important;
   transform: scale(0.92);
-  pointer-events: none;
+  pointer-events: none !important;
   transition: all .35s ease;
 }
 
@@ -4432,13 +4469,22 @@ body.light .cosmic-pill-btn.active {
   .planet-ground-shadow { width: 44px; height: 10px; }
   .planet-atmosphere-3d { width: 74px; height: 74px; }
 
+  .cosmic-solar-universe.inspecting .cosmic-3d-scene {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
   .cosmic-inspector-backdrop {
     position: fixed;
-    z-index: 90;
-    background: rgba(11, 19, 32, 0.72);
+    inset: 0;
+    z-index: 998;
+    background: rgba(15, 23, 42, 0.72) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
   body.light .cosmic-inspector-backdrop {
-    background: rgba(245, 240, 235, 0.82);
+    background: rgba(15, 23, 42, 0.65) !important;
   }
 
   .cosmic-inspector-card {
@@ -4448,14 +4494,15 @@ body.light .cosmic-pill-btn.active {
     right: 0;
     width: 100%;
     max-width: 100%;
-    z-index: 100;
+    z-index: 999;
     padding: 16px 18px 22px;
     border-radius: 22px 22px 0 0;
     border-bottom: none;
     border-left: none;
     border-right: none;
-    background: #142236 !important;
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.65), 0 0 30px rgba(245, 165, 173, 0.18);
+    background: #ffffff !important;
+    color: #192940 !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.45);
     max-height: 85vh;
     overflow-y: auto;
   }
@@ -4614,92 +4661,175 @@ body.light .gbb-badge {
   box-shadow: 0 10px 26px rgba(212, 175, 55, 0.5);
 }
 
-/* Gift Builder Modal */
-.gift-builder-card {
-  max-width: 680px;
-  width: 95%;
-  max-height: 90vh;
-  overflow-y: auto;
-  border-radius: 24px;
-  padding: 28px 30px;
-  background: var(--card);
-  border: 1px solid var(--line);
+/* ==========================================================
+   Gift Builder Modal (صمّم بوكس هدايا رُوح الملكي)
+   ========================================================== */
+#giftBoxBuilderModal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000 !important;
+  background: rgba(15, 23, 42, 0.75) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  overflow: hidden;
 }
-.gb-header {
-  text-align: center;
-  margin-bottom: 22px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--line);
-}
-.gb-header h2 {
-  margin: 0 0 6px;
-  font-size: 22px;
-  color: var(--ink);
-}
-.gb-header p {
-  margin: 0;
-  font-size: 12.5px;
-  color: var(--muted);
+#giftBoxBuilderModal.open {
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-/* Tier Selector Pills */
+body.modal-open {
+  overflow: hidden !important;
+}
+
+.gift-builder-card {
+  position: relative;
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 24px;
+  padding: 28px 28px 22px;
+  background: #ffffff !important;
+  color: #192940 !important;
+  border: 1px solid rgba(25, 41, 64, 0.12) !important;
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.4) !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(129, 45, 53, 0.25) transparent;
+}
+.gift-builder-card::-webkit-scrollbar {
+  width: 6px;
+}
+.gift-builder-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+.gift-builder-card::-webkit-scrollbar-thumb {
+  background: rgba(129, 45, 53, 0.2);
+  border-radius: 4px;
+}
+.gift-builder-card::-webkit-scrollbar-thumb:hover {
+  background: rgba(129, 45, 53, 0.4);
+}
+
+#giftBoxBuilderModal .modal-close {
+  position: absolute;
+  top: 14px;
+  inset-inline-start: 16px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(25, 41, 64, 0.05);
+  border: 1px solid rgba(25, 41, 64, 0.1);
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  line-height: 1;
+  color: #192940;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+#giftBoxBuilderModal .modal-close:hover {
+  background: #812d35;
+  color: #ffffff;
+  border-color: #812d35;
+  transform: rotate(90deg);
+}
+
+.gb-header {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(25, 41, 64, 0.08);
+}
+.gb-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  background: rgba(212, 175, 55, 0.12);
+  color: #8b5a00;
+  font-size: 11.5px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+.gb-title {
+  margin: 4px 0 6px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #192940;
+}
+.gb-desc {
+  margin: 0 auto;
+  max-width: 520px;
+  font-size: 13px;
+  color: #65758b;
+  line-height: 1.5;
+}
+
+/* Tier Selector Cards */
 .gb-section-label {
   display: block;
   font-size: 12px;
   font-weight: 700;
-  color: var(--ink);
+  color: #192940;
   margin-bottom: 10px;
-  letter-spacing: .03em;
 }
 .gb-tiers-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-  margin-bottom: 22px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
 }
 .gb-tier-card {
-  border: 1.5px solid var(--line);
-  background: rgba(255, 255, 255, 0.02);
+  background: #faf8f5;
+  border: 1.5px solid rgba(25, 41, 64, 0.1);
   border-radius: 14px;
-  padding: 14px;
+  padding: 12px 10px;
   cursor: pointer;
   text-align: center;
-  transition: all .2s ease;
-}
-body.light .gb-tier-card {
-  background: rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+  user-select: none;
 }
 .gb-tier-card:hover {
-  border-color: rgba(212, 175, 55, 0.4);
+  border-color: #d4af37;
+  background: #fffdf9;
   transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.15);
 }
 .gb-tier-card.active {
+  background: #fff9eb;
   border-color: #d4af37;
-  background: rgba(212, 175, 55, 0.1);
-  box-shadow: 0 4px 18px rgba(212, 175, 55, 0.2);
-}
-.gb-tier-icon {
-  font-size: 24px;
-  margin-bottom: 4px;
+  box-shadow: 0 0 0 2px #d4af37, 0 6px 18px rgba(212, 175, 55, 0.2);
 }
 .gb-tier-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  color: var(--ink);
-  margin-bottom: 2px;
+  color: #192940;
+  margin-bottom: 3px;
+  line-height: 1.3;
 }
 .gb-tier-sub {
-  font-size: 10.5px;
-  color: var(--muted);
+  font-size: 10px;
+  color: #65758b;
   margin-bottom: 6px;
+  line-height: 1.3;
 }
 .gb-tier-price {
   font-size: 14px;
   font-weight: 700;
-  color: #f6bd60;
-}
-body.light .gb-tier-price {
-  color: #8b5a00;
+  color: #b8860b;
+  font-family: 'DM Sans', sans-serif;
 }
 
 /* Fragrance Selection Grid */
@@ -4708,81 +4838,90 @@ body.light .gb-tier-price {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
-  font-size: 12px;
+  font-size: 12.5px;
+  color: #192940;
 }
 .gb-picker-counter {
   font-weight: 700;
-  color: var(--pink);
-}
-body.light .gb-picker-counter {
-  color: var(--burgundy);
+  color: #812d35;
 }
 .gb-perfumes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 10px;
-  max-height: 260px;
+  max-height: 240px;
   overflow-y: auto;
-  padding: 6px;
-  margin-bottom: 20px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.08);
+  padding: 8px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(25, 41, 64, 0.1);
+  border-radius: 14px;
+  background: #faf8f5;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(129, 45, 53, 0.2) transparent;
 }
-body.light .gb-perfumes-grid {
-  background: rgba(0, 0, 0, 0.02);
+.gb-perfumes-grid::-webkit-scrollbar {
+  width: 5px;
+}
+.gb-perfumes-grid::-webkit-scrollbar-thumb {
+  background: rgba(129, 45, 53, 0.2);
+  border-radius: 4px;
 }
 .gb-perfume-chip {
   position: relative;
-  border: 1.5px solid var(--line);
-  border-radius: 10px;
-  padding: 8px;
+  border: 1.5px solid rgba(25, 41, 64, 0.08);
+  border-radius: 12px;
+  padding: 10px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 4px;
+  gap: 5px;
   cursor: pointer;
-  background: var(--card);
-  transition: all .2s ease;
+  background: #ffffff;
+  transition: all 0.2s ease;
   user-select: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 .gb-perfume-chip:hover {
-  border-color: rgba(245, 165, 173, 0.4);
+  border-color: #d4af37;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(212, 175, 55, 0.15);
 }
 .gb-perfume-chip.selected {
+  background: #fff9ea;
   border-color: #d4af37;
-  background: rgba(212, 175, 55, 0.12);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+  box-shadow: 0 0 0 2px #d4af37, 0 6px 16px rgba(212, 175, 55, 0.22);
 }
 .gb-chip-check {
   position: absolute;
   top: 6px;
-  right: 6px;
+  inset-inline-end: 6px;
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 1.5px solid var(--line);
+  border: 1.5px solid rgba(25, 41, 64, 0.15);
   display: grid;
   place-items: center;
   font-size: 10px;
-  background: var(--card);
+  background: #ffffff;
+  color: #65758b;
+  font-weight: 700;
 }
 .gb-perfume-chip.selected .gb-chip-check {
   background: #d4af37;
   border-color: #d4af37;
   color: #0b111a;
-  font-weight: 700;
 }
 .gb-chip-thumb {
   width: 38px;
   height: 48px;
   object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
 }
 .gb-chip-name {
   font-size: 11px;
   font-weight: 600;
-  color: var(--ink);
+  color: #192940;
   line-height: 1.3;
   max-width: 100%;
   white-space: nowrap;
@@ -4791,31 +4930,32 @@ body.light .gb-perfumes-grid {
 }
 .gb-chip-brand {
   font-size: 9.5px;
-  color: var(--muted);
+  color: #65758b;
 }
 
 /* Dedication Card Message */
 .gb-card-field {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 .gb-card-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  min-height: 60px;
+  background: #faf8f5;
+  border: 1.5px solid rgba(25, 41, 64, 0.12);
+  border-radius: 12px;
   padding: 10px 14px;
-  color: var(--ink);
+  color: #192940;
   font-family: inherit;
   font-size: 12.5px;
   resize: vertical;
-  min-height: 55px;
-}
-body.light .gb-card-input {
-  background: #fff;
+  outline: none;
+  transition: all 0.2s ease;
+  line-height: 1.6;
 }
 .gb-card-input:focus {
-  outline: none;
   border-color: #d4af37;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
 }
 
 /* Modal Footer & Actions */
@@ -4823,49 +4963,50 @@ body.light .gb-card-input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
+  gap: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(25, 41, 64, 0.08);
   flex-wrap: wrap;
 }
 .gb-price-block {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 .gb-price-label {
-  font-size: 10.5px;
-  color: var(--muted);
+  font-size: 11px;
+  color: #65758b;
+  font-weight: 500;
 }
 .gb-price-val {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
-  color: #f6bd60;
-}
-body.light .gb-price-val {
-  color: #8b5a00;
+  color: #b8860b;
+  font-family: 'DM Sans', sans-serif;
 }
 .gb-actions-row {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 .btn-gb-cart {
   padding: 11px 20px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #0b111a !important;
+  background: #812d35;
+  color: #ffffff !important;
   font-weight: 700;
   font-size: 13px;
   border: none;
   cursor: pointer;
-  transition: all .2s;
-  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+  transition: all 0.2s ease;
 }
 .btn-gb-cart:hover:not(:disabled) {
+  background: #9d3943;
   transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(129, 45, 53, 0.25);
 }
 .btn-gb-cart:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
   transform: none;
 }
@@ -4873,7 +5014,7 @@ body.light .gb-price-val {
   padding: 11px 18px;
   border-radius: 10px;
   background: #25d366;
-  color: #fff !important;
+  color: #ffffff !important;
   font-weight: 700;
   font-size: 13px;
   border: none;
@@ -4882,11 +5023,45 @@ body.light .gb-price-val {
   align-items: center;
   gap: 6px;
   text-decoration: none;
-  transition: all .2s;
+  transition: all 0.2s ease;
 }
 .btn-gb-wa:hover:not(:disabled) {
   background: #20bd5a;
   transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.3);
+}
+.btn-gb-wa:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 600px) {
+  .gift-builder-card {
+    padding: 22px 14px 16px;
+    border-radius: 18px;
+    max-height: 92vh;
+  }
+  .gb-tiers-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .gb-perfumes-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-height: 200px;
+  }
+  .gb-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .gb-actions-row {
+    flex-direction: column;
+  }
+  .btn-gb-cart, .btn-gb-wa {
+    width: 100%;
+    justify-content: center;
+  }
 }
 .btn-gb-wa:disabled {
   opacity: 0.5;
