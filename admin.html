@@ -741,28 +741,35 @@
           </label>
 
           <div class="form-group image-upload-group">
-            <label>صورة العطر</label>
-            <div class="image-dropzone" id="imageDropzone">
-              <input type="file" id="prodFileInput" accept="image/*" style="display:none">
-              <div class="dropzone-preview" id="dropzonePreview" hidden>
-                <img id="imagePreviewImg" src="" alt="معاينة الصورة">
-                <button type="button" class="btn-remove-image" id="btnRemoveImage" title="إزالة أو تغيير الصورة">×</button>
-              </div>
-              <div class="dropzone-prompt" id="dropzonePrompt">
+            <div class="image-gallery-header">
+              <label>معرض صور العطر (يمكنك رفع أو إضافة أكثر من صورة — الأولى ستكون الغلاف الرئيسي)</label>
+              <span class="gallery-count-badge" id="galleryCountBadge">0 صور</span>
+            </div>
+
+            <!-- Upload & URL Row -->
+            <div class="image-add-row">
+              <div class="image-dropzone-compact" id="imageDropzone">
+                <input type="file" id="prodFileInput" accept="image/*" multiple style="display:none">
                 <span class="upload-icon">📷</span>
-                <p><strong>اضغط لاختيار صورة العطر من جهازك</strong> أو اسحبها هنا</p>
-                <small>يدعم JPG, PNG, WebP حتى 5MB</small>
+                <span><strong>اضغط لاختيار صور العطر من جهازك (يدعم صوراً متعددة)</strong> أو اسحبها هنا</span>
+              </div>
+              <div class="image-url-add-wrap">
+                <input id="prodImageManual" type="url" placeholder="أو أدخل رابط صورة مباشر https://...">
+                <button type="button" class="btn-add-img-url" id="btnAddImageUrl">+ إضافة الرابط</button>
               </div>
             </div>
+
+            <!-- Visual Gallery Grid -->
+            <div class="prod-images-gallery-grid" id="prodImagesGallery">
+              <!-- Dynamically populated thumbnail cards -->
+            </div>
+
             <input type="hidden" id="prodImage" name="image_url">
           </div>
 
           <div class="form-row">
             <label>شارة أو وسام (اختياري)
               <input id="prodTag" name="tag" placeholder="مثال: جديد / الأكثر مبيعاً">
-            </label>
-            <label>أو أدخل رابط صورة مباشر (اختياري)
-              <input id="prodImageManual" type="url" placeholder="https://... رابط صورة">
             </label>
           </div>
           <div class="form-section-title">📦 إدارة المخزون والكميات (Inventory & Stock)</div>

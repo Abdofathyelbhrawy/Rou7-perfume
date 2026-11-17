@@ -303,7 +303,8 @@
       discount_percent: p.discount_percent || meta.discount_percent || '',
       discount_badge:   p.discount_badge || meta.discount_badge || '',
       brand:        p.brand || meta.brand || '',
-      stock_quantity: p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : '')
+      stock_quantity: p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : ''),
+      images:       Array.isArray(p.images) && p.images.length ? p.images : (Array.isArray(meta.images) && meta.images.length ? meta.images : (p.image_url ? [p.image_url] : []))
     };
   }
 
@@ -571,6 +572,43 @@
     const heroImg = $('#prodHeroImage');
     heroImg.src = p.image_url || 'assets/branding/2.svg';
     heroImg.alt = prodName;
+
+    // Multi-Image Gallery Strip
+    const galleryStrip = $('#prodGalleryStrip');
+    const imagesList = Array.isArray(d.images) && d.images.length
+      ? d.images
+      : (Array.isArray(p.images) && p.images.length
+        ? p.images
+        : (p.image_url ? [p.image_url] : []));
+
+    if (galleryStrip) {
+      if (imagesList.length > 1) {
+        galleryStrip.hidden = false;
+        galleryStrip.innerHTML = imagesList.map((imgSrc, idx) => `
+          <button type="button" class="pdp-gallery-thumb ${idx === 0 ? 'active' : ''}" data-src="${escapeHtml(imgSrc)}" aria-label="صورة ${idx + 1}">
+            <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(prodName)} - ${idx + 1}" loading="lazy">
+          </button>
+        `).join('');
+
+        galleryStrip.querySelectorAll('.pdp-gallery-thumb').forEach(btn => {
+          btn.addEventListener('click', () => {
+            galleryStrip.querySelectorAll('.pdp-gallery-thumb').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const targetSrc = btn.getAttribute('data-src');
+            if (targetSrc && heroImg.src !== targetSrc) {
+              heroImg.style.opacity = '0';
+              setTimeout(() => {
+                heroImg.src = targetSrc;
+                heroImg.style.opacity = '1';
+              }, 120);
+            }
+          });
+        });
+      } else {
+        galleryStrip.hidden = true;
+        galleryStrip.innerHTML = '';
+      }
+    }
 
     const badgeTag = $('#prodBadgeTag');
     if (p.tag) {

@@ -1242,48 +1242,169 @@
   const fileInput   = $('#prodFileInput');
   const dropzone    = $('#imageDropzone');
   const dropPrompt  = $('#dropzonePrompt');
-  const dropPreview = $('#dropzonePreview');
-  const previewImg  = $('#imagePreviewImg');
-  const removeImgBtn= $('#btnRemoveImage');
   const manualImg   = $('#prodImageManual');
+  const btnAddImageUrl = $('#btnAddImageUrl');
+  const galleryGrid = $('#prodImagesGallery');
+  const galleryCountBadge = $('#galleryCountBadge');
 
-  let selectedImageFile = null;
+  let currentProductImages = [];
 
   function showImagePreview(urlOrData) {
     if (!urlOrData) return;
-    previewImg.src = urlOrData;
-    dropPreview.hidden = false;
-    dropPrompt.hidden = true;
+    addImageToGallery(urlOrData);
   }
 
   function clearImagePreview() {
-    selectedImageFile = null;
-    previewImg.src = '';
-    dropPreview.hidden = true;
-    dropPrompt.hidden = false;
+    currentProductImages = [];
+    renderAdminGallery();
     if (fileInput) fileInput.value = '';
-    $('#prodImage').value = '';
     if (manualImg) manualImg.value = '';
   }
 
+  function renderAdminGallery() {
+    if (!galleryGrid) return;
+    if (galleryCountBadge) {
+      galleryCountBadge.textContent = `${currentProductImages.length} ${adminLang === 'ar' ? 'صور' : 'images'}`;
+    }
+
+    if (currentProductImages.length === 0) {
+      galleryGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; font-size: 11.5px; color: var(--admin-muted); padding: 16px 8px; border: 1.5px dashed var(--admin-line); border-radius: 8px;">
+          📷 لا توجد صور مضافة بعد. اختر صوراً من جهازك أو الصق رابط صورة أعلاه أو اسحبها برابط العطر السحري.
+        </div>
+      `;
+      if ($('#prodImage')) $('#prodImage').value = '';
+      return;
+    }
+
+    if ($('#prodImage')) $('#prodImage').value = currentProductImages[0] || '';
+
+    galleryGrid.innerHTML = currentProductImages.map((imgSrc, idx) => {
+      const isPrimary = idx === 0;
+      return `
+        <div class="admin-gallery-card ${isPrimary ? 'is-primary' : ''}">
+          ${isPrimary ? '<span class="admin-gallery-badge">⭐ الغلاف</span>' : ''}
+          <img src="${escapeHtml(imgSrc)}" alt="صورة ${idx + 1}" loading="lazy">
+          <div class="admin-gallery-actions">
+            ${!isPrimary ? `<button type="button" class="btn-set-cover" data-idx="${idx}" title="تعيين كغلاف رئيسي">غلاف</button>` : '<span style="flex:1; text-align:center; font-size:9.5px; color:#d4af37; font-weight:700;">الرئيسية</span>'}
+            <button type="button" class="btn-del-img" data-idx="${idx}" title="حذف الصورة">×</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Wire Set Cover & Delete Buttons
+    galleryGrid.querySelectorAll('.btn-set-cover').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        if (!isNaN(idx) && idx > 0 && idx < currentProductImages.length) {
+          const item = currentProductImages.splice(idx, 1)[0];
+          currentProductImages.unshift(item);
+          renderAdminGallery();
+        }
+      });
+    });
+
+    galleryGrid.querySelectorAll('.btn-del-img').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        if (!isNaN(idx) && idx >= 0 && idx < currentProductImages.length) {
+          currentProductImages.splice(idx, 1);
+          renderAdminGallery();
+        }
+      });
+    });
+  }
+
+  function addImageToGallery(url) {
+    if (!url) return;
+    const cleanUrl = String(url).trim();
+    if (cleanUrl && !currentProductImages.includes(cleanUrl)) {
+      currentProductImages.push(cleanUrl);
+      renderAdminGallery();
+    }
+  }
+
+  // Handle Add Image URL button & Enter key
+  btnAddImageUrl?.addEventListener('click', () => {
+    const url = (manualImg?.value || '').trim();
+    if (url) {
+      addImageToGallery(url);
+      if (manualImg) manualImg.value = '';
+    }
+  });
+
+  manualImg?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const url = (manualImg.value || '').trim();
+      if (url) {
+        addImageToGallery(url);
+        manualImg.value = '';
+      }
+    }
+  });
+
   // Handle Dropzone Click & Drag
-  dropzone?.addEventListener('click', event => {
-    if (event.target === removeImgBtn || event.target.closest('#btnRemoveImage')) return;
+  dropzone?.addEventListener('click', () => {
     fileInput?.click();
   });
 
-  removeImgBtn?.addEventListener('click', event => {
-    event.stopPropagation();
-    clearImagePreview();
-  });
+  async function processSelectedImageFiles(files) {
+    if (!files || !files.length) return;
+    const status = $('#prodFormStatus');
+    if (status) {
+      status.className = '';
+      status.textContent = 'جاري معالجة ورفع الصور…';
+    }
 
-  fileInput?.addEventListener('change', () => {
-    const file = fileInput.files?.[0];
-    if (!file) return;
-    selectedImageFile = file;
-    const reader = new FileReader();
-    reader.onload = e => showImagePreview(e.target.result);
-    reader.readAsDataURL(file);
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith('image/')) continue;
+      try {
+        let uploadedUrl = '';
+        try {
+          const fileExt = file.name.split('.').pop().toLowerCase() || 'jpg';
+          const cleanName = file.name.substring(0, 15).replace(/[^a-zA-Z0-9]/g, '_');
+          const filePath = `rooh_${Date.now()}_${cleanName}.${fileExt}`;
+
+          const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/products/${filePath}`, {
+            method: 'POST',
+            headers: {
+              'apikey': SUPABASE_ANON,
+              'Authorization': `Bearer ${SUPABASE_ANON}`,
+              'Content-Type': file.type || 'image/jpeg',
+              'x-upsert': 'true',
+            },
+            body: file,
+          });
+
+          if (uploadRes.ok) {
+            uploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${filePath}`;
+          } else {
+            uploadedUrl = await compressImage(file);
+          }
+        } catch (_) {
+          uploadedUrl = await compressImage(file);
+        }
+
+        if (uploadedUrl) {
+          addImageToGallery(uploadedUrl);
+        }
+      } catch (err) {
+        console.warn('Error processing image file:', err);
+      }
+    }
+
+    if (status) {
+      status.textContent = '';
+    }
+  }
+
+  fileInput?.addEventListener('change', async () => {
+    if (fileInput.files?.length) {
+      await processSelectedImageFiles(fileInput.files);
+      fileInput.value = '';
+    }
   });
 
   ['dragenter', 'dragover'].forEach(eventName => {
@@ -1300,25 +1421,12 @@
     });
   });
 
-  dropzone?.addEventListener('drop', e => {
-    const file = e.dataTransfer?.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      selectedImageFile = file;
-      const reader = new FileReader();
-      reader.onload = ev => showImagePreview(ev.target.result);
-      reader.readAsDataURL(file);
-    }
-  });
-
-  manualImg?.addEventListener('input', () => {
-    const url = manualImg.value.trim();
-    if (url) {
-      selectedImageFile = null;
-      if (fileInput) fileInput.value = '';
-      $('#prodImage').value = url;
-      showImagePreview(url);
-    } else {
-      clearImagePreview();
+  dropzone?.addEventListener('drop', async e => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    const files = e.dataTransfer?.files;
+    if (files && files.length) {
+      await processSelectedImageFiles(files);
     }
   });
 
@@ -1446,7 +1554,8 @@
       discount_badge:   p.discount_badge || meta.discount_badge || '',
       stock_quantity:   p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : ''),
       cost_price:       p.cost_price !== undefined && p.cost_price !== null ? p.cost_price : (meta.cost_price !== undefined && meta.cost_price !== null ? meta.cost_price : ''),
-      in_solar_system:  Boolean(p.in_solar_system !== undefined ? p.in_solar_system : meta.in_solar_system)
+      in_solar_system:  Boolean(p.in_solar_system !== undefined ? p.in_solar_system : meta.in_solar_system),
+      images:           Array.isArray(p.images) && p.images.length ? p.images : (Array.isArray(meta.images) && meta.images.length ? meta.images : (p.image_url ? [p.image_url] : []))
     };
   }
 
@@ -1532,10 +1641,11 @@
       $('#prodCategory').value    = product.category || 'unisex';
       $('#prodNotes').value       = details.notes;
       $('#prodImage').value       = product.image_url || '';
-      if (manualImg) manualImg.value = product.image_url || '';
-      if (product.image_url) {
-        showImagePreview(product.image_url);
-      }
+      if (manualImg) manualImg.value = '';
+      currentProductImages = Array.isArray(details.images) && details.images.length
+        ? [...details.images]
+        : (product.image_url ? [product.image_url] : []);
+      renderAdminGallery();
       $('#prodTag').value         = product.tag || '';
       $('#prodTopNotes').value    = details.top_notes;
       $('#prodMiddleNotes').value = details.middle_notes;
@@ -1599,6 +1709,9 @@
       renderAdminAccordsChips([]);
       renderAdminSeasonsChips('');
 
+      currentProductImages = [];
+      renderAdminGallery();
+      if (manualImg) manualImg.value = '';
       $('#saveProdBtn').innerHTML = 'إضافة العطر <span>←</span>';
     }
 
@@ -1607,7 +1720,8 @@
 
   function closeProductModal() {
     prodModal.classList.remove('open');
-    clearImagePreview();
+    currentProductImages = [];
+    renderAdminGallery();
   }
 
   // Scent DNA & Seasons Interactive Pickers in Admin Modal
@@ -1914,44 +2028,99 @@
         category = 'women';
       }
 
-      // 3. Notes Extraction
+      // 3. Robust Multi-Pattern Notes Extraction
       let topNotesEn = '';
       let midNotesEn = '';
       let baseNotesEn = '';
 
       if (pageText) {
-        const notesBlock = pageText.match(/top notes? (?:are|:)?\s*([^\n\.]+)/i);
-        if (notesBlock) {
-          const rawAll = notesBlock[1];
-          const parts = rawAll.split(/;\s*/);
-          parts.forEach(p => {
-            if (/middle notes? (?:are|:)?/i.test(p)) {
-              midNotesEn = p.replace(/middle notes? (?:are|:)?/i, '').trim();
-            } else if (/base notes? (?:are|:)?/i.test(p)) {
-              baseNotesEn = p.replace(/base notes? (?:are|:)?/i, '').trim();
-            } else {
-              topNotesEn = p.replace(/top notes? (?:are|:)?/i, '').trim();
+        // 1. Sentence/paragraph match:
+        // 'Top notes are Calabrian bergamot and Pepper; middle notes are ...; base notes are ...'
+        // 'Top note is Citruses; middle note is Sea Notes; base notes are Cedar and Amber.'
+        const paraMatch = pageText.match(/(?:top|head)\s+notes?\s+(?:is|are|:)\s+([\s\S]*?)(?:\.\s|\.\n|\n\n|$)/i);
+        if (paraMatch) {
+          const rawAll = paraMatch[1];
+          const parts = rawAll.split(/;\s*|\n+/);
+          parts.forEach(part => {
+            const p = part.trim();
+            if (/(?:middle|heart)\s+notes?\s+(?:is|are|:)?/i.test(p)) {
+              midNotesEn = p.replace(/^(?:and\s+)?(?:middle|heart)\s+notes?\s+(?:is|are|:)\s*/i, '').trim();
+            } else if (/(?:base|bottom)\s+notes?\s+(?:is|are|:)?/i.test(p)) {
+              baseNotesEn = p.replace(/^(?:and\s+)?(?:base|bottom)\s+notes?\s+(?:is|are|:)\s*/i, '').trim();
+            } else if (!topNotesEn) {
+              topNotesEn = p.replace(/^(?:and\s+)?(?:top|head)\s+notes?\s+(?:is|are|:)\s*/i, '').trim();
             }
           });
         }
 
+        // Helper: extract notes from markdown sections
+        function extractFromSection(headingRegex) {
+          const m = pageText.match(headingRegex);
+          if (!m) return '';
+          const section = m[1];
+          const notes = [];
+          const linkMatches = section.matchAll(/\[(?:!\[[^\]]*\]\([^)]*\)\s*)?([^\]\n]+)\]\(https?:\/\/[^\/]*fragrantica\.com\/notes\/[^)]+\)/gi);
+          for (const lm of linkMatches) {
+            const n = lm[1].replace(/^Image\s*\d+:?/i, '').replace(/[\[\]]/g, '').trim();
+            if (n && !notes.includes(n) && !n.startsWith('http')) notes.push(n);
+          }
+          if (!notes.length) {
+            const altMatches = section.matchAll(/!\[Image\s*\d*:\s*([^\]]+)\]/gi);
+            for (const am of altMatches) {
+              const n = am[1].trim();
+              if (n && !notes.includes(n)) notes.push(n);
+            }
+          }
+          return notes.join(', ');
+        }
+
+        // 2. Headings: '#### Top Notes', '#### Middle Notes', '#### Base Notes'
+        if (!topNotesEn) topNotesEn = extractFromSection(/####\s*Top Notes\s*([\s\S]*?)(?=####|###|\n\s*\n\s*\n|Vote|$)/i);
+        if (!midNotesEn) midNotesEn = extractFromSection(/####\s*(?:Middle|Heart) Notes\s*([\s\S]*?)(?=####|###|\n\s*\n\s*\n|Vote|$)/i);
+        if (!baseNotesEn) baseNotesEn = extractFromSection(/####\s*Base Notes\s*([\s\S]*?)(?=####|###|\n\s*\n\s*\n|Vote|$)/i);
+
+        // 3. Alternate line lists: 'Top notes: a, b', 'Middle notes: c, d', 'Base notes: e, f'
         if (!topNotesEn) {
-          const m = pageText.match(/top notes?:\s*([^\n\.]+)/i);
+          const m = pageText.match(/(?:top|head)\s+notes?:\s*([^\n\.]+)/i);
           if (m) topNotesEn = m[1].trim();
         }
         if (!midNotesEn) {
-          const m = pageText.match(/(?:middle|heart) notes?:\s*([^\n\.]+)/i);
+          const m = pageText.match(/(?:middle|heart)\s+notes?:\s*([^\n\.]+)/i);
           if (m) midNotesEn = m[1].trim();
         }
         if (!baseNotesEn) {
-          const m = pageText.match(/base notes?:\s*([^\n\.]+)/i);
+          const m = pageText.match(/(?:base|bottom)\s+notes?:\s*([^\n\.]+)/i);
           if (m) baseNotesEn = m[1].trim();
+        }
+
+        // 4. Parfumo / general 'Fragrance Notes' list
+        if (!topNotesEn && !midNotesEn && !baseNotesEn) {
+          const fnMatch = pageText.match(/(?:##\s*Fragrance Notes|##\s*Pyramid)[\s\S]*?([\s\S]*?)(?=##|###|\n\s*\n\s*\n|$)/i);
+          if (fnMatch) {
+            const notes = [];
+            const pMatches = fnMatch[1].matchAll(/!\[Image\s*\d*:\s*([^\]]+)\]\([^)]+\)\s*([A-Za-z0-9\s'-]+)/gi);
+            for (const pm of pMatches) {
+              const n = pm[2].trim() || pm[1].trim();
+              if (n && !notes.includes(n)) notes.push(n);
+            }
+            if (notes.length) {
+              topNotesEn = notes.slice(0, Math.ceil(notes.length / 3)).join(', ');
+              midNotesEn = notes.slice(Math.ceil(notes.length / 3), Math.ceil(notes.length * 2 / 3)).join(', ');
+              baseNotesEn = notes.slice(Math.ceil(notes.length * 2 / 3)).join(', ');
+            }
+          }
         }
       }
 
-      topNotesEn = topNotesEn.replace(/\s+and\s+/gi, ', ');
-      midNotesEn = midNotesEn.replace(/\s+and\s+/gi, ', ');
-      baseNotesEn = baseNotesEn.replace(/\s+and\s+/gi, ', ');
+      const cleanNotesStr = s => (s || '')
+        .replace(/\s+and\s+/gi, ', ')
+        .replace(/[.;]+$/, '')
+        .replace(/\s*,\s*/g, ', ')
+        .trim();
+
+      topNotesEn = cleanNotesStr(topNotesEn);
+      midNotesEn = cleanNotesStr(midNotesEn);
+      baseNotesEn = cleanNotesStr(baseNotesEn);
 
       const topNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(topNotesEn, 'ar') : topNotesEn;
       const midNotesAr = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(midNotesEn, 'ar') : midNotesEn;
@@ -1966,19 +2135,32 @@
         }
       }
 
-      // 5. Bottle Image
-      let bottleImageUrl = '';
+      // 5. Bottle Images Extraction (Cover + Secondary Photos)
+      const scrapedImages = [];
       if (pageText) {
-        const fMatches = [...pageText.matchAll(/!\[(?:[^\]]*)\]\((https:\/\/fimgs\.net\/mdimg\/perfume-thumbs\/375x500\.[^)]+)\)/gi)];
-        if (fMatches.length) {
-          bottleImageUrl = fMatches[0][1];
-        } else {
-          const generalMatches = [...pageText.matchAll(/!\[(?:[^\]]*)\]\((https:\/\/fimgs\.net\/mdimg\/[a-z-]+\/[^)]+\.(?:jpg|jpeg|webp|png))\)/gi)];
-          if (generalMatches.length) bottleImageUrl = generalMatches[0][1];
+        const thumbMatches = [...pageText.matchAll(/!\[(?:[^\]]*)\]\((https:\/\/fimgs\.net\/mdimg\/perfume-thumbs\/(?:dark-)?375x500\.[^)]+)\)/gi)];
+        for (const tm of thumbMatches) {
+          if (!scrapedImages.includes(tm[1])) scrapedImages.push(tm[1]);
+        }
+        if (!scrapedImages.length) {
+          const generalMatches = [...pageText.matchAll(/!\[(?:[^\]]*)\]\((https:\/\/fimgs\.net\/mdimg\/(?:perfume-thumbs|perfume)\/[^)]+\.(?:jpg|jpeg|webp|png))\)/gi)];
+          for (const gm of generalMatches) {
+            if (!scrapedImages.includes(gm[1]) && !gm[1].includes('avatari') && !gm[1].includes('sastojci')) {
+              scrapedImages.push(gm[1]);
+            }
+          }
         }
       }
-      if (!bottleImageUrl && microlinkData && microlinkData.image && microlinkData.image.url) {
-        bottleImageUrl = microlinkData.image.url;
+      if (microlinkData && microlinkData.image && microlinkData.image.url) {
+        if (!scrapedImages.includes(microlinkData.image.url)) {
+          scrapedImages.unshift(microlinkData.image.url);
+        }
+      }
+
+      const primaryCoverImg = scrapedImages[0] || '';
+      if (scrapedImages.length) {
+        currentProductImages = [...scrapedImages.slice(0, 5)];
+        renderAdminGallery();
       }
 
       // 6. Description
@@ -2043,10 +2225,9 @@
       }
 
       // Image
-      if (bottleImageUrl) {
-        $('#prodImage').value = bottleImageUrl;
-        if (manualImg) manualImg.value = bottleImageUrl;
-        showImagePreview(bottleImageUrl);
+      if (primaryCoverImg) {
+        $('#prodImage').value = primaryCoverImg;
+        if (manualImg) manualImg.value = '';
       }
 
       // Description
@@ -2372,7 +2553,7 @@
     formStatus.className = '';
 
     const id = $('#productId').value.trim();
-    let imageUrl = $('#prodImage').value.trim() || manualImg?.value.trim() || null;
+    let imageUrl = currentProductImages[0] || $('#prodImage').value.trim() || manualImg?.value.trim() || null;
 
     // رفع الصورة إلى Supabase Storage إذا اختار المستخدم ملف من جهازه
     if (selectedImageFile) {
@@ -2449,6 +2630,7 @@
       category:    $('#prodCategory').value,
       notes:       rawNotesVal || null,
       image_url:   imageUrl,
+      images:      currentProductImages,
       tag:         $('#prodTag').value.trim() || null,
       top_notes:   rawTopVal || null,
       middle_notes:rawMidVal || null,
@@ -2528,7 +2710,8 @@
               box_items:      payload.box_items,
               is_custom_box:  payload.is_custom_box,
               extra_item_price: payload.extra_item_price,
-              max_box_items:  payload.max_box_items
+              max_box_items:  payload.max_box_items,
+              images:         currentProductImages
             }),
           };
           if (id) {

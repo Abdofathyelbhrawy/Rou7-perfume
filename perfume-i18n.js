@@ -240,6 +240,7 @@
     'black tea': 'شاي أسود',
     'green tea': 'شاي أخضر',
     'ambroxan': 'أمبروكسان',
+    'ambrox': 'أمبروكسان',
     'geranium': 'إبرة الراعي (جيرانيوم)',
     'sichuan pepper': 'فلفل سيتشوان',
     'calabrian bergamot': 'برغموت كالابريا',
@@ -247,7 +248,53 @@
     'iso e super': 'آيزو إي سوبر',
     'aldehydes': 'ألدهيدات',
     'aldehyde': 'ألدهيدات',
-    'petitgrain': 'بيتي غران'
+    'petitgrain': 'بيتي غران',
+    'tobacco leaf': 'أوراق التبغ',
+    'tobacco blossom': 'زهر التبغ',
+    'cacao': 'كاكاو فاخر',
+    'dried fruits': 'فواكه مجففة',
+    'amberwood': 'خشب العنبر',
+    'hedione': 'هيديون',
+    'fir resin': 'راتنج التنوب',
+    'fir': 'شجر التنوب',
+    'sugar': 'سكر مكرمل',
+    'citruses': 'حمضيات منعشة',
+    'citrus': 'حمضيات منعشة',
+    'elemi resin': 'راتنج الإليمي',
+    'provencal lavender': 'لافندر بروفانس',
+    'french lavender': 'لافندر فرنسي',
+    'bourbon vanilla': 'فانيليا بوربون',
+    'madagascar vanilla': 'فانيليا مدغشقر',
+    'haitian vetiver': 'فيتيفر هايتي',
+    'virginian cedar': 'أرز فيرجينيا',
+    'atlas cedar': 'أرز الأطلس',
+    'mysore sandalwood': 'صندل ميسور',
+    'damask rose': 'ورد جوري دمشقي',
+    'taif rose': 'ورد طائفي',
+    'bulgarian rose': 'ورد بلغاري',
+    'turkish rose': 'ورد تركي',
+    'may rose': 'ورد ماي',
+    'sambac jasmine': 'ياسمين سامباك',
+    'grandiflorum jasmine': 'ياسمين فاخر',
+    'orange blossom': 'زهر البرتقال',
+    'neroli': 'نيرولي',
+    'heliotrope': 'هيليوتروب',
+    'lily-of-the-valley': 'زنبق الوادي',
+    'lily of the valley': 'زنبق الوادي',
+    'black currant': 'كشمش أسود',
+    'cassis': 'كاسيس',
+    'raspberry': 'توت العليق',
+    'blackberry': 'توت أسود',
+    'strawberry': 'فراولة',
+    'pineapple': 'أناناس',
+    'bitter almond': 'لوز مر',
+    'birch tar': 'قطران البتولا',
+    'olibanum': 'لبان الذكر',
+    'cistus': 'قستوس',
+    'animalic notes': 'نوتات عنبرية حيوانية',
+    'solar notes': 'نوتات شمسية دافئة',
+    'powdery notes': 'نوتات بودرية ناعمة',
+    'mineral notes': 'نوتات معدنية'
   };
 
   // Reverse mapping (Arabic to English)
@@ -271,30 +318,49 @@
    */
   function translateNotes(notesStr, targetLang = 'ar') {
     if (!notesStr || typeof notesStr !== 'string') return '';
-    const parts = notesStr.split(/[,،؛;]/).map(s => s.trim()).filter(Boolean);
-    if (!parts.length) return '';
+    // Normalize and split by commas, semicolons, newlines, and 'and' / '&'
+    const normalized = notesStr
+      .replace(/\s+(?:and|&)\s+/gi, ', ')
+      .replace(/^(?:and\s+)?(?:top|head|middle|heart|base|bottom)\s+notes?\s*(?:is|are|:)?\s*/gi, '')
+      .replace(/[.;]+$/, '');
+
+    const rawParts = normalized.split(/[,،؛;\n]+/).map(s => s.trim().replace(/^[-*•\d\.\)\]]+\s*/, '')).filter(Boolean);
+    if (!rawParts.length) return '';
 
     if (targetLang === 'ar') {
-      const translated = parts.map(part => {
-        const lower = part.toLowerCase();
+      const translated = rawParts.map(part => {
+        const clean = part.replace(/^Image\s*\d+:?/i, '').replace(/[\[\]\(\)]/g, '').trim();
+        const lower = clean.toLowerCase();
         if (NOTES_EN_TO_AR[lower]) return NOTES_EN_TO_AR[lower];
+        // Singular / plural fallback (e.g. 'citruses' -> 'citrus')
+        if (lower.endsWith('s') && NOTES_EN_TO_AR[lower.slice(0, -1)]) return NOTES_EN_TO_AR[lower.slice(0, -1)];
         // Partial matching for combined terms e.g. "Spanish tobacco"
         for (const [en, ar] of Object.entries(NOTES_EN_TO_AR)) {
           if (lower === en || lower.includes(en)) return ar;
         }
-        return part;
+        return clean;
       });
-      return translated.join('، ');
+      // Deduplicate notes while preserving order
+      const unique = [];
+      translated.forEach(t => {
+        if (t && !unique.includes(t)) unique.push(t);
+      });
+      return unique.join('، ');
     } else {
-      const translated = parts.map(part => {
-        const lower = part.toLowerCase();
+      const translated = rawParts.map(part => {
+        const clean = part.replace(/^Image\s*\d+:?/i, '').replace(/[\[\]\(\)]/g, '').trim();
+        const lower = clean.toLowerCase();
         if (NOTES_AR_TO_EN[lower]) return NOTES_AR_TO_EN[lower];
         for (const [ar, en] of Object.entries(NOTES_AR_TO_EN)) {
           if (lower === ar || lower.includes(ar)) return en;
         }
-        return part;
+        return clean;
       });
-      return translated.join(', ');
+      const unique = [];
+      translated.forEach(t => {
+        if (t && !unique.includes(t)) unique.push(t);
+      });
+      return unique.join(', ');
     }
   }
 

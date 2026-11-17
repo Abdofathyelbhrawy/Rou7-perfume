@@ -1624,3 +1624,57 @@ body.light .sh-level {
     margin-inline-start: 0;
   }
 }
+
+/* ── Interactive Multi-Image Gallery Strip ───────────────────────────────── */
+.prod-gallery-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+  max-width: 360px;
+  overflow-x: auto;
+  padding: 6px 8px;
+  scrollbar-width: thin;
+  z-index: 4;
+  position: relative;
+}
+
+.pdp-gallery-thumb {
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  padding: 4px;
+  display: grid;
+  place-items: center;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  outline: none;
+}
+
+body.light .pdp-gallery-thumb {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.pdp-gallery-thumb:hover {
+  transform: translateY(-2px) scale(1.05);
+  border-color: var(--pink);
+}
+
+.pdp-gallery-thumb.active {
+  border-color: #d4af37;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.35), 0 4px 14px rgba(212, 175, 55, 0.25);
+  transform: scale(1.06);
+}
+
+.pdp-gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}

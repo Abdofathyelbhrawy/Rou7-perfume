@@ -3139,7 +3139,31 @@
     detailBody.innerHTML = `
       <div class="detail-header-section">
         <div class="detail-media">
-          ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}">` : '<span class="detail-placeholder">🧴</span>'}
+          ${product.image_url ? `<img id="detailHeroImg" src="${product.image_url}" alt="${escapeHtml(prodName)}">` : '<span class="detail-placeholder">🧴</span>'}
+          ${(() => {
+            let metaImgs = [];
+            if (product.notes && typeof product.notes === 'string' && (product.notes.trim().startsWith('{') || product.notes.trim().startsWith('['))) {
+              try { metaImgs = JSON.parse(product.notes).images || []; } catch (_) {}
+            }
+            const allImgs = Array.isArray(product.images) && product.images.length
+              ? product.images
+              : (Array.isArray(metaImgs) && metaImgs.length ? metaImgs : (product.image_url ? [product.image_url] : []));
+            if (allImgs.length <= 1) return '';
+            return `
+              <div class="detail-gallery-thumbs">
+                ${allImgs.map((img, i) => `
+                  <button type="button" class="detail-thumb-btn ${i === 0 ? 'active' : ''}" onclick="
+                    const hero = document.getElementById('detailHeroImg');
+                    if (hero) hero.src = '${escapeHtml(img)}';
+                    this.parentElement.querySelectorAll('.detail-thumb-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                  ">
+                    <img src="${escapeHtml(img)}" alt="" loading="lazy">
+                  </button>
+                `).join('')}
+              </div>
+            `;
+          })()}
         </div>
         <div class="detail-title-col">
           <p class="eyebrow"><span></span> ${currentLang === 'ar' ? 'تفاصيل العطر' : 'Fragrance Profile'}</p>

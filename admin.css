@@ -1119,7 +1119,222 @@ body.light .url-importer-header strong {
    Image Dropzone & Uploader
    ========================================================== */
 .image-upload-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.image-gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.image-gallery-header label {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--admin-ink);
+  margin: 0;
+}
+
+.gallery-count-badge {
+  font-size: 11px;
+  background: rgba(212, 175, 55, 0.15);
+  color: #f6bd60;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+body.light .gallery-count-badge {
+  color: #8b5a00;
+  background: rgba(212, 175, 55, 0.25);
+}
+
+.image-add-row {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 640px) {
+  .image-add-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.image-dropzone-compact {
+  border: 1.5px dashed rgba(212, 175, 55, 0.4);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all .2s ease;
+  font-size: 11.5px;
+  color: var(--admin-muted);
+}
+
+.image-dropzone-compact:hover,
+.image-dropzone-compact.dragover {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--admin-ink);
+}
+
+.image-dropzone-compact .upload-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.image-url-add-wrap {
+  display: flex;
+  gap: 6px;
+}
+
+.image-url-add-wrap input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-line);
+  color: var(--admin-ink);
+  font-size: 11.5px;
+  direction: ltr;
+  text-align: left;
+}
+
+.image-url-add-wrap input:focus {
+  outline: none;
+  border-color: #d4af37;
+}
+
+.btn-add-img-url {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #f6bd60;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .2s;
+}
+
+body.light .btn-add-img-url {
+  color: #8b5a00;
+}
+
+.btn-add-img-url:hover {
+  background: #d4af37;
+  color: #0b111a;
+}
+
+.prod-images-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+  min-height: 50px;
+}
+
+.admin-gallery-card {
+  position: relative;
+  border: 1.5px solid var(--admin-line);
+  border-radius: 10px;
+  background: var(--admin-surface);
+  padding: 8px 6px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all .2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-gallery-card.is-primary {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.06);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.3);
+}
+
+.admin-gallery-card img {
+  width: 100%;
+  height: 95px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+body.light .admin-gallery-card img {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.admin-gallery-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: linear-gradient(135deg, #d4af37, #b8860b);
+  color: #0b111a;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.admin-gallery-actions {
+  display: flex;
+  width: 100%;
+  gap: 4px;
+}
+
+.btn-set-cover {
+  flex: 1;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #f6bd60;
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 4px 0;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: all .2s;
+}
+
+body.light .btn-set-cover {
+  color: #8b5a00;
+}
+
+.btn-set-cover:hover {
+  background: #d4af37;
+  color: #0b111a;
+}
+
+.btn-del-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  background: rgba(231, 76, 60, 0.15);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  color: #e74c3c;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  transition: all .2s;
+}
+
+.btn-del-img:hover {
+  background: #e74c3c;
+  color: #fff;
 }
 
 .image-dropzone {
