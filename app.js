@@ -1326,6 +1326,24 @@
 
         if (currentPriceEl) currentPriceEl.textContent = money(activePrice);
 
+        // Dynamic accent color shift based on product's main accord
+        const accordColors = {
+          sweet: '#EC407A', woody: '#8B5A2B', vanilla: '#D4A373',
+          oriental: '#8E24AA', amber: '#C58F28', spicy: '#E65100',
+          fresh: '#00ACC1', floral: '#E91E63', citrus: '#FBC02D',
+          oud: '#4A2C11', tobacco: '#795548', musky: '#90A4AE',
+          fruity: '#FB8C00', aquatic: '#0288D1', leather: '#5D4037',
+          powdery: '#78909C', aromatic: '#43A047'
+        };
+        const d = unpackProduct(target);
+        const mainAccord = (d.main_accord || '').toLowerCase();
+        const accordColor = accordColors[mainAccord] || '#f5a5ad';
+        document.documentElement.style.setProperty('--story-accent', accordColor);
+        const storyArt = $('#storyArt');
+        if (storyArt) {
+          storyArt.style.setProperty('--story-accent', accordColor);
+        }
+
         if (oldPriceEl) {
           if (hasDiscount && originalPrice > activePrice) {
             oldPriceEl.style.display = 'inline-block';
@@ -3065,7 +3083,7 @@
             ? `<div class="card-mood-match-pill"><span class="cmm-icon">${moodProfile.icon}</span> ${currentLang === 'ar' ? moodProfile.badgeAr : moodProfile.badgeEn}</div>`
             : '';
 
-          return `<article class="product-card" data-product-id="${product.id}">
+          return `<article class="product-card" data-product-id="${product.id}" style="--card-accent: ${getAccordDotColor(d.main_accord || d.accords || 'default')}">
             <div class="product-image">
               <a href="product.html?id=${product.id}" class="product-thumb-link" aria-label="${escapeHtml(prodName)}">
                 ${product.image_url ? `<img src="${product.image_url}" alt="${escapeHtml(prodName)}" loading="lazy" decoding="async">` : ''}
