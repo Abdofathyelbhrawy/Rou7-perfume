@@ -3811,12 +3811,49 @@
           if (quizAnswers.mood === 'fresh' && (combined.includes('fresh') || combined.includes('citrus') || combined.includes('منعش') || combined.includes('برغموت'))) score += 5;
           if (quizAnswers.mood === 'spicy' && (combined.includes('spic') || combined.includes('oriental') || combined.includes('زعفران') || combined.includes('شرقي'))) score += 5;
         }
+        // Occasion-based scoring
+        if (quizAnswers.occasion) {
+          if (quizAnswers.occasion === 'daily' && (combined.includes('fresh') || combined.includes('light') || combined.includes('بحري') || combined.includes('aquatic'))) score += 4;
+          if (quizAnswers.occasion === 'evening' && (combined.includes('oud') || combined.includes('oriental') || combined.includes('شرقي') || combined.includes('spic'))) score += 4;
+          if (quizAnswers.occasion === 'winter' && (combined.includes('woody') || combined.includes('amber') || combined.includes('spic') || combined.includes('tabac') || combined.includes('تبغ'))) score += 4;
+          if (quizAnswers.occasion === 'signature' && (combined.includes('woody') || combined.includes('amber') || combined.includes('fresh') || combined.includes('floral'))) score += 4;
+        }
         if (p.is_featured) score += 2;
         if (score > bestScore) {
           bestScore = score;
           bestMatch = p;
         }
       });
+
+      // Collect top matches and shuffle to avoid always returning the same product
+      const topMatches = available.filter(p => {
+        let score = 0;
+        const d = unpackProduct(p);
+        const combined = `${p.category} ${p.name} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.accords}`.toLowerCase();
+        if (quizAnswers.category && quizAnswers.category !== 'gift') {
+          if (p.category === quizAnswers.category || p.category === 'unisex') score += 3;
+        }
+        if (quizAnswers.mood) {
+          if (quizAnswers.mood === 'sweet' && (combined.includes('sweet') || combined.includes('vanilla') || combined.includes('حلو') || combined.includes('فانيليا'))) score += 5;
+          if (quizAnswers.mood === 'woody' && (combined.includes('wood') || combined.includes('amber') || combined.includes('خشب') || combined.includes('عنبر'))) score += 5;
+          if (quizAnswers.mood === 'fresh' && (combined.includes('fresh') || combined.includes('citrus') || combined.includes('منعش') || combined.includes('برغموت'))) score += 5;
+          if (quizAnswers.mood === 'spicy' && (combined.includes('spic') || combined.includes('oriental') || combined.includes('زعفران') || combined.includes('شرقي'))) score += 5;
+        }
+        if (quizAnswers.occasion) {
+          if (quizAnswers.occasion === 'daily' && (combined.includes('fresh') || combined.includes('light') || combined.includes('بحري') || combined.includes('aquatic'))) score += 4;
+          if (quizAnswers.occasion === 'evening' && (combined.includes('oud') || combined.includes('oriental') || combined.includes('شرقي') || combined.includes('spic'))) score += 4;
+          if (quizAnswers.occasion === 'winter' && (combined.includes('woody') || combined.includes('amber') || combined.includes('spic') || combined.includes('tabac') || combined.includes('تبغ'))) score += 4;
+          if (quizAnswers.occasion === 'signature' && (combined.includes('woody') || combined.includes('amber') || combined.includes('fresh') || combined.includes('floral'))) score += 4;
+        }
+        if (p.is_featured) score += 2;
+        return score >= bestScore;
+      });
+      topMatches.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
+      for (let i = topMatches.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [topMatches[i], topMatches[j]] = [topMatches[j], topMatches[i]];
+      }
+      bestMatch = topMatches[0] || bestMatch || available[0];
 
       if (!bestMatch && available.length) bestMatch = available[0];
       const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(bestMatch, currentLang) : null;
