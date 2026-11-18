@@ -1,51 +1,8 @@
 (() => {
-  // ── WhatsApp & Supabase config ───────────────────────────────────────────
-  // رقم واتساب رُوح المستخرج من الرابط الرسمي: 01000603308
-  const WHATSAPP_PHONE    = '201000603308';
-  const WHATSAPP_BASE_URL = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}`;
-  const SUPABASE_URL      = 'https://oyslbombgdvcoyqotyao.supabase.co';
-  const SUPABASE_ANON     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95c2xib21iZ2R2Y295cW90eWFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1NzEwNTksImV4cCI6MjExMDE0NzA1OX0.VxKOxH3MTxC2Pdnf6GSCSHoBd6bWIiEvqTV9dQTh3SU';
-
-  async function supaFetch(table, { method = 'GET', filters = '', body = null, select = '*' } = {}) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-    try {
-      const url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
-      const res = await fetch(url, {
-        method,
-        signal: controller.signal,
-        headers: {
-          'apikey':        SUPABASE_ANON,
-          'Authorization': `Bearer ${SUPABASE_ANON}`,
-          'Content-Type':  'application/json',
-          'Prefer':        (method === 'POST' || method === 'PATCH') ? 'return=representation' : '',
-        },
-        body: body ? JSON.stringify(body) : undefined,
-      });
-      clearTimeout(timeoutId);
-      if (!res.ok) throw new Error(await res.text());
-      if (res.status === 204 || method === 'DELETE') return null;
-      const text = await res.text();
-      return text ? JSON.parse(text) : null;
-    } catch (err) {
-      clearTimeout(timeoutId);
-      if (err.name === 'AbortError') {
-        throw new Error('انتهت مهلة الاتصال بالخادم. تحقق من اتصال الإنترنت.');
-      }
-      throw err;
-    }
-  }
-  // ─────────────────────────────────────────────────────────────────────────
-
-  // ── Fault-Tolerant Architectural Primitives ──────────────────────────────
-  const $ = selector => {
-    try { return document.querySelector(selector); } catch (_) { return null; }
-  };
-  const $$ = selector => {
-    try { return [...document.querySelectorAll(selector)]; } catch (_) { return []; }
-  };
-
-  function safeOn(selectorOrEl, event, handler, options) {
+  // ── Fault-Tolerant Architectural Primitives (fallback if utils.js not loaded) ──────────────────────────────
+  const $ = window.RoohUtils?.$ || (selector => { try { return document.querySelector(selector); } catch (_) { return null; } });
+  const $$ = window.RoohUtils?.$$ || (selector => { try { return [...document.querySelectorAll(selector)]; } catch (_) { return []; } });
+  const safeOn = window.RoohUtils?.safeOn || function(selectorOrEl, event, handler, options) {
     if (!selectorOrEl) return;
     try {
       const elements = typeof selectorOrEl === 'string'
@@ -65,15 +22,15 @@
     } catch (err) {
       console.warn(`[safeOn notice for ${selectorOrEl}]:`, err);
     }
-  }
+  };
 
-  function safeModule(name, initFn) {
+  const safeModule = window.RoohUtils?.safeModule || function(name, initFn) {
     try {
       initFn();
     } catch (err) {
       console.warn(`[Module skipped safely: ${name}]:`, err);
     }
-  }
+  };
 
   // Early loader dismissal failsafe
   setTimeout(() => {

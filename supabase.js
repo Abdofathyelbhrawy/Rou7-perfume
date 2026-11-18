@@ -1,18 +1,20 @@
 // ============================================
 // ROOH Perfume — Supabase Client
-// ضع هنا بيانات مشروعك من Supabase Dashboard
+// This file is kept for documentation purposes.
+// Actual credentials are defined inline in app.js, admin.js, and product.js
+// to avoid module loading order issues.
 // ============================================
 
-const SUPABASE_URL  = 'https://YOUR_PROJECT_ID.supabase.co';  // ← بدّل هذا
-const SUPABASE_ANON = 'YOUR_ANON_PUBLIC_KEY';                  // ← بدّل هذا
+const SUPABASE_URL  = 'https://oyslbombgdvcoyqotyao.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95c2xib21iZ2R2Y295cW90eWFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1NzEwNTksImV4cCI6MjExMDE0NzA1OX0.VxKOxH3MTxC2Pdnf6GSCSHoBd6bWIiEvqTV9dQTh3SU';
 
 // ──────────────────────────────────────────────
-// HTTP helper (لا يحتاج npm أو bundler)
+// HTTP helper (no npm or bundler required)
 // ──────────────────────────────────────────────
 async function supaQuery(table, options = {}) {
   const {
     method  = 'GET',
-    filters = '',       // مثال: '&category=eq.women'
+    filters = '',
     body    = null,
     select  = '*',
   } = options;
@@ -77,4 +79,3 @@ export async function subscribeNewsletter(email) {
     body: { email },
   });
 }
-

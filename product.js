@@ -5,16 +5,49 @@
 (() => {
   'use strict';
 
-  // ── Config ───────────────────────────────────────────────────
-  const WHATSAPP_PHONE    = '201000603308';
-  const WHATSAPP_BASE_URL = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}`;
-  const SUPABASE_URL      = 'https://oyslbombgdvcoyqotyao.supabase.co';
-  const SUPABASE_ANON     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95c2xib21iZ2R2Y295cW90eWFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1NzEwNTksImV4cCI6MjExMDE0NzA1OX0.VxKOxH3MTxC2Pdnf6GSCSHoBd6bWIiEvqTV9dQTh3SU';
+  // ── Fault-Tolerant Architectural Primitives (fallback if utils.js not loaded) ──────────────────────────────
+  const $ = window.RoohUtils?.$ || (selector => { try { return document.querySelector(selector); } catch (_) { return null; } });
+  const $$ = window.RoohUtils?.$$ || (selector => { try { return [...document.querySelectorAll(selector)]; } catch (_) { return []; } });
+  const safeOn = window.RoohUtils?.safeOn || function(selectorOrEl, event, handler, options) {
+    if (!selectorOrEl) return;
+    try {
+      const elements = typeof selectorOrEl === 'string'
+        ? $$(selectorOrEl)
+        : (selectorOrEl instanceof NodeList || Array.isArray(selectorOrEl) ? selectorOrEl : [selectorOrEl]);
+      elements.forEach(el => {
+        if (el && typeof el.addEventListener === 'function') {
+          el.addEventListener(event, function(e) {
+            try {
+              return handler.call(this, e);
+            } catch (err) {
+              console.warn(`[Event notice on ${event} (${selectorOrEl})]:`, err);
+            }
+          }, options);
+        }
+      });
+    } catch (err) {
+      console.warn(`[safeOn notice for ${selectorOrEl}]:`, err);
+    }
+  };
 
-  const STORAGE_KEY = 'rooh-cart';
-  const THEME_KEY   = 'rooh-theme';
-  const LANG_KEY    = 'rooh-lang';
-  const CACHE_KEY   = 'rooh-cached-products';
+  const safeModule = window.RoohUtils?.safeModule || function(name, initFn) {
+    try {
+      initFn();
+    } catch (err) {
+      console.warn(`[Module skipped safely: ${name}]:`, err);
+    }
+  };
+
+  // ── Config ───────────────────────────────────────────────────
+  const WHATSAPP_PHONE    = window.RoohConstants?.WHATSAPP_PHONE || '201000603308';
+  const WHATSAPP_BASE_URL = window.RoohConstants?.WHATSAPP_BASE_URL || `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}`;
+  const SUPABASE_URL      = window.RoohConstants?.SUPABASE_URL || 'https://oyslbombgdvcoyqotyao.supabase.co';
+  const SUPABASE_ANON     = window.RoohConstants?.SUPABASE_ANON || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95c2xib21iZ2R2Y295cW90eWFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1NzEwNTksImV4cCI6MjExMDE0NzA1OX0.VxKOxH3MTxC2Pdnf6GSCSHoBd6bWIiEvqTV9dQTh3SU';
+
+  const STORAGE_KEY = window.RoohConstants?.STORAGE_KEYS?.CART || 'rooh-cart';
+  const THEME_KEY   = window.RoohConstants?.STORAGE_KEYS?.THEME || 'rooh-theme';
+  const LANG_KEY    = window.RoohConstants?.STORAGE_KEYS?.LANG || 'rooh-lang';
+  const CACHE_KEY   = window.RoohConstants?.STORAGE_KEYS?.CACHED_PRODUCTS || 'rooh-cached-products';
 
   // ── i18n Dictionary ──────────────────────────────────────────
   const I18N = {
@@ -225,34 +258,6 @@
     accords: 'Vanilla, Sweet, Oriental, Powdery, Amber',
     seasons: 'winter,fall,night'
   };
-
-  // ── Safe Fault-Tolerant DOM & Event Helpers ───────────────────
-  const $ = sel => {
-    try { return document.querySelector(sel); } catch (_) { return null; }
-  };
-  const $$ = sel => {
-    try { return [...document.querySelectorAll(sel)]; } catch (_) { return []; }
-  };
-
-  function safeOn(target, event, handler, options) {
-    if (!target) return;
-    try {
-      const elements = typeof target === 'string'
-        ? $$(target)
-        : (target instanceof NodeList || Array.isArray(target) ? target : [target]);
-      elements.forEach(el => {
-        if (el && typeof el.addEventListener === 'function') {
-          el.addEventListener(event, function(e) {
-            try {
-              return handler.call(this, e);
-            } catch (err) {
-              console.warn(`[Product Page Event Notice (${event})]:`, err);
-            }
-          }, options);
-        }
-      });
-    } catch (_) {}
-  }
 
   // Early loader dismissal failsafe
   setTimeout(() => {

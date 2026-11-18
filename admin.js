@@ -1,43 +1,71 @@
 (() => {
-  const $ = selector => {
-    try { return document.querySelector(selector); } catch (_) { return null; }
-  };
-  const $$ = selector => {
-    try { return [...document.querySelectorAll(selector)]; } catch (_) { return []; }
+  // ── Fault-Tolerant Architectural Primitives (fallback if utils.js not loaded) ──────────────────────────────
+  const $ = window.RoohUtils?.$ || (selector => { try { return document.querySelector(selector); } catch (_) { return null; } });
+  const $$ = window.RoohUtils?.$$ || (selector => { try { return [...document.querySelectorAll(selector)]; } catch (_) { return []; } });
+  const safeOn = window.RoohUtils?.safeOn || function(selectorOrEl, event, handler, options) {
+    if (!selectorOrEl) return;
+    try {
+      const elements = typeof selectorOrEl === 'string'
+        ? $$(selectorOrEl)
+        : (selectorOrEl instanceof NodeList || Array.isArray(selectorOrEl) ? selectorOrEl : [selectorOrEl]);
+      elements.forEach(el => {
+        if (el && typeof el.addEventListener === 'function') {
+          el.addEventListener(event, function(e) {
+            try {
+              return handler.call(this, e);
+            } catch (err) {
+              console.warn(`[Event notice on ${event} (${selectorOrEl})]:`, err);
+            }
+          }, options);
+        }
+      });
+    } catch (err) {
+      console.warn(`[safeOn notice for ${selectorOrEl}]:`, err);
+    }
   };
 
-  // ── Supabase config (نفس القيم في app.js) ────────────────────────────────
-  const SUPABASE_URL  = 'https://oyslbombgdvcoyqotyao.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95c2xib21iZ2R2Y295cW90eWFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1NzEwNTksImV4cCI6MjExMDE0NzA1OX0.VxKOxH3MTxC2Pdnf6GSCSHoBd6bWIiEvqTV9dQTh3SU';
+  const safeModule = window.RoohUtils?.safeModule || function(name, initFn) {
+    try {
+      initFn();
+    } catch (err) {
+      console.warn(`[Module skipped safely: ${name}]:`, err);
+    }
+  };
+
+  // ── Supabase config ────────────────────────────────
+  const SUPABASE_URL  = window.RoohConstants?.SUPABASE_URL || 'https://oyslbombgdvcoyqotyao.supabase.co';
+  const SUPABASE_ANON = window.RoohConstants?.SUPABASE_ANON || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95c2xib21iZ2R2Y295cW90eWFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1NzEwNTksImV4cCI6MjExMDE0NzA1OX0.VxKOxH3MTxC2Pdnf6GSCSHoBd6bWIiEvqTV9dQTh3SU';
 
   async function supaFetch(table, { method = 'GET', filters = '', body = null, select = '*' } = {}) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
-    try {
-      const url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
-      const res = await fetch(url, {
-        method,
-        signal: controller.signal,
-        headers: {
-          'apikey':        SUPABASE_ANON,
-          'Authorization': `Bearer ${SUPABASE_ANON}`,
-          'Content-Type':  'application/json',
-          'Prefer':        (method === 'POST' || method === 'PATCH') ? 'return=representation' : '',
-        },
-        body: body ? JSON.stringify(body) : undefined,
-      });
-      clearTimeout(timeoutId);
-      if (!res.ok) throw new Error(await res.text());
-      if (res.status === 204 || method === 'DELETE') return null;
-      const text = await res.text();
-      return text ? JSON.parse(text) : null;
-    } catch (err) {
-      clearTimeout(timeoutId);
-      if (err.name === 'AbortError') {
-        throw new Error('انتهت مهلة الاتصال بالخادم. تحقق من اتصال الإنترنت.');
+    return window.RoohUtils?.supaFetch?.(table, { method, filters, body, select }) ?? (async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
+        const res = await fetch(url, {
+          method,
+          signal: controller.signal,
+          headers: {
+            'apikey':        SUPABASE_ANON,
+            'Authorization': `Bearer ${SUPABASE_ANON}`,
+            'Content-Type':  'application/json',
+            'Prefer':        (method === 'POST' || method === 'PATCH') ? 'return=representation' : '',
+          },
+          body: body ? JSON.stringify(body) : undefined,
+        });
+        clearTimeout(timeoutId);
+        if (!res.ok) throw new Error(await res.text());
+        if (res.status === 204 || method === 'DELETE') return null;
+        const text = await res.text();
+        return text ? JSON.parse(text) : null;
+      } catch (err) {
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+          throw new Error('انتهت مهلة الاتصال بالخادم. تحقق من اتصال الإنترنت.');
+        }
+        throw err;
       }
-      throw err;
-    }
+    })();
   }
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -46,17 +74,17 @@
     theme = 'light';
     document.body.classList.add('light');
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = '#f5f0eb';
-    document.querySelectorAll('.brand-logo').forEach(image => {
-      image.src = 'assets/branding/1.svg';
+    if (meta) meta.content = window.RoohConstants?.DEFAULTS?.THEME_COLOR_LIGHT || '#f5f0eb';
+    $$('.brand-logo').forEach(image => {
+      image.src = window.RoohConstants?.DEFAULTS?.BRAND_LOGO_LIGHT || 'assets/branding/1.svg';
     });
-    try { localStorage.setItem('rooh-theme', 'light'); } catch (_) {}
+    try { localStorage.setItem(window.RoohConstants?.STORAGE_KEYS?.THEME || 'rooh-theme', 'light'); } catch (_) {}
   }
   setTheme();
 
   // ── Language & State Setup ────────────────────────────────────────────────
   let adminLang = 'ar';
-  try { adminLang = localStorage.getItem('rooh-lang') || 'ar'; } catch (_) {}
+  try { adminLang = localStorage.getItem(window.RoohConstants?.STORAGE_KEYS?.LANG || 'rooh-lang') || 'ar'; } catch (_) {}
 
   const arabicNum = n => adminLang === 'ar' ? String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : String(n);
   const money = value => {
