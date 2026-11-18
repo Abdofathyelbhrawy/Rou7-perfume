@@ -2527,6 +2527,73 @@ body.light .btn-card-quickview {
   perspective: 1000px;
   cursor: pointer;
   position: relative;
+  background: radial-gradient(ellipse at center, rgba(245, 165, 173, 0.08) 0%, transparent 70%);
+  border-radius: 24px;
+  padding: 40px 20px;
+  overflow: hidden;
+}
+
+/* Animated light rays */
+.story-art::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(245, 165, 173, 0.06), transparent, rgba(245, 165, 173, 0.04), transparent);
+  animation: spinRay 20s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes spinRay {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Floating particles */
+.story-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.story-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--pink);
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: floatParticle 8s ease-in-out infinite;
+}
+
+@keyframes floatParticle {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
+  10% { opacity: 0.6; }
+  50% { transform: translate(20px, -30px) scale(1.5); opacity: 0.4; }
+  90% { opacity: 0.3; }
+}
+
+/* Premium glow ring */
+.story-glow-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  border: 2px solid rgba(245, 165, 173, 0.3);
+  border-radius: 50%;
+  animation: pulseRing 3s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes pulseRing {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.05); }
 }
 
 .story-caption {
@@ -2589,6 +2656,110 @@ body.light .btn-card-quickview {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Creative spotlight badge */
+.story-offer-badge {
+  position: absolute;
+  top: -16px;
+  background: linear-gradient(135deg, var(--pink), #e88d97);
+  color: var(--navy);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 18px rgba(245, 165, 173, 0.45);
+  white-space: nowrap;
+  z-index: 10;
+  animation: badgeFloat 3s ease-in-out infinite;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* Creative story copy section */
+.story-copy {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.story-copy .eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.story-copy .eyebrow-line {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--pink));
+}
+
+.story-copy .eyebrow-line:last-of-type {
+  background: linear-gradient(90deg, var(--pink), transparent);
+}
+
+.story-copy h2 {
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 300;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  margin-bottom: 18px;
+}
+
+.story-copy h2 em {
+  font-style: italic;
+  color: var(--pink);
+  font-weight: 400;
+}
+
+.story-copy p {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin-bottom: 28px;
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.story-signature {
+  font-size: 14px;
+  color: var(--ink);
+  opacity: 0.7;
+  margin-bottom: 24px;
+}
+
+.story-signature span {
+  color: var(--pink);
+  font-weight: 600;
+}
+
+.story-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: gap 0.2s, color 0.2s;
+  padding: 8px 0;
+}
+
+.story-link:hover {
+  color: var(--pink);
+  gap: 14px;
+}
+
+.story-link .arrow-icon {
+  transition: transform 0.2s;
+}
+
+.story-link:hover .arrow-icon {
+  transform: translateX(-4px);
+}
+
 .story-offer-badge {
   position: absolute;
   top: -16px;
@@ -2643,7 +2814,120 @@ body.light .btn-card-quickview {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  transition: border-color .2s;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.story-spotlight-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(245, 165, 173, 0.08), transparent);
+  transition: left 0.5s;
+}
+
+.story-spotlight-box:hover::before {
+  left: 100%;
+}
+
+.story-spotlight-box:hover {
+  border-color: var(--pink);
+  box-shadow: 0 8px 32px rgba(245, 165, 173, 0.15);
+  transform: translateY(-2px);
+}
+
+.story-spotlight-box .story-price-group {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.story-spotlight-box .story-price-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.story-spotlight-box .story-current-price {
+  font-size: 22px;
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', sans-serif;
+  font-weight: 700;
+  color: var(--pink);
+}
+
+.story-spotlight-box .story-old-price {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.story-spotlight-box .story-discount-tag {
+  background: rgba(129, 45, 53, 0.25);
+  color: var(--pink);
+  border: 1px solid rgba(245, 165, 173, 0.4);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-left: auto;
+}
+
+.story-spotlight-box .story-actions-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.story-spotlight-box .story-quick-buy {
+  flex: 1;
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 12px;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--pink), #e88d97);
+  border: none;
+  color: var(--navy);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.story-spotlight-box .story-quick-buy:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 165, 173, 0.4);
+}
+
+.story-spotlight-box .story-details-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 10px;
+  transition: all .2s;
+}
+
+.story-spotlight-box .story-details-btn:hover {
+  background: var(--pink);
+  color: var(--navy);
+  border-color: var(--pink);
+  transform: translateY(-2px);
 }
 
 body.light .story-spotlight-box {

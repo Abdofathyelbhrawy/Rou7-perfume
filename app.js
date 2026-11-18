@@ -1402,6 +1402,20 @@
         openProductDetails(targetId);
       }
     });
+
+    // Generate floating particles
+    const particlesContainer = $('#storyParticles');
+    if (particlesContainer) {
+      for (let i = 0; i < 12; i++) {
+        const p = document.createElement('div');
+        p.className = 'story-particle';
+        p.style.left = `${Math.random() * 100}%`;
+        p.style.top = `${Math.random() * 100}%`;
+        p.style.animationDelay = `${Math.random() * 8}s`;
+        p.style.animationDuration = `${6 + Math.random() * 4}s`;
+        particlesContainer.appendChild(p);
+      }
+    }
   }
 
   function initStorySpray() {
