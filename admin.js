@@ -2157,6 +2157,8 @@
 
       // 2. Gender / Category
       let category = 'unisex';
+      // For direct text input, use the raw text as the page text for note extraction
+      const textToScan = isDirectText ? rawUrl : pageText;
       const catCheckText = (textToScan + ' ' + (microlinkData?.description || '')).toLowerCase();
       if (/for women and men|unisex/i.test(catCheckText)) {
         category = 'unisex';
@@ -2170,9 +2172,6 @@
       let topNotesEn = '';
       let midNotesEn = '';
       let baseNotesEn = '';
-
-      // For direct text input, use the raw text as the page text for note extraction
-      const textToScan = isDirectText ? rawUrl : pageText;
 
       if (textToScan) {
         // 1. Sentence/paragraph match:
