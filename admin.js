@@ -2100,7 +2100,10 @@
 
       // 1. Extract Title and Clean Name
       let extractedTitle = '';
-      if (pageText) {
+      if (isDirectText) {
+        // For direct text input, use the raw text as the title
+        extractedTitle = rawUrl.trim();
+      } else if (pageText) {
         const titleMatch = pageText.match(/Title:\s*(.+)/i);
         if (titleMatch) extractedTitle = titleMatch[1].trim();
       }
@@ -2154,7 +2157,7 @@
 
       // 2. Gender / Category
       let category = 'unisex';
-      const catCheckText = (pageText + ' ' + (microlinkData?.description || '')).toLowerCase();
+      const catCheckText = (textToScan + ' ' + (microlinkData?.description || '')).toLowerCase();
       if (/for women and men|unisex/i.test(catCheckText)) {
         category = 'unisex';
       } else if (/for men|men 20\d\d|cologne for men/i.test(catCheckText)) {
@@ -2168,11 +2171,14 @@
       let midNotesEn = '';
       let baseNotesEn = '';
 
-      if (pageText) {
+      // For direct text input, use the raw text as the page text for note extraction
+      const textToScan = isDirectText ? rawUrl : pageText;
+
+      if (textToScan) {
         // 1. Sentence/paragraph match:
         // 'Top notes are Calabrian bergamot and Pepper; middle notes are ...; base notes are ...'
         // 'Top note is Citruses; middle note is Sea Notes; base notes are Cedar and Amber.'
-        const paraMatch = pageText.match(/(?:top|head)\s+notes?\s+(?:is|are|:)\s+([\s\S]*?)(?:\.\s|\.\n|\n\n|$)/i);
+        const paraMatch = textToScan.match(/(?:top|head)\s+notes?\s+(?:is|are|:)\s+([\s\S]*?)(?:\.\s|\.\n|\n\n|$)/i);
         if (paraMatch) {
           const rawAll = paraMatch[1];
           const parts = rawAll.split(/;\s*|\n+/);
@@ -2190,7 +2196,7 @@
 
         // Helper: extract notes from markdown sections
         function extractFromSection(headingRegex) {
-          const m = pageText.match(headingRegex);
+          const m = textToScan.match(headingRegex);
           if (!m) return '';
           const section = m[1];
           const notes = [];
@@ -2216,21 +2222,21 @@
 
         // 3. Alternate line lists: 'Top notes: a, b', 'Middle notes: c, d', 'Base notes: e, f'
         if (!topNotesEn) {
-          const m = pageText.match(/(?:top|head)\s+notes?:\s*([^\n\.]+)/i);
+          const m = textToScan.match(/(?:top|head)\s+notes?:\s*([^\n\.]+)/i);
           if (m) topNotesEn = m[1].trim();
         }
         if (!midNotesEn) {
-          const m = pageText.match(/(?:middle|heart)\s+notes?:\s*([^\n\.]+)/i);
+          const m = textToScan.match(/(?:middle|heart)\s+notes?:\s*([^\n\.]+)/i);
           if (m) midNotesEn = m[1].trim();
         }
         if (!baseNotesEn) {
-          const m = pageText.match(/(?:base|bottom)\s+notes?:\s*([^\n\.]+)/i);
+          const m = textToScan.match(/(?:base|bottom)\s+notes?:\s*([^\n\.]+)/i);
           if (m) baseNotesEn = m[1].trim();
         }
 
         // 4. Parfumo / general 'Fragrance Notes' list
         if (!topNotesEn && !midNotesEn && !baseNotesEn) {
-          const fnMatch = pageText.match(/(?:##\s*Fragrance Notes|##\s*Pyramid)[\s\S]*?([\s\S]*?)(?=##|###|\n\s*\n\s*\n|$)/i);
+          const fnMatch = textToScan.match(/(?:##\s*Fragrance Notes|##\s*Pyramid)[\s\S]*?([\s\S]*?)(?=##|###|\n\s*\n\s*\n|$)/i);
           if (fnMatch) {
             const notes = [];
             const pMatches = fnMatch[1].matchAll(/!\[Image\s*\d*:\s*([^\]]+)\]\([^)]+\)\s*([A-Za-z0-9\s'-]+)/gi);
@@ -2248,8 +2254,8 @@
 
         // 5. 'Scent pyramid' format (Top / Heart / Base with time indicators)
         if (!topNotesEn || !midNotesEn || !baseNotesEn) {
-          const pyrBlock = pageText.match(/(?:scent\s+pyramid|olfactory\s+pyramid|الهرم العطري)[\s\S]*?(?=(?:scent\s+dna|performance|###|##|$))/i);
-          const pArea = pyrBlock ? pyrBlock[0] : pageText;
+          const pyrBlock = textToScan.match(/(?:scent\s+pyramid|olfactory\s+pyramid|الهرم العطري)[\s\S]*?(?=(?:scent\s+dna|performance|###|##|$))/i);
+          const pArea = pyrBlock ? pyrBlock[0] : textToScan;
 
           if (!topNotesEn) {
             const tm = pArea.match(/(?:^|\n)\s*(?:▲\s*)?(?:Top|قمة العطر)(?:\s*\(Top\))?(?:\s*First\s*\d+\s*min)?\s*\n([\s\S]*?)(?=(?:\n\s*(?:■\s*)?(?:Heart|Middle|قلب العطر))|$)/i);
@@ -2297,7 +2303,7 @@
 
       // Guaranteed Scent Pyramid: If any note level is still empty, auto-extract via intelligent NLP or accord harmonics
       if (!topNotesAr || !midNotesAr || !baseNotesAr) {
-        const smartPyr = window.PerfumeI18n?.extractSmartPyramid(pageText || microlinkData?.description || cleanName, category);
+        const smartPyr = window.PerfumeI18n?.extractSmartPyramid(textToScan || microlinkData?.description || cleanName, category);
         if (smartPyr) {
           if (!topNotesAr) topNotesAr = smartPyr.top;
           if (!midNotesAr) midNotesAr = smartPyr.heart;
@@ -2309,25 +2315,25 @@
       let accordsList = [];
       let scrapedLongevity = '4';
       let scrapedSillage = '3';
-      if (pageText) {
-        const accordsMatch = pageText.match(/(?:main accords|scent dna|الأكوردات)\s*\n+([\s\S]*?)(?=\n\s*\n|###|---|\*\*|Performance|$)/i);
+      if (textToScan) {
+        const accordsMatch = textToScan.match(/(?:main accords|scent dna|الأكوردات)\s*\n+([\s\S]*?)(?=\n\s*\n|###|---|\*\*|Performance|$)/i);
         if (accordsMatch) {
           accordsList = accordsMatch[1].split(/\n+/).map(s => s.trim().replace(/^(?:[-*•]|built from[^\n]*)\s*/i, '')).filter(s => s && !s.toLowerCase().includes('built from') && !s.toLowerCase().includes('main accord')).slice(0, 5);
         }
-        if (/beast mode|12\+|10\+|very long lasting/i.test(pageText)) scrapedLongevity = '5';
-        else if (/moderate/i.test(pageText)) scrapedLongevity = '3';
-        if (/beast mode|enormous|strong/i.test(pageText)) scrapedSillage = '4';
+        if (/beast mode|12\+|10\+|very long lasting/i.test(textToScan)) scrapedLongevity = '5';
+        else if (/moderate/i.test(textToScan)) scrapedLongevity = '3';
+        if (/beast mode|enormous|strong/i.test(textToScan)) scrapedSillage = '4';
       }
 
       // 5. Bottle Images Extraction (Cover + Secondary Photos)
       const scrapedImages = [];
-      if (pageText) {
-        const thumbMatches = [...pageText.matchAll(/!\[(?:[^\]]*)\]\((https:\/\/fimgs\.net\/mdimg\/perfume-thumbs\/(?:dark-)?375x500\.[^)]+)\)/gi)];
+      if (textToScan) {
+        const thumbMatches = [...textToScan.matchAll(/!\[(?:[^\]]*)\]\((https:\/\/fimgs\.net\/mdimg\/perfume-thumbs\/(?:dark-)?375x500\.[^)]+)\)/gi)];
         for (const tm of thumbMatches) {
           if (!scrapedImages.includes(tm[1])) scrapedImages.push(tm[1]);
         }
         if (!scrapedImages.length) {
-          const generalMatches = [...pageText.matchAll(/!\[(?:[^\]]*)\]\((https:\/\/fimgs\.net\/mdimg\/(?:perfume-thumbs|perfume)\/[^)]+\.(?:jpg|jpeg|webp|png))\)/gi)];
+          const generalMatches = [...textToScan.matchAll(/!\[(?:[^\]]*)\]\((https:\/\/fimgs\.net\/mdimg\/(?:perfume-thumbs|perfume)\/[^)]+\.(?:jpg|jpeg|webp|png))\)/gi)];
           for (const gm of generalMatches) {
             if (!scrapedImages.includes(gm[1]) && !gm[1].includes('avatari') && !gm[1].includes('sastojci')) {
               scrapedImages.push(gm[1]);
