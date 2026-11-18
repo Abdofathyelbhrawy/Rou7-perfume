@@ -1279,6 +1279,7 @@
   const galleryCountBadge = $('#galleryCountBadge');
 
   let currentProductImages = [];
+  let selectedImageFile = null;
 
   function showImagePreview(urlOrData) {
     if (!urlOrData) return;
@@ -1352,6 +1353,7 @@
     const cleanUrl = String(url).trim();
     if (cleanUrl && !currentProductImages.includes(cleanUrl)) {
       currentProductImages.push(cleanUrl);
+      selectedImageFile = null; // Clear file reference when adding via URL
       renderAdminGallery();
     }
   }
@@ -1433,6 +1435,7 @@
 
   fileInput?.addEventListener('change', async () => {
     if (fileInput.files?.length) {
+      selectedImageFile = fileInput.files[0];
       await processSelectedImageFiles(fileInput.files);
       fileInput.value = '';
     }
