@@ -339,18 +339,26 @@
       discount_badge:   p.discount_badge || meta.discount_badge || '',
       brand:        p.brand || meta.brand || '',
       stock_quantity: p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : ''),
-      images:       Array.isArray(p.images) && p.images.length ? p.images : (Array.isArray(meta.images) && meta.images.length ? meta.images : (p.image_url ? [p.image_url] : []))
+      images:       Array.isArray(p.images) && p.images.length ? p.images : (Array.isArray(meta.images) && meta.images.length ? meta.images : (p.image_url ? [p.image_url] : [])),
+      sizes:        Array.isArray(p.sizes) && p.sizes.length ? p.sizes : (Array.isArray(meta.sizes) && meta.sizes.length ? meta.sizes : [])
     };
   }
 
-  // ── Pricing & Discount Engine ────────────────────────────────
-  function computeProductPrice(p, campaignData = campaignSettings) {
-    if (!p) return { price: 0, originalPrice: 0, hasDiscount: false, discountPercent: 0, discountBadge: '', savedAmount: 0 };
+  // ── Pricing & Discount Engine (Supports Multi-Sizes) ────────
+  let currentSelectedSizeIndex = 0;
 
-    const originalPrice = Number(p.price || 0);
+  function computeProductPrice(p, campaignData = campaignSettings, sizeIndex = currentSelectedSizeIndex) {
+    if (!p) return { price: 0, originalPrice: 0, hasDiscount: false, discountPercent: 0, discountBadge: '', savedAmount: 0, selectedSize: null };
+
     const d = unpackProduct(p);
+    const hasSizes = Array.isArray(d.sizes) && d.sizes.length > 0;
+    const activeSize = (hasSizes && typeof sizeIndex === 'number' && d.sizes[sizeIndex]) ? d.sizes[sizeIndex] : null;
 
-    const rawSale = Number(p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : d.sale_price);
+    const originalPrice = activeSize ? Number(activeSize.price || 0) : Number(p.price || 0);
+    const rawSale = activeSize && activeSize.sale_price !== undefined && activeSize.sale_price !== null
+      ? Number(activeSize.sale_price)
+      : Number(p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : d.sale_price);
+
     const hasCustomSale = Boolean(rawSale && rawSale > 0 && rawSale < originalPrice);
 
     const camp = campaignData || campaignSettings || {};
@@ -399,7 +407,8 @@
       hasDiscount,
       discountPercent,
       discountBadge,
-      savedAmount
+      savedAmount,
+      selectedSize: activeSize ? activeSize.size : null
     };
   }
 
@@ -589,12 +598,75 @@
     ];
   }
 
+  // ── Multi-Size & Pricing UI Updaters ─────────────────────────
+  function updatePdpPricing() {
+    if (!currentProduct) return;
+    const pricing = computeProductPrice(currentProduct, campaignSettings, currentSelectedSizeIndex);
+    const prodPriceTag = $('#prodPriceTag');
+    const prodOldPrice = $('#prodOldPrice');
+    const prodDiscountPill = $('#prodDiscountPill');
+    const smPrice = $('#smPrice');
+
+    if (prodPriceTag) prodPriceTag.textContent = money(pricing.price);
+
+    if (pricing.hasDiscount) {
+      if (prodOldPrice) {
+        prodOldPrice.textContent = money(pricing.originalPrice);
+        prodOldPrice.style.display = 'inline-block';
+      }
+      if (prodDiscountPill) {
+        prodDiscountPill.textContent = currentLang === 'ar' ? `وفر ${money(pricing.savedAmount)} (${pricing.discountBadge})` : `Save ${money(pricing.savedAmount)} (${pricing.discountBadge})`;
+        prodDiscountPill.style.display = 'inline-flex';
+      }
+    } else {
+      if (prodOldPrice) prodOldPrice.style.display = 'none';
+      if (prodDiscountPill) prodDiscountPill.style.display = 'none';
+    }
+
+    if (smPrice) {
+      smPrice.innerHTML = pricing.hasDiscount
+        ? `<span class="sm-sale">${money(pricing.price)}</span> <del class="sm-old">${money(pricing.originalPrice)}</del>`
+        : money(pricing.price);
+    }
+
+    updateWaOrderLink();
+  }
+
+  function renderPdpSizeSelector(d) {
+    const sizeSection = $('#pdpSizeSection');
+    const sizeOptions = $('#pdpSizeOptions');
+    if (!sizeSection || !sizeOptions) return;
+
+    if (Array.isArray(d.sizes) && d.sizes.length > 0) {
+      sizeSection.hidden = false;
+      if (typeof currentSelectedSizeIndex !== 'number' || currentSelectedSizeIndex >= d.sizes.length) {
+        currentSelectedSizeIndex = 0;
+      }
+      sizeOptions.innerHTML = d.sizes.map((s, idx) => {
+        const isAct = idx === currentSelectedSizeIndex;
+        return `<button type="button" class="pdp-size-btn ${isAct ? 'active' : ''}" data-size-idx="${idx}" role="radio" aria-checked="${isAct}">
+          <span>${escapeHtml(s.size)}</span>
+        </button>`;
+      }).join('');
+    } else {
+      sizeSection.hidden = true;
+      sizeOptions.innerHTML = '';
+      currentSelectedSizeIndex = 0;
+    }
+  }
+
   // ── Render Product Page ──────────────────────────────────────
   function renderProductDetails(p) {
     if (!p) return;
     currentProduct = p;
     const d = unpackProduct(p);
     const t = I18N[currentLang];
+
+    // Track product view event
+    if (window.RoohAnalytics) {
+      const pricing = computeProductPrice(p, campaignSettings);
+      window.RoohAnalytics.trackProductView(String(p.id), p.name, pricing.price);
+    }
 
     const prodName = currentLang === 'en' ? (p.latin || p.name) : p.name;
     const prodSub  = currentLang === 'en' ? (p.latin ? p.name : '') : (p.latin || '');
@@ -672,29 +744,13 @@
         brandPill.hidden = true;
       }
     }
-    const pricing = computeProductPrice(p, campaignSettings);
+    const pricing = computeProductPrice(p, campaignSettings, currentSelectedSizeIndex);
     $('#prodMainTitle').textContent = prodName;
     $('#prodLatinTitle').textContent = prodSub;
 
-    const prodPriceTag = $('#prodPriceTag');
-    const prodOldPrice = $('#prodOldPrice');
-    const prodDiscountPill = $('#prodDiscountPill');
-
-    if (prodPriceTag) prodPriceTag.textContent = money(pricing.price);
-
-    if (pricing.hasDiscount) {
-      if (prodOldPrice) {
-        prodOldPrice.textContent = money(pricing.originalPrice);
-        prodOldPrice.style.display = 'inline-block';
-      }
-      if (prodDiscountPill) {
-        prodDiscountPill.textContent = currentLang === 'ar' ? `وفر ${money(pricing.savedAmount)} (${pricing.discountBadge})` : `Save ${money(pricing.savedAmount)} (${pricing.discountBadge})`;
-        prodDiscountPill.style.display = 'inline-flex';
-      }
-    } else {
-      if (prodOldPrice) prodOldPrice.style.display = 'none';
-      if (prodDiscountPill) prodDiscountPill.style.display = 'none';
-    }
+    // Multi-Size Selector
+    renderPdpSizeSelector(d);
+    updatePdpPricing();
 
     const isOutOfStock = (p.in_stock === false) || (d.stock_quantity !== '' && d.stock_quantity !== undefined && parseInt(d.stock_quantity) <= 0);
     const stockBadge = $('#prodStockBadge');
@@ -1145,10 +1201,13 @@
   function updateWaOrderLink() {
     const waBtn = $('#pdpWaBtn');
     if (!waBtn || !currentProduct) return;
-    const pricing = computeProductPrice(currentProduct, campaignSettings);
+    const pricing = computeProductPrice(currentProduct, campaignSettings, currentSelectedSizeIndex);
     const prodName = currentLang === 'en' ? (currentProduct.latin || currentProduct.name) : currentProduct.name;
     const totalPrice = (pricing.price * currentQty);
-    const text = I18N[currentLang].wa_order_template(prodName, currentQty, totalPrice);
+    const sizeNote = pricing.selectedSize ? (currentLang === 'ar' ? ` (حجم: ${pricing.selectedSize})` : ` (Size: ${pricing.selectedSize})`) : '';
+    const text = currentLang === 'ar'
+      ? `مرحباً رُوح، أود طلب عطر "${prodName}"${sizeNote} عدد (${arabicDigits(currentQty)}) عبوة.\nالقيمة الإجمالية: ${totalPrice} ج.م.\nبرجاء تأكيد الطلب ومعلومات الشحن.`
+      : `Hello Rou7, I would like to order "${prodName}"${sizeNote} quantity (${currentQty}).\nTotal Price: ${totalPrice} EGP.\nPlease confirm order and shipping details.`;
     waBtn.href = `${WHATSAPP_BASE_URL}&text=${encodeURIComponent(text)}`;
   }
 
@@ -1177,7 +1236,9 @@
     }
 
     readCart();
-    const existing = cart.find(item => String(item.id) === String(p.id));
+    const pricing = computeProductPrice(p, campaignSettings, currentSelectedSizeIndex);
+    const chosenSize = pricing.selectedSize || null;
+    const existing = cart.find(item => String(item.id) === String(p.id) && (item.selectedSize || null) === chosenSize);
     const currentQtyInCart = existing ? existing.qty : 0;
     if (d.stock_quantity !== '' && d.stock_quantity !== undefined && d.stock_quantity !== null) {
       const maxStock = parseInt(d.stock_quantity) || 0;
@@ -1187,11 +1248,11 @@
       }
     }
 
-    const pricing = computeProductPrice(p, campaignSettings);
     if (existing) {
       existing.qty += qty;
       existing.price = pricing.price;
       existing.customPrice = pricing.hasDiscount ? pricing.price : null;
+      existing.selectedSize = chosenSize;
     } else {
       cart.push({
         id: String(p.id),
@@ -1200,12 +1261,18 @@
         price: pricing.price,
         customPrice: pricing.hasDiscount ? pricing.price : null,
         image_url: p.image_url || '',
-        qty: qty
+        qty: qty,
+        selectedSize: chosenSize
       });
     }
     saveCart();
     openCartDrawer(true);
     showToast(I18N[currentLang].toast_added);
+
+    // Track add to cart event
+    if (window.RoohAnalytics) {
+      window.RoohAnalytics.trackAddToCart(String(p.id), p.name, pricing.price, qty);
+    }
   }
 
   function updateCartUI() {
@@ -1235,7 +1302,7 @@
     if (cartTotal) cartTotal.textContent = money(totalPrice);
 
     if (cartItems) {
-      cartItems.innerHTML = cart.map(item => {
+      cartItems.innerHTML = cart.map((item, idx) => {
         const title = currentLang === 'en' ? (item.latin || item.name) : item.name;
         return `
           <div class="cart-item">
@@ -1244,12 +1311,13 @@
             </div>
             <div class="cart-item-info">
               <h4>${escapeHtml(title)}</h4>
+              ${item.selectedSize ? `<span class="cart-item-size-badge">🧴 ${escapeHtml(item.selectedSize)}</span>` : ''}
               <span class="cart-item-price">${money(item.price)}</span>
               <div class="cart-qty-row">
-                <button type="button" class="cart-qty-btn" data-qty-change="${item.id}" data-step="-1">−</button>
+                <button type="button" class="cart-qty-btn" data-cart-idx="${idx}" data-qty-change="${item.id}" data-step="-1">−</button>
                 <span class="cart-qty-num">${currentLang === 'ar' ? arabicDigits(item.qty) : item.qty}</span>
-                <button type="button" class="cart-qty-btn" data-qty-change="${item.id}" data-step="1">+</button>
-                <button type="button" class="cart-remove-btn" data-remove="${item.id}" title="إزالة">×</button>
+                <button type="button" class="cart-qty-btn" data-cart-idx="${idx}" data-qty-change="${item.id}" data-step="1">+</button>
+                <button type="button" class="cart-remove-btn" data-cart-rm="${idx}" data-remove="${item.id}" title="إزالة">×</button>
               </div>
             </div>
           </div>
@@ -1421,6 +1489,21 @@
       updateWaOrderLink();
     });
 
+    // 5.1 Multi-Size Options click
+    safeOn('#pdpSizeOptions', 'click', e => {
+      const btn = e.target.closest('.pdp-size-btn');
+      if (!btn || !currentProduct) return;
+      const idx = parseInt(btn.dataset.sizeIdx);
+      if (isNaN(idx)) return;
+      currentSelectedSizeIndex = idx;
+      $$('.pdp-size-btn', $('#pdpSizeOptions')).forEach((b, i) => {
+        const isAct = i === idx;
+        b.classList.toggle('active', isAct);
+        b.setAttribute('aria-checked', isAct);
+      });
+      updatePdpPricing();
+    });
+
     // 6. Add to Bag button
     $('#pdpAddBagBtn')?.addEventListener('click', () => {
       if (currentProduct) {
@@ -1435,8 +1518,44 @@
 
     // Cart Items Event Delegation (+, -, remove)
     $('#cartItems')?.addEventListener('click', e => {
+      const idxBtn = e.target.closest('[data-cart-idx]');
+      const rmIdxBtn = e.target.closest('[data-cart-rm]');
       const stepBtn = e.target.closest('[data-qty-change]');
       const rmBtn   = e.target.closest('[data-remove]');
+
+      if (idxBtn) {
+        const idx = parseInt(idxBtn.dataset.cartIdx);
+        const step = parseInt(idxBtn.dataset.step) || 0;
+        const item = cart[idx];
+        if (item) {
+          if (step > 0) {
+            const prod = allProducts.find(p => String(p.id) === String(item.id));
+            if (prod) {
+              const d = unpackProduct(prod);
+              if (d.stock_quantity !== '' && d.stock_quantity !== undefined && d.stock_quantity !== null) {
+                const maxStock = parseInt(d.stock_quantity) || 0;
+                if (item.qty + step > maxStock) {
+                  showToast(currentLang === 'ar' ? `عفواً، أقصى كمية متاحة في المخزون هي ${arabicDigits(maxStock)} قطعة` : `Sorry, only ${maxStock} items available in stock`);
+                  return;
+                }
+              }
+            }
+          }
+          item.qty += step;
+          if (item.qty <= 0) cart.splice(idx, 1);
+          saveCart();
+        }
+        return;
+      }
+
+      if (rmIdxBtn) {
+        const idx = parseInt(rmIdxBtn.dataset.cartRm);
+        if (!isNaN(idx) && cart[idx]) {
+          cart.splice(idx, 1);
+          saveCart();
+        }
+        return;
+      }
 
       if (stepBtn) {
         const id = stepBtn.dataset.qtyChange;

@@ -3380,7 +3380,7 @@
     $('#cartEmpty').classList.toggle('show', count === 0);
     $('#cartSummary').classList.toggle('empty', count === 0);
 
-    $('#cartItems').innerHTML = cart.map(row => {
+    $('#cartItems').innerHTML = cart.map((row, idx) => {
       if (row.is_custom_box) {
         const prodName = row.name || (currentLang === 'ar' ? 'بوكس هدايا رُوح الملكي 🎁' : 'Rou7 Royal Gift Box 🎁');
         const boxItemsDesc = Array.isArray(row.box_items) ? row.box_items.join(' + ') : (row.box_items || '');
@@ -3393,12 +3393,12 @@
             ${boxItemsDesc ? `<div class="cart-custom-box-notes"><strong>${currentLang === 'ar' ? 'العطور:' : 'Perfumes:'}</strong> ${escapeHtml(boxItemsDesc)}</div>` : ''}
             ${cardMsgDesc ? `<div class="cart-custom-box-card"><strong>💌</strong> ${escapeHtml(cardMsgDesc)}</div>` : ''}
             <div class="qty">
-              <button data-qty="${row.id}" data-step="-1" aria-label="تقليل">−</button>
+              <button data-cart-idx="${idx}" data-qty="${row.id}" data-step="-1" aria-label="تقليل">−</button>
               <span>${formatDigits(row.qty)}</span>
-              <button data-qty="${row.id}" data-step="1" aria-label="زيادة">＋</button>
+              <button data-cart-idx="${idx}" data-qty="${row.id}" data-step="1" aria-label="زيادة">＋</button>
             </div>
           </div>
-          <button class="remove-item" data-remove="${row.id}" aria-label="حذف">×</button>
+          <button class="remove-item" data-cart-rm="${idx}" data-remove="${row.id}" aria-label="حذف">×</button>
         </div>`;
       }
 
@@ -3413,14 +3413,15 @@
         <div class="cart-thumb">${product.image_url ? `<img src="${product.image_url}" alt="" loading="lazy">` : ''}</div>
         <div>
           <h3>${escapeHtml(prodName)}</h3>
+          ${row.selectedSize ? `<div style="margin:2px 0;"><span style="display:inline-block; font-size:11px; background:rgba(140, 115, 85, 0.12); color:#8c7355; border:1px solid rgba(140, 115, 85, 0.25); padding:1px 8px; border-radius:12px; font-weight:600;">🧴 ${escapeHtml(row.selectedSize)}</span></div>` : ''}
           <p>${priceDisplay}</p>
           <div class="qty">
-            <button data-qty="${product.id}" data-step="-1" aria-label="تقليل">−</button>
+            <button data-cart-idx="${idx}" data-qty="${product.id}" data-step="-1" aria-label="تقليل">−</button>
             <span>${formatDigits(row.qty)}</span>
-            <button data-qty="${product.id}" data-step="1" aria-label="زيادة">＋</button>
+            <button data-cart-idx="${idx}" data-qty="${product.id}" data-step="1" aria-label="زيادة">＋</button>
           </div>
         </div>
-        <button class="remove-item" data-remove="${product.id}" aria-label="حذف ${escapeHtml(prodName)}">×</button>
+        <button class="remove-item" data-cart-rm="${idx}" data-remove="${product.id}" aria-label="حذف ${escapeHtml(prodName)}">×</button>
       </div>`;
     }).join('');
 
@@ -3981,8 +3982,44 @@
   $('#quizModalClose')?.addEventListener('click', closeScentQuiz);
 
   $('#cartItems')?.addEventListener('click', event => {
+    const idxBtn = event.target.closest('[data-cart-idx]');
+    const rmIdxBtn = event.target.closest('[data-cart-rm]');
     const qty = event.target.closest('[data-qty]');
     const remove = event.target.closest('[data-remove]');
+
+    if (idxBtn) {
+      const idx = parseInt(idxBtn.dataset.cartIdx);
+      const step = Number(idxBtn.dataset.step);
+      const row = cart[idx];
+      if (!row) return;
+      if (step > 0) {
+        const prod = products.find(p => String(p.id) === String(row.id));
+        if (prod) {
+          const d = unpackProduct(prod);
+          if (d.stock_quantity !== '' && d.stock_quantity !== undefined && d.stock_quantity !== null) {
+            const maxStock = parseInt(d.stock_quantity) || 0;
+            if (row.qty + step > maxStock) {
+              showToast(currentLang === 'ar' ? `عفواً، أقصى كمية متاحة في المخزون هي ${formatDigits(maxStock)} قطعة` : `Sorry, only ${maxStock} items available in stock`);
+              return;
+            }
+          }
+        }
+      }
+      row.qty += step;
+      if (row.qty <= 0) cart.splice(idx, 1);
+      updateCart();
+      return;
+    }
+
+    if (rmIdxBtn) {
+      const idx = parseInt(rmIdxBtn.dataset.cartRm);
+      if (!isNaN(idx) && cart[idx]) {
+        cart.splice(idx, 1);
+        updateCart();
+      }
+      return;
+    }
+
     if (qty) {
       const row = cart.find(item => item.id === qty.dataset.qty);
       if (!row) return;
@@ -4164,6 +4201,12 @@
     if (formView) formView.hidden = false;
     const successView = $('#orderSuccess');
     if (successView) successView.hidden = true;
+
+    // Track checkout visit
+    if (window.RoohAnalytics) {
+      const cartValue = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      window.RoohAnalytics.trackCheckoutVisit(cartValue, cart.length);
+    }
   });
 
   $('#checkoutClose')?.addEventListener('click', () => $('#checkoutModal')?.classList.remove('open'));
@@ -4196,7 +4239,14 @@
       }
       const product = products.find(p => p.id === row.id);
       const unitPrice = row.customPrice || product?.price || 0;
-      return { id: row.id, name: product?.name, latin: product?.latin, price: unitPrice, qty: row.qty };
+      return {
+        id: row.id,
+        name: product?.name || row.name,
+        latin: product?.latin || row.latin,
+        price: unitPrice,
+        qty: row.qty,
+        selectedSize: row.selectedSize || null
+      };
     });
     const total   = cart.reduce((sum, row) => sum + (row.customPrice || products.find(p => p.id === row.id)?.price || row.price || 0) * row.qty, 0);
 
@@ -4271,6 +4321,11 @@
 
     try { localStorage.setItem('rooh-last-order', JSON.stringify({ id: orderNumber, createdAt: new Date().toISOString(), items, total })); } catch (_) {}
 
+    // Track order placed
+    if (window.RoohAnalytics) {
+      window.RoohAnalytics.trackOrderPlaced(orderNumber, total, items);
+    }
+
     submitBtn.disabled = false;
     submitBtn.innerHTML = `${I18N[currentLang].checkout_submit} <span class="arrow-icon">←</span>`;
 
@@ -4287,7 +4342,7 @@
           const card = i.card_message ? ` [Card: "${i.card_message}"]` : '';
           return `• 🎁 ${i.latin || i.name} (Perfumes: ${boxed})${card} × ${i.qty} — ${money(i.price * i.qty)}`;
         }
-        return `• ${i.latin || i.name} × ${i.qty} — ${money(i.price * i.qty)}`;
+        return `• ${i.latin || i.name}${i.selectedSize ? ` (Size: ${i.selectedSize})` : ''} × ${i.qty} — ${money(i.price * i.qty)}`;
       }).join('\n');
       waMessage =
 `✨ *New Order from Rou7-perfume* ✨
@@ -4312,7 +4367,7 @@ I would like to confirm my order please 🌸`;
           const card = i.card_message ? ` [كارت إهداء: "${i.card_message}"]` : '';
           return `• 🎁 ${i.name} (العطور: ${boxed})${card} × ${i.qty} — ${money(i.price * i.qty)}`;
         }
-        return `• ${i.name} × ${i.qty} — ${money(i.price * i.qty)}`;
+        return `• ${i.name}${i.selectedSize ? ` (حجم: ${i.selectedSize})` : ''} × ${i.qty} — ${money(i.price * i.qty)}`;
       }).join('\n');
       waMessage =
 `✨ *طلب جديد من متجر رُوح | Rou7-perfume* ✨

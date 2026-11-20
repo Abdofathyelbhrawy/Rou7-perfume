@@ -1,4 +1,7 @@
 (() => {
+  // ── Traffic Analytics State (must be declared early to avoid TDZ) ──────────────────────────────────────────
+  let trafficTimeRange = 'all';
+
   // ── Fault-Tolerant Architectural Primitives (fallback if utils.js not loaded) ──────────────────────────────
   const $ = window.RoohUtils?.$ || (selector => { try { return document.querySelector(selector); } catch (_) { return null; } });
   const $$ = window.RoohUtils?.$$ || (selector => { try { return [...document.querySelectorAll(selector)]; } catch (_) { return []; } });
@@ -1204,6 +1207,15 @@
           </div>
         `;
       }
+      if (d.sizes && d.sizes.length) {
+        priceCellHtml += `
+          <div style="margin-top:3px;">
+            <span style="display:inline-block; font-size:10px; background:rgba(59,130,246,0.12); color:#1d4ed8; border:1px solid rgba(59,130,246,0.25); padding:1px 6px; border-radius:4px; font-weight:600;" title="${d.sizes.map(s => `${s.size}: ${money(s.price)}`).join(' · ')}">
+              ${arabicNum(d.sizes.length)} ${adminLang === 'ar' ? 'أحجام' : 'sizes'} 🧴
+            </span>
+          </div>
+        `;
+      }
 
       return `<tr>
         <td>${imgHtml}</td>
@@ -1232,6 +1244,7 @@
             <button class="btn-action btn-orbit-toggle ${(p.in_solar_system || d.in_solar_system) ? 'in-orbit' : ''}" data-toggle-solar="${p.id}" title="${(p.in_solar_system || d.in_solar_system) ? (adminLang === 'ar' ? 'إزالة من مدار المنظومة الشمسية' : 'Remove from Solar Orbit') : (adminLang === 'ar' ? 'إضافة إلى مدار المنظومة الشمسية' : 'Add to Solar Orbit')}">
               ${(p.in_solar_system || d.in_solar_system) ? (adminLang === 'ar' ? '🪐 بالمدار' : '🪐 Orbiting') : (adminLang === 'ar' ? '＋ للمدار' : '＋ To Orbit')}
             </button>
+            <button class="btn-action btn-duplicate" data-duplicate="${p.id}" title="${adminLang === 'ar' ? 'نسخ هذا العطر كمنتج جديد' : 'Duplicate Product'}">${adminLang === 'ar' ? 'نسخ ⧉' : 'Duplicate ⧉'}</button>
             <button class="btn-action btn-edit" data-edit="${p.id}" title="${adminLang === 'ar' ? 'تعديل' : 'Edit'}">${adminLang === 'ar' ? 'تعديل ✎' : 'Edit ✎'}</button>
             <button class="btn-action btn-delete" data-del="${p.id}" title="${adminLang === 'ar' ? 'حذف' : 'Delete'}">${adminLang === 'ar' ? 'حذف 🗑' : 'Delete 🗑'}</button>
           </div>
@@ -1589,8 +1602,45 @@
       stock_quantity:   p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : ''),
       cost_price:       p.cost_price !== undefined && p.cost_price !== null ? p.cost_price : (meta.cost_price !== undefined && meta.cost_price !== null ? meta.cost_price : ''),
       in_solar_system:  Boolean(p.in_solar_system !== undefined ? p.in_solar_system : meta.in_solar_system),
-      images:           Array.isArray(p.images) && p.images.length ? p.images : (Array.isArray(meta.images) && meta.images.length ? meta.images : (p.image_url ? [p.image_url] : []))
+      images:           Array.isArray(p.images) && p.images.length ? p.images : (Array.isArray(meta.images) && meta.images.length ? meta.images : (p.image_url ? [p.image_url] : [])),
+      sizes:            Array.isArray(p.sizes) && p.sizes.length ? p.sizes : (Array.isArray(meta.sizes) && meta.sizes.length ? meta.sizes : [])
     };
+  }
+
+  function renderAdminSizes(sizes = []) {
+    const container = $('#adminSizesContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!Array.isArray(sizes) || !sizes.length) return;
+    sizes.forEach(s => {
+      addAdminSizeRow(s.size || '', s.price || '', s.sale_price || '');
+    });
+  }
+
+  function addAdminSizeRow(size = '', price = '', sale_price = '') {
+    const container = $('#adminSizesContainer');
+    if (!container) return;
+    const row = document.createElement('div');
+    row.className = 'admin-size-row';
+    row.innerHTML = `
+      <div class="size-col-name">
+        <label>الحجم / السعة</label>
+        <input type="text" class="size-name-input" placeholder="مثال: 100 مل" value="${escapeHtml(size)}">
+      </div>
+      <div class="size-col-price">
+        <label>سعر البيع (ج.م) *</label>
+        <input type="number" step="0.01" min="0" class="size-price-input" placeholder="مثال: 1600" value="${price !== '' && price !== null && price !== undefined ? price : ''}">
+      </div>
+      <div class="size-col-sale">
+        <label>سعر الخصم <small style="opacity:.6">(اختياري)</small></label>
+        <input type="number" step="0.01" min="0" class="size-sale-input" placeholder="مثال: 1350" value="${sale_price !== '' && sale_price !== null && sale_price !== undefined ? sale_price : ''}">
+      </div>
+      <button type="button" class="btn-remove-size" title="حذف هذا الحجم" aria-label="حذف">✕</button>
+    `;
+    row.querySelector('.btn-remove-size').addEventListener('click', () => {
+      row.remove();
+    });
+    container.appendChild(row);
   }
 
   function syncDiscountFeedback() {
@@ -1643,7 +1693,7 @@
     }
   }
 
-  function openProductModal(product = null) {
+  function openProductModal(product = null, isDuplicate = false) {
     prodForm.reset();
     formStatus.textContent = '';
     formStatus.className   = '';
@@ -1666,8 +1716,15 @@
 
     if (product) {
       const details = unpackProductDetails(product);
-      modalTitle.innerHTML = `تعديل عطر: <em>${escapeHtml(product.name)}</em>`;
-      $('#productId').value       = product.id;
+      if (isDuplicate) {
+        modalTitle.innerHTML = `نسخ عطر: <em>${escapeHtml(product.name)}</em>`;
+        $('#productId').value       = '';
+        $('#saveProdBtn').innerHTML = 'حفظ كعطر جديد <span>←</span>';
+      } else {
+        modalTitle.innerHTML = `تعديل عطر: <em>${escapeHtml(product.name)}</em>`;
+        $('#productId').value       = product.id;
+        $('#saveProdBtn').innerHTML = 'حفظ التعديلات <span>←</span>';
+      }
       $('#prodName').value        = product.name || '';
       $('#prodLatin').value       = product.latin || '';
       populateBrandSelects(details.brand || product.brand || '');
@@ -1705,6 +1762,9 @@
       syncDiscountFeedback();
       syncProfitFeedback();
 
+      // Multi-Sizes
+      renderAdminSizes(details.sizes || []);
+
       // Scent DNA Accords & Main Accord
       let currentAccordsList = (details.accords || '').split(/[,،;|\n]+/).map(s => s.trim()).filter(Boolean);
       const chosenMain = details.main_accord || currentAccordsList[0] || '';
@@ -1714,8 +1774,6 @@
       // Seasons & Occasions
       const currentSeasons = (details.seasons || '').toLowerCase();
       renderAdminSeasonsChips(currentSeasons);
-
-      $('#saveProdBtn').innerHTML = 'حفظ التعديلات <span>←</span>';
     } else {
       modalTitle.innerHTML = 'إضافة <em>عطر جديد</em>';
       $('#productId').value     = '';
@@ -1738,6 +1796,9 @@
       if ($('#prodMaxItems')) $('#prodMaxItems').value = '4';
       if (feedback) feedback.style.display = 'none';
       syncProfitFeedback();
+
+      // Multi-Sizes
+      renderAdminSizes([]);
 
       if ($('#prodMainAccord')) $('#prodMainAccord').value = '';
       renderAdminAccordsChips([]);
@@ -1831,6 +1892,17 @@
   $('#productModalClose')?.addEventListener('click', closeProductModal);
   $('#cancelProdBtn')?.addEventListener('click', closeProductModal);
   prodModal?.addEventListener('click', e => { if (e.target === prodModal) closeProductModal(); });
+
+  // Multi-Sizes Admin Listeners
+  $('#btnAddSizeRow')?.addEventListener('click', () => {
+    addAdminSizeRow('', $('#prodPrice')?.value || '', $('#prodSalePrice')?.value || '');
+  });
+  document.querySelectorAll('.quick-size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const preset = btn.dataset.presetSize;
+      if (preset) addAdminSizeRow(preset, $('#prodPrice')?.value || '', $('#prodSalePrice')?.value || '');
+    });
+  });
 
   // ── 🪄 Magic URL Scent Extractor (سحب بيانات العطر عبر الرابط) ────────────
   const FAMOUS_PERFUME_NAMES_AR = {
@@ -2673,8 +2745,22 @@
       return;
     }
 
+    const duplicateBtn = event.target.closest('[data-duplicate]');
     const editBtn = event.target.closest('[data-edit]');
     const delBtn  = event.target.closest('[data-del]');
+
+    if (duplicateBtn) {
+      const id = duplicateBtn.dataset.duplicate;
+      const product = currentProducts.find(p => String(p.id) === String(id));
+      if (product) {
+        const cloned = JSON.parse(JSON.stringify(product));
+        cloned.id = '';
+        cloned.name = cloned.name ? `${cloned.name} (نسخة)` : '';
+        if (cloned.latin) cloned.latin = `${cloned.latin} (Copy)`;
+        openProductModal(cloned, true /* isDuplicate */);
+      }
+      return;
+    }
 
     if (editBtn) {
       const id = editBtn.dataset.edit;
@@ -2823,6 +2909,16 @@
     const rawCategory = $('#prodCategory').value;
     const category = VALID_CATEGORIES.includes(rawCategory) ? rawCategory : 'unisex';
 
+    // Multi-Sizes collection
+    const sizeRows = Array.from(document.querySelectorAll('#adminSizesContainer .admin-size-row'));
+    const collectedSizes = sizeRows.map(row => {
+      const sName = row.querySelector('.size-name-input')?.value.trim() || '';
+      const sPrice = parseFloat(row.querySelector('.size-price-input')?.value) || 0;
+      const sSale = parseFloat(row.querySelector('.size-sale-input')?.value);
+      const validSale = (!isNaN(sSale) && sSale > 0 && sSale < sPrice) ? sSale : null;
+      return { size: sName, price: sPrice, sale_price: validSale };
+    }).filter(item => Boolean(item.size && item.price > 0));
+
     const payload = {
       name:        $('#prodName').value.trim(),
       latin:       $('#prodLatin').value.trim() || null,
@@ -2836,6 +2932,7 @@
       notes:       rawNotesVal || null,
       image_url:   imageUrl,
       images:      currentProductImages,
+      sizes:       collectedSizes,
       tag:         $('#prodTag').value.trim() || null,
       top_notes:   rawTopVal || null,
       middle_notes:rawMidVal || null,
@@ -2875,7 +2972,7 @@
       } catch (colErr) {
         // إذا لم تكن الأعمدة الجديدة مضافة في Supabase بعد، نحفظها كـ JSON داخل notes تلقائياً
         const errMsg = String(colErr?.message || '');
-        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('cost_price') || errMsg.includes('top_notes') || errMsg.includes('brand') || errMsg.includes('main_accord') || errMsg.includes('seasons') || errMsg.includes('sale_price') || errMsg.includes('discount') || errMsg.includes('stock_quantity') || errMsg.includes('in_solar')) {
+        if (errMsg.includes('column') || errMsg.includes('42703') || errMsg.includes('sizes') || errMsg.includes('cost_price') || errMsg.includes('top_notes') || errMsg.includes('brand') || errMsg.includes('main_accord') || errMsg.includes('seasons') || errMsg.includes('sale_price') || errMsg.includes('discount') || errMsg.includes('stock_quantity') || errMsg.includes('in_solar')) {
           console.warn('Columns not yet in Supabase schema, falling back to JSON notes:', colErr);
           const fallbackPayload = {
             name:        payload.name,
@@ -2916,6 +3013,7 @@
               is_custom_box:  payload.is_custom_box,
               extra_item_price: payload.extra_item_price,
               max_box_items:  payload.max_box_items,
+              sizes:          collectedSizes,
               images:         currentProductImages
             }),
           };
@@ -3602,7 +3700,7 @@
   });
 
   // ── Admin Views & Tab Routing Engine (صفحات الداشبورد المستقلة) ────────────
-  const ADMIN_PANEL_IDS = ['products-panel', 'brands-panel', 'campaign', 'orders', 'sales-panel'];
+  const ADMIN_PANEL_IDS = ['products-panel', 'brands-panel', 'campaign', 'orders', 'sales-panel', 'traffic-panel'];
 
   function switchAdminView(targetHash) {
     const rawHash = (targetHash !== undefined ? targetHash : (window.location.hash || '#overview')).trim();
@@ -3639,6 +3737,8 @@
       });
       if (cleanHash === 'sales-panel') {
         calculateSalesAnalytics();
+      } else if (cleanHash === 'traffic-panel') {
+        calculateTrafficAnalytics();
       }
     }
   }
@@ -3695,5 +3795,328 @@
       }, 500);
     });
   }
+  // ── Traffic Analytics ────────────────────────────────────────────────
+
+  function getLocalTrafficEvents() {
+    try {
+      return JSON.parse(localStorage.getItem('rooh-traffic-events') || '[]');
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function filterEventsByRange(events, range) {
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+
+    if (range === 'today') {
+      const todayStart = new Date().setHours(0, 0, 0, 0);
+      return events.filter(e => new Date(e.timestamp).getTime() >= todayStart);
+    } else if (range === 'week') {
+      const weekStart = now - (7 * dayMs);
+      return events.filter(e => new Date(e.timestamp).getTime() >= weekStart);
+    } else if (range === 'month') {
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
+      return events.filter(e => new Date(e.timestamp).getTime() >= monthStart);
+    }
+    return events;
+  }
+
+  function calculateTrafficAnalytics(range) {
+    if (!range) range = trafficTimeRange;
+    trafficTimeRange = range;
+
+    const events = getLocalTrafficEvents();
+    const filtered = filterEventsByRange(events, range);
+
+    // Unique visitors by session_id
+    const uniqueSessions = new Set(filtered.map(e => e.session_id)).size;
+
+    // Event counts
+    const pageViews = filtered.filter(e => e.event_type === 'page_view').length;
+    const productViews = filtered.filter(e => e.event_type === 'product_view').length;
+    const checkoutViews = filtered.filter(e => e.event_type === 'checkout_visit').length;
+    const addToCarts = filtered.filter(e => e.event_type === 'add_to_cart').length;
+    const ordersPlaced = filtered.filter(e => e.event_type === 'order_placed').length;
+
+    // Conversion rate
+    const conversionRate = uniqueSessions > 0 ? ((ordersPlaced / uniqueSessions) * 100).toFixed(2) : 0;
+
+    // Render KPIs
+    const kpiTotalViews = $('#kpiTotalViews');
+    const kpiViewsSub = $('#kpiViewsSub');
+    const kpiUniqueVisitors = $('#kpiUniqueVisitors');
+    const kpiVisitorsSub = $('#kpiVisitorsSub');
+    const kpiProductViews = $('#kpiProductViews');
+    const kpiProductViewsSub = $('#kpiProductViewsSub');
+    const kpiCheckoutViews = $('#kpiCheckoutViews');
+    const kpiCheckoutSub = $('#kpiCheckoutSub');
+    const kpiCompletedOrders = $('#kpiCompletedOrders');
+    const kpiOrdersSub = $('#kpiOrdersSub');
+    const kpiConversionRate = $('#kpiConversionRate');
+    const kpiCrSub = $('#kpiCrSub');
+
+    if (kpiTotalViews) kpiTotalViews.textContent = arabicNum(pageViews);
+    if (kpiViewsSub) kpiViewsSub.textContent = 'مشاهدات الصفحات';
+    if (kpiUniqueVisitors) kpiUniqueVisitors.textContent = arabicNum(uniqueSessions);
+    if (kpiVisitorsSub) kpiVisitorsSub.textContent = 'جلسات فريدة';
+    if (kpiProductViews) kpiProductViews.textContent = arabicNum(productViews);
+    if (kpiProductViewsSub) kpiProductViewsSub.textContent = 'دخول لصفحات العطور';
+    if (kpiCheckoutViews) kpiCheckoutViews.textContent = arabicNum(checkoutViews);
+    if (kpiCheckoutSub) kpiCheckoutSub.textContent = 'وصلوا لل Checkout';
+    if (kpiCompletedOrders) kpiCompletedOrders.textContent = arabicNum(ordersPlaced);
+    if (kpiOrdersSub) kpiOrdersSub.textContent = 'تمت بنجاح';
+    if (kpiConversionRate) kpiConversionRate.textContent = arabicNum(conversionRate) + '%';
+    if (kpiCrSub) kpiCrSub.textContent = 'من زيارة لطلب';
+
+    // Top Pages
+    const pageMap = new Map();
+    filtered.filter(e => e.event_type === 'page_view').forEach(e => {
+      const path = e.path || '/';
+      if (!pageMap.has(path)) {
+        pageMap.set(path, { views: 0, sessions: new Set(), totalTime: 0, bounces: 0 });
+      }
+      const p = pageMap.get(path);
+      p.views++;
+      p.sessions.add(e.session_id);
+    });
+
+    // Calculate bounce rate (simplified: sessions with only 1 page view)
+    const sessionPageCounts = new Map();
+    filtered.filter(e => e.event_type === 'page_view').forEach(e => {
+      const key = e.session_id;
+      sessionPageCounts.set(key, (sessionPageCounts.get(key) || 0) + 1);
+    });
+    const bouncedSessions = Array.from(sessionPageCounts.values()).filter(c => c === 1).length;
+    const totalSessionsForBounce = sessionPageCounts.size;
+    const bounceRate = totalSessionsForBounce > 0 ? ((bouncedSessions / totalSessionsForBounce) * 100).toFixed(1) : 0;
+
+    const sortedPages = Array.from(pageMap.entries())
+      .sort((a, b) => b[1].views - a[1].views)
+      .slice(0, 10);
+
+    const topPagesBody = $('#topPagesBody');
+    if (topPagesBody) {
+      if (!sortedPages.length) {
+        topPagesBody.innerHTML = `<tr><td colspan="5" class="empty-table">${adminLang === 'ar' ? 'لا توجد بيانات صفحات في هذه الفترة.' : 'No page data for this period.'}</td></tr>`;
+      } else {
+        topPagesBody.innerHTML = sortedPages.map(([path, data]) => {
+          const pageBounce = totalSessionsForBounce > 0 ? ((data.sessions.size > 0 ? 0 : 0)) : 0;
+          return `
+            <tr>
+              <td><code style="font-size:11px;">${escapeHtml(path)}</code></td>
+              <td><strong>${arabicNum(data.views)}</strong></td>
+              <td>${arabicNum(data.sessions.size)}</td>
+              <td><span style="color:var(--admin-muted);">—</span></td>
+              <td><span class="stock-tag ${bounceRate > 50 ? 'out' : 'in'}" style="font-size:11px;">${arabicNum(bounceRate)}%</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    // Top Products Traffic
+    const productMap = new Map();
+    filtered.filter(e => e.event_type === 'product_view').forEach(e => {
+      const pid = e.product_id || 'unknown';
+      const name = e.product_name || 'عطر غير معروف';
+      const price = e.product_price || 0;
+      if (!productMap.has(pid)) {
+        productMap.set(pid, { name, views: 0, addToCarts: 0, orders: 0 });
+      }
+      productMap.get(pid).views++;
+    });
+    filtered.filter(e => e.event_type === 'add_to_cart').forEach(e => {
+      const pid = e.product_id || 'unknown';
+      if (productMap.has(pid)) {
+        productMap.get(pid).addToCarts++;
+      }
+    });
+    filtered.filter(e => e.event_type === 'order_placed').forEach(e => {
+      if (e.items && Array.isArray(e.items)) {
+        e.items.forEach(item => {
+          const pid = item.id || 'unknown';
+          if (productMap.has(pid)) {
+            productMap.get(pid).orders++;
+          }
+        });
+      }
+    });
+
+    const sortedProducts = Array.from(productMap.entries())
+      .sort((a, b) => b[1].views - a[1].views)
+      .slice(0, 10);
+
+    const topProductsBody = $('#topProductsTrafficBody');
+    if (topProductsBody) {
+      if (!sortedProducts.length) {
+        topProductsBody.innerHTML = `<tr><td colspan="4" class="empty-table">${adminLang === 'ar' ? 'لا توجد بيانات منتجات في هذه الفترة.' : 'No product data for this period.'}</td></tr>`;
+      } else {
+        topProductsBody.innerHTML = sortedProducts.map(([pid, data]) => {
+          const cr = data.views > 0 ? ((data.orders / data.views) * 100).toFixed(1) : 0;
+          return `
+            <tr>
+              <td><strong>${escapeHtml(data.name)}</strong></td>
+              <td>${arabicNum(data.views)}</td>
+              <td>${arabicNum(data.addToCarts)}</td>
+              <td><span class="stock-tag in" style="font-size:11px;">${arabicNum(cr)}%</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    // Geographic Breakdown
+    const countryMap = new Map();
+    filtered.forEach(e => {
+      const country = e.country || 'unknown';
+      if (!countryMap.has(country)) {
+        countryMap.set(country, { visits: 0, sessions: new Set() });
+      }
+      countryMap.get(country).visits++;
+      countryMap.get(country).sessions.add(e.session_id);
+    });
+
+    const sortedCountries = Array.from(countryMap.entries())
+      .sort((a, b) => b[1].visits - a[1].visits)
+      .slice(0, 8);
+
+    const geoWrap = $('#geoBreakdown');
+    if (geoWrap) {
+      if (!sortedCountries.length) {
+        geoWrap.innerHTML = '<small style="color:var(--admin-muted);">لا توجد بيانات جغرافية</small>';
+      } else {
+        const totalVisits = filtered.length || 1;
+        geoWrap.innerHTML = sortedCountries.map(([country, data]) => {
+          const pct = Math.round((data.visits / totalVisits) * 100);
+          return `
+            <div style="margin-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
+                <span>${escapeHtml(country)}</span>
+                <strong>${arabicNum(data.visits)} (${arabicNum(pct)}%)</strong>
+              </div>
+              <div style="height:5px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden;">
+                <div style="width:${pct}%; height:100%; background:var(--pink); border-radius:3px;"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // Recent Visitors (last 50 sessions with details)
+    const sessionDetails = new Map();
+    filtered.forEach(e => {
+      const sid = e.session_id;
+      if (!sessionDetails.has(sid)) {
+        sessionDetails.set(sid, {
+          firstSeen: e.timestamp,
+          lastSeen: e.timestamp,
+          ip: e.ip || 'unknown',
+          country: e.country || 'unknown',
+          city: e.city || 'unknown',
+          pages: new Set(),
+          products: new Set(),
+          checkoutVisit: false,
+          orderPlaced: false,
+          referrer: e.referrer || 'direct'
+        });
+      }
+      const s = sessionDetails.get(sid);
+      if (new Date(e.timestamp) < new Date(s.firstSeen)) s.firstSeen = e.timestamp;
+      if (new Date(e.timestamp) > new Date(s.lastSeen)) s.lastSeen = e.timestamp;
+      if (e.path) s.pages.add(e.path);
+      if (e.product_name) s.products.add(e.product_name);
+      if (e.event_type === 'checkout_visit') s.checkoutVisit = true;
+      if (e.event_type === 'order_placed') s.orderPlaced = true;
+    });
+
+    const sortedVisitors = Array.from(sessionDetails.entries())
+      .sort((a, b) => new Date(b[1].lastSeen) - new Date(a[1].lastSeen))
+      .slice(0, 50);
+
+    const recentBody = $('#recentVisitorsBody');
+    if (recentBody) {
+      if (!sortedVisitors.length) {
+        recentBody.innerHTML = `<tr><td colspan="7" class="empty-table">${adminLang === 'ar' ? 'لا توجد بيانات زوار في هذه الفترة.' : 'No visitor data for this period.'}</td></tr>`;
+      } else {
+        recentBody.innerHTML = sortedVisitors.map(([sid, data]) => {
+          const time = new Date(data.lastSeen);
+          const timeStr = `${String(time.getHours()).padStart(2,'0')}:${String(time.getMinutes()).padStart(2,'0')} ${String(time.getDate()).padStart(2,'0')}/${String(time.getMonth()+1).padStart(2,'0')}`;
+          const pagesList = Array.from(data.pages).slice(0, 3).join(', ') || '—';
+          const productsList = Array.from(data.products).slice(0, 3).join(', ') || '—';
+          return `
+            <tr>
+              <td><span style="font-size:10px;">${timeStr}</span></td>
+              <td><code style="font-size:10px;">${escapeHtml(data.ip)} / ${escapeHtml(data.city)}, ${escapeHtml(data.country)}</code></td>
+              <td><span style="font-size:10px;">${escapeHtml(pagesList)}</span></td>
+              <td><span style="font-size:10px;">${escapeHtml(productsList)}</span></td>
+              <td style="text-align:center;">${data.checkoutVisit ? '<span style="color:#2ecc71;">✓</span>' : '<span style="color:var(--admin-muted);">—</span>'}</td>
+              <td style="text-align:center;">${data.orderPlaced ? '<span style="color:#2ecc71;font-weight:bold;">✓ طلب</span>' : '<span style="color:var(--admin-muted);">—</span>'}</td>
+              <td><span style="font-size:10px;">${escapeHtml(data.referrer)}</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    // Update traffic badge in sidebar
+    const trafficBadge = $('#trafficBadge');
+    if (trafficBadge) {
+      trafficBadge.textContent = arabicNum(uniqueSessions);
+    }
+  }
+
+  // Traffic Time Filter Buttons
+  $('#trafficTimeFilters')?.querySelectorAll('.btn-time-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $('#trafficTimeFilters')?.querySelectorAll('.btn-time-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      calculateTrafficAnalytics(btn.dataset.range);
+    });
+  });
+
+  // Refresh Traffic Button
+  $('#refreshTrafficBtn')?.addEventListener('click', () => {
+    const btn = $('#refreshTrafficBtn');
+    btn.classList.add('spinning');
+    // Force re-read from localStorage
+    calculateTrafficAnalytics(trafficTimeRange);
+    setTimeout(() => btn.classList.remove('spinning'), 500);
+  });
+
+  // Export Traffic CSV
+  $('#exportTrafficBtn')?.addEventListener('click', () => {
+    const events = getLocalTrafficEvents();
+    const filtered = filterEventsByRange(events, trafficTimeRange);
+    if (!filtered.length) {
+      window.RoohUtils?.showToast(adminLang === 'ar' ? 'لا توجد بيانات للتصدير' : 'No data to export');
+      return;
+    }
+    const headers = ['Timestamp', 'Event Type', 'Session ID', 'IP', 'Country', 'City', 'Path', 'Referrer', 'Product ID', 'Product Name', 'Product Price'];
+    const rows = filtered.map(e => [
+      e.timestamp,
+      e.event_type,
+      e.session_id,
+      e.ip,
+      e.country,
+      e.city,
+      e.path,
+      e.referrer,
+      e.product_id || '',
+      e.product_name || '',
+      e.product_price || ''
+    ]);
+    const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))].join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rooh-traffic-${trafficTimeRange}-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    window.RoohUtils?.showToast(adminLang === 'ar' ? 'تم تصدير ملف CSV' : 'CSV exported');
+  });
+
   // ─────────────────────────────────────────────────────────────────────────
 })();

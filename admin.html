@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="admin.css">
 </head>
 <body class="light">
-  <aside class="admin-sidebar"><a href="index.html" class="admin-logo"><img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></a><div class="side-label">القائمة الرئيسية</div><a class="side-link selected" href="#overview"><span>◫</span> نظرة عامة</a><a class="side-link" href="#products-panel"><span>🧴</span> إدارة العطور <b id="prodBadge">٠</b></a><a class="side-link" href="#brands-panel"><span>🏷️</span> إدارة البراندات <b id="brandBadge">٠</b></a><a class="side-link" href="#campaign"><span>✳</span> إعلان ومميزات المتجر</a><a class="side-link" href="#orders"><span>▤</span> الطلبات <b id="orderBadge">٠</b></a><a class="side-link" href="#sales-panel"><span>📊</span> تقارير المبيعات والأرباح</a><a class="side-link" href="index.html#collection"><span>✳</span> متجر رُوح</a><div class="sidebar-bottom"><span class="admin-avatar">ر</span><span><strong>فريق رُوح</strong><small>مساحة الإدارة</small></span></div></aside>
+  <aside class="admin-sidebar"><a href="index.html" class="admin-logo"><img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></a><div class="side-label">القائمة الرئيسية</div><a class="side-link selected" href="#overview"><span>◫</span> نظرة عامة</a><a class="side-link" href="#products-panel"><span>🧴</span> إدارة العطور <b id="prodBadge">٠</b></a><a class="side-link" href="#brands-panel"><span>🏷️</span> إدارة البراندات <b id="brandBadge">٠</b></a><a class="side-link" href="#campaign"><span>✳</span> إعلان ومميزات المتجر</a><a class="side-link" href="#orders"><span>▤</span> الطلبات <b id="orderBadge">٠</b></a><a class="side-link" href="#sales-panel"><span>📊</span> تقارير المبيعات والأرباح</a><a class="side-link" href="#traffic-panel"><span>📈</span> تحليلات الزيارات <b id="trafficBadge">٠</b></a><a class="side-link" href="index.html#collection"><span>✳</span> متجر رُوح</a><div class="sidebar-bottom"><span class="admin-avatar">ر</span><span><strong>فريق رُوح</strong><small>مساحة الإدارة</small></span></div></aside>
   <main class="admin-main" id="overview">
     <header class="admin-topbar">
       <div><span class="crumb">رُوح /</span> <span id="adminTopTitle">نظرة عامة</span></div>
@@ -463,6 +463,154 @@
       </div>
     </section>
 
+    <!-- 📈 قسم تحليلات الزيارات والترافيك (Traffic Analytics) -->
+    <section class="traffic-panel" id="traffic-panel" style="margin-top: 48px;">
+      <div class="panel-heading">
+        <div>
+          <p class="admin-kicker">تحليلات الحركة والزوار</p>
+          <h2>📈 تحليلات الزيارات والترافيك</h2>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <div class="traffic-time-filters" id="trafficTimeFilters">
+            <button type="button" class="btn-time-filter active" data-range="all">كل الأوقات</button>
+            <button type="button" class="btn-time-filter" data-range="month">هذا الشهر</button>
+            <button type="button" class="btn-time-filter" data-range="week">آخر ٧ أيام</button>
+            <button type="button" class="btn-time-filter" data-range="today">اليوم</button>
+          </div>
+          <button class="button button-outline" id="refreshTrafficBtn" style="padding:9px 13px; font-size:12px;" title="تحديث بيانات الترافيك">
+            <span>🔄</span> تحديث
+          </button>
+          <button class="button button-outline" id="exportTrafficBtn" style="padding:9px 13px; font-size:12px;" title="تصدير بيانات الترافيك">
+            <span>📥</span> تصدير CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="sales-kpi-grid" id="trafficKpiGrid">
+        <div class="sales-kpi-card">
+          <span class="kpi-title">إجمالي الزيارات (Page Views)</span>
+          <strong class="kpi-value" id="kpiTotalViews">٠</strong>
+          <small class="kpi-sub" id="kpiViewsSub">مشاهدات الصفحات</small>
+          <span class="kpi-icon">👁️</span>
+        </div>
+        <div class="sales-kpi-card">
+          <span class="kpi-title">زوار فريدون (Unique Visitors)</span>
+          <strong class="kpi-value" id="kpiUniqueVisitors">٠</strong>
+          <small class="kpi-sub" id="kpiVisitorsSub">جلسات فريدة</small>
+          <span class="kpi-icon">👤</span>
+        </div>
+        <div class="sales-kpi-card">
+          <span class="kpi-title">مشاهدات المنتجات</span>
+          <strong class="kpi-value" id="kpiProductViews">٠</strong>
+          <small class="kpi-sub" id="kpiProductViewsSub">دخول لصفحات العطور</small>
+          <span class="kpi-icon">🧴</span>
+        </div>
+        <div class="sales-kpi-card">
+          <span class="kpi-title">زيارات صفحة الدفع</span>
+          <strong class="kpi-value" id="kpiCheckoutViews">٠</strong>
+          <small class="kpi-sub" id="kpiCheckoutSub">وصلوا لل Checkout</small>
+          <span class="kpi-icon">💳</span>
+        </div>
+        <div class="sales-kpi-card">
+          <span class="kpi-title">طلبات مكتملة</span>
+          <strong class="kpi-value" id="kpiCompletedOrders">٠</strong>
+          <small class="kpi-sub" id="kpiOrdersSub">تمت بنجاح</small>
+          <span class="kpi-icon">✅</span>
+        </div>
+        <div class="sales-kpi-card">
+          <span class="kpi-title">معدل التحويل (CR)</span>
+          <strong class="kpi-value" id="kpiConversionRate">٠٪</strong>
+          <small class="kpi-sub" id="kpiCrSub">من زيارة لطلب</small>
+          <span class="kpi-icon">📊</span>
+        </div>
+      </div>
+
+      <!-- Main Analytics Layout -->
+      <div class="sales-analytics-layout">
+        <!-- Column 1: Top Pages & Visitor Details -->
+        <div class="analytics-box" style="flex: 1.4;">
+          <div class="analytics-box-header">
+            <h3>📄 الصفحات الأكثر زيارة</h3>
+            <small style="color:var(--admin-muted); font-size:11px;">مرتبة حسب عدد المشاهدات</small>
+          </div>
+          <div class="table-wrap">
+            <table class="analytics-table">
+              <thead>
+                <tr>
+                  <th>الصفحة</th>
+                  <th>المشاهدات</th>
+                  <th>زوار فريدون</th>
+                  <th>متوسط الوقت</th>
+                  <th>معدل الارتداد</th>
+                </tr>
+              </thead>
+              <tbody id="topPagesBody">
+                <tr><td colspan="5" class="empty-table">جاري تحميل بيانات الصفحات…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Column 2: Top Products & Visitor Geography -->
+        <div class="analytics-box" style="flex: 1;">
+          <div class="analytics-box-header">
+            <h3>🏆 العطور الأكثر مشاهدة</h3>
+            <small style="color:var(--admin-muted); font-size:11px;">المنتجات التي جذبت أكبر اهتمام</small>
+          </div>
+          <div class="table-wrap">
+            <table class="analytics-table">
+              <thead>
+                <tr>
+                  <th>العطر</th>
+                  <th>المشاهدات</th>
+                  <th>إضافات للسلة</th>
+                  <th>معدل التحويل</th>
+                </tr>
+              </thead>
+              <tbody id="topProductsTrafficBody">
+                <tr><td colspan="4" class="empty-table">جاري تحميل بيانات العطور…</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="analytics-box-header" style="margin-top: 24px;">
+            <h3>🌍 توزيع الزوار الجغرافي</h3>
+            <small style="color:var(--admin-muted); font-size:11px;">أبرز الدول والمدن</small>
+          </div>
+          <div id="geoBreakdown" class="status-breakdown-wrap">
+            <!-- Dynamic Geo Bars -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Visitors Table -->
+      <div class="analytics-box" style="margin-top: 24px;">
+        <div class="analytics-box-header">
+          <h3>👥 أحدث الزوار (Recent Visitors)</h3>
+          <small style="color:var(--admin-muted); font-size:11px;">آخر ٥٠ زائر مع تفاصيل الجلسة</small>
+        </div>
+        <div class="table-wrap">
+          <table class="analytics-table">
+            <thead>
+              <tr>
+                <th>الوقت</th>
+                <th>IP / الموقع</th>
+                <th>الصفحات المزارة</th>
+                <th>المنتجات المشاهدة</th>
+                <th>وصل للـ Checkout</th>
+                <th>طلب</th>
+                <th>المصدر</th>
+              </tr>
+            </thead>
+            <tbody id="recentVisitorsBody">
+              <tr><td colspan="7" class="empty-table">جاري تحميل بيانات الزوار…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <footer class="admin-footer"><span>رُوح | Rou7 Perfume</span><span>عطر يلامس أعماقك <b>✳</b></span></footer>
   </main>
 
@@ -576,6 +724,34 @@
               </label>
             </div>
             <div id="prodDiscountFeedback" style="font-size: 11.5px; color: var(--admin-accent); padding: 4px 6px; display: none;"></div>
+          </div>
+
+          <!-- Multi-Sizes & Pricing Panel (أحجام العطر وأسعارها) -->
+          <div class="prod-sizes-panel" id="prodSizesPanel">
+            <div class="sizes-panel-head">
+              <div class="sizes-head-title">
+                <span class="sizes-icon">🧴</span>
+                <div>
+                  <strong>أحجام وسعات العطر وأسعارها (Multi-Sizes & Pricing)</strong>
+                  <p>إذا كان العطر متوفراً بأكثر من سعة/حجم (مثال: 100 مل، 200 مل)، أضف الأحجام مع سعر كل حجم لتظهر كأزرار اختيار أنيقة للعميل في صفحة العطر.</p>
+                </div>
+              </div>
+              <button type="button" class="button button-outline btn-add-size" id="btnAddSizeRow">
+                <span>＋</span> إضافة حجم
+              </button>
+            </div>
+
+            <div class="quick-sizes-bar">
+              <span class="quick-sizes-label">إضافة سريعة:</span>
+              <button type="button" class="quick-size-btn" data-preset-size="50 مل">+ 50 مل</button>
+              <button type="button" class="quick-size-btn" data-preset-size="100 مل">+ 100 مل</button>
+              <button type="button" class="quick-size-btn" data-preset-size="200 مل">+ 200 مل</button>
+            </div>
+
+            <div id="adminSizesContainer" class="admin-sizes-container">
+              <!-- Dynamic size rows rendered via JS -->
+            </div>
+            <small class="sizes-foot-note">* إذا لم تُضف أي أحجام هنا، سيتم اعتماد سعر البيع الأساسي بالأعلى تلقائياً كحجم موحد.</small>
           </div>
 
           <!-- Gift Box Details (إعدادات بوكسات الهدايا والتجميع) -->
@@ -959,6 +1135,7 @@
   <script src="constants.js"></script>
   <script src="utils.js"></script>
   <script src="perfume-i18n.js"></script>
+  <script src="analytics.js"></script>
   <script src="admin.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
 </body>

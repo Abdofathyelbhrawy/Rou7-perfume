@@ -743,6 +743,130 @@ body.light .btn-action.btn-orbit-toggle.in-orbit {
   color: #5c3b00;
 }
 
+/* Duplicate Product Action Button */
+.btn-action.btn-duplicate {
+  color: #0284c7;
+  border-color: rgba(2, 132, 199, 0.35);
+  white-space: nowrap;
+}
+.btn-action.btn-duplicate:hover {
+  background: rgba(2, 132, 199, 0.12);
+  border-color: #0284c7;
+}
+body.light .btn-action.btn-duplicate {
+  color: #0369a1;
+  border-color: rgba(3, 105, 161, 0.35);
+}
+body.light .btn-action.btn-duplicate:hover {
+  background: rgba(3, 105, 161, 0.1);
+}
+
+/* Multi-Sizes Admin Panel */
+.prod-sizes-panel {
+  background: rgba(59, 130, 246, 0.04);
+  border: 1px solid rgba(59, 130, 246, 0.22);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.sizes-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.sizes-head-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sizes-head-title strong {
+  font-size: 13px;
+  color: var(--admin-ink);
+}
+.sizes-head-title p {
+  font-size: 11px;
+  color: var(--admin-muted);
+  margin: 2px 0 0;
+  line-height: 1.4;
+}
+.quick-sizes-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.quick-sizes-label {
+  font-size: 11px;
+  color: var(--admin-muted);
+}
+.quick-size-btn {
+  background: var(--surface);
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--admin-ink);
+  transition: all 0.15s;
+}
+.quick-size-btn:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  color: #2563eb;
+}
+.admin-sizes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.admin-size-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr auto;
+  gap: 10px;
+  align-items: flex-end;
+  background: var(--surface);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+.admin-size-row label {
+  font-size: 11px;
+  margin-bottom: 4px;
+  display: block;
+}
+.admin-size-row input {
+  width: 100%;
+  box-sizing: border-box;
+}
+.btn-remove-size {
+  background: transparent;
+  border: 1px solid rgba(255, 118, 117, 0.4);
+  color: #ff7675;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+.btn-remove-size:hover {
+  background: rgba(255, 118, 117, 0.15);
+  border-color: #ff7675;
+}
+.sizes-foot-note {
+  display: block;
+  font-size: 10.5px;
+  color: var(--admin-muted);
+  margin-top: 4px;
+}
+
 .btn-solar-quickfilter {
   padding: 9px 14px;
   border-radius: 8px;

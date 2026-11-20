@@ -350,7 +350,85 @@ body.light .pdp-inspired-card {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 28px;
+  margin-bottom: 22px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MULTI-SIZE SELECTOR (Exact match to reference image)
+   ══════════════════════════════════════════════════════════════ */
+.pdp-size-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 26px;
+  flex-wrap: wrap;
+}
+
+.pdp-size-label {
+  font-family: 'DM Serif Display', 'Playfair Display', 'Cinzel', Georgia, serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: #8c7355;
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+
+.pdp-size-options {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pdp-size-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 92px;
+  height: 50px;
+  padding: 0 22px;
+  background: #ffffff;
+  border: 1.2px solid #dcdde1;
+  border-radius: 8px;
+  font-family: 'DM Serif Display', 'Playfair Display', 'IBM Plex Sans Arabic', serif;
+  font-size: 19px;
+  font-weight: 400;
+  color: #2d3436;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.pdp-size-btn:hover {
+  border-color: #8c7355;
+  background: #fdfbf7;
+  transform: translateY(-1px);
+}
+
+.pdp-size-btn.active {
+  border: 1.8px solid #111111;
+  color: #111111;
+  font-weight: 600;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.pdp-size-btn:focus-visible {
+  outline: 2px solid #8c7355;
+  outline-offset: 2px;
+}
+
+.cart-item-size-badge {
+  display: inline-block;
+  font-size: 11px;
+  background: rgba(140, 115, 85, 0.12);
+  color: #8c7355;
+  border: 1px solid rgba(140, 115, 85, 0.25);
+  padding: 1px 8px;
+  border-radius: 12px;
+  margin-top: 3px;
+  font-weight: 600;
 }
 
 /* Purchase Actions Bar */
