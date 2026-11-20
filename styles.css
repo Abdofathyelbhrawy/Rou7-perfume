@@ -4034,7 +4034,7 @@ body.light .cosmic-sun-3d:hover .sun-core-3d {
 
 .sun-kicker-pill {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 56px);
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -4067,6 +4067,49 @@ body.light .sun-kicker-pill {
 
 body.light .sun-kicker-spark {
   color: var(--burgundy);
+}
+
+/* Brand name on the central sun — animated glow pulse + drift */
+.sun-brand-name {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'IBM Plex Sans Arabic', 'DM Sans', serif;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -.04em;
+  color: var(--cream);
+  text-shadow: 0 0 14px rgba(245, 165, 173, .85), 0 0 30px rgba(245, 165, 173, .45), 0 2px 6px rgba(0, 0, 0, .6);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 4;
+  animation: sunBrandPulse 2.6s ease-in-out infinite, sunBrandDrift 6s ease-in-out infinite alternate;
+}
+
+body.light .sun-brand-name {
+  color: var(--navy);
+  text-shadow: 0 0 14px rgba(129, 45, 53, .55), 0 0 30px rgba(129, 45, 53, .28), 0 2px 6px rgba(255, 255, 255, .7);
+}
+
+@keyframes sunBrandPulse {
+  0%, 100% {
+    text-shadow: 0 0 12px rgba(245, 165, 173, .7), 0 0 26px rgba(245, 165, 173, .35), 0 2px 6px rgba(0, 0, 0, .55);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    text-shadow: 0 0 22px rgba(245, 165, 173, 1), 0 0 46px rgba(245, 165, 173, .6), 0 2px 6px rgba(0, 0, 0, .6);
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+}
+
+@keyframes sunBrandDrift {
+  0% {
+    transform: translate(-50%, -50%) translateX(-3px) translateY(-2px);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateX(3px) translateY(2px);
+  }
 }
 
 /* 5. 3D Planets Stage & Orbiting Nodes */
@@ -4788,6 +4831,7 @@ body.light .cosmic-pill-btn.active {
   .track-3d-3 { width: 500px; height: 500px; }
   .sun-core-3d { width: 92px; height: 92px; }
   .cosmic-sun-logo { max-width: 60px; max-height: 60px; }
+  .sun-brand-name { font-size: 20px; }
   .planet-billboard { width: 84px; height: 125px; }
   .planet-bottle-img-3d { max-height: 75px; }
   .planet-tag-3d { padding: 2px 5px; font-size: 8.5px; }
@@ -4814,6 +4858,7 @@ body.light .cosmic-pill-btn.active {
   .track-3d-3 { width: 370px; height: 370px; }
   .sun-core-3d { width: 72px; height: 72px; }
   .cosmic-sun-logo { max-width: 48px; max-height: 48px; }
+  .sun-brand-name { font-size: 15px; }
   .sun-kicker-pill { font-size: 8px; padding: 2.5px 8px; margin-top: 3px; }
   .planet-billboard { width: 70px; height: 110px; }
   .planet-bottle-img-3d { max-height: 64px; }

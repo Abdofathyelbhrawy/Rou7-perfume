@@ -115,6 +115,7 @@
       spotlight_explore_notes: 'تحليل النوتات',
       spotlight_save_prefix: 'وفر',
       cosmic_sun_title: 'رُوح · مدار العطور الشمسي',
+      cosmic_brand_name: 'رُوح',
       cosmic_orbit_hint: 'انقر على أي عطر لاستكشاف نوتاته ✦',
       cosmic_top_title: 'قمة العطر · TOP',
       cosmic_heart_title: 'قلب العطر · HEART',
@@ -280,6 +281,7 @@
       spotlight_explore_notes: 'Scent Analysis',
       spotlight_save_prefix: 'Save',
       cosmic_sun_title: 'Rou7 · Scent Solar Orbit',
+      cosmic_brand_name: 'Rou7',
       cosmic_orbit_hint: 'Click any perfume planet to inspect notes ✦',
       cosmic_top_title: 'Top Notes · TOP',
       cosmic_heart_title: 'Heart Notes · HEART',
@@ -1844,6 +1846,7 @@
                      data-light="assets/branding/1.svg"
                      alt="رُوح | Rou7 Perfume">
               </div>
+              <div class="sun-brand-name" data-i18n="cosmic_brand_name">${escapeHtml(t.cosmic_brand_name)}</div>
               <div class="sun-kicker-pill">
                 <span class="sun-kicker-spark">✦</span>
                 <span data-i18n="cosmic_sun_title">${escapeHtml(t.cosmic_sun_title)}</span>
