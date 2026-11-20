@@ -2812,6 +2812,17 @@
     const autoBaseAr = i18n ? i18n.translateNotes(rawBaseVal, 'ar') : rawBaseVal;
     const autoBaseEn = i18n ? i18n.translateNotes(rawBaseVal, 'en') : rawBaseVal;
 
+    // ── Category coercion ─────────────────────────────────────────────────────
+    // The products table enforces a CHECK constraint (products_category_check)
+    // that only allows: 'women', 'men', 'unisex'. The Gifts & Boxes category
+    // is a storefront filter concept, not a DB category — gift boxes are
+    // stored as regular products (with is_custom_box / box_items metadata).
+    // Any unexpected or unsupported category value is normalized to 'unisex'
+    // so the INSERT/PATCH never violates the check constraint.
+    const VALID_CATEGORIES = ['women', 'men', 'unisex'];
+    const rawCategory = $('#prodCategory').value;
+    const category = VALID_CATEGORIES.includes(rawCategory) ? rawCategory : 'unisex';
+
     const payload = {
       name:        $('#prodName').value.trim(),
       latin:       $('#prodLatin').value.trim() || null,
@@ -2821,7 +2832,7 @@
       cost_price:  costPrice,
       discount_percent: validPercent,
       discount_badge:   validBadge,
-      category:    $('#prodCategory').value,
+      category:    category,
       notes:       rawNotesVal || null,
       image_url:   imageUrl,
       images:      currentProductImages,
