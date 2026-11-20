@@ -2284,7 +2284,9 @@
 
         const orbitToggle = e.target.closest('#btnOrbitToggle');
         if (orbitToggle) {
-          // Handled directly by orbitBtn listener below
+          e.preventDefault();
+          e.stopPropagation();
+          toggleCosmicOrbit();
           return;
         }
 
@@ -2306,25 +2308,34 @@
       });
     }
 
-    // Direct click listener on Pause/Resume Orbit button (Desktop & Universal)
-    const orbitBtn = $('#btnOrbitToggle');
-    if (orbitBtn) {
-      orbitBtn.addEventListener('click', (e) => {
+    // Direct click listener on Pause/Resume Orbit button (Desktop & Universal with 250ms debounce)
+    let lastOrbitToggleTime = 0;
+    function toggleCosmicOrbit(e) {
+      if (e) {
         e.preventDefault();
         e.stopPropagation();
-        if (cosmicInspectIndex !== -1) {
-          cosmicCloseInspection();
-        } else {
-          cosmicOrbitRunning = !cosmicOrbitRunning;
-          const orbitIcon = $('#orbitIcon');
-          const orbitText = $('#orbitText');
-          if (orbitIcon) orbitIcon.textContent = cosmicOrbitRunning ? '⏸' : '▶';
-          if (orbitText) orbitText.textContent = cosmicOrbitRunning ? t.cosmic_pause_orbit : t.cosmic_resume_orbit;
-          if (cosmicOrbitRunning && cosmicInView && !cosmicRafId) {
-            cosmicRafId = requestAnimationFrame(updateCosmicOrbit);
-          }
+      }
+      const now = Date.now();
+      if (now - lastOrbitToggleTime < 250) return;
+      lastOrbitToggleTime = now;
+
+      if (cosmicInspectIndex !== -1) {
+        cosmicCloseInspection();
+      } else {
+        cosmicOrbitRunning = !cosmicOrbitRunning;
+        const orbitIcon = $('#orbitIcon');
+        const orbitText = $('#orbitText');
+        if (orbitIcon) orbitIcon.textContent = cosmicOrbitRunning ? '⏸' : '▶';
+        if (orbitText) orbitText.textContent = cosmicOrbitRunning ? t.cosmic_pause_orbit : t.cosmic_resume_orbit;
+        if (cosmicOrbitRunning && cosmicInView && !cosmicRafId) {
+          cosmicRafId = requestAnimationFrame(updateCosmicOrbit);
         }
-      });
+      }
+    }
+
+    const orbitBtn = $('#btnOrbitToggle');
+    if (orbitBtn) {
+      orbitBtn.onclick = toggleCosmicOrbit;
     }
 
     // If specific target index requested, inspect it immediately

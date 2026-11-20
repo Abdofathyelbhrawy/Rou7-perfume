@@ -3858,9 +3858,6 @@ body.light .card-mood-match-pill {
   align-items: center;
   justify-content: center;
   overflow: visible;
-  perspective: 1400px;
-  perspective-origin: 50% 38%;
-  transform-style: preserve-3d;
   user-select: none;
   border-radius: 36px;
   background: radial-gradient(circle at center, rgba(32, 47, 69, 0.45) 0%, rgba(17, 29, 46, 0.25) 55%, transparent 80%);
@@ -3915,6 +3912,8 @@ body.light .c-star {
   display: flex;
   align-items: center;
   justify-content: center;
+  perspective: 1400px;
+  perspective-origin: 50% 38%;
   transform-style: preserve-3d;
   transition: transform 0.15s ease-out;
 }
@@ -4678,14 +4677,14 @@ body.light .cosmic-timer-bar {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 60;
+  z-index: 100 !important;
   display: flex;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
   justify-content: center;
   max-width: 95%;
-  pointer-events: auto;
+  pointer-events: auto !important;
 }
 
 .btn-orbit-control {
@@ -4702,12 +4701,15 @@ body.light .cosmic-timer-bar {
   cursor: pointer;
   pointer-events: auto !important;
   position: relative;
-  z-index: 65 !important;
+  z-index: 105 !important;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(10px);
   transition: all .25s ease;
   white-space: nowrap;
   user-select: none;
+}
+.btn-orbit-control * {
+  pointer-events: none !important;
 }
 
 body.light .btn-orbit-control {
