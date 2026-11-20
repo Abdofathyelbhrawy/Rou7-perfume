@@ -2209,6 +2209,11 @@
       if (orbitIcon) orbitIcon.textContent = '⏸';
       if (orbitText) orbitText.textContent = t.cosmic_pause_orbit;
 
+      // Restart the RAF animation loop
+      if (cosmicInView && !cosmicRafId) {
+        cosmicRafId = requestAnimationFrame(updateCosmicOrbit);
+      }
+
       // Remove active classes
       $$('.cosmic-planet-3d').forEach(el => {
         el.classList.remove('planet-focused', 'planet-dimmed');
@@ -2289,6 +2294,10 @@
             const orbitText = $('#orbitText');
             if (orbitIcon) orbitIcon.textContent = cosmicOrbitRunning ? '⏸' : '▶';
             if (orbitText) orbitText.textContent = cosmicOrbitRunning ? t.cosmic_pause_orbit : t.cosmic_resume_orbit;
+            // Restart the RAF loop when resuming orbit
+            if (cosmicOrbitRunning && cosmicInView && !cosmicRafId) {
+              cosmicRafId = requestAnimationFrame(updateCosmicOrbit);
+            }
           }
           return;
         }
@@ -2307,6 +2316,27 @@
             }
           }
           return;
+        }
+      });
+    }
+
+    // Direct click listener on Pause/Resume Orbit button (fallback for 3D transform click issues)
+    const orbitBtn = $('#btnOrbitToggle');
+    if (orbitBtn) {
+      orbitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (cosmicInspectIndex !== -1) {
+          cosmicCloseInspection();
+        } else {
+          cosmicOrbitRunning = !cosmicOrbitRunning;
+          const orbitIcon = $('#orbitIcon');
+          const orbitText = $('#orbitText');
+          if (orbitIcon) orbitIcon.textContent = cosmicOrbitRunning ? '⏸' : '▶';
+          if (orbitText) orbitText.textContent = cosmicOrbitRunning ? t.cosmic_pause_orbit : t.cosmic_resume_orbit;
+          if (cosmicOrbitRunning && cosmicInView && !cosmicRafId) {
+            cosmicRafId = requestAnimationFrame(updateCosmicOrbit);
+          }
         }
       });
     }
