@@ -4660,14 +4660,13 @@ body.light .cosmic-timer-bar {
   bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 40;
+  z-index: 15;
   display: flex;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
   justify-content: center;
   max-width: 95%;
-  pointer-events: auto;
 }
 
 .btn-orbit-control {
@@ -4681,9 +4680,6 @@ body.light .cosmic-timer-bar {
   color: var(--cream);
   font-size: 11px;
   cursor: pointer;
-  pointer-events: auto;
-  position: relative;
-  z-index: 42;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(10px);
   transition: all .25s ease;
@@ -4885,6 +4881,15 @@ body.light .cosmic-pill-btn.active {
     font-size: 11px;
   }
   .cosmic-planet-pills { display: none; }
+  .cosmic-controls-bar {
+    z-index: 40;
+    pointer-events: auto;
+  }
+  .btn-orbit-control {
+    pointer-events: auto;
+    position: relative;
+    z-index: 42;
+  }
 }
 
 /* ==========================================================
