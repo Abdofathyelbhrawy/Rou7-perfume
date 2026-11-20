@@ -2284,21 +2284,7 @@
 
         const orbitToggle = e.target.closest('#btnOrbitToggle');
         if (orbitToggle) {
-          e.preventDefault();
-          e.stopPropagation();
-          if (cosmicInspectIndex !== -1) {
-            cosmicCloseInspection();
-          } else {
-            cosmicOrbitRunning = !cosmicOrbitRunning;
-            const orbitIcon = $('#orbitIcon');
-            const orbitText = $('#orbitText');
-            if (orbitIcon) orbitIcon.textContent = cosmicOrbitRunning ? '⏸' : '▶';
-            if (orbitText) orbitText.textContent = cosmicOrbitRunning ? t.cosmic_pause_orbit : t.cosmic_resume_orbit;
-            // Restart the RAF loop when resuming orbit
-            if (cosmicOrbitRunning && cosmicInView && !cosmicRafId) {
-              cosmicRafId = requestAnimationFrame(updateCosmicOrbit);
-            }
-          }
+          // Handled directly by orbitBtn listener below
           return;
         }
 
@@ -2320,7 +2306,7 @@
       });
     }
 
-    // Direct click listener on Pause/Resume Orbit button (fallback for 3D transform click issues)
+    // Direct click listener on Pause/Resume Orbit button (Desktop & Universal)
     const orbitBtn = $('#btnOrbitToggle');
     if (orbitBtn) {
       orbitBtn.addEventListener('click', (e) => {
