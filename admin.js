@@ -1065,12 +1065,26 @@
       // 2. Fetch live orders from Supabase
       const rawOrders = await supaFetch('orders', { filters: '&order=created_at.desc&limit=100' });
       if (Array.isArray(rawOrders)) {
-        const filteredOrders = rawOrders
+        let filteredOrders = rawOrders
           .filter(o => !deletedOrderIds.has(String(o.id)))
           .map(o => {
             if (orderStatusMap[o.id]) o.status = orderStatusMap[o.id];
             return o;
           });
+
+        // Self-healing: if the deletion register swallowed every live order, the
+        // register is stale/corrupted — restore the orders instead of showing none.
+        if (!filteredOrders.length && rawOrders.length) {
+          console.warn('Orders: deleted register covers all live orders — resetting it.');
+          deletedOrderIds = new Set();
+          try { localStorage.removeItem('rooh-deleted-orders'); } catch (_) {}
+          await persistOrdersMeta();
+          filteredOrders = rawOrders.map(o => {
+            if (orderStatusMap[o.id]) o.status = orderStatusMap[o.id];
+            return o;
+          });
+        }
+
         renderOrders(filteredOrders);
       }
     } catch (err) {
@@ -3750,6 +3764,7 @@
   if (currentProducts.length) renderProductsTable(currentProducts);
   if (currentOrders.length) renderOrders(currentOrders);
   calculateSalesAnalytics('all');
+  calculateTrafficAnalytics('all');
   renderBrandsTable();
   populateBrandSelects();
 
