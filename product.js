@@ -1516,6 +1516,31 @@
     $('#cartClose')?.addEventListener('click', () => openCartDrawer(false));
     $('#overlay')?.addEventListener('click', () => openCartDrawer(false));
 
+    // ── Mobile Menu (product page) ─────────────────────────────────
+    const menuToggle = $('#menuToggle');
+    const mobileMenu = $('#mobileMenu');
+    if (menuToggle && mobileMenu) {
+      menuToggle.addEventListener('click', () => {
+        const open = !mobileMenu.classList.contains('open');
+        mobileMenu.classList.toggle('open', open);
+        const overlay = $('#overlay');
+        if (overlay) overlay.classList.toggle('open', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+      });
+      $$('#mobileMenu a').forEach(link => link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        const overlay = $('#overlay');
+        if (overlay) overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }));
+      $('#overlay')?.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        const overlay = $('#overlay');
+        if (overlay) overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    }
+
     // Cart Items Event Delegation (+, -, remove)
     $('#cartItems')?.addEventListener('click', e => {
       const idxBtn = e.target.closest('[data-cart-idx]');
