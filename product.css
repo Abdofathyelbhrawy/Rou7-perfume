@@ -1,6 +1,6 @@
 /* ==========================================================
    ROU7 PERFUME — DEDICATED PRODUCT PAGE STYLES (product.css)
-   Brand Identity: Navy #192940, Cream #f5f0eb, Pink #f5a5ad, Burgundy #812d35
+   Brand Identity: Primary #E3D8C5 (60%), Secondary #4B5A3C (30%), Accent #FF8F3A (10%)
    ========================================================== */
 
 html, body {
@@ -274,7 +274,7 @@ body.light .p-float-badge {
   padding: 5px 12px;
   border-radius: 20px;
   background: rgba(34, 197, 94, 0.15);
-  color: #4ade80;
+  color: var(--color-accent-light);
   border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
@@ -306,7 +306,7 @@ body.light .pdp-inspired-card {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #d4a373;
+  color: var(--color-accent);
 }
 
 .pdp-inspired-text {
@@ -319,7 +319,7 @@ body.light .pdp-inspired-card {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: .12em;
-  color: #d4a373;
+  color: var(--color-accent);
   text-transform: uppercase;
   font-family: 'DM Sans', sans-serif;
 }
@@ -368,7 +368,7 @@ body.light .pdp-inspired-card {
   font-family: 'DM Serif Display', 'Playfair Display', 'Cinzel', Georgia, serif;
   font-size: 24px;
   font-weight: 500;
-  color: #8c7355;
+  color: var(--color-accent);
   letter-spacing: 0.5px;
   user-select: none;
 }
@@ -387,13 +387,13 @@ body.light .pdp-inspired-card {
   min-width: 92px;
   height: 50px;
   padding: 0 22px;
-  background: #ffffff;
-  border: 1.2px solid #dcdde1;
+  background: var(--color-primary-light);
+  border: 1.2px solid var(--color-primary-dark);
   border-radius: 8px;
   font-family: 'DM Serif Display', 'Playfair Display', 'IBM Plex Sans Arabic', serif;
   font-size: 19px;
   font-weight: 400;
-  color: #2d3436;
+  color: var(--color-secondary);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
@@ -401,21 +401,21 @@ body.light .pdp-inspired-card {
 }
 
 .pdp-size-btn:hover {
-  border-color: #8c7355;
-  background: #fdfbf7;
+  border-color: var(--color-accent);
+  background: var(--color-primary-light);
   transform: translateY(-1px);
 }
 
 .pdp-size-btn.active {
-  border: 1.8px solid #111111;
-  color: #111111;
+  border: 1.8px solid var(--color-secondary-dark);
+  color: var(--color-secondary-dark);
   font-weight: 600;
-  background: #ffffff;
+  background: var(--color-primary-light);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
 
 .pdp-size-btn:focus-visible {
-  outline: 2px solid #8c7355;
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
@@ -423,7 +423,7 @@ body.light .pdp-inspired-card {
   display: inline-block;
   font-size: 11px;
   background: rgba(140, 115, 85, 0.12);
-  color: #8c7355;
+  color: var(--color-accent);
   border: 1px solid rgba(140, 115, 85, 0.25);
   padding: 1px 8px;
   border-radius: 12px;
@@ -489,7 +489,7 @@ body.light .pdp-inspired-card {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: #25D366;
+  background: #25D366 /* WhatsApp brand green - keep as-is */;
   color: #fff !important;
   height: 48px;
   padding: 0 20px;
@@ -605,7 +605,7 @@ body.light .pdp-inspired-card {
 }
 
 body.light .pdp-card {
-  background: #ffffff;
+  background: var(--color-primary-light);
   box-shadow: 0 16px 45px rgba(66, 44, 36, 0.06);
 }
 
@@ -680,15 +680,15 @@ body.light .pdp-card {
 }
 
 .shape-triangle {
-  color: #eab308; /* Yellow/Gold for Top */
+  color: var(--color-accent); /* Yellow/Gold for Top */
 }
 
 .shape-trapezoid {
-  color: #f472b6; /* Pink/Rose for Heart */
+  color: var(--color-accent); /* Pink/Rose for Heart */
 }
 
 .shape-square {
-  color: #b45309; /* Warm Amber/Brown for Base */
+  color: var(--color-accent-dark); /* Warm Amber/Brown for Base */
 }
 
 .p-level-meta {
@@ -741,7 +741,7 @@ body.light .pdp-card {
 }
 
 body.light .note-pill {
-  background: #fbf9f6;
+  background: var(--color-primary-light);
   border-color: rgba(25, 41, 64, 0.12);
 }
 
@@ -908,7 +908,7 @@ body.light .dna-bar-track {
 }
 
 body.light .perf-pill-box {
-  background: #faf8f5;
+  background: var(--color-primary-light);
   border-color: rgba(25, 41, 64, 0.1);
 }
 
@@ -916,7 +916,7 @@ body.light .perf-pill-box {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: .12em;
-  color: #d4a373;
+  color: var(--color-accent);
   text-transform: uppercase;
   font-family: 'DM Sans', sans-serif;
 }
@@ -981,7 +981,7 @@ body.light .ppm-segment.filled {
 }
 
 body.light .accord-pill {
-  background: #fbf9f6;
+  background: var(--color-primary-light);
 }
 
 .accord-pill-dot {
@@ -1028,7 +1028,7 @@ body.light .accord-pill.season-pill {
   padding: 4px 12px;
   border-radius: 20px;
   background: rgba(233, 30, 99, 0.15);
-  color: #ff80ab;
+  color: var(--color-accent-light);
   border: 1px solid rgba(233, 30, 99, 0.3);
   margin-inline-start: 10px;
 }
@@ -1079,7 +1079,7 @@ body.light .sm-sale {
 }
 
 body.light .related-card {
-  background: #ffffff;
+  background: var(--color-primary-light);
   box-shadow: 0 10px 30px rgba(66, 44, 36, 0.05);
 }
 
@@ -1211,7 +1211,7 @@ body.light .related-img-wrap {
   gap: 16px;
 }
 body.light .pyramid-note-inspector {
-  background: #fbf9f6;
+  background: var(--color-primary-light);
   border-color: rgba(129, 45, 53, 0.2);
 }
 
@@ -1416,7 +1416,7 @@ body.light .sticky-mobile-buy-bar {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 12px rgba(245, 165, 173, 0.2);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: #ffffff;
+  color: var(--color-primary-light);
   font-size: 11.5px;
   font-weight: 700;
   cursor: pointer;
@@ -1481,7 +1481,7 @@ body.light .aroma-capsule {
   border-radius: 999px;
   background: linear-gradient(135deg, rgba(245, 165, 173, 0.2), rgba(129, 45, 53, 0.45));
   border: 1px solid rgba(245, 165, 173, 0.4);
-  color: #ffffff;
+  color: var(--color-primary-light);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -1602,7 +1602,7 @@ body.light .sh-dot.filled {
 
 .sh-level {
   font-size: 12.5px;
-  color: #ffffff;
+  color: var(--color-primary-light);
 }
 
 body.light .sh-level {
@@ -1745,7 +1745,7 @@ body.light .pdp-gallery-thumb {
 }
 
 .pdp-gallery-thumb.active {
-  border-color: #d4af37;
+  border-color: var(--color-accent);
   box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.35), 0 4px 14px rgba(212, 175, 55, 0.25);
   transform: scale(1.06);
 }
