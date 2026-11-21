@@ -2311,15 +2311,15 @@
       });
     }
 
-    // Direct click listener on Pause/Resume Orbit button (Desktop & Universal with 250ms debounce)
+    // Universal handler for Pause/Resume Orbit button (with 400ms debounce to prevent touch-click bounce)
     let lastOrbitToggleTime = 0;
     function toggleCosmicOrbit(e) {
       if (e) {
-        e.preventDefault();
-        e.stopPropagation();
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
       }
       const now = Date.now();
-      if (now - lastOrbitToggleTime < 250) return;
+      if (now - lastOrbitToggleTime < 400) return;
       lastOrbitToggleTime = now;
 
       if (cosmicInspectIndex !== -1) {
@@ -3770,57 +3770,212 @@
     }
   });
 
-  // ── Scent Finder Interactive Quiz ──────────────────────────────────────────
+  // ── Scent Finder Interactive Quiz (Smart AI-powered Recommendation Engine) ──
   const quizModal = $('#scentQuizModal');
   const quizContainer = $('#quizContainer');
   let quizStep = 0;
-  let quizAnswers = { category: '', mood: '', occasion: '' };
+  let quizAnswers = { category: '', mood: '', occasion: '', intensity: '', season: '' };
+
+  // ── Mood-to-Accords & Notes Mapping (Intelligent keyword matching) ──
+  const MOOD_KEYWORDS = {
+    sweet:   { accords: ['sweet','gourmand','vanilla','caramel','chocolate','candy','sugar','honey','praline','toffee','tonka'], notes: ['vanilla','vanille','فانيليا','حلو','سكر','كراميل','عسل','شوكولاتة','توفي','تونكا','بنزوين','praline','caramel','sugar','honey','chocolate','toffee','candy','tonka','benzoin','dulce'] },
+    woody:   { accords: ['woody','amber','oud','leather','earthy','smoky','tobacco','balsamic'], notes: ['oud','عود','wood','خشب','sandal','صندل','cedar','ارز','cashmere','كشمير','amber','عنبر','leather','جلد','vetiver','فتيفر','patchouli','باتشولي','agarwood','tobacco','تبغ','oakmoss','birch','guaiac'] },
+    fresh:   { accords: ['fresh','citrus','aquatic','marine','green','aromatic','ozonic','fougere'], notes: ['bergamot','برغموت','lemon','ليمون','grapefruit','جريب','lime','aqua','بحر','marine','مائي','cucumber','نعناع','mint','lavender','خزامي','tea','شاي','clean','منعش','green','أخضر','basil','thyme'] },
+    spicy:   { accords: ['spicy','oriental','arabian','oud','incense','bakhoor','musky','resinous','animalic'], notes: ['saffron','زعفران','cinnamon','قرفة','pepper','فلفل','clove','قرنفل','cardamom','هيل','ginger','زنجبيل','nutmeg','جوزة','incense','بخور','oud','عود','musk','مسك','frankincense','لبان','myrrh','مر','rose','ورد'] },
+    floral:  { accords: ['floral','rose','jasmine','powdery','romantic','white floral','muguet'], notes: ['rose','ورد','jasmine','ياسمين','tuberose','فل','lily','زنبق','iris','سوسن','peony','gardenia','violet','بنفسج','magnolia','neroli','نيرولي','orange blossom','زهر البرتقال','ylang','freesia','orchid'] },
+    musky:   { accords: ['musk','clean','skin','intimate','white musk','powdery'], notes: ['musk','مسك','white musk','مسك أبيض','powder','بودر','cashmere','كشمير','clean','نظيف','cotton','ambroxan','ambrette','cetalox'] }
+  };
+
+  // ── Occasion-to-Product Attribute Mapping ──
+  const OCCASION_PROFILE = {
+    daily:     { sillageMax: 3, longevityMin: 2, longevityMax: 4, seasonBoost: ['spring','summer','all'], moodBoost: ['fresh','floral','musky'] },
+    evening:   { sillageMin: 3, longevityMin: 4, seasonBoost: ['fall','winter','all'], moodBoost: ['spicy','woody','sweet'] },
+    winter:    { sillageMin: 3, longevityMin: 4, seasonBoost: ['fall','winter'], moodBoost: ['spicy','woody','sweet'] },
+    summer:    { sillageMax: 3, longevityMin: 2, seasonBoost: ['spring','summer'], moodBoost: ['fresh','floral','musky'] },
+    signature: { sillageMin: 2, longevityMin: 3, seasonBoost: ['all','spring','fall'], moodBoost: [] }
+  };
 
   const quizQuestions = [
     {
       title_ar: '١. لمن تختار هذا العطر؟',
       title_en: '1. Who is this fragrance for?',
-      desc_ar: 'اختر لمن سيترك هذا العطر أثره الخاص',
-      desc_en: 'Select who will leave this signature scent',
+      desc_ar: 'حدد الفئة عشان نرشحلك الأنسب',
+      desc_en: 'Select the category for the best match',
       key: 'category',
       options: [
-        { val: 'men', icon: '👔', t_ar: 'لي أنا (عطر رجالي)', t_en: 'For Me (Men)', s_ar: 'نفحات رجالية أنيقة وقوية', s_en: 'Bold & elegant masculine notes' },
-        { val: 'women', icon: '👗', t_ar: 'لي أنا (عطر نسائي)', t_en: 'For Me (Women)', s_ar: 'أنوثة ناعمة وجاذبية ساحرة', s_en: 'Soft & alluring feminine aura' },
-        { val: 'unisex', icon: '✨', t_ar: 'عطر للجميع (للجنسين)', t_en: 'Unisex Fragrance', s_ar: 'توازن فاخر يناسب كل الأذواق', s_en: 'Balanced luxury for everyone' },
-        { val: 'gift', icon: '🎁', t_ar: 'هدية راقية لشخص مميز', t_en: 'A Luxury Gift', s_ar: 'عطر يترك ذكرى لا تُنسى', s_en: 'A gift made to be remembered' }
+        { val: 'men', icon: '👔', t_ar: 'عطر رجالي', t_en: 'For Men', s_ar: 'نفحات رجالية أنيقة وقوية', s_en: 'Bold & elegant masculine notes' },
+        { val: 'women', icon: '👗', t_ar: 'عطر نسائي', t_en: 'For Women', s_ar: 'أنوثة ناعمة وجاذبية ساحرة', s_en: 'Soft & alluring feminine aura' },
+        { val: 'unisex', icon: '✨', t_ar: 'للجنسين (Unisex)', t_en: 'Unisex Fragrance', s_ar: 'توازن فاخر يناسب كل الأذواق', s_en: 'Balanced luxury for everyone' },
+        { val: 'gift', icon: '🎁', t_ar: 'هدية لشخص مميز', t_en: 'A Luxury Gift', s_ar: 'عطر يترك ذكرى لا تُنسى', s_en: 'A memorable fragrance gift' }
       ]
     },
     {
-      title_ar: '٢. ما هو الإحساس أو الطابع الأقرب لقلبك؟',
-      title_en: '2. What is your preferred scent mood?',
-      desc_ar: 'الرائحة التي تشعر أنها تلامس روحك وتعبّر عنك',
-      desc_en: 'The scent that feels closest to your personality',
+      title_ar: '٢. إيه الطابع العطري اللي بتحبه؟',
+      title_en: '2. What scent family do you love?',
+      desc_ar: 'اختار الإحساس الأقرب لروحك',
+      desc_en: 'Pick the mood that resonates with you',
       key: 'mood',
       options: [
-        { val: 'sweet', icon: '🍦', t_ar: 'فانيليا ونفحات سكرية دافئة', t_en: 'Sweet & Vanilla', s_ar: 'فانيليا ناعمة، لمسة سكرية وكراميل', s_en: 'Velvety vanilla & cozy gourmand' },
-        { val: 'woody', icon: '🪵', t_ar: 'أخشاب فاخرة وعنبر دافئ', t_en: 'Woody & Amber', s_ar: 'صندل، خشب كشمير وعنبر أصيل', s_en: 'Rich amber, sandalwood & cashmeran' },
-        { val: 'fresh', icon: '🍋', t_ar: 'انتعاش حمضي ونقاء أثيري', t_en: 'Fresh & Clean', s_ar: 'برغموت منعش ونفحات زهور بيضاء', s_en: 'Crisp bergamot & uplifting florals' },
-        { val: 'spicy', icon: '🌙', t_ar: 'طابع شرقي غامض وجريء', t_en: 'Spicy & Oriental', s_ar: 'زعفران، توابل راقية وأثر لا يُقاوم', s_en: 'Exotic saffron & hypnotic spices' }
+        { val: 'sweet', icon: '🍦', t_ar: 'حلو ودافي (فانيليا وكراميل)', t_en: 'Sweet & Gourmand', s_ar: 'فانيليا، توفي، تونكا، شوكولاتة', s_en: 'Vanilla, toffee, tonka, chocolate' },
+        { val: 'woody', icon: '🪵', t_ar: 'خشبي وعنبري (فخم)', t_en: 'Woody & Amber', s_ar: 'عود، صندل، باتشولي، عنبر', s_en: 'Oud, sandalwood, patchouli, amber' },
+        { val: 'fresh', icon: '🍋', t_ar: 'منعش وحمضي (سبور)', t_en: 'Fresh & Citrus', s_ar: 'برغموت، ليمون، نعناع، شاي أخضر', s_en: 'Bergamot, lemon, mint, green tea' },
+        { val: 'spicy', icon: '🌙', t_ar: 'شرقي وتوابل (غامض)', t_en: 'Spicy & Oriental', s_ar: 'زعفران، قرفة، بخور، مسك', s_en: 'Saffron, cinnamon, incense, musk' },
+        { val: 'floral', icon: '🌹', t_ar: 'وردي وزهري (رومانسي)', t_en: 'Floral & Rose', s_ar: 'ورد، ياسمين، زنبق، نيرولي', s_en: 'Rose, jasmine, lily, neroli' },
+        { val: 'musky', icon: '🤍', t_ar: 'مسكي ونظيف (ناعم)', t_en: 'Musky & Clean', s_ar: 'مسك أبيض، بودرة، كشمير', s_en: 'White musk, powder, cashmere' }
       ]
     },
     {
-      title_ar: '٣. ما هي المناسبة الأكثر ملاءمة لاستخدامك؟',
-      title_en: '3. What is your primary occasion?',
-      desc_ar: 'متى تحب أن يفوح عطرك؟',
-      desc_en: 'When do you want your perfume to radiate?',
+      title_ar: '٣. إيه المناسبة اللي هتستخدمه فيها؟',
+      title_en: '3. When will you wear it most?',
+      desc_ar: 'ده بيأثر على الثبات والفوحان المثالي',
+      desc_en: 'This affects ideal longevity & projection',
       key: 'occasion',
       options: [
-        { val: 'daily', icon: '💼', t_ar: 'يومي وللعمل والجامعة', t_en: 'Daily & Casual / Office', s_ar: 'فوحان متوازن ومريح طوال اليوم', s_en: 'Subtle projection & all-day comfort' },
-        { val: 'evening', icon: '🕯️', t_ar: 'سهرات ومناسبات خاصة وفخمة', t_en: 'Evenings & Special Events', s_ar: 'ثبات خيالي وحضور طاغٍ يلفت الأنظار', s_en: 'Heavy sillage & captivating presence' },
-        { val: 'winter', icon: '🍂', t_ar: 'أجواء الشتاء والخريف الباردة', t_en: 'Fall & Winter Coziness', s_ar: 'دفء مغناطيسي يحيط بك بنعومة', s_en: 'Deep enveloping warmth' },
-        { val: 'signature', icon: '🔄', t_ar: 'عطر توقيع دائم لكل الأوقات', t_en: 'Signature Scent for All Times', s_ar: 'عطرك الثابت الذي يتذكرك به الجميع', s_en: 'Your undeniable trademark everywhere' }
+        { val: 'daily', icon: '💼', t_ar: 'يومي (شغل / جامعة / خروج خفيف)', t_en: 'Daily & Casual', s_ar: 'فوحان هادي ومريح طول اليوم', s_en: 'Subtle projection & all-day comfort' },
+        { val: 'evening', icon: '🕯️', t_ar: 'سهرات ومناسبات خاصة', t_en: 'Evenings & Events', s_ar: 'حضور طاغي وثبات خيالي', s_en: 'Heavy sillage & captivating presence' },
+        { val: 'winter', icon: '🍂', t_ar: 'شتا وأجواء باردة', t_en: 'Fall & Winter', s_ar: 'دفء مغناطيسي يلفك بنعومة', s_en: 'Deep enveloping warmth' },
+        { val: 'summer', icon: '☀️', t_ar: 'صيف وأجواء حارة', t_en: 'Summer & Heat', s_ar: 'انتعاش وخفة تقاوم الحرارة', s_en: 'Fresh lightness that beats the heat' },
+        { val: 'signature', icon: '🔄', t_ar: 'عطر توقيع لكل الأوقات', t_en: 'Signature for All Times', s_ar: 'عطرك اللي الكل بيتذكرك بيه', s_en: 'Your trademark everywhere you go' }
+      ]
+    },
+    {
+      title_ar: '٤. بتحب الفوحان يبقى إزاي؟',
+      title_en: '4. How strong should the sillage be?',
+      desc_ar: 'قوة انتشار العطر حواليك',
+      desc_en: 'How far should your scent project?',
+      key: 'intensity',
+      options: [
+        { val: 'intimate', icon: '🤫', t_ar: 'قريب وهادي (Skin Scent)', t_en: 'Intimate & Close', s_ar: 'بيحسه اللي جنبك بس', s_en: 'Only those very close notice it' },
+        { val: 'moderate', icon: '🌊', t_ar: 'متوسط ومتوازن', t_en: 'Moderate & Balanced', s_ar: 'فوحان محترم مش مبالغ فيه', s_en: 'Pleasant projection without overwhelming' },
+        { val: 'strong', icon: '💥', t_ar: 'قوي ووحش (Beast Mode)', t_en: 'Strong & Powerful', s_ar: 'الكل هيحس بيك أول ما تدخل', s_en: 'Everyone notices when you enter' }
+      ]
+    },
+    {
+      title_ar: '٥. إيه الموسم اللي بتحب تلبسه فيه أكتر؟',
+      title_en: '5. Your favorite wearing season?',
+      desc_ar: 'عشان نختار التركيبة المناسبة للجو',
+      desc_en: 'So we pick the right composition for the weather',
+      key: 'season',
+      options: [
+        { val: 'summer', icon: '☀️', t_ar: 'الصيف (انتعاش وخفة)', t_en: 'Summer (Fresh & Light)', s_ar: 'تركيبات خفيفة تقاوم الحر', s_en: 'Light compositions that beat the heat' },
+        { val: 'winter', icon: '❄️', t_ar: 'الشتا (دفء وثبات)', t_en: 'Winter (Warm & Lasting)', s_ar: 'تركيبات دافية بتثبت أكتر في البرد', s_en: 'Warm compositions that last longer in cold' },
+        { val: 'spring', icon: '🌸', t_ar: 'الربيع والخريف (معتدل)', t_en: 'Spring & Fall (Moderate)', s_ar: 'تركيبات متوازنة لأجواء لطيفة', s_en: 'Balanced compositions for mild weather' },
+        { val: 'all', icon: '🌍', t_ar: 'كل المواسم (All Season)', t_en: 'All Seasons', s_ar: 'عطر يمشي معاك في أي وقت', s_en: 'A fragrance for any time of year' }
       ]
     }
   ];
 
+  // ── Intelligent Scoring Engine ──
+  function computeQuizScore(product, answers) {
+    const d = unpackProduct(product);
+    let score = 0;
+    let maxPossible = 0;
+    const allText = `${product.category || ''} ${product.name || ''} ${product.latin || ''} ${d.notes || ''} ${d.top_notes || ''} ${d.middle_notes || ''} ${d.base_notes || ''} ${d.accords || ''} ${d.main_accord || ''} ${d.seasons || ''} ${d.inspired_by || ''}`.toLowerCase();
+
+    // ── 1. Category Match (Weight: 15) ──
+    maxPossible += 15;
+    if (answers.category && answers.category !== 'gift') {
+      if (product.category === answers.category) score += 15;
+      else if (product.category === 'unisex') score += 10;
+    } else if (answers.category === 'gift') {
+      score += 12; // Gifts match all, slight penalty
+    }
+
+    // ── 2. Mood / Scent Family Match (Weight: 30) ──
+    maxPossible += 30;
+    if (answers.mood && MOOD_KEYWORDS[answers.mood]) {
+      const moodData = MOOD_KEYWORDS[answers.mood];
+      let moodScore = 0;
+
+      // Check accords
+      const accordsLower = (d.accords || '').toLowerCase() + ' ' + (d.main_accord || '').toLowerCase();
+      moodData.accords.forEach(keyword => {
+        if (accordsLower.includes(keyword)) moodScore += 4;
+      });
+
+      // Check notes (top, middle, base)
+      moodData.notes.forEach(keyword => {
+        if (allText.includes(keyword)) moodScore += 2;
+      });
+
+      // Check main_accord direct match
+      if (d.main_accord && moodData.accords.some(a => d.main_accord.toLowerCase().includes(a))) {
+        moodScore += 6;
+      }
+
+      score += Math.min(30, moodScore);
+    }
+
+    // ── 3. Occasion Match (Weight: 20) ──
+    maxPossible += 20;
+    if (answers.occasion && OCCASION_PROFILE[answers.occasion]) {
+      const occ = OCCASION_PROFILE[answers.occasion];
+      let occScore = 0;
+
+      // Sillage match
+      const sillage = d.sillage || 3;
+      if (occ.sillageMin && sillage >= occ.sillageMin) occScore += 5;
+      else if (occ.sillageMax && sillage <= occ.sillageMax) occScore += 5;
+      else if (!occ.sillageMin && !occ.sillageMax) occScore += 3;
+
+      // Longevity match
+      const longevity = d.longevity || 3;
+      if (occ.longevityMin && longevity >= occ.longevityMin) occScore += 5;
+      if (occ.longevityMax && longevity <= occ.longevityMax) occScore += 3;
+      else if (!occ.longevityMax) occScore += 2;
+
+      // Mood synergy with occasion
+      if (answers.mood && occ.moodBoost.includes(answers.mood)) occScore += 5;
+
+      // Season synergy with occasion
+      const prodSeasons = (d.seasons || '').toLowerCase();
+      if (occ.seasonBoost.some(s => prodSeasons.includes(s) || s === 'all')) occScore += 5;
+
+      score += Math.min(20, occScore);
+    }
+
+    // ── 4. Intensity / Sillage Preference (Weight: 15) ──
+    maxPossible += 15;
+    if (answers.intensity) {
+      const sillage = d.sillage || 3;
+      if (answers.intensity === 'intimate' && sillage <= 2) score += 15;
+      else if (answers.intensity === 'intimate' && sillage === 3) score += 8;
+      else if (answers.intensity === 'moderate' && sillage >= 2 && sillage <= 4) score += 15;
+      else if (answers.intensity === 'moderate' && (sillage === 1 || sillage === 5)) score += 6;
+      else if (answers.intensity === 'strong' && sillage >= 4) score += 15;
+      else if (answers.intensity === 'strong' && sillage === 3) score += 8;
+      else score += 3;
+    }
+
+    // ── 5. Season Match (Weight: 15) ──
+    maxPossible += 15;
+    if (answers.season) {
+      const prodSeasons = (d.seasons || '').toLowerCase();
+      if (answers.season === 'all') {
+        if (prodSeasons.includes('all') || prodSeasons.includes('كل')) score += 15;
+        else score += 8;
+      } else {
+        const seasonMap = { summer: ['summer','صيف','spring'], winter: ['winter','شتاء','شتا','fall','خريف'], spring: ['spring','ربيع','fall','خريف','all'] };
+        const keywords = seasonMap[answers.season] || [answers.season];
+        if (keywords.some(k => prodSeasons.includes(k))) score += 15;
+        else if (prodSeasons.includes('all') || prodSeasons.includes('كل')) score += 10;
+        else score += 2;
+      }
+    }
+
+    // ── 6. Bonus: Featured / Best Seller (Weight: 5) ──
+    maxPossible += 5;
+    if (product.is_featured) score += 3;
+    if (product.is_best_seller) score += 2;
+
+    // Calculate real match percentage
+    const matchPercent = maxPossible > 0 ? Math.round((score / maxPossible) * 100) : 50;
+    return { score, maxPossible, matchPercent: Math.max(15, Math.min(99, matchPercent)) };
+  }
+
   function openScentQuiz() {
     quizStep = 0;
-    quizAnswers = { category: '', mood: '', occasion: '' };
+    quizAnswers = { category: '', mood: '', occasion: '', intensity: '', season: '' };
     renderQuizStep();
     quizModal?.classList.add('open');
   }
@@ -3835,15 +3990,19 @@
 
     if (quizStep < quizQuestions.length) {
       const q = quizQuestions[quizStep];
+      const totalSteps = quizQuestions.length;
       const dotsHtml = quizQuestions.map((_, i) => `<span class="quiz-dot ${i <= quizStep ? 'active' : ''}"></span>`).join('');
+      const progressPct = Math.round(((quizStep + 1) / totalSteps) * 100);
 
       quizContainer.innerHTML = `
         <div class="quiz-header">
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${progressPct}%"></div></div>
+          <div class="quiz-step-info">${isAr ? `سؤال ${arabicDigits(quizStep + 1)} من ${arabicDigits(totalSteps)}` : `Question ${quizStep + 1} of ${totalSteps}`}</div>
           <div class="quiz-step-dots">${dotsHtml}</div>
           <h3 class="quiz-question-title">${isAr ? q.title_ar : q.title_en}</h3>
           <p class="quiz-question-desc">${isAr ? q.desc_ar : q.desc_en}</p>
         </div>
-        <div class="quiz-options-grid">
+        <div class="quiz-options-grid${q.options.length > 4 ? ' quiz-grid-compact' : ''}">
           ${q.options.map(opt => `
             <button type="button" class="quiz-opt-btn" data-quiz-val="${opt.val}" data-quiz-key="${q.key}">
               <span class="quiz-opt-icon">${opt.icon}</span>
@@ -3854,105 +4013,90 @@
             </button>
           `).join('')}
         </div>
+        ${quizStep > 0 ? `<button type="button" class="btn-quiz-back" id="quizBackBtn">${isAr ? '← رجوع' : '← Back'}</button>` : ''}
       `;
     } else {
-      const available = products.filter(p => p.name !== '__system_announcements__' && p.in_stock !== false);
-      let bestMatch = available[0];
-      let bestScore = -1;
+      // ── Intelligent Results Engine ──
+      const available = products.filter(p =>
+        p.name !== '__system_announcements__' &&
+        p.name !== '__system_brands__' &&
+        p.name !== '__system_orders_meta__' &&
+        p.in_stock !== false
+      );
 
-      available.forEach(p => {
-        let score = 0;
-        const d = unpackProduct(p);
-        const combined = `${p.category} ${p.name} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.accords}`.toLowerCase();
+      // Score every product
+      const scored = available.map(p => ({ product: p, ...computeQuizScore(p, quizAnswers) }));
+      scored.sort((a, b) => b.score - a.score || b.matchPercent - a.matchPercent);
 
-        if (quizAnswers.category && quizAnswers.category !== 'gift') {
-          if (p.category === quizAnswers.category || p.category === 'unisex') score += 3;
-        }
-        if (quizAnswers.mood) {
-          if (quizAnswers.mood === 'sweet' && (combined.includes('sweet') || combined.includes('vanilla') || combined.includes('حلو') || combined.includes('فانيليا'))) score += 5;
-          if (quizAnswers.mood === 'woody' && (combined.includes('wood') || combined.includes('amber') || combined.includes('خشب') || combined.includes('عنبر'))) score += 5;
-          if (quizAnswers.mood === 'fresh' && (combined.includes('fresh') || combined.includes('citrus') || combined.includes('منعش') || combined.includes('برغموت'))) score += 5;
-          if (quizAnswers.mood === 'spicy' && (combined.includes('spic') || combined.includes('oriental') || combined.includes('زعفران') || combined.includes('شرقي'))) score += 5;
-        }
-        // Occasion-based scoring
-        if (quizAnswers.occasion) {
-          if (quizAnswers.occasion === 'daily' && (combined.includes('fresh') || combined.includes('light') || combined.includes('بحري') || combined.includes('aquatic'))) score += 4;
-          if (quizAnswers.occasion === 'evening' && (combined.includes('oud') || combined.includes('oriental') || combined.includes('شرقي') || combined.includes('spic'))) score += 4;
-          if (quizAnswers.occasion === 'winter' && (combined.includes('woody') || combined.includes('amber') || combined.includes('spic') || combined.includes('tabac') || combined.includes('تبغ'))) score += 4;
-          if (quizAnswers.occasion === 'signature' && (combined.includes('woody') || combined.includes('amber') || combined.includes('fresh') || combined.includes('floral'))) score += 4;
-        }
-        if (p.is_featured) score += 2;
-        if (score > bestScore) {
-          bestScore = score;
-          bestMatch = p;
-        }
-      });
+      // Get top 3 unique results
+      const topResults = scored.slice(0, 3);
 
-      // Collect top matches and shuffle to avoid always returning the same product
-      const topMatches = available.filter(p => {
-        let score = 0;
-        const d = unpackProduct(p);
-        const combined = `${p.category} ${p.name} ${d.notes} ${d.top_notes} ${d.middle_notes} ${d.base_notes} ${d.accords}`.toLowerCase();
-        if (quizAnswers.category && quizAnswers.category !== 'gift') {
-          if (p.category === quizAnswers.category || p.category === 'unisex') score += 3;
-        }
-        if (quizAnswers.mood) {
-          if (quizAnswers.mood === 'sweet' && (combined.includes('sweet') || combined.includes('vanilla') || combined.includes('حلو') || combined.includes('فانيليا'))) score += 5;
-          if (quizAnswers.mood === 'woody' && (combined.includes('wood') || combined.includes('amber') || combined.includes('خشب') || combined.includes('عنبر'))) score += 5;
-          if (quizAnswers.mood === 'fresh' && (combined.includes('fresh') || combined.includes('citrus') || combined.includes('منعش') || combined.includes('برغموت'))) score += 5;
-          if (quizAnswers.mood === 'spicy' && (combined.includes('spic') || combined.includes('oriental') || combined.includes('زعفران') || combined.includes('شرقي'))) score += 5;
-        }
-        if (quizAnswers.occasion) {
-          if (quizAnswers.occasion === 'daily' && (combined.includes('fresh') || combined.includes('light') || combined.includes('بحري') || combined.includes('aquatic'))) score += 4;
-          if (quizAnswers.occasion === 'evening' && (combined.includes('oud') || combined.includes('oriental') || combined.includes('شرقي') || combined.includes('spic'))) score += 4;
-          if (quizAnswers.occasion === 'winter' && (combined.includes('woody') || combined.includes('amber') || combined.includes('spic') || combined.includes('tabac') || combined.includes('تبغ'))) score += 4;
-          if (quizAnswers.occasion === 'signature' && (combined.includes('woody') || combined.includes('amber') || combined.includes('fresh') || combined.includes('floral'))) score += 4;
-        }
-        if (p.is_featured) score += 2;
-        return score >= bestScore;
-      });
-      topMatches.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
-      for (let i = topMatches.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [topMatches[i], topMatches[j]] = [topMatches[j], topMatches[i]];
+      if (!topResults.length) {
+        quizContainer.innerHTML = `<div class="quiz-result-card"><p>${isAr ? 'لم نجد عطور مطابقة. جرب إعادة الاستشارة.' : 'No matching fragrances found. Try retaking the quiz.'}</p><button type="button" class="btn-quiz-retry" id="quizRetryBtn"><span>${isAr ? 'إعادة الاستشارة ↺' : 'Retake Quiz ↺'}</span></button></div>`;
+        return;
       }
-      bestMatch = topMatches[0] || bestMatch || available[0];
 
-      if (!bestMatch && available.length) bestMatch = available[0];
-      const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(bestMatch, currentLang) : null;
-      const d = unpackProduct(bestMatch);
-      const prodName = localized ? localized.name : (isAr ? bestMatch.name : (bestMatch.latin || bestMatch.name));
+      // Build results HTML
+      const resultsHtml = topResults.map((item, rank) => {
+        const p = item.product;
+        const d = unpackProduct(p);
+        const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(p, currentLang) : null;
+        const prodName = localized ? localized.name : (isAr ? p.name : (p.latin || p.name));
+        const pricing = computeProductPrice(p);
+        const matchPct = item.matchPercent;
 
-      let quizDesc = (localized && localized.desc) ? localized.desc : (d.desc || d.notes || '');
-      if (isAr) {
-        if (!quizDesc || !/[\u0600-\u06FF]/.test(quizDesc)) {
-          quizDesc = (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(quizDesc || d.notes || '', 'ar', bestMatch.id, bestMatch.name) : '') ||
-            'عطر استثنائي يجمع بين النقاء والجاذبية والثبات العالي، صُمم بعناية ليعبر عن روحك ويترك أثراً لا يُنسى في كل لحظة.';
+        // Build reasons
+        const reasons = [];
+        if (quizAnswers.mood) {
+          const moodLabels = { sweet: isAr ? 'حلو ودافي' : 'Sweet', woody: isAr ? 'خشبي' : 'Woody', fresh: isAr ? 'منعش' : 'Fresh', spicy: isAr ? 'شرقي' : 'Oriental', floral: isAr ? 'زهري' : 'Floral', musky: isAr ? 'مسكي' : 'Musky' };
+          if (moodLabels[quizAnswers.mood]) reasons.push(moodLabels[quizAnswers.mood]);
         }
-      } else {
-        if (!quizDesc || !/[a-zA-Z]/.test(quizDesc)) {
-          quizDesc = (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(quizDesc || d.notes || '', 'en', bestMatch.id, bestMatch.latin || bestMatch.name) : '') ||
-            'An exquisite signature fragrance tailored to complement your presence, leaving an unforgettable trace.';
-        }
-      }
-      const matchPct = 96 + Math.floor(Math.random() * 4);
+        if (d.main_accord) reasons.push(d.main_accord);
+        if (d.longevity >= 4) reasons.push(isAr ? 'ثبات عالي' : 'Long lasting');
+        if (d.sillage >= 4) reasons.push(isAr ? 'فوحان قوي' : 'Strong sillage');
+
+        const rankBadge = rank === 0 ? (isAr ? '🥇 الأفضل لك' : '🥇 Best Match') : rank === 1 ? (isAr ? '🥈 بديل ممتاز' : '🥈 Great Alternative') : (isAr ? '🥉 اختيار رائع' : '🥉 Excellent Choice');
+
+        return `
+          <div class="quiz-result-item${rank === 0 ? ' quiz-result-hero' : ''}">
+            <div class="quiz-result-rank-badge">${rankBadge}</div>
+            <div class="quiz-result-match-ring">
+              <svg viewBox="0 0 36 36" class="quiz-match-svg">
+                <path class="quiz-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                <path class="quiz-ring-fill" stroke-dasharray="${matchPct}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              </svg>
+              <span class="quiz-match-num">${matchPct}%</span>
+            </div>
+            <div class="quiz-result-body">
+              ${p.image_url ? `<a href="product.html?id=${encodeURIComponent(p.id)}" class="quiz-result-img-wrap"><img src="${p.image_url}" alt="${escapeHtml(prodName)}" class="quiz-result-bottle"></a>` : ''}
+              <h4 class="quiz-result-name"><a href="product.html?id=${encodeURIComponent(p.id)}">${escapeHtml(prodName)}</a></h4>
+              ${d.inspired_by ? `<span class="quiz-result-inspired">✦ ${isAr ? 'مستوحى من' : 'Inspired by'}: ${escapeHtml(d.inspired_by)}</span>` : ''}
+              ${reasons.length ? `<div class="quiz-result-reasons">${reasons.slice(0, 3).map(r => `<span class="quiz-reason-chip">${escapeHtml(r)}</span>`).join('')}</div>` : ''}
+              <div class="quiz-result-price">
+                <span class="quiz-price-current">${money(pricing.price)}</span>
+                ${pricing.hasDiscount ? `<del class="quiz-price-orig">${money(pricing.originalPrice)}</del><span class="quiz-price-save">${escapeHtml(pricing.discountBadge)}</span>` : ''}
+              </div>
+            </div>
+            <div class="quiz-result-cta">
+              <a href="product.html?id=${encodeURIComponent(p.id)}" class="btn-quiz-explore">${isAr ? 'استكشف العطر' : 'Explore'} ✦</a>
+              <button type="button" class="btn-quiz-add" data-add="${p.id}">＋ ${isAr ? 'أضف للسلة' : 'Add to Bag'}</button>
+            </div>
+          </div>
+        `;
+      }).join('');
 
       quizContainer.innerHTML = `
-        <div class="quiz-result-card">
-          <div class="quiz-match-pill">✨ ${isAr ? `نسبة التطابق العطري: ${arabicDigits(matchPct)}%` : `Fragrance Match: ${matchPct}%`}</div>
-          ${bestMatch.image_url ? `<a href="product.html?id=${encodeURIComponent(bestMatch.id)}" style="display:inline-block;"><img src="${bestMatch.image_url}" alt="${escapeHtml(prodName)}" class="quiz-result-bottle" style="cursor:pointer;"></a>` : ''}
-          <h3 class="quiz-result-title"><a href="product.html?id=${encodeURIComponent(bestMatch.id)}" style="color:inherit;text-decoration:none;">${escapeHtml(prodName)}</a></h3>
-          <p class="quiz-result-desc">${escapeHtml(quizDesc)}</p>
-          <div class="quiz-result-actions">
-            <a href="product.html?id=${encodeURIComponent(bestMatch.id)}" class="button button-primary">
-              <span>${isAr ? 'استكشف هرم النوتات والتحليل' : 'Explore Scent DNA'}</span>
-              <span class="arrow-icon">←</span>
-            </a>
-            <button type="button" class="button" style="background:rgba(255,255,255,0.08);border:1px solid var(--line);" data-add="${bestMatch.id}">
-              <span>${isAr ? 'أضف للسلة' : 'Add to Bag'}</span> <span>＋</span>
-            </button>
+        <div class="quiz-results-wrap">
+          <div class="quiz-results-header">
+            <h3 class="quiz-results-title">${isAr ? '✨ ترشيحات رُوح الذكية' : '✨ Smart Rou7 Recommendations'}</h3>
+            <p class="quiz-results-subtitle">${isAr ? 'بناءً على إجاباتك، اخترنالك أفضل ٣ عطور مطابقة لذوقك وشخصيتك' : 'Based on your answers, here are the top 3 fragrances matched to your taste'}</p>
+          </div>
+          <div class="quiz-results-list">
+            ${resultsHtml}
+          </div>
+          <div class="quiz-results-footer">
             <button type="button" class="btn-quiz-retry" id="quizRetryBtn">
-              <span>${isAr ? 'إعادة الاستشارة ↺' : 'Retake Quiz ↺'}</span>
+              <span>${isAr ? '↺ إعادة الاستشارة' : '↺ Retake Quiz'}</span>
             </button>
           </div>
         </div>
@@ -3966,8 +4110,14 @@
       const key = optBtn.dataset.quizKey;
       const val = optBtn.dataset.quizVal;
       quizAnswers[key] = val;
-      quizStep++;
-      renderQuizStep();
+      // Animate selection
+      optBtn.classList.add('quiz-opt-selected');
+      setTimeout(() => { quizStep++; renderQuizStep(); }, 250);
+      return;
+    }
+    const backBtn = e.target.closest('#quizBackBtn');
+    if (backBtn) {
+      if (quizStep > 0) { quizStep--; renderQuizStep(); }
       return;
     }
     const retryBtn = e.target.closest('#quizRetryBtn');
@@ -4463,20 +4613,24 @@ ${itemsTextAr}
   // Apply initial language state
   setLanguage(currentLang, false);
 
-  // ── Fast Instant Loader Dismissal & Keyboard Controls ───────────────────
+  // ── Robust Loader Dismissal & Keyboard Controls ─────────────────────────
   function dismissLoader() {
-    const ldr = $('#loader');
+    const ldr = document.getElementById('loader') || $('#loader');
     if (ldr && !ldr.classList.contains('done')) {
       ldr.classList.add('done');
+      // Ensure it's fully removed from layout after transition
+      setTimeout(() => { if (ldr) ldr.style.display = 'none'; }, 700);
     }
   }
+  // Fire immediately if DOM already ready
   if (document.readyState === 'interactive' || document.readyState === 'complete') {
     dismissLoader();
   } else {
     document.addEventListener('DOMContentLoaded', dismissLoader);
   }
   window.addEventListener('load', dismissLoader);
-  setTimeout(dismissLoader, 400); // Failsafe fast load timeout
+  setTimeout(dismissLoader, 350); // Fast failsafe
+  setTimeout(dismissLoader, 1200); // Ultimate failsafe — never get stuck
 
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
