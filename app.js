@@ -1800,15 +1800,6 @@
         <!-- Giant High-Fashion Background Watermark Typography -->
         <div class="hero-bg-watermark ${isMultiWord ? 'multi-word' : 'single-word'}" id="heroWatermark" aria-hidden="true">${watermarkHtml}</div>
 
-        <!-- Ambient Luxury Particle Accents -->
-        <div class="hero-ambient-particles" aria-hidden="true">
-          <span class="h-particle p-1">✦</span>
-          <span class="h-particle p-2">✳</span>
-          <span class="h-particle p-3">·</span>
-          <span class="h-particle p-4">✦</span>
-          <span class="h-particle p-5">·</span>
-        </div>
-
         <!-- Center Stage: 3D Floating Perfume Bottle -->
         <div class="hero-bottle-center-stage" id="heroBottleStage">
           <div class="hero-aura-glow" aria-hidden="true"></div>
@@ -1821,9 +1812,7 @@
 
           <!-- Interactive Trigger Button -->
           <button type="button" class="hero-bottle-trigger-btn" id="heroBottleTriggerBtn" aria-label="${isAr ? 'عرض تفاصيل العطر' : 'Show Fragrance Details'}">
-            <span class="trigger-spark">✦</span>
             <span>${isAr ? 'اضغط لاكتشاف العطر' : 'Tap to Discover Scent'}</span>
-            <span class="trigger-spark">✦</span>
           </button>
         </div>
 
