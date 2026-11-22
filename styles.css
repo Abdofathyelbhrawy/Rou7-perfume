@@ -4709,7 +4709,9 @@ body.light .cart-custom-box-card strong {
   font-size: clamp(65px, 16vw, 210px);
   font-weight: 900;
   letter-spacing: 0.1em;
-  color: rgba(75, 90, 60, 0.08);
+  color: rgba(255, 143, 58, 0.28);
+  -webkit-text-stroke: 1.5px rgba(255, 143, 58, 0.45);
+  text-shadow: 0 4px 35px rgba(255, 143, 58, 0.22);
   text-transform: uppercase;
   white-space: nowrap;
   user-select: none;

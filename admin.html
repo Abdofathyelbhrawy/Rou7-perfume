@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="admin.css">
 </head>
 <body class="light">
-  <aside class="admin-sidebar"><a href="index.html" class="admin-logo"><img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></a><div class="side-label">القائمة الرئيسية</div><a class="side-link selected" href="#overview"><span>◫</span> نظرة عامة</a><a class="side-link" href="#products-panel"><span>🧴</span> إدارة العطور <b id="prodBadge">٠</b></a><a class="side-link" href="#brands-panel"><span>🏷️</span> إدارة البراندات <b id="brandBadge">٠</b></a><a class="side-link" href="#campaign"><span>✳</span> إعلان ومميزات المتجر</a><a class="side-link" href="#orders"><span>▤</span> الطلبات <b id="orderBadge">٠</b></a><a class="side-link" href="#sales-panel"><span>📊</span> تقارير المبيعات والأرباح</a><a class="side-link" href="#traffic-panel"><span>📈</span> تحليلات الزيارات <b id="trafficBadge">٠</b></a><a class="side-link" href="index.html#collection"><span>✳</span> متجر رُوح</a><div class="sidebar-bottom"><span class="admin-avatar">ر</span><span><strong>فريق رُوح</strong><small>مساحة الإدارة</small></span></div></aside>
+  <aside class="admin-sidebar"><a href="index.html" class="admin-logo"><img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></a><div class="side-label">القائمة الرئيسية</div><a class="side-link selected" href="#overview"><span>◫</span> نظرة عامة</a><a class="side-link" href="#products-panel"><span>🧴</span> إدارة العطور <b id="prodBadge">٠</b></a><a class="side-link" href="#brands-panel"><span>🏷️</span> إدارة البراندات <b id="brandBadge">٠</b></a><a class="side-link" href="#campaign"><span>✳</span> إعلان ومميزات المتجر</a><a class="side-link" href="#orders"><span>▤</span> الطلبات <b id="orderBadge">٠</b></a><a class="side-link" href="#inventory-panel"><span>📦</span> إدارة المخزون <b id="inventoryBadge">٠</b></a><a class="side-link" href="#sales-panel"><span>📊</span> تقارير المبيعات والأرباح</a><a class="side-link" href="#traffic-panel"><span>📈</span> تحليلات الزيارات <b id="trafficBadge">٠</b></a><a class="side-link" href="index.html#collection"><span>✳</span> متجر رُوح</a><div class="sidebar-bottom"><span class="admin-avatar">ر</span><span><strong>فريق رُوح</strong><small>مساحة الإدارة</small></span></div></aside>
   <main class="admin-main" id="overview">
     <header class="admin-topbar">
       <div><span class="crumb">رُوح /</span> <span id="adminTopTitle">نظرة عامة</span></div>
@@ -349,6 +349,97 @@
           </thead>
           <tbody id="ordersTable">
             <tr><td colspan="7" class="empty-table">جاري تحميل الطلبات…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 📦 قسم إدارة المخزون والمستودع (Inventory Management Panel) -->
+    <section class="inventory-panel" id="inventory-panel" style="margin-top: 48px;">
+      <div class="panel-heading">
+        <div>
+          <p class="admin-kicker">المستودع ومتابعة الكميات</p>
+          <h2>📦 إدارة المخزون وحركة القطع</h2>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button class="button button-outline" id="refreshInventoryBtn" style="padding:10px 14px;" title="تحديث المخزون"><span>🔄</span> تحديث</button>
+          <button class="button button-outline" id="exportInventoryBtn" style="padding:10px 14px;" title="تصدير كشف الجرد CSV"><span>📥</span> تصدير الجرد</button>
+        </div>
+      </div>
+
+      <!-- مؤشرات سريعة للمخزون -->
+      <div class="inventory-kpi-grid">
+        <article class="inventory-kpi-card">
+          <span class="inv-kpi-title">إجمالي القطع المتوفرة</span>
+          <strong class="inv-kpi-value" id="invTotalUnits">٠</strong>
+          <small class="inv-kpi-desc">إجمالي عدد الزجاجات بالمخزن</small>
+          <i class="inv-kpi-icon">📦</i>
+        </article>
+        <article class="inventory-kpi-card">
+          <span class="inv-kpi-title">عطور متوفرة بالمخزن</span>
+          <strong class="inv-kpi-value text-success" id="invInStockCount">٠</strong>
+          <small class="inv-kpi-desc">جاهزة للطلب والشحن الفوري</small>
+          <i class="inv-kpi-icon">✓</i>
+        </article>
+        <article class="inventory-kpi-card">
+          <span class="inv-kpi-title">أوشكت على النفاد ⚠️</span>
+          <strong class="inv-kpi-value text-warning" id="invLowStockCount">٠</strong>
+          <small class="inv-kpi-desc">أقل من ٥ قطع (تحتاج توريد)</small>
+          <i class="inv-kpi-icon">⚠️</i>
+        </article>
+        <article class="inventory-kpi-card">
+          <span class="inv-kpi-title">عطور غير متوفرة 🚫</span>
+          <strong class="inv-kpi-value text-danger" id="invOutOfStockCount">٠</strong>
+          <small class="inv-kpi-desc">رصيد المخزن ٠ (نفدت تماماً)</small>
+          <i class="inv-kpi-icon">✕</i>
+        </article>
+        <article class="inventory-kpi-card">
+          <span class="inv-kpi-title">القيمة المالية للمخزون</span>
+          <strong class="inv-kpi-value text-accent" id="invTotalValuation">٠ ج.م</strong>
+          <small class="inv-kpi-desc">إجمالي قيمة البضاعة بسعر البيع</small>
+          <i class="inv-kpi-icon">💰</i>
+        </article>
+      </div>
+
+      <!-- تنبيه العطور منخفضة المخزون -->
+      <div class="inventory-alert-box" id="inventoryAlertBox" style="display:none;">
+        <span class="inv-alert-icon">⚠️</span>
+        <div class="inv-alert-content">
+          <h4 id="invAlertHeadline">تنبيه المخزون المنخفض</h4>
+          <p id="inventoryAlertText">يوجد عطور قاربت كميتها على الانتهاء، يرجى مراجعتها وتحديث المخزون.</p>
+        </div>
+        <button type="button" class="btn-inv-filter-alert" id="btnFilterLowStock">عرض العطور المحتاجة تموين <span>←</span></button>
+      </div>
+
+      <!-- شريط البحث وفلاتر المخزون -->
+      <div class="inventory-controls-bar">
+        <div class="inv-search-wrap">
+          <input type="search" id="inventorySearchInput" class="admin-search-input" placeholder="🔍 بحث في المخزون بالاسم، البراند، أو التصنيف...">
+        </div>
+        <div class="inv-filter-chips">
+          <button type="button" class="inv-chip active" data-inv-filter="all">الكل (<span id="invFilterAllCount">0</span>)</button>
+          <button type="button" class="inv-chip chip-warning" data-inv-filter="low">أوشك على النفاد ⚠️ (<span id="invFilterLowCount">0</span>)</button>
+          <button type="button" class="inv-chip chip-danger" data-inv-filter="out">نفد من المخزن 🚫 (<span id="invFilterOutCount">0</span>)</button>
+          <button type="button" class="inv-chip chip-success" data-inv-filter="instock">متوفر بوفرة ✓ (<span id="invFilterGoodCount">0</span>)</button>
+        </div>
+      </div>
+
+      <!-- جدول إدارة المخزون الفوري -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:65px;">الصورة</th>
+              <th>اسم العطر والبراند</th>
+              <th>السعر والتكلفة</th>
+              <th style="width:160px;">مستوى المخزون</th>
+              <th style="width:130px;">حالة التوفر</th>
+              <th style="width:180px;">الكمية بالمخزن</th>
+              <th style="width:120px;">إجراء سريع</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTable">
+            <tr><td colspan="7" class="empty-table">جاري تحميل بيانات المخزون…</td></tr>
           </tbody>
         </table>
       </div>

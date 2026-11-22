@@ -2274,3 +2274,330 @@ body.light .financial-summary-card h4 {
 .quick-note-chip:active {
   transform: scale(0.96);
 }
+
+/* ── Inventory Management Panel (إدارة المخزون والمستودع) ────────────────────── */
+.inventory-panel {
+  margin-top: 48px;
+}
+
+.inventory-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.inventory-kpi-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+  transition: transform .2s, box-shadow .2s;
+}
+
+.inventory-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+}
+
+.inv-kpi-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.inv-kpi-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.inv-kpi-value.text-success { color: #10b981; }
+.inv-kpi-value.text-warning { color: #f59e0b; }
+.inv-kpi-value.text-danger  { color: #ef4444; }
+.inv-kpi-value.text-accent  { color: var(--color-accent); }
+
+.inv-kpi-desc {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.inv-kpi-icon {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  font-size: 24px;
+  opacity: 0.25;
+  font-style: normal;
+}
+[dir="ltr"] .inv-kpi-icon {
+  left: auto;
+  right: 16px;
+}
+
+/* Alert banner */
+.inventory-alert-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1.5px solid rgba(245, 158, 11, 0.35);
+  border-radius: 14px;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.inv-alert-icon {
+  font-size: 26px;
+}
+
+.inv-alert-content {
+  flex: 1;
+  min-width: 240px;
+}
+
+.inv-alert-content h4 {
+  margin: 0 0 3px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #b45309;
+}
+
+.inv-alert-content p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.btn-inv-filter-alert {
+  background: #f59e0b;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .2s;
+}
+
+.btn-inv-filter-alert:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+}
+
+/* Controls Bar */
+.inventory-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.inv-search-wrap {
+  flex: 1;
+  min-width: 260px;
+}
+
+.inv-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.inv-chip {
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.inv-chip:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.inv-chip.active {
+  background: var(--color-secondary);
+  color: #fff;
+  border-color: var(--color-secondary);
+}
+
+.inv-chip.chip-warning.active {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #fff;
+}
+
+.inv-chip.chip-danger.active {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+
+.inv-chip.chip-success.active {
+  background: #10b981;
+  border-color: #10b981;
+  color: #fff;
+}
+
+/* Stock Progress Bar in Table */
+.stock-level-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stock-level-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(75, 90, 60, 0.12);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.stock-level-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .3s ease;
+}
+
+.stock-level-fill.good { background: #10b981; }
+.stock-level-fill.low  { background: #f59e0b; }
+.stock-level-fill.out  { background: #ef4444; }
+
+.stock-level-text {
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+}
+
+.stock-level-text.good { color: #059669; }
+.stock-level-text.low  { color: #d97706; }
+.stock-level-text.out  { color: #dc2626; }
+
+/* Stepper Input */
+.stock-qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 34px;
+}
+
+.stock-step-btn {
+  background: transparent;
+  border: none;
+  width: 30px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.stock-step-btn:hover {
+  background: rgba(75, 90, 60, 0.1);
+}
+
+.stock-qty-input {
+  width: 54px;
+  height: 100%;
+  border: none;
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  background: transparent;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  outline: none;
+  font-family: inherit;
+  -moz-appearance: textfield;
+}
+
+.stock-qty-input::-webkit-outer-spin-button,
+.stock-qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Quick Toggle and Action Buttons */
+.btn-stock-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all .2s;
+}
+
+.btn-stock-toggle.in-stock {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.btn-stock-toggle.out-of-stock {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-stock-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.btn-stock-save {
+  background: var(--color-accent);
+  color: var(--color-secondary);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all .2s;
+}
+
+.btn-stock-save:hover {
+  background: var(--color-accent-dark);
+  transform: translateY(-1px);
+}
+
+.btn-stock-save.saved {
+  background: #10b981;
+  color: #fff;
+}

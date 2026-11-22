@@ -1106,6 +1106,7 @@
     $('#prodBadge').textContent     = arabicNum(currentProducts.length);
     populateSpotlightSelect(currentProducts);
     if (typeof calculateSalesAnalytics === 'function') calculateSalesAnalytics();
+    if (typeof renderInventoryPanel === 'function') renderInventoryPanel();
 
     // Update Brand Filter dropdown options
     populateBrandSelects();
@@ -3717,7 +3718,7 @@
   });
 
   // ── Admin Views & Tab Routing Engine (صفحات الداشبورد المستقلة) ────────────
-  const ADMIN_PANEL_IDS = ['products-panel', 'brands-panel', 'campaign', 'orders', 'sales-panel', 'traffic-panel'];
+  const ADMIN_PANEL_IDS = ['products-panel', 'brands-panel', 'campaign', 'orders', 'inventory-panel', 'sales-panel', 'traffic-panel'];
 
   function switchAdminView(targetHash) {
     const rawHash = (targetHash !== undefined ? targetHash : (window.location.hash || '#overview')).trim();
@@ -3734,6 +3735,19 @@
 
     const welcomeEl = document.querySelector('.welcome');
     const statsGrid = document.querySelector('.stats-grid');
+    const topTitle = document.getElementById('adminTopTitle');
+
+    const TITLES_MAP = {
+      'overview': adminLang === 'ar' ? 'نظرة عامة' : 'Overview',
+      'products-panel': adminLang === 'ar' ? 'إدارة العطور' : 'Fragrances',
+      'brands-panel': adminLang === 'ar' ? 'إدارة البراندات' : 'Brands',
+      'campaign': adminLang === 'ar' ? 'إعلان ومميزات المتجر' : 'Campaigns',
+      'orders': adminLang === 'ar' ? 'إدارة الطلبات' : 'Orders',
+      'inventory-panel': adminLang === 'ar' ? 'إدارة المخزون' : 'Inventory',
+      'sales-panel': adminLang === 'ar' ? 'تقارير المبيعات والأرباح' : 'Sales Analytics',
+      'traffic-panel': adminLang === 'ar' ? 'تحليلات الزيارات' : 'Traffic Analytics'
+    };
+    if (topTitle) topTitle.textContent = TITLES_MAP[cleanHash] || (adminLang === 'ar' ? 'لوحة الإدارة' : 'Dashboard');
 
     if (cleanHash === 'overview') {
       if (welcomeEl) welcomeEl.style.display = '';
@@ -3743,7 +3757,7 @@
         if (el) el.style.display = '';
       });
     } else {
-      // In dedicated view (e.g. Sales Page, Orders, Products, Brands, Campaign)
+      // In dedicated view (e.g. Sales Page, Orders, Products, Brands, Campaign, Inventory)
       if (welcomeEl) welcomeEl.style.display = 'none';
       if (statsGrid) statsGrid.style.display = 'none';
       ADMIN_PANEL_IDS.forEach(id => {
@@ -3756,6 +3770,8 @@
         calculateSalesAnalytics();
       } else if (cleanHash === 'traffic-panel') {
         calculateTrafficAnalytics();
+      } else if (cleanHash === 'inventory-panel') {
+        renderInventoryPanel();
       }
     }
   }
@@ -3764,7 +3780,10 @@
   switchAdminView();
 
   // ── Immediate Cache Render (0ms Instant Load) ─────────────────────────────
-  if (currentProducts.length) renderProductsTable(currentProducts);
+  if (currentProducts.length) {
+    renderProductsTable(currentProducts);
+    renderInventoryPanel();
+  }
   if (currentOrders.length) renderOrders(currentOrders);
   calculateSalesAnalytics('all');
   calculateTrafficAnalytics('all');
@@ -4134,6 +4153,353 @@
     a.click();
     URL.revokeObjectURL(url);
     window.RoohUtils?.showToast(adminLang === 'ar' ? 'تم تصدير ملف CSV' : 'CSV exported');
+  });
+
+  // ── 📦 نظام إدارة المخزون والمستودع (Inventory Management Engine) ───────────
+  let inventoryFilter = 'all';
+  let inventorySearch = '';
+
+  function renderInventoryPanel() {
+    const tableBody = $('#inventoryTable');
+    if (!tableBody) return;
+
+    const rawList = currentProducts.filter(p =>
+      p.name !== '__system_announcements__' &&
+      p.name !== '__system_brands__' &&
+      p.name !== '__system_orders_meta__'
+    );
+
+    // Calculate Inventory Stats
+    let totalUnits = 0;
+    let inStockCount = 0;
+    let lowStockCount = 0;
+    let outOfStockCount = 0;
+    let goodStockCount = 0;
+    let totalValuation = 0;
+
+    rawList.forEach(p => {
+      const d = unpackProductDetails(p);
+      const isAvailable = p.in_stock !== false;
+      const qtyRaw = d.stock_quantity !== '' && d.stock_quantity !== undefined ? parseInt(d.stock_quantity) : (isAvailable ? 10 : 0);
+      const priceVal = parseFloat(d.sale_price) || parseFloat(p.price) || 0;
+
+      if (isAvailable && qtyRaw > 0) {
+        inStockCount++;
+        totalUnits += qtyRaw;
+        totalValuation += (qtyRaw * priceVal);
+        if (qtyRaw <= 5) {
+          lowStockCount++;
+        } else {
+          goodStockCount++;
+        }
+      } else {
+        outOfStockCount++;
+      }
+    });
+
+    // Update KPI cards
+    if ($('#invTotalUnits')) $('#invTotalUnits').textContent = arabicNum(totalUnits);
+    if ($('#invInStockCount')) $('#invInStockCount').textContent = arabicNum(inStockCount);
+    if ($('#invLowStockCount')) $('#invLowStockCount').textContent = arabicNum(lowStockCount);
+    if ($('#invOutOfStockCount')) $('#invOutOfStockCount').textContent = arabicNum(outOfStockCount);
+    if ($('#invTotalValuation')) $('#invTotalValuation').textContent = money(totalValuation);
+
+    // Update badge in sidebar
+    const invBadge = $('#inventoryBadge');
+    if (invBadge) {
+      const alertCount = lowStockCount + outOfStockCount;
+      invBadge.textContent = arabicNum(alertCount || rawList.length);
+      if (alertCount > 0) {
+        invBadge.style.background = '#f59e0b';
+        invBadge.style.color = '#fff';
+      } else {
+        invBadge.style.background = '';
+        invBadge.style.color = '';
+      }
+    }
+
+    // Filter counts
+    if ($('#invFilterAllCount')) $('#invFilterAllCount').textContent = arabicNum(rawList.length);
+    if ($('#invFilterLowCount')) $('#invFilterLowCount').textContent = arabicNum(lowStockCount);
+    if ($('#invFilterOutCount')) $('#invFilterOutCount').textContent = arabicNum(outOfStockCount);
+    if ($('#invFilterGoodCount')) $('#invFilterGoodCount').textContent = arabicNum(goodStockCount);
+
+    // Low stock alert banner
+    const alertBox = $('#inventoryAlertBox');
+    if (alertBox) {
+      if (lowStockCount > 0 || outOfStockCount > 0) {
+        alertBox.style.display = 'flex';
+        const alertMsg = adminLang === 'ar'
+          ? `يوجد ${arabicNum(lowStockCount)} عطر أوشك على النفاد (أقل من 5 قطع) و ${arabicNum(outOfStockCount)} عطر نفد تماماً من المخزن.`
+          : `There are ${lowStockCount} items low on stock (≤5 pcs) and ${outOfStockCount} out of stock.`;
+        if ($('#inventoryAlertText')) $('#inventoryAlertText').textContent = alertMsg;
+      } else {
+        alertBox.style.display = 'none';
+      }
+    }
+
+    // Filter items for table display
+    const q = (inventorySearch || '').trim().toLowerCase();
+    let filtered = rawList.filter(p => {
+      const d = unpackProductDetails(p);
+      const isAvail = p.in_stock !== false;
+      const qty = d.stock_quantity !== '' && d.stock_quantity !== undefined ? parseInt(d.stock_quantity) : (isAvail ? 10 : 0);
+
+      // Status filter
+      if (inventoryFilter === 'low' && !(isAvail && qty > 0 && qty <= 5)) return false;
+      if (inventoryFilter === 'out' && !(!isAvail || qty === 0)) return false;
+      if (inventoryFilter === 'instock' && !(isAvail && qty > 5)) return false;
+
+      // Search filter
+      if (q) {
+        const nameMatch = (p.name || '').toLowerCase().includes(q);
+        const latinMatch = (p.latin || '').toLowerCase().includes(q);
+        const brandMatch = (d.brand || '').toLowerCase().includes(q);
+        const catMatch = (p.category || '').toLowerCase().includes(q);
+        if (!nameMatch && !latinMatch && !brandMatch && !catMatch) return false;
+      }
+      return true;
+    });
+
+    if (!filtered.length) {
+      tableBody.innerHTML = `<tr><td colspan="7" class="empty-table">${adminLang === 'ar' ? 'لا توجد عطور تطابق معايير الفلترة المحددة' : 'No items match the selected filter'}</td></tr>`;
+      return;
+    }
+
+    tableBody.innerHTML = filtered.map(p => {
+      const d = unpackProductDetails(p);
+      const isAvail = p.in_stock !== false;
+      const qty = d.stock_quantity !== '' && d.stock_quantity !== undefined ? parseInt(d.stock_quantity) : (isAvail ? 10 : 0);
+      const sellPrice = parseFloat(d.sale_price) || parseFloat(p.price) || 0;
+      const costPrice = parseFloat(d.cost_price) || 0;
+      const img = p.image_url || 'assets/branding/2.svg';
+      const bObj = findBrandObject(p.brand || d.brand);
+      const brand = bObj ? (adminLang === 'ar' ? bObj.ar : bObj.en) : (p.brand || d.brand || 'رُوح');
+
+      // Stock status calculations
+      let statusClass = 'good';
+      let statusLabel = adminLang === 'ar' ? 'وفرة كافية' : 'In Stock';
+      let barPct = Math.min(100, Math.max(8, (qty / 20) * 100));
+
+      if (!isAvail || qty === 0) {
+        statusClass = 'out';
+        statusLabel = adminLang === 'ar' ? 'نفد من المخزن' : 'Out of Stock';
+        barPct = 0;
+      } else if (qty <= 5) {
+        statusClass = 'low';
+        statusLabel = adminLang === 'ar' ? 'أوشك على النفاد ⚠️' : 'Low Stock ⚠️';
+        barPct = Math.max(12, (qty / 10) * 100);
+      }
+
+      return `
+        <tr data-inv-id="${p.id}">
+          <td>
+            <img src="${escapeHtml(img)}" alt="${escapeHtml(p.name)}" class="table-thumb" style="width:48px;height:48px;object-fit:contain;background:var(--surface);border-radius:8px;padding:3px;border:1px solid var(--line);">
+          </td>
+          <td>
+            <strong style="display:block;font-size:13.5px;color:var(--ink);">${escapeHtml(p.name)}</strong>
+            ${p.latin ? `<span style="font-size:11px;color:var(--muted);display:block;">${escapeHtml(p.latin)}</span>` : ''}
+            <span class="brand-pill" style="font-size:10.5px;padding:2px 8px;border-radius:12px;background:rgba(75,90,60,0.08);color:var(--color-secondary);">${escapeHtml(brand)}</span>
+          </td>
+          <td>
+            <div style="font-weight:700;color:var(--ink);">${money(sellPrice)}</div>
+            ${costPrice ? `<div style="font-size:11px;color:#10b981;">${adminLang === 'ar' ? 'تكلفة:' : 'Cost:'} ${money(costPrice)}</div>` : `<div style="font-size:11px;color:var(--muted);">${adminLang === 'ar' ? 'بدون تكلفة' : 'No cost set'}</div>`}
+          </td>
+          <td>
+            <div class="stock-level-bar-wrap">
+              <div class="stock-level-text ${statusClass}">
+                <span>${statusLabel}</span>
+                <span>${arabicNum(qty)} ${adminLang === 'ar' ? 'قطعة' : 'pcs'}</span>
+              </div>
+              <div class="stock-level-bar">
+                <div class="stock-level-fill ${statusClass}" style="width:${barPct}%;"></div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <button type="button" class="btn-stock-toggle ${isAvail ? 'in-stock' : 'out-of-stock'}" data-stock-toggle="${p.id}" title="${isAvail ? 'انقر لجعله غير متوفر' : 'انقر لجعله متوفر بالمخزن'}">
+              <span>${isAvail ? '● متوفر' : '○ نفد'}</span>
+            </button>
+          </td>
+          <td>
+            <div class="stock-qty-stepper">
+              <button type="button" class="stock-step-btn" data-step="-1" data-target="${p.id}">−</button>
+              <input type="number" class="stock-qty-input" data-qty-id="${p.id}" value="${qty}" min="0">
+              <button type="button" class="stock-step-btn" data-step="1" data-target="${p.id}">+</button>
+            </div>
+          </td>
+          <td>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button type="button" class="btn-stock-save" data-save-stock="${p.id}" title="${adminLang === 'ar' ? 'حفظ الكمية فوراً' : 'Save Quantity'}">💾 ${adminLang === 'ar' ? 'حفظ' : 'Save'}</button>
+              <button type="button" class="btn-action" data-edit="${p.id}" title="${adminLang === 'ar' ? 'تعديل كافة تفاصيل العطر' : 'Edit Perfume'}">✏️</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Inventory Event Handlers
+  $('#inventorySearchInput')?.addEventListener('input', e => {
+    inventorySearch = e.target.value;
+    renderInventoryPanel();
+  });
+
+  $('#inventory-panel')?.querySelectorAll('.inv-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      $('#inventory-panel').querySelectorAll('.inv-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      inventoryFilter = chip.dataset.invFilter || 'all';
+      renderInventoryPanel();
+    });
+  });
+
+  $('#btnFilterLowStock')?.addEventListener('click', () => {
+    $('#inventory-panel')?.querySelectorAll('.inv-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.invFilter === 'low');
+    });
+    inventoryFilter = 'low';
+    renderInventoryPanel();
+  });
+
+  $('#refreshInventoryBtn')?.addEventListener('click', () => {
+    loadProducts();
+    window.RoohUtils?.showToast(adminLang === 'ar' ? 'جاري تحديث المخزون...' : 'Refreshing inventory...');
+  });
+
+  // Export Inventory CSV
+  $('#exportInventoryBtn')?.addEventListener('click', () => {
+    const rawList = currentProducts.filter(p =>
+      p.name !== '__system_announcements__' &&
+      p.name !== '__system_brands__' &&
+      p.name !== '__system_orders_meta__'
+    );
+    if (!rawList.length) {
+      window.RoohUtils?.showToast(adminLang === 'ar' ? 'لا توجد بيانات بالمخزون للتصدير' : 'No inventory data to export');
+      return;
+    }
+    const headers = ['ID', 'Name', 'Latin Name', 'Brand', 'Category', 'Price', 'Sale Price', 'Cost Price', 'In Stock', 'Stock Quantity', 'Stock Valuation'];
+    const rows = rawList.map(p => {
+      const d = unpackProductDetails(p);
+      const isAvail = p.in_stock !== false;
+      const qty = d.stock_quantity !== '' && d.stock_quantity !== undefined ? parseInt(d.stock_quantity) : (isAvail ? 10 : 0);
+      const sellPrice = parseFloat(d.sale_price) || parseFloat(p.price) || 0;
+      const costPrice = parseFloat(d.cost_price) || 0;
+      return [
+        p.id,
+        p.name || '',
+        p.latin || '',
+        d.brand || '',
+        p.category || '',
+        p.price || 0,
+        d.sale_price || '',
+        costPrice || '',
+        isAvail ? 'Yes' : 'No',
+        qty,
+        (qty * sellPrice)
+      ];
+    });
+    const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rooh-inventory-stock-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    window.RoohUtils?.showToast(adminLang === 'ar' ? 'تم تصدير كشف جرد المخزون بنجاح' : 'Inventory CSV exported successfully');
+  });
+
+  // Table actions: stepper, toggle, save
+  $('#inventoryTable')?.addEventListener('click', async e => {
+    // Stepper + or -
+    const stepBtn = e.target.closest('[data-step]');
+    if (stepBtn) {
+      const step = parseInt(stepBtn.dataset.step) || 0;
+      const targetId = stepBtn.dataset.target;
+      const inp = document.querySelector(`input[data-qty-id="${targetId}"]`);
+      if (inp) {
+        let cur = parseInt(inp.value) || 0;
+        cur = Math.max(0, cur + step);
+        inp.value = cur;
+      }
+      return;
+    }
+
+    // In Stock toggle button
+    const toggleBtn = e.target.closest('[data-stock-toggle]');
+    if (toggleBtn) {
+      const id = toggleBtn.dataset.stockToggle;
+      const targetProduct = currentProducts.find(p => String(p.id) === String(id));
+      if (!targetProduct) return;
+      const newInStock = !(targetProduct.in_stock !== false);
+      targetProduct.in_stock = newInStock;
+      try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
+      renderInventoryPanel();
+      renderProductsTable();
+
+      try {
+        await supaFetch('products', {
+          method: 'PATCH',
+          filters: `&id=eq.${encodeURIComponent(id)}`,
+          body: { in_stock: newInStock }
+        });
+        window.RoohUtils?.showToast(newInStock
+          ? (adminLang === 'ar' ? 'تم تعيين العطر كمتوفر بالمخزن ✓' : 'Marked as In Stock ✓')
+          : (adminLang === 'ar' ? 'تم تعيين العطر كغير متوفر ✕' : 'Marked as Out of Stock ✕')
+        );
+      } catch (err) {
+        console.warn('Could not sync stock status to remote:', err);
+      }
+      return;
+    }
+
+    // Save Stock Quantity
+    const saveBtn = e.target.closest('[data-save-stock]');
+    if (saveBtn) {
+      const id = saveBtn.dataset.saveStock;
+      const targetProduct = currentProducts.find(p => String(p.id) === String(id));
+      if (!targetProduct) return;
+      const inp = document.querySelector(`input[data-qty-id="${id}"]`);
+      const newQty = inp ? Math.max(0, parseInt(inp.value) || 0) : 0;
+      const isNowInStock = newQty > 0;
+
+      targetProduct.stock_quantity = newQty;
+      targetProduct.in_stock = isNowInStock;
+
+      // Also update packed notes
+      let meta = {};
+      if (targetProduct.notes && typeof targetProduct.notes === 'string') {
+        try { meta = JSON.parse(targetProduct.notes); } catch (_) {}
+      }
+      meta.stock_quantity = newQty;
+      targetProduct.notes = JSON.stringify(meta);
+
+      try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
+
+      saveBtn.classList.add('saved');
+      saveBtn.textContent = '✓ ' + (adminLang === 'ar' ? 'تم' : 'Saved');
+
+      try {
+        await supaFetch('products', {
+          method: 'PATCH',
+          filters: `&id=eq.${encodeURIComponent(id)}`,
+          body: {
+            stock_quantity: newQty,
+            in_stock: isNowInStock,
+            notes: targetProduct.notes
+          }
+        });
+      } catch (err) {
+        console.warn('Could not sync stock quantity to remote:', err);
+      }
+
+      setTimeout(() => {
+        renderInventoryPanel();
+        renderProductsTable();
+      }, 700);
+      return;
+    }
   });
 
   // ─────────────────────────────────────────────────────────────────────────
