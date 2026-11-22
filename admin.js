@@ -342,6 +342,8 @@
   }
 
   let isHeroQuickActive = false;
+  let inventoryFilter = 'all';
+  let inventorySearch = '';
 
   const campaignKey = 'rooh-campaign-settings';
   const defaultCampaign = {
@@ -4156,9 +4158,6 @@
   });
 
   // ── 📦 نظام إدارة المخزون والمستودع (Inventory Management Engine) ───────────
-  let inventoryFilter = 'all';
-  let inventorySearch = '';
-
   function renderInventoryPanel() {
     const tableBody = $('#inventoryTable');
     if (!tableBody) return;
