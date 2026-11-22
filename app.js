@@ -1810,51 +1810,62 @@
           <div class="hero-aura-glow" aria-hidden="true"></div>
           <div class="hero-bottle-float-wrap" id="heroBottleWrap">
             <div class="hero-bottle-contact-shadow" aria-hidden="true"></div>
-            <a href="product.html?id=${encodeURIComponent(featured.id)}" class="hero-bottle-3d-link" title="${safeName}">
+            <a href="product.html?id=${encodeURIComponent(featured.id)}" class="hero-bottle-3d-link" id="heroBottleLink" title="${safeName}">
               <img class="hero-bottle-3d-img" src="${safeImg}" alt="${safeName}" loading="eager">
             </a>
           </div>
+
+          <!-- Interactive Trigger Button -->
+          <button type="button" class="hero-bottle-trigger-btn" id="heroBottleTriggerBtn" aria-label="${isAr ? 'عرض تفاصيل العطر' : 'Show Fragrance Details'}">
+            <span class="trigger-spark">✦</span>
+            <span>${isAr ? 'اضغط لاكتشاف العطر' : 'Tap to Discover Scent'}</span>
+            <span class="trigger-spark">✦</span>
+          </button>
         </div>
 
-        <!-- Floating Product Info HUD Card -->
-        <div class="hero-info-hud">
-          <div class="hero-hud-badge-row">
-            <span class="hero-badge-pill">
-              <span class="hero-badge-spark">✦</span>
-              <span>${isAr ? 'عطر الواجهة الاستثنائي' : 'Featured Signature Fragrance'}</span>
-              <span class="hero-badge-spark">✦</span>
-            </span>
-            <span class="hero-gender-badge">${genderText}</span>
-          </div>
+        <!-- Modal Overlay: Floating Product Info HUD Card (Opens on Click) -->
+        <div class="hero-hud-modal-overlay" id="heroHudModalOverlay" aria-hidden="true">
+          <div class="hero-info-hud" id="heroInfoHud" role="dialog" aria-modal="true" aria-labelledby="heroProductTitle">
+            <button type="button" class="hero-hud-close-btn" id="heroHudCloseBtn" aria-label="${isAr ? 'إغلاق' : 'Close'}">✕</button>
 
-          <h1 class="hero-product-title">
-            <a href="product.html?id=${encodeURIComponent(featured.id)}">${safeName}</a>
-          </h1>
-
-          ${inspiredText ? `<p class="hero-inspired-by"><span>✦</span> ${inspiredText}</p>` : ''}
-
-          ${(topList.length || midList.length || baseList.length) ? `
-            <div class="hero-notes-chips-row">
-              ${topList.map(n => `<span class="hero-note-chip">🌸 ${escapeHtml(transNote(n))}</span>`).join('')}
-              ${midList.map(n => `<span class="hero-note-chip">💖 ${escapeHtml(transNote(n))}</span>`).join('')}
-              ${baseList.map(n => `<span class="hero-note-chip">🌲 ${escapeHtml(transNote(n))}</span>`).join('')}
+            <div class="hero-hud-badge-row">
+              <span class="hero-badge-pill">
+                <span class="hero-badge-spark">✦</span>
+                <span>${isAr ? 'عطر الواجهة الاستثنائي' : 'Featured Signature Fragrance'}</span>
+                <span class="hero-badge-spark">✦</span>
+              </span>
+              <span class="hero-gender-badge">${genderText}</span>
             </div>
-          ` : ''}
 
-          <div class="hero-pricing-cta-row">
-            <div class="hero-price-block">
-              <span class="hero-price-current">${money(pricing.price)}</span>
-              ${pricing.hasDiscount ? `<del class="hero-price-original">${money(pricing.originalPrice)}</del><span class="hero-sale-badge">${escapeHtml(pricing.discountBadge)}</span>` : ''}
-            </div>
-            <div class="hero-buttons-group">
-              <a href="product.html?id=${encodeURIComponent(featured.id)}" class="button button-primary btn-hero-explore">
-                <span>${isAr ? 'استكشف العطر' : 'Explore Fragrance'}</span>
-                <span class="arrow-icon">←</span>
-              </a>
-              <button type="button" class="button btn-hero-quickadd" data-add="${featured.id}">
-                <span>＋</span>
-                <span>${isAr ? 'أضف للسلة' : 'Add to Bag'}</span>
-              </button>
+            <h2 class="hero-product-title" id="heroProductTitle">
+              <a href="product.html?id=${encodeURIComponent(featured.id)}">${safeName}</a>
+            </h2>
+
+            ${inspiredText ? `<p class="hero-inspired-by"><span>✦</span> ${inspiredText}</p>` : ''}
+
+            ${(topList.length || midList.length || baseList.length) ? `
+              <div class="hero-notes-chips-row">
+                ${topList.map(n => `<span class="hero-note-chip">🌸 ${escapeHtml(transNote(n))}</span>`).join('')}
+                ${midList.map(n => `<span class="hero-note-chip">💖 ${escapeHtml(transNote(n))}</span>`).join('')}
+                ${baseList.map(n => `<span class="hero-note-chip">🌲 ${escapeHtml(transNote(n))}</span>`).join('')}
+              </div>
+            ` : ''}
+
+            <div class="hero-pricing-cta-row">
+              <div class="hero-price-block">
+                <span class="hero-price-current">${money(pricing.price)}</span>
+                ${pricing.hasDiscount ? `<del class="hero-price-original">${money(pricing.originalPrice)}</del><span class="hero-sale-badge">${escapeHtml(pricing.discountBadge)}</span>` : ''}
+              </div>
+              <div class="hero-buttons-group">
+                <a href="product.html?id=${encodeURIComponent(featured.id)}" class="button button-primary btn-hero-explore">
+                  <span>${isAr ? 'استكشف العطر' : 'Explore Fragrance'}</span>
+                  <span class="arrow-icon">←</span>
+                </a>
+                <button type="button" class="button btn-hero-quickadd" data-add="${featured.id}">
+                  <span>＋</span>
+                  <span>${isAr ? 'أضف للسلة' : 'Add to Bag'}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1927,6 +1938,65 @@
         if (!heroTiltRaf) heroTiltRaf = requestAnimationFrame(updateTilt);
       });
     }
+
+    // Modal Open & Close logic
+    const overlay = hero.querySelector('#heroHudModalOverlay');
+    const closeBtn = hero.querySelector('#heroHudCloseBtn');
+    const bottleLink = hero.querySelector('#heroBottleLink');
+    const triggerBtn = hero.querySelector('#heroBottleTriggerBtn');
+    const bottleWrapEl = hero.querySelector('#heroBottleWrap');
+
+    function openHudModal() {
+      if (!overlay) return;
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('hero-modal-open');
+    }
+
+    function closeHudModal() {
+      if (!overlay) return;
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('hero-modal-open');
+    }
+
+    bottleLink?.addEventListener('click', e => {
+      e.preventDefault();
+      openHudModal();
+    });
+
+    triggerBtn?.addEventListener('click', e => {
+      e.preventDefault();
+      openHudModal();
+    });
+
+    bottleWrapEl?.addEventListener('click', e => {
+      if (e.target.closest('#heroBottleTriggerBtn')) return;
+      e.preventDefault();
+      openHudModal();
+    });
+
+    closeBtn?.addEventListener('click', e => {
+      e.preventDefault();
+      closeHudModal();
+    });
+
+    overlay?.addEventListener('click', e => {
+      if (e.target === overlay) {
+        closeHudModal();
+      }
+    });
+
+    // Close on Escape key
+    if (window._heroEscHandler) {
+      window.removeEventListener('keydown', window._heroEscHandler);
+    }
+    window._heroEscHandler = e => {
+      if (e.key === 'Escape' && overlay?.classList.contains('active')) {
+        closeHudModal();
+      }
+    };
+    window.addEventListener('keydown', window._heroEscHandler);
 
     // Quick add to cart
     hero.querySelector('.btn-hero-quickadd')?.addEventListener('click', e => {

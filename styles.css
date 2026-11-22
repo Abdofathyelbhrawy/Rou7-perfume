@@ -4751,20 +4751,21 @@ body.light .cart-custom-box-card strong {
   position: relative;
   z-index: 3;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   perspective: 1200px;
-  min-height: 420px;
-  padding: 20px 0;
+  min-height: 480px;
+  padding: 30px 0;
 }
 
 .hero-aura-glow {
   position: absolute;
-  width: 360px;
-  height: 360px;
+  width: 380px;
+  height: 380px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 143, 58, 0.22) 0%, rgba(75, 90, 60, 0.08) 55%, transparent 75%);
-  filter: blur(30px);
+  background: radial-gradient(circle, rgba(255, 143, 58, 0.25) 0%, rgba(75, 90, 60, 0.08) 55%, transparent 75%);
+  filter: blur(32px);
   pointer-events: none;
   z-index: -1;
 }
@@ -4778,6 +4779,7 @@ body.light .cart-custom-box-card strong {
   transform-style: preserve-3d;
   will-change: transform;
   animation: heroBottleBreathing 6s ease-in-out infinite;
+  cursor: pointer;
 }
 
 .hero-bottle-contact-shadow {
@@ -4800,10 +4802,11 @@ body.light .cart-custom-box-card strong {
   cursor: pointer;
   z-index: 3;
   text-decoration: none;
+  outline: none;
 }
 
 .hero-bottle-3d-img {
-  max-height: clamp(280px, 42vh, 440px);
+  max-height: clamp(300px, 46vh, 480px);
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 25px 35px rgba(75, 90, 60, 0.28));
@@ -4812,9 +4815,54 @@ body.light .cart-custom-box-card strong {
   -webkit-user-drag: none;
 }
 
-.hero-bottle-3d-link:hover .hero-bottle-3d-img {
-  transform: scale(1.05) translateY(-6px);
-  filter: drop-shadow(0 32px 48px rgba(255, 143, 58, 0.35)) drop-shadow(0 15px 25px rgba(75, 90, 60, 0.3));
+.hero-bottle-float-wrap:hover .hero-bottle-3d-img {
+  transform: scale(1.06) translateY(-8px);
+  filter: drop-shadow(0 34px 50px rgba(255, 143, 58, 0.38)) drop-shadow(0 15px 25px rgba(75, 90, 60, 0.3));
+}
+
+/* Interactive Trigger Button below bottle */
+.hero-bottle-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255, 143, 58, 0.45);
+  border-radius: 30px;
+  color: var(--color-secondary);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(75, 90, 60, 0.12), 0 0 15px rgba(255, 143, 58, 0.15);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 5;
+}
+
+.hero-bottle-trigger-btn .trigger-spark {
+  color: var(--color-accent);
+  font-size: 13px;
+  animation: triggerSparkle 2s ease-in-out infinite alternate;
+}
+
+.hero-bottle-trigger-btn:hover {
+  background: var(--color-accent);
+  color: #ffffff;
+  border-color: var(--color-accent);
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 12px 30px rgba(255, 143, 58, 0.35);
+}
+
+.hero-bottle-trigger-btn:hover .trigger-spark {
+  color: #ffffff;
+}
+
+@keyframes triggerSparkle {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.3); opacity: 1; }
 }
 
 @keyframes heroBottleBreathing {
@@ -4837,30 +4885,92 @@ body.light .cart-custom-box-card strong {
   }
 }
 
-/* Floating Product Info HUD Card */
-.hero-info-hud {
+/* Modal Overlay for Hero Info HUD */
+body.hero-modal-open {
+  overflow: hidden;
+}
+
+.hero-hud-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 36, 26, 0.48);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s ease;
+}
+
+.hero-hud-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.hero-hud-modal-overlay .hero-info-hud {
   position: relative;
-  z-index: 4;
-  margin-top: 10px;
-  background: rgba(255, 253, 248, 0.90);
-  backdrop-filter: blur(14px);
-  border: 1.5px solid rgba(75, 90, 60, 0.14);
-  border-radius: 24px;
-  padding: 24px 32px;
-  box-shadow: 0 18px 50px rgba(75, 90, 60, 0.12);
+  z-index: 10000;
+  margin-top: 0;
+  background: rgba(255, 253, 248, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 143, 58, 0.35);
+  border-radius: 28px;
+  padding: 32px 36px;
+  box-shadow: 0 25px 70px rgba(40, 48, 36, 0.3), 0 0 40px rgba(255, 143, 58, 0.18);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 12px;
-  max-width: 650px;
-  width: 92%;
-  transition: all .3s ease;
+  gap: 14px;
+  max-width: 620px;
+  width: 95%;
+  transform: translateY(24px) scale(0.93);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-.hero-info-hud:hover {
-  box-shadow: 0 22px 60px rgba(75, 90, 60, 0.18);
-  border-color: rgba(255, 143, 58, 0.35);
+.hero-hud-modal-overlay.active .hero-info-hud {
+  transform: translateY(0) scale(1);
+}
+
+.hero-hud-close-btn {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(75, 90, 60, 0.18);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--color-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  z-index: 10;
+}
+
+[dir="ltr"] .hero-hud-close-btn {
+  left: auto;
+  right: 16px;
+}
+
+.hero-hud-close-btn:hover {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+  transform: rotate(90deg) scale(1.08);
 }
 
 .hero-hud-badge-row {
@@ -4896,22 +5006,25 @@ body.light .cart-custom-box-card strong {
   color: var(--color-secondary);
 }
 
+/* Product title strictly in radiant orange */
 .hero-product-title {
-  font-size: clamp(24px, 3.2vw, 36px);
-  font-weight: 700;
-  margin: 0;
-  color: var(--color-secondary);
+  font-size: clamp(26px, 3.6vw, 42px);
+  font-weight: 800;
+  margin: 2px 0 0;
+  color: var(--color-accent) !important;
   line-height: 1.25;
+  text-shadow: 0 2px 14px rgba(255, 143, 58, 0.25);
 }
 
 .hero-product-title a {
-  color: inherit;
+  color: var(--color-accent) !important;
   text-decoration: none;
-  transition: color .2s;
+  transition: all .2s ease;
 }
 
 .hero-product-title a:hover {
-  color: var(--color-accent);
+  color: var(--color-accent-dark) !important;
+  text-shadow: 0 4px 20px rgba(255, 143, 58, 0.45);
 }
 
 .hero-inspired-by {
@@ -5058,8 +5171,33 @@ body.light .cart-custom-box-card strong {
     border-radius: 20px;
     width: 96%;
   }
+  .hero-hud-modal-overlay {
+    padding: 12px;
+  }
+  .hero-hud-modal-overlay .hero-info-hud {
+    padding: 24px 16px 20px;
+    border-radius: 22px;
+    width: 100%;
+  }
+  .hero-hud-close-btn {
+    top: 10px;
+    left: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+  [dir="ltr"] .hero-hud-close-btn {
+    left: auto;
+    right: 12px;
+  }
+  .hero-bottle-trigger-btn {
+    margin-top: 14px;
+    padding: 8px 18px;
+    font-size: 12px;
+  }
   .hero-product-title {
-    font-size: 20px;
+    font-size: 22px;
+    color: var(--color-accent) !important;
   }
   .hero-pricing-cta-row {
     flex-direction: column;
