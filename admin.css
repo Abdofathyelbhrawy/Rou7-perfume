@@ -726,28 +726,34 @@ body.light .solar-orbit-badge {
   border-color: rgba(184, 134, 11, 0.35);
 }
 
+.btn-action.btn-hero-toggle,
 .btn-action.btn-orbit-toggle {
   color: var(--color-accent-light);
   border-color: rgba(212, 175, 55, 0.35);
   white-space: nowrap;
 }
+.btn-action.btn-hero-toggle:hover,
 .btn-action.btn-orbit-toggle:hover {
   background: rgba(212, 175, 55, 0.15);
   border-color: var(--color-accent);
 }
+.btn-action.btn-hero-toggle.in-hero,
 .btn-action.btn-orbit-toggle.in-orbit {
   background: rgba(212, 175, 55, 0.2);
   border-color: var(--color-accent);
   color: var(--color-accent-light);
-  font-weight: 600;
+  font-weight: 700;
 }
+body.light .btn-action.btn-hero-toggle,
 body.light .btn-action.btn-orbit-toggle {
   color: var(--color-accent-dark);
   border-color: rgba(184, 134, 11, 0.35);
 }
+body.light .btn-action.btn-hero-toggle.in-hero,
 body.light .btn-action.btn-orbit-toggle.in-orbit {
-  background: rgba(184, 134, 11, 0.15);
+  background: rgba(184, 134, 11, 0.18);
   color: var(--color-accent-dark);
+  font-weight: 700;
 }
 
 /* Duplicate Product Action Button */

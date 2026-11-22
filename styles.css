@@ -4117,1128 +4117,6 @@ body.light .card-mood-match-pill {
 }
 
 
-/* ==========================================================================
-   COSMIC SOLAR SYSTEM 3D PERFUME SHOWCASE (المنظومة الشمسية العطرية ثلاثية الأبعاد)
-   Tilted 3D planetary disc + Clean Sun Logo (No blinding light behind logo)
-   ========================================================================== */
-
-.cosmic-solar-universe {
-  position: relative;
-  width: 100%;
-  max-width: 1320px;
-  min-height: 640px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
-  user-select: none;
-  border-radius: 36px;
-  background: radial-gradient(circle at center, rgba(32, 47, 69, 0.45) 0%, rgba(17, 29, 46, 0.25) 55%, transparent 80%);
-  transition: background .45s ease;
-}
-
-body.light .cosmic-solar-universe {
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.65) 0%, rgba(245, 240, 235, 0.4) 55%, transparent 80%);
-}
-
-/* 1. Celestial Star Dust & Nebulae */
-.cosmic-stars-layer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.c-star {
-  position: absolute;
-  color: var(--color-accent);
-  opacity: 0.35;
-  font-size: 14px;
-  animation: starTwinkle 4s ease-in-out infinite alternate;
-}
-
-body.light .c-star {
-  color: var(--color-secondary);
-  opacity: 0.28;
-}
-
-.c-star.star-1 { top: 12%; right: 18%; font-size: 18px; animation-delay: 0s; }
-.c-star.star-2 { bottom: 18%; left: 14%; font-size: 20px; animation-delay: 1.2s; }
-.c-star.star-3 { top: 22%; left: 22%; font-size: 10px; animation-delay: 2.1s; }
-.c-star.star-4 { bottom: 25%; right: 15%; font-size: 16px; animation-delay: 0.8s; }
-.c-star.star-5 { top: 50%; left: 8%; font-size: 12px; animation-delay: 1.7s; }
-.c-star.star-6 { top: 15%; left: 45%; font-size: 15px; animation-delay: 2.6s; }
-.c-star.star-7 { bottom: 12%; right: 40%; font-size: 17px; animation-delay: 1.4s; }
-.c-star.star-8 { top: 68%; right: 8%; font-size: 11px; animation-delay: 3s; }
-
-@keyframes starTwinkle {
-  0% { transform: scale(0.8); opacity: 0.2; }
-  50% { transform: scale(1.2); opacity: 0.75; }
-  100% { transform: scale(0.9); opacity: 0.3; }
-}
-
-/* 2. 3D Scene Container & Tilted Orbital Disc */
-.cosmic-3d-scene {
-  position: relative;
-  width: 100%;
-  height: 600px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  perspective: 1400px;
-  perspective-origin: 50% 38%;
-  transform-style: preserve-3d;
-  transition: transform 0.15s ease-out;
-}
-
-.cosmic-3d-disc {
-  position: relative;
-  width: 780px;
-  height: 780px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform-style: preserve-3d;
-  transform: rotateX(62deg) rotateZ(-8deg);
-  transition: transform .25s ease-out;
-}
-
-/* 3. True 3D Circular Orbit Tracks on the tilted plane */
-.cosmic-track-3d {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  pointer-events: none;
-  transition: border-color .4s ease, box-shadow .4s ease;
-}
-
-.track-3d-1 {
-  width: 380px;
-  height: 380px;
-  border: 1.5px dashed rgba(255, 143, 58, 0.32);
-  box-shadow: 0 0 25px rgba(255, 143, 58, 0.08);
-}
-
-.track-3d-2 {
-  width: 580px;
-  height: 580px;
-  border: 1.5px solid rgba(255, 143, 58, 0.24);
-  box-shadow: 0 0 35px rgba(255, 143, 58, 0.06);
-}
-
-.track-3d-3 {
-  width: 780px;
-  height: 780px;
-  border: 1px dashed rgba(255, 143, 58, 0.16);
-}
-
-body.light .track-3d-1 {
-  border-color: rgba(129, 45, 53, 0.24);
-  box-shadow: 0 0 20px rgba(129, 45, 53, 0.06);
-}
-
-body.light .track-3d-2 {
-  border-color: rgba(129, 45, 53, 0.2);
-  box-shadow: 0 0 25px rgba(129, 45, 53, 0.05);
-}
-
-body.light .track-3d-3 {
-  border-color: rgba(129, 45, 53, 0.14);
-}
-
-/* 4. Central Sun Logo - Upright 3D & Clean (شعار رُوح بدون ضوء مشتت خلفه) */
-.cosmic-sun-3d {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  /* Billboarded upright to directly face the camera */
-  transform: translate(-50%, -50%) rotateZ(8deg) rotateX(-62deg);
-  transform-style: preserve-3d;
-  width: 130px;
-  height: 130px;
-  z-index: 20;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.sun-core-3d {
-  position: relative;
-  width: 122px;
-  height: 122px;
-  border-radius: 50%;
-  background: var(--color-secondary-dark);
-  border: 2px solid rgba(255, 143, 58, 0.32);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
-  z-index: 3;
-}
-
-body.light .sun-core-3d {
-  background: #ffffff;
-  border-color: rgba(129, 45, 53, 0.22);
-  box-shadow: 0 16px 36px rgba(66, 44, 36, 0.12);
-}
-
-.cosmic-sun-3d:hover .sun-core-3d {
-  transform: scale(1.08);
-  border-color: var(--color-accent);
-}
-
-body.light .cosmic-sun-3d:hover .sun-core-3d {
-  border-color: var(--color-secondary);
-}
-
-.cosmic-sun-logo {
-  max-width: 82px;
-  max-height: 82px;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  transition: opacity .25s ease, transform .25s ease;
-}
-
-.sun-kicker-pill {
-  position: absolute;
-  top: calc(100% + 56px);
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 14px;
-  border-radius: 20px;
-  background: rgba(25, 41, 64, 0.92);
-  border: 1px solid rgba(255, 143, 58, 0.4);
-  color: var(--color-primary);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .08em;
-  white-space: nowrap;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(10px);
-  transition: all .25s ease;
-  pointer-events: none;
-}
-
-body.light .sun-kicker-pill {
-  background: rgba(255, 253, 251, 0.95);
-  border-color: rgba(129, 45, 53, 0.22);
-  color: var(--color-secondary);
-  box-shadow: 0 8px 22px rgba(66, 44, 36, 0.12);
-}
-
-.sun-kicker-spark {
-  color: var(--color-accent);
-  font-size: 10px;
-}
-
-body.light .sun-kicker-spark {
-  color: var(--color-secondary);
-}
-
-/* Brand name on the central sun — animated glow pulse + drift */
-.sun-brand-name {
-  position: absolute;
-  top: calc(100% + 14px);
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'IBM Plex Sans Arabic', 'DM Sans', serif;
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: -.04em;
-  color: var(--color-primary);
-  text-shadow: 0 0 14px rgba(255, 143, 58, .85), 0 0 30px rgba(255, 143, 58, .45), 0 2px 6px rgba(0, 0, 0, .6);
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 4;
-  animation: sunBrandPulse 2.6s ease-in-out infinite, sunBrandDrift 6s ease-in-out infinite alternate;
-}
-
-body.light .sun-brand-name {
-  color: var(--color-secondary);
-  text-shadow: 0 0 14px rgba(129, 45, 53, .55), 0 0 30px rgba(129, 45, 53, .28), 0 2px 6px rgba(255, 255, 255, .7);
-}
-
-@keyframes sunBrandPulse {
-  0%, 100% {
-    text-shadow: 0 0 12px rgba(255, 143, 58, .7), 0 0 26px rgba(255, 143, 58, .35), 0 2px 6px rgba(0, 0, 0, .55);
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    text-shadow: 0 0 22px rgba(255, 143, 58, 1), 0 0 46px rgba(255, 143, 58, .6), 0 2px 6px rgba(0, 0, 0, .6);
-    transform: translate(-50%, -50%) scale(1.06);
-  }
-}
-
-@keyframes sunBrandDrift {
-  0% {
-    transform: translate(-50%, -50%) translateX(-3px) translateY(-2px);
-  }
-  100% {
-    transform: translate(-50%, -50%) translateX(3px) translateY(2px);
-  }
-}
-
-/* 5. 3D Planets Stage & Orbiting Nodes */
-.cosmic-planets-stage-3d {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  transform-style: preserve-3d;
-}
-
-.cosmic-planet-3d {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 1px;
-  height: 1px;
-  transform-style: preserve-3d;
-  pointer-events: auto;
-  cursor: pointer;
-  will-change: transform;
-}
-
-/* Ground shadow lying flat on the 3D orbit plane */
-.planet-ground-shadow {
-  position: absolute;
-  width: 64px;
-  height: 34px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.55) 0%, transparent 72%);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  transition: transform .35s ease, opacity .35s ease;
-}
-
-body.light .planet-ground-shadow {
-  background: radial-gradient(ellipse, rgba(66, 44, 36, 0.3) 0%, transparent 72%);
-}
-
-/* Upright Billboarded Container facing the camera */
-.planet-billboard {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 120px;
-  height: 175px;
-  transform-origin: 50% 90%;
-  /* Billboarded upright to face camera perpendicular to the tilted plane */
-  transform: translate(-50%, -88%) rotateZ(8deg) rotateX(-62deg);
-  transform-style: preserve-3d;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  padding-bottom: 6px;
-  transition: transform .35s cubic-bezier(0.16, 1, 0.3, 1), opacity .35s ease, filter .35s ease;
-}
-
-.cosmic-planet-3d:hover .planet-billboard {
-  transform: translate(-50%, -98%) rotateZ(8deg) rotateX(-62deg) scale(1.1);
-}
-
-.cosmic-planet-3d:hover .planet-ground-shadow {
-  transform: translate(-50%, -50%) scale(0.85);
-  opacity: 0.7;
-}
-
-/* Planetary atmosphere glow */
-.planet-atmosphere-3d {
-  position: absolute;
-  width: 105px;
-  height: 105px;
-  top: 18px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--atm-color, var(--color-accent)) 0%, transparent 72%);
-  opacity: 0.35;
-  filter: blur(12px);
-  pointer-events: none;
-  transition: opacity .35s ease, transform .35s ease;
-}
-
-.cosmic-planet-3d:hover .planet-atmosphere-3d {
-  opacity: 0.65;
-  transform: scale(1.25);
-}
-
-/* Perfume Bottle Inside Planet */
-.planet-bottle-wrap-3d {
-  position: relative;
-  z-index: 2;
-  height: 120px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.planet-bottle-img-3d {
-  max-height: 115px;
-  max-width: 82px;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.55));
-  transition: transform .35s ease, filter .35s ease;
-  animation: planetHoverFloat 5s ease-in-out infinite alternate;
-}
-
-body.light .planet-bottle-img-3d {
-  filter: drop-shadow(0 14px 22px rgba(66, 44, 36, 0.28));
-}
-
-.cosmic-planet-3d:hover .planet-bottle-img-3d {
-  filter: drop-shadow(0 18px 28px rgba(255, 143, 58, 0.45));
-}
-
-@keyframes planetHoverFloat {
-  0% { transform: translateY(0px); }
-  100% { transform: translateY(-6px); }
-}
-
-/* Floating Planet Label Tag */
-.planet-tag-3d {
-  position: relative;
-  z-index: 3;
-  margin-top: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 12px;
-  background: rgba(25, 41, 64, 0.92);
-  border: 1px solid rgba(255, 143, 58, 0.35);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(8px);
-  white-space: nowrap;
-  max-width: 110px;
-  transition: all .25s ease;
-}
-
-body.light .planet-tag-3d {
-  background: rgba(255, 253, 251, 0.95);
-  border-color: rgba(129, 45, 53, 0.22);
-  box-shadow: 0 6px 16px rgba(66, 44, 36, 0.12);
-}
-
-.planet-name {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--ink);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 95px;
-}
-
-.planet-price {
-  font-size: 9.5px;
-  color: var(--accent);
-  font-weight: 500;
-}
-
-.planet-inspect-hint {
-  position: absolute;
-  top: -24px;
-  opacity: 0;
-  transform: translateY(4px);
-  font-size: 9px;
-  color: var(--color-accent);
-  background: rgba(17, 29, 46, 0.94);
-  border: 1px solid rgba(255, 143, 58, 0.4);
-  padding: 2px 8px;
-  border-radius: 10px;
-  white-space: nowrap;
-  pointer-events: none;
-  transition: all .25s ease;
-  z-index: 10;
-}
-
-body.light .planet-inspect-hint {
-  color: var(--color-secondary);
-  background: rgba(255, 253, 251, 0.95);
-  border-color: rgba(129, 45, 53, 0.3);
-}
-
-.cosmic-planet-3d:hover .planet-inspect-hint {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Planet Dimmed & Focused States in 3D */
-.cosmic-planet-3d.planet-dimmed .planet-billboard {
-  opacity: 0.16 !important;
-  filter: blur(1.5px) grayscale(0.4);
-  pointer-events: none;
-}
-.cosmic-planet-3d.planet-dimmed .planet-ground-shadow {
-  opacity: 0.15 !important;
-}
-
-.cosmic-planet-3d.planet-focused {
-  z-index: 45 !important;
-}
-
-.cosmic-planet-3d.planet-focused .planet-billboard {
-  opacity: 1 !important;
-  transform: translate(-50%, -95%) rotateZ(8deg) rotateX(-62deg) scale(1.3) translateY(-20px);
-}
-
-.cosmic-planet-3d.planet-focused .planet-atmosphere-3d {
-  opacity: 0.85;
-  transform: scale(1.6);
-}
-
-.cosmic-planet-3d.planet-focused .planet-bottle-img-3d {
-  filter: drop-shadow(0 24px 38px rgba(255, 143, 58, 0.55));
-}
-
-/* Dim background 3D scene when inspecting */
-.cosmic-solar-universe.inspecting .cosmic-3d-scene {
-  opacity: 0.04 !important;
-  filter: blur(10px) !important;
-  transform: scale(0.92);
-  pointer-events: none !important;
-  transition: all .35s ease;
-}
-
-/* Inspector Backdrop */
-.cosmic-inspector-backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: 45;
-  background: rgba(11, 19, 32, 0.65);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  animation: fadeIn 0.25s ease forwards;
-  cursor: pointer;
-}
-body.light .cosmic-inspector-backdrop {
-  background: rgba(245, 240, 235, 0.75);
-}
-
-/* 6. Cosmic Inspector Card HUD (بطاقة فحص النوتات العطرية) */
-.cosmic-inspector-card {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 80;
-  width: 400px;
-  max-width: calc(100vw - 32px);
-  max-height: calc(100% - 40px);
-  max-height: min(580px, calc(100% - 30px));
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: #ffffff !important;
-  border: 1px solid rgba(129, 45, 53, 0.22) !important;
-  border-radius: 24px;
-  padding: 22px 24px 20px;
-  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.35) !important;
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  color: var(--color-secondary) !important;
-  animation: inspectorSlideIn .35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  pointer-events: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(129, 45, 53, 0.25) transparent;
-}
-.cosmic-inspector-card::-webkit-scrollbar {
-  width: 5px;
-}
-.cosmic-inspector-card::-webkit-scrollbar-track {
-  background: transparent;
-}
-.cosmic-inspector-card::-webkit-scrollbar-thumb {
-  background: rgba(129, 45, 53, 0.2);
-  border-radius: 4px;
-}
-
-body.light .cosmic-inspector-card {
-  background: #ffffff !important;
-  border-color: rgba(129, 45, 53, 0.22) !important;
-  box-shadow: 0 25px 65px rgba(66, 44, 36, 0.16) !important;
-  color: var(--color-secondary) !important;
-}
-
-@keyframes inspectorSlideIn {
-  from { opacity: 0; transform: scale(0.96) translateY(calc(-50% + 14px)); }
-  to { opacity: 1; transform: scale(1) translateY(-50%); }
-}
-
-/* Inspector Header */
-.inspector-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--line);
-}
-
-.inspector-header-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-  min-width: 0;
-}
-
-.inspector-prod-thumb {
-  width: 48px;
-  height: 58px;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
-  flex-shrink: 0;
-  border-radius: 8px;
-}
-body.light .inspector-prod-thumb {
-  filter: drop-shadow(0 4px 10px rgba(66, 44, 36, 0.18));
-}
-
-.inspector-badges-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.inspector-pill-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 12px;
-  background: rgba(255, 143, 58, 0.18);
-  color: var(--color-accent);
-  border: 1px solid rgba(255, 143, 58, 0.35);
-}
-
-body.light .inspector-pill-badge {
-  background: rgba(129, 45, 53, 0.1);
-  color: var(--color-secondary);
-  border-color: rgba(129, 45, 53, 0.25);
-}
-
-.inspector-pill-badge.sale-badge {
-  background: var(--color-accent);
-  color: var(--color-secondary);
-  border-color: var(--color-accent);
-  font-weight: 700;
-}
-
-.btn-inspector-close {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--line);
-  color: var(--ink);
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all .2s ease;
-}
-
-.btn-inspector-close:hover {
-  background: var(--color-accent);
-  color: var(--color-secondary);
-  border-color: var(--color-accent);
-  transform: rotate(90deg);
-}
-
-/* Inspector Body */
-.inspector-title-wrap {
-  margin-bottom: 14px;
-}
-
-.inspector-perfume-name {
-  font-size: 21px;
-  font-weight: 700;
-  margin: 0 0 4px;
-  color: var(--ink);
-  line-height: 1.25;
-}
-
-.inspector-inspired-tag {
-  font-size: 11px;
-  color: var(--accent);
-  font-style: italic;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Scent DNA Pyramid Breakdown (نوتات العطر) */
-.inspector-notes-pyramid {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  margin: 14px 0 16px;
-  background: rgba(0, 0, 0, 0.18);
-  border-radius: 16px;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-}
-
-body.light .inspector-notes-pyramid {
-  background: rgba(25, 41, 64, 0.04);
-}
-
-.inspector-note-box {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.note-phase-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-width: 90px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.note-phase-icon {
-  font-size: 12px;
-}
-
-.note-pills-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  flex: 1;
-}
-
-.scent-note-chip {
-  font-size: 10.5px;
-  padding: 2px 8px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: var(--ink);
-  white-space: nowrap;
-}
-
-body.light .scent-note-chip {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(25, 41, 64, 0.14);
-}
-
-.note-box-top .note-phase-badge { color: var(--color-accent); }
-.note-box-heart .note-phase-badge { color: var(--color-accent-light); }
-.note-box-base .note-phase-badge { color: var(--color-accent-light); }
-
-body.light .note-box-top .note-phase-badge { color: var(--color-secondary); }
-body.light .note-box-heart .note-phase-badge { color: var(--color-accent-dark); }
-body.light .note-box-base .note-phase-badge { color: var(--color-secondary); }
-
-/* Inspector Actions & Price */
-.inspector-footer-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-}
-
-.inspector-price-col {
-  display: flex;
-  flex-direction: column;
-}
-
-.inspector-current-price {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.inspector-orig-price {
-  font-size: 11px;
-  opacity: 0.6;
-  text-decoration: line-through;
-}
-
-.inspector-btn-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-cosmic-explore {
-  padding: 8px 14px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--line);
-  color: var(--ink);
-  font-size: 11.5px;
-  cursor: pointer;
-  transition: all .25s ease;
-  white-space: nowrap;
-}
-
-.btn-cosmic-explore:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-}
-
-body.light .btn-cosmic-explore:hover {
-  border-color: var(--color-secondary);
-  color: var(--color-secondary);
-}
-
-.btn-cosmic-quickadd {
-  padding: 8px 16px;
-  border-radius: 12px;
-  background: var(--color-accent);
-  color: var(--color-secondary);
-  border: 1px solid var(--color-accent);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .25s ease;
-  white-space: nowrap;
-}
-
-.btn-cosmic-quickadd:hover {
-  background: var(--color-accent-light);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 143, 58, 0.45);
-}
-
-/* 7. Inspector Countdown Timer HUD (لمدة معينة من زمن) */
-.inspector-timer-hud {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid var(--line);
-}
-
-body.light .inspector-timer-hud {
-  background: rgba(25, 41, 64, 0.05);
-}
-
-.timer-hud-info {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 10.5px;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.timer-countdown-num {
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.cosmic-timer-track {
-  flex: 1;
-  height: 4px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.15);
-  overflow: hidden;
-  position: relative;
-}
-
-body.light .cosmic-timer-track {
-  background: rgba(25, 41, 64, 0.15);
-}
-
-.cosmic-timer-bar {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light));
-  border-radius: 4px;
-  transition: width 0.05s linear;
-}
-
-body.light .cosmic-timer-bar {
-  background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
-}
-
-.btn-timer-hold {
-  background: none;
-  border: 0;
-  color: var(--muted);
-  font-size: 12px;
-  cursor: pointer;
-  padding: 2px 4px;
-  transition: color .2s ease;
-}
-
-.btn-timer-hold:hover {
-  color: var(--ink);
-}
-
-/* 8. Bottom Cosmic Controls Bar */
-.cosmic-controls-bar {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100 !important;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-  justify-content: center;
-  max-width: 95%;
-  pointer-events: auto !important;
-}
-
-.btn-orbit-control {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
-  border-radius: 20px;
-  background: #ffffff;
-  border: 1.5px solid rgba(75, 90, 60, 0.25);
-  color: var(--color-secondary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  pointer-events: auto !important;
-  position: relative;
-  z-index: 105 !important;
-  box-shadow: 0 4px 14px rgba(75, 90, 60, 0.12);
-  backdrop-filter: blur(10px);
-  transition: all .25s ease;
-  white-space: nowrap;
-  user-select: none;
-  touch-action: manipulation;
-}
-.btn-orbit-control * {
-  pointer-events: none;
-}
-
-body.light .btn-orbit-control {
-  background: #ffffff;
-  border-color: rgba(75, 90, 60, 0.25);
-  color: var(--color-secondary);
-  box-shadow: 0 4px 14px rgba(75, 90, 60, 0.12);
-}
-
-.btn-orbit-control:hover {
-  background: var(--color-secondary);
-  color: #ffffff;
-  border-color: var(--color-secondary);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(75, 90, 60, 0.2);
-}
-
-.cosmic-planet-pills {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.cosmic-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
-  border-radius: 16px;
-  background: rgba(25, 41, 64, 0.75);
-  border: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 10.5px;
-  cursor: pointer;
-  transition: all .2s ease;
-  backdrop-filter: blur(8px);
-}
-
-body.light .cosmic-pill-btn {
-  background: rgba(255, 253, 251, 0.82);
-  color: var(--muted);
-}
-
-.cosmic-pill-btn:hover,
-.cosmic-pill-btn.active {
-  background: rgba(255, 143, 58, 0.25);
-  border-color: var(--color-accent);
-  color: var(--ink);
-  transform: translateY(-2px);
-}
-
-body.light .cosmic-pill-btn:hover,
-body.light .cosmic-pill-btn.active {
-  background: rgba(129, 45, 53, 0.12);
-  border-color: var(--color-secondary);
-  color: var(--color-secondary);
-}
-
-/* ==========================================================================
-   Responsive Adaptations for 3D Cosmic Solar System
-   ========================================================================== */
-
-@media (max-width: 900px) {
-  .cosmic-solar-universe {
-    min-height: 530px;
-  }
-  .cosmic-3d-disc {
-    width: 500px;
-    height: 500px;
-    transform: rotateX(55deg) rotateZ(-5deg);
-  }
-  .track-3d-1 { width: 250px; height: 250px; }
-  .track-3d-2 { width: 375px; height: 375px; }
-  .track-3d-3 { width: 500px; height: 500px; }
-  .sun-core-3d { width: 92px; height: 92px; }
-  .cosmic-sun-logo { max-width: 60px; max-height: 60px; }
-  .sun-brand-name { font-size: 20px; }
-  .planet-billboard { width: 84px; height: 125px; }
-  .planet-bottle-img-3d { max-height: 75px; }
-  .planet-tag-3d { padding: 2px 5px; font-size: 8.5px; }
-  .planet-name { font-size: 8.5px; max-width: 64px; }
-  .planet-price { font-size: 8px; }
-  .cosmic-inspector-card { width: 340px; padding: 18px 20px 14px; }
-}
-
-@media (max-width: 600px) {
-  .cosmic-solar-universe {
-    min-height: 480px;
-    border-radius: 20px;
-    perspective: 800px;
-    overflow: hidden;
-  }
-  .cosmic-3d-disc {
-    width: 370px;
-    height: 370px;
-    max-width: 98vw;
-    transform: rotateX(46deg) rotateZ(-3deg);
-  }
-  .track-3d-1 { width: 170px; height: 170px; }
-  .track-3d-2 { width: 270px; height: 270px; }
-  .track-3d-3 { width: 370px; height: 370px; }
-  .sun-core-3d { width: 72px; height: 72px; }
-  .cosmic-sun-logo { max-width: 48px; max-height: 48px; }
-  .sun-brand-name { font-size: 15px; }
-  .sun-kicker-pill { font-size: 8px; padding: 2.5px 8px; margin-top: 3px; }
-  .planet-billboard { width: 70px; height: 110px; }
-  .planet-bottle-img-3d { max-height: 64px; }
-  .planet-tag-3d { padding: 2px 5px; font-size: 8px; border-radius: 6px; }
-  .planet-name { font-size: 8.5px; max-width: 62px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .planet-price { font-size: 8px; }
-  .planet-ground-shadow { width: 44px; height: 10px; }
-  .planet-atmosphere-3d { width: 74px; height: 74px; }
-
-  .cosmic-solar-universe.inspecting .cosmic-3d-scene {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-  }
-
-  .cosmic-inspector-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 998;
-    background: rgba(15, 23, 42, 0.72) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-  body.light .cosmic-inspector-backdrop {
-    background: rgba(15, 23, 42, 0.65) !important;
-  }
-
-  .cosmic-inspector-card {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    max-width: 100%;
-    z-index: 999;
-    padding: 16px 18px 32px;
-    border-radius: 22px 22px 0 0;
-    border-bottom: none;
-    border-left: none;
-    border-right: none;
-    background: #ffffff !important;
-    color: var(--color-secondary) !important;
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.45);
-    max-height: 80vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  body.light .cosmic-inspector-card {
-    background: #ffffff !important;
-    border-color: rgba(129, 45, 53, 0.18);
-    box-shadow: 0 -10px 40px rgba(66, 44, 36, 0.18);
-  }
-  .inspector-header {
-    margin-bottom: 10px;
-    padding-bottom: 8px;
-  }
-  .inspector-prod-thumb {
-    width: 44px;
-    height: 52px;
-  }
-  .inspector-perfume-name {
-    font-size: 16px;
-  }
-  .inspector-inspired-tag {
-    font-size: 10.5px;
-  }
-  .inspector-notes-pyramid {
-    margin: 8px 0 10px;
-    padding: 8px 10px;
-    gap: 6px;
-  }
-  .note-phase-badge {
-    min-width: 70px;
-    font-size: 8.5px;
-  }
-  .scent-note-chip {
-    font-size: 9px;
-    padding: 1px 5px;
-  }
-  .inspector-footer-bar {
-    gap: 10px;
-    padding-bottom: env(safe-area-inset-bottom, 8px);
-  }
-  .inspector-current-price {
-    font-size: 16px;
-  }
-  .inspector-btn-group {
-    gap: 6px;
-  }
-  .btn-cosmic-explore, .btn-cosmic-quickadd {
-    padding: 7px 11px;
-    font-size: 11px;
-  }
-  .cosmic-planet-pills { display: none; }
-  .cosmic-controls-bar {
-    z-index: 40;
-    pointer-events: auto;
-  }
-  .btn-orbit-control {
-    pointer-events: auto;
-    position: relative;
-    z-index: 42;
-  }
-}
-
 /* ==========================================================
    Gift Boxes & Custom Gift Builder Styling
    ========================================================== */
@@ -5772,18 +4650,429 @@ body.light .cart-custom-box-card strong {
 }
 
 /* Performance optimizations */
-.cosmic-planet-3d {
+.hero-bottle-float-wrap {
   will-change: transform;
   backface-visibility: hidden;
 }
-.planet-billboard {
+.hero-bg-watermark {
   will-change: transform;
-  backface-visibility: hidden;
-}
-.cosmic-3d-scene {
-  contain: layout paint;
 }
 .product-card {
   content-visibility: auto;
   contain-intrinsic-size: 320px;
+}
+
+/* ==========================================================================
+   3D SINGLE FEATURED PERFUME SHOWCASE (الواجهة الملكية ثلاثية الأبعاد)
+   Matches the exact site color palette: --color-primary, --color-secondary, --color-accent
+   ========================================================================== */
+
+.hero.hero-fullwidth {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: calc(100vh - 116px);
+  margin: 0 !important;
+  padding: 30px 40px 60px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse 75% 65% at 50% 46%, rgba(255, 143, 58, 0.15) 0%, rgba(245, 239, 230, 0.65) 50%, var(--color-primary) 100%);
+}
+
+.hero-fullwidth .hero-art {
+  width: 100% !important;
+  max-width: 1300px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.hero-3d-showcase {
+  position: relative;
+  width: 100%;
+  min-height: 540px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+/* Giant High-Fashion Watermark Typography Behind the Bottle */
+.hero-bg-watermark {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', serif;
+  font-size: clamp(65px, 16vw, 210px);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: rgba(75, 90, 60, 0.08);
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+  line-height: 1;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+/* Ambient Particles */
+.hero-ambient-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero-ambient-particles .h-particle {
+  position: absolute;
+  color: var(--color-accent);
+  opacity: 0.45;
+  animation: heroParticleFloat 6s ease-in-out infinite alternate;
+}
+
+.h-particle.p-1 { top: 18%; right: 16%; font-size: 20px; animation-delay: 0s; }
+.h-particle.p-2 { top: 62%; right: 22%; font-size: 15px; animation-delay: 1.5s; }
+.h-particle.p-3 { top: 25%; left: 18%; font-size: 28px; animation-delay: 2.5s; }
+.h-particle.p-4 { top: 70%; left: 15%; font-size: 18px; animation-delay: 3.5s; }
+.h-particle.p-5 { top: 40%; left: 28%; font-size: 22px; animation-delay: 4.5s; }
+
+@keyframes heroParticleFloat {
+  0% { transform: translateY(0) scale(0.9); opacity: 0.3; }
+  100% { transform: translateY(-16px) scale(1.15); opacity: 0.7; }
+}
+
+/* 3D Floating Bottle Stage */
+.hero-bottle-center-stage {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+  min-height: 420px;
+  padding: 20px 0;
+}
+
+.hero-aura-glow {
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 143, 58, 0.22) 0%, rgba(75, 90, 60, 0.08) 55%, transparent 75%);
+  filter: blur(30px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.hero-bottle-float-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  will-change: transform;
+  animation: heroBottleBreathing 6s ease-in-out infinite;
+}
+
+.hero-bottle-contact-shadow {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 20px;
+  background: radial-gradient(ellipse at center, rgba(75, 90, 60, 0.38) 0%, transparent 72%);
+  border-radius: 50%;
+  filter: blur(7px);
+  animation: heroShadowBreathing 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-bottle-3d-link {
+  display: block;
+  cursor: pointer;
+  z-index: 3;
+  text-decoration: none;
+}
+
+.hero-bottle-3d-img {
+  max-height: clamp(280px, 42vh, 440px);
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 25px 35px rgba(75, 90, 60, 0.28));
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.hero-bottle-3d-link:hover .hero-bottle-3d-img {
+  transform: scale(1.05) translateY(-6px);
+  filter: drop-shadow(0 32px 48px rgba(255, 143, 58, 0.35)) drop-shadow(0 15px 25px rgba(75, 90, 60, 0.3));
+}
+
+@keyframes heroBottleBreathing {
+  0%, 100% {
+    transform: translateY(0px) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(-18px) rotate(1.5deg);
+  }
+}
+
+@keyframes heroShadowBreathing {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateX(-50%) scale(0.82);
+    opacity: 0.25;
+  }
+}
+
+/* Floating Product Info HUD Card */
+.hero-info-hud {
+  position: relative;
+  z-index: 4;
+  margin-top: 10px;
+  background: rgba(255, 253, 248, 0.90);
+  backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(75, 90, 60, 0.14);
+  border-radius: 24px;
+  padding: 24px 32px;
+  box-shadow: 0 18px 50px rgba(75, 90, 60, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  max-width: 650px;
+  width: 92%;
+  transition: all .3s ease;
+}
+
+.hero-info-hud:hover {
+  box-shadow: 0 22px 60px rgba(75, 90, 60, 0.18);
+  border-color: rgba(255, 143, 58, 0.35);
+}
+
+.hero-hud-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hero-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 143, 58, 0.14);
+  border: 1px solid rgba(255, 143, 58, 0.35);
+  color: var(--color-accent);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.hero-gender-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(75, 90, 60, 0.08);
+  color: var(--color-secondary);
+}
+
+.hero-product-title {
+  font-size: clamp(24px, 3.2vw, 36px);
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-secondary);
+  line-height: 1.25;
+}
+
+.hero-product-title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.hero-product-title a:hover {
+  color: var(--color-accent);
+}
+
+.hero-inspired-by {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.hero-inspired-by strong {
+  color: var(--color-secondary);
+}
+
+.hero-notes-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.hero-note-chip {
+  font-size: 11px;
+  padding: 4px 11px;
+  border-radius: 12px;
+  background: rgba(75, 90, 60, 0.08);
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+.hero-pricing-cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(75, 90, 60, 0.1);
+}
+
+.hero-price-block {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.hero-price-current {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-secondary);
+}
+
+.hero-price-original {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.hero-sale-badge {
+  font-size: 11px;
+  color: #10b981;
+  font-weight: 700;
+}
+
+.hero-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-hero-explore {
+  padding: 10px 22px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  background: var(--color-accent) !important;
+  color: var(--color-secondary) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 16px rgba(255, 143, 58, 0.3);
+}
+
+.btn-hero-explore:hover {
+  background: var(--color-accent-light) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(255, 143, 58, 0.4);
+}
+
+.btn-hero-quickadd {
+  padding: 10px 20px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  background: #ffffff !important;
+  border: 1.5px solid var(--color-secondary) !important;
+  color: var(--color-secondary) !important;
+  border-radius: 14px !important;
+  cursor: pointer;
+  transition: all .25s ease;
+}
+
+.btn-hero-quickadd:hover {
+  background: rgba(255, 143, 58, 0.12) !important;
+  border-color: var(--color-accent) !important;
+  color: var(--color-accent) !important;
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .hero.hero-fullwidth {
+    padding: 20px 20px 50px !important;
+    min-height: auto;
+  }
+  .hero-3d-showcase {
+    min-height: 480px;
+  }
+  .hero-bottle-center-stage {
+    min-height: 350px;
+  }
+  .hero-info-hud {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero.hero-fullwidth {
+    padding: 16px 12px 40px !important;
+  }
+  .hero-bg-watermark {
+    font-size: clamp(50px, 18vw, 90px);
+    top: 38%;
+  }
+  .hero-bottle-center-stage {
+    min-height: 300px;
+    padding: 10px 0;
+  }
+  .hero-bottle-3d-img {
+    max-height: 270px;
+  }
+  .hero-aura-glow {
+    width: 250px;
+    height: 250px;
+  }
+  .hero-info-hud {
+    padding: 18px 16px;
+    border-radius: 20px;
+    width: 96%;
+  }
+  .hero-product-title {
+    font-size: 20px;
+  }
+  .hero-pricing-cta-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .hero-buttons-group {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .btn-hero-explore, .btn-hero-quickadd {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+  }
 }
