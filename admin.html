@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="admin.css">
 </head>
 <body class="light">
-  <aside class="admin-sidebar"><a href="index.html" class="admin-logo"><img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></a><div class="side-label">القائمة الرئيسية</div><a class="side-link selected" href="#overview"><span>◫</span> نظرة عامة</a><a class="side-link" href="#products-panel"><span>🧴</span> إدارة العطور <b id="prodBadge">٠</b></a><a class="side-link" href="#brands-panel"><span>🏷️</span> إدارة البراندات <b id="brandBadge">٠</b></a><a class="side-link" href="#orders"><span>▤</span> الطلبات <b id="orderBadge">٠</b></a><a class="side-link" href="#inventory-panel"><span>📦</span> إدارة المخزون <b id="inventoryBadge">٠</b></a><a class="side-link" href="#sales-panel"><span>📊</span> تقارير المبيعات والأرباح</a><a class="side-link" href="#traffic-panel"><span>📈</span> تحليلات الزيارات <b id="trafficBadge">٠</b></a><a class="side-link" href="index.html#collection"><span>✳</span> متجر رُوح</a><div class="sidebar-bottom"><span class="admin-avatar">ر</span><span><strong>فريق رُوح</strong><small>مساحة الإدارة</small></span></div></aside>
+  <aside class="admin-sidebar"><a href="index.html" class="admin-logo"><img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></a><div class="side-label">القائمة الرئيسية</div><a class="side-link selected" href="#overview"><span>◫</span> نظرة عامة</a><a class="side-link" href="#products-panel"><span>🧴</span> إدارة العطور <b id="prodBadge">٠</b></a><a class="side-link" href="#brands-panel"><span>🏷️</span> إدارة البراندات <b id="brandBadge">٠</b></a><a class="side-link" href="#orders"><span>▤</span> الطلبات <b id="orderBadge">٠</b></a><a class="side-link" href="#inventory-panel"><span>📦</span> إدارة المخزون <b id="inventoryBadge">٠</b></a><a class="side-link" href="#campaign"><span>✨</span> عطر اليوم والخصومات</a><a class="side-link" href="#sales-panel"><span>📊</span> تقارير المبيعات والأرباح</a><a class="side-link" href="#traffic-panel"><span>📈</span> تحليلات الزيارات <b id="trafficBadge">٠</b></a><a class="side-link" href="index.html#collection"><span>✳</span> متجر رُوح</a><div class="sidebar-bottom"><span class="admin-avatar">ر</span><span><strong>فريق رُوح</strong><small>مساحة الإدارة</small></span></div></aside>
   <main class="admin-main" id="overview">
     <header class="admin-topbar">
       <div><span class="crumb">رُوح /</span> <span id="adminTopTitle">نظرة عامة</span></div>
@@ -102,6 +102,112 @@
     </section>
 
     
+        <section class="campaign-panel" id="campaign">
+      <div class="panel-heading">
+        <div>
+          <p class="admin-kicker">إدارة العروض وقسم حكايتنا</p>
+          <h2>عطر اليوم والخصومات</h2>
+        </div>
+        <span class="local-label">تحكم فوري بالعروض</span>
+      </div>
+      <div class="campaign-body">
+        <form id="campaignForm">
+          <!-- 1. عطر اليوم والعرض المميز (قسم حكايتنا) -->
+          <div class="campaign-fieldset" style="border: 1px solid var(--admin-line); border-radius: 12px; padding: 18px; margin-bottom: 20px; background: rgba(255,255,255,0.02);">
+            <h3 style="font-size: 14px; margin: 0 0 12px; color: var(--admin-accent); display: flex; align-items: center; gap: 8px;">
+              <span>🌟</span> عطر اليوم والعرض المميز (قسم حكايتنا)
+            </h3>
+            
+            <label style="margin-bottom: 12px;">اختر عطر اليوم المميز
+              <select id="spotlightPerfumeSelect" name="spotlight_perfume_id" style="width: 100%; padding: 10px 12px; background: var(--admin-surface); border: 1px solid var(--admin-line); border-radius: 8px; color: var(--admin-ink); font-size: 13px;">
+                <option value="">-- تلقائي (أول عطر متاح بالمتجر) --</option>
+              </select>
+            </label>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <label>شارة العرض (Badge)
+                <input id="spotlightBadgeInput" name="spotlight_badge" maxlength="40" placeholder="مثال: ✨ مختاراتنا اليوم أو خصم ٢٥٪">
+              </label>
+              <label>سعر العرض الخاص <span>(ج.م)</span>
+                <input id="spotlightPriceInput" name="spotlight_price" type="number" min="0" placeholder="اتركه فارغاً لاعتماد السعر الأصلي">
+              </label>
+            </div>
+
+            <label style="margin-bottom: 12px;">عنوان مخصص للعرض <span>(اختياري)</span>
+              <input id="spotlightTitleInput" name="spotlight_title" maxlength="100" placeholder="مثال: عطر اليوم · نفحات تأسر حواسك">
+            </label>
+
+            <label style="margin-bottom: 12px;">وصف أو قصة العطر <span>(اختياري)</span>
+              <textarea id="spotlightDescInput" name="spotlight_desc" rows="2" maxlength="240" placeholder="اتركه فارغاً لاعتماد قصة رُوح الافتراضية أو وصف العطر"></textarea>
+            </label>
+
+            <label class="campaign-active" style="margin: 0;">
+              <input id="spotlightActiveInput" type="checkbox" checked>
+              <span>تفعيل وإبراز عطر اليوم والعرض في قسم حكايتنا</span>
+            </label>
+          </div>
+
+          <!-- 2. نظام الخصومات والعروض الشاملة على المتجر -->
+          <div class="campaign-fieldset" style="border: 1px solid var(--admin-line); border-radius: 12px; padding: 18px; margin-bottom: 20px; background: rgba(245, 165, 173, 0.03);">
+            <h3 style="font-size: 14px; margin: 0 0 12px; color: var(--admin-accent); display: flex; align-items: center; gap: 8px;">
+              <span>🏷️</span> نظام الخصومات والعروض الشاملة على المتجر
+            </h3>
+            
+            <label class="campaign-active" style="margin-bottom: 14px;">
+              <input id="storewideDiscountActive" type="checkbox">
+              <strong style="color:var(--admin-ink);">تفعيل خصم شامل على عطور المتجر</strong>
+            </label>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <label>نسبة الخصم العام (%)
+                <input id="storewideDiscountPercent" type="number" min="1" max="90" placeholder="مثال: 20">
+              </label>
+              <label>نطاق تطبيق الخصم
+                <select id="storewideDiscountScope" style="width: 100%; padding: 10px 12px; background: var(--admin-surface); border: 1px solid var(--admin-line); border-radius: 8px; color: var(--admin-ink); font-size: 13px;">
+                  <option value="all">تطبيق على جميع العطور بلا استثناء</option>
+                  <option value="only_no_custom" selected>فقط العطور التي ليس لها خصم خاص</option>
+                </select>
+              </label>
+            </div>
+
+            <label style="margin-bottom: 14px;">شارة الخصم العامة (Badge)
+              <input id="storewideDiscountBadge" maxlength="40" placeholder="مثال: عرض خاص 🔥 أو خصم ٢٠٪">
+            </label>
+
+            <div style="padding-top: 12px; border-top: 1px dashed var(--admin-line); margin-top: 10px;">
+              <small style="display:block; color:var(--admin-muted); font-size:11px; margin-bottom:8px;">إجراءات سريعة للتعديل المباشر على أسعار كافة العطور في قاعدة البيانات:</small>
+              <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                <button type="button" class="button button-outline" id="btnApplyBulkDiscount" style="font-size:12px; padding:6px 14px; border-color:var(--pink); color:var(--admin-ink);">⚡ تطبيق الخصم فورياً على أسعار كل العطور</button>
+                <button type="button" class="button button-outline" id="btnRemoveBulkDiscounts" style="font-size:12px; padding:6px 14px; opacity:0.8;">🔄 إزالة كافة الخصومات وإرجاع الأسعار الأصلية</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="campaign-actions">
+            <button class="button button-primary" type="submit" id="saveCampaignBtn">حفظ ونشر التعديلات فوراً <span>←</span></button>
+            <p id="campaignStatus" role="status"></p>
+          </div>
+        </form>
+
+        <div class="campaign-preview">
+          <span>معاينة حية لعطر اليوم</span>
+          <!-- Spotlight Preview -->
+          <small style="display:block; margin-bottom:6px; color:var(--admin-muted); font-size:11px;">عطر اليوم في قسم حكايتنا:</small>
+          <div class="campaign-preview-card" id="spotlightPreviewCard" style="display:flex; gap:12px; align-items:center;">
+            <div id="spotlightPreviewImgWrap" style="width:52px; height:52px; border-radius:8px; background:rgba(255,255,255,0.04); border:1px solid var(--admin-line); display:grid; place-items:center; overflow:hidden; flex-shrink:0;">
+              <img id="spotlightPreviewImg" src="assets/bottles/coral-orange.png" style="max-width:100%; max-height:100%; object-fit:contain;" alt="">
+            </div>
+            <div style="flex:1;">
+              <span id="spotlightPreviewBadge" style="display:inline-block; font-size:9px; background:var(--pink); color:var(--navy); padding:2px 7px; border-radius:10px; font-weight:700; margin-bottom:3px;">✨ مختاراتنا اليوم</span>
+              <strong id="spotlightPreviewName" style="display:block; font-size:13px;">بلو دايموند</strong>
+              <small id="spotlightPreviewPrice" style="color:var(--admin-accent); font-size:11px; font-weight:600;"></small>
+            </div>
+          </div>
+          <small class="preview-note">تنعكس التعديلات مباشرة على المتجر للعملاء فور الحفظ.</small>
+        </div>
+      </div>
+    </section>
+
     <section class="orders-panel" id="orders">
       <div class="panel-heading">
         <div>

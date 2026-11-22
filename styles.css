@@ -5131,25 +5131,37 @@ body.hero-modal-open {
   .hero.hero-fullwidth {
     padding: 16px 12px 40px !important;
   }
+  .hero-bg-watermark {
+    top: 22% !important;
+    max-width: 96vw !important;
+    color: rgba(255, 143, 58, 0.42) !important;
+    -webkit-text-stroke: 1.8px rgba(255, 143, 58, 0.85) !important;
+    text-shadow: 0 4px 28px rgba(255, 143, 58, 0.3) !important;
+  }
   .hero-bg-watermark.single-word {
-    font-size: clamp(38px, 12vw, 70px);
-    top: 38%;
+    font-size: clamp(48px, 14.5vw, 76px) !important;
+    letter-spacing: clamp(0.12em, 2.8vw, 0.22em) !important;
+    top: 22% !important;
   }
   .hero-bg-watermark.multi-word {
-    font-size: clamp(26px, 8.2vw, 46px);
-    top: 38%;
-    line-height: 0.88;
+    font-size: clamp(32px, 9.8vw, 50px) !important;
+    letter-spacing: clamp(0.08em, 1.8vw, 0.16em) !important;
+    top: 20% !important;
+    line-height: 0.9;
   }
   .hero-bottle-center-stage {
-    min-height: 300px;
-    padding: 10px 0;
+    min-height: 320px;
+    padding: 10px 0 4px;
   }
   .hero-bottle-3d-img {
-    max-height: 270px;
+    max-height: 235px;
+    max-width: 68vw;
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.28));
   }
   .hero-aura-glow {
     width: 250px;
     height: 250px;
+    top: 48%;
   }
   .hero-info-hud {
     padding: 18px 16px;

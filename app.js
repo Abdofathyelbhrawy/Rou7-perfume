@@ -1811,8 +1811,8 @@
           </div>
 
           <!-- Interactive Trigger Button -->
-          <button type="button" class="hero-bottle-trigger-btn" id="heroBottleTriggerBtn" aria-label="${isAr ? 'عرض تفاصيل العطر' : 'Show Fragrance Details'}">
-            <span>${isAr ? 'اضغط لاكتشاف العطر' : 'Tap to Discover Scent'}</span>
+          <button type="button" class="hero-bottle-trigger-btn" id="heroBottleTriggerBtn" aria-label="${isAr ? `عرض تفاصيل عطر ${safeName}` : `Show Fragrance Details for ${safeName}`}">
+            <span>${isAr ? `اضغط لاكتشاف عطر ${safeName}` : `Discover ${safeName}`}</span>
           </button>
         </div>
 
