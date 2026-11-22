@@ -1772,6 +1772,10 @@
     rawWatermark = rawWatermark.replace(/[\(\)\[\]\{\}]/g, '').replace(/[-_]/g, ' ').split(/\s+/).slice(0, 2).join(' ').trim().toUpperCase();
     if (!rawWatermark || rawWatermark.length < 2) rawWatermark = 'ROUH';
 
+    const wmWords = rawWatermark.split(/\s+/).filter(Boolean);
+    const isMultiWord = wmWords.length > 1;
+    const watermarkHtml = wmWords.map(w => `<span class="wm-line">${escapeHtml(w)}</span>`).join('');
+
     const safeImg = escapeHtml(featured.image_url || 'assets/branding/2.svg');
     const safeName = escapeHtml(prodName || 'Rou7');
     const inspiredText = d.inspired_by ? `${isAr ? 'مستوحى من' : 'Inspired by'}: <strong>${escapeHtml(d.inspired_by)}</strong>` : '';
@@ -1794,7 +1798,7 @@
     hero.innerHTML = `
       <div class="hero-3d-showcase" id="hero3dShowcase">
         <!-- Giant High-Fashion Background Watermark Typography -->
-        <div class="hero-bg-watermark" id="heroWatermark" aria-hidden="true">${escapeHtml(rawWatermark)}</div>
+        <div class="hero-bg-watermark ${isMultiWord ? 'multi-word' : 'single-word'}" id="heroWatermark" aria-hidden="true">${watermarkHtml}</div>
 
         <!-- Ambient Luxury Particle Accents -->
         <div class="hero-ambient-particles" aria-hidden="true">

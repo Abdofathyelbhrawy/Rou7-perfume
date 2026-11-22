@@ -4705,21 +4705,40 @@ body.light .cart-custom-box-card strong {
   top: 44%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-family: 'DM Sans', 'IBM Plex Sans Arabic', serif;
-  font-size: clamp(65px, 16vw, 210px);
+  font-family: 'DM Sans', 'IBM Plex Sans Arabic', sans-serif;
   font-weight: 900;
-  letter-spacing: 0.1em;
+  letter-spacing: clamp(0.03em, 0.8vw, 0.07em);
   color: rgba(255, 143, 58, 0.28);
   -webkit-text-stroke: 1.5px rgba(255, 143, 58, 0.45);
   text-shadow: 0 4px 35px rgba(255, 143, 58, 0.22);
   text-transform: uppercase;
-  white-space: nowrap;
   user-select: none;
   pointer-events: none;
   z-index: 1;
-  line-height: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 90vw;
+  width: auto;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
+}
+
+.hero-bg-watermark.single-word {
+  font-size: clamp(55px, 12vw, 150px);
+  line-height: 1;
+}
+
+.hero-bg-watermark.multi-word {
+  font-size: clamp(38px, 8.2vw, 110px);
+  line-height: 0.86;
+}
+
+.hero-bg-watermark .wm-line {
+  display: block;
+  white-space: nowrap;
 }
 
 /* Ambient Particles */
@@ -5153,9 +5172,14 @@ body.hero-modal-open {
   .hero.hero-fullwidth {
     padding: 16px 12px 40px !important;
   }
-  .hero-bg-watermark {
-    font-size: clamp(50px, 18vw, 90px);
+  .hero-bg-watermark.single-word {
+    font-size: clamp(38px, 12vw, 70px);
     top: 38%;
+  }
+  .hero-bg-watermark.multi-word {
+    font-size: clamp(26px, 8.2vw, 46px);
+    top: 38%;
+    line-height: 0.88;
   }
   .hero-bottle-center-stage {
     min-height: 300px;
