@@ -3720,7 +3720,7 @@
   });
 
   // ── Admin Views & Tab Routing Engine (صفحات الداشبورد المستقلة) ────────────
-  const ADMIN_PANEL_IDS = ['products-panel', 'brands-panel', 'campaign', 'orders', 'inventory-panel', 'sales-panel', 'traffic-panel'];
+  const ADMIN_PANEL_IDS = ['products-panel', 'brands-panel', 'orders', 'inventory-panel', 'sales-panel', 'traffic-panel'];
 
   function switchAdminView(targetHash) {
     const rawHash = (targetHash !== undefined ? targetHash : (window.location.hash || '#overview')).trim();
@@ -3743,7 +3743,6 @@
       'overview': adminLang === 'ar' ? 'نظرة عامة' : 'Overview',
       'products-panel': adminLang === 'ar' ? 'إدارة العطور' : 'Fragrances',
       'brands-panel': adminLang === 'ar' ? 'إدارة البراندات' : 'Brands',
-      'campaign': adminLang === 'ar' ? 'إعلان ومميزات المتجر' : 'Campaigns',
       'orders': adminLang === 'ar' ? 'إدارة الطلبات' : 'Orders',
       'inventory-panel': adminLang === 'ar' ? 'إدارة المخزون' : 'Inventory',
       'sales-panel': adminLang === 'ar' ? 'تقارير المبيعات والأرباح' : 'Sales Analytics',
