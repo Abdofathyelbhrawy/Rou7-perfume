@@ -1778,6 +1778,7 @@
 
     const safeImg = escapeHtml(featured.image_url || 'assets/branding/2.svg');
     const safeName = escapeHtml(prodName || 'Rou7');
+    const shortName = escapeHtml(prodName ? prodName.split(/[-–—|]/)[0].trim() : 'Rou7');
     const inspiredText = d.inspired_by ? `${isAr ? 'مستوحى من' : 'Inspired by'}: <strong>${escapeHtml(d.inspired_by)}</strong>` : '';
 
     // Extract fragrance key notes
@@ -1789,6 +1790,14 @@
     const topList = topRaw ? topRaw.split(/[,،]/).map(s => s.trim()).filter(Boolean).slice(0, 2) : [];
     const midList = midRaw ? midRaw.split(/[,،]/).map(s => s.trim()).filter(Boolean).slice(0, 2) : [];
     const baseList = baseRaw ? baseRaw.split(/[,،]/).map(s => s.trim()).filter(Boolean).slice(0, 2) : [];
+
+    const allNotes = [];
+    if (topList.length) allNotes.push(`🌸 ${transNote(topList[0])}`);
+    if (midList.length) allNotes.push(`💖 ${transNote(midList[0])}`);
+    if (baseList.length) allNotes.push(`🌲 ${transNote(baseList[0])}`);
+    if (topList.length > 1) allNotes.push(`🌸 ${transNote(topList[1])}`);
+    else if (midList.length > 1) allNotes.push(`💖 ${transNote(midList[1])}`);
+    else if (baseList.length > 1) allNotes.push(`🌲 ${transNote(baseList[1])}`);
 
     // Gender Category text
     let genderText = isAr ? 'للجميع (Unisex)' : 'Unisex';
@@ -1811,9 +1820,52 @@
           </div>
 
           <!-- Interactive Trigger Button -->
-          <button type="button" class="hero-bottle-trigger-btn" id="heroBottleTriggerBtn" aria-label="${isAr ? `عرض تفاصيل عطر ${safeName}` : `Show Fragrance Details for ${safeName}`}">
-            <span>${isAr ? `اضغط لاكتشاف عطر ${safeName}` : `Discover ${safeName}`}</span>
+          <button type="button" class="hero-bottle-trigger-btn" id="heroBottleTriggerBtn" aria-label="${isAr ? `عرض تفاصيل عطر ${shortName}` : `Show Fragrance Details for ${shortName}`}">
+            <span>${isAr ? `اضغط لاكتشاف عطر ${shortName}` : `Discover ${shortName}`}</span>
           </button>
+
+          <!-- Rich Under-Bottle Space Utilization (استغلال المساحة أسفل العطر) -->
+          <div class="hero-bottom-highlights">
+            ${allNotes.length ? `
+              <div class="hero-notes-preview">
+                ${allNotes.slice(0, 4).map(n => `<span class="hero-note-pill">${escapeHtml(n)}</span>`).join('')}
+              </div>
+            ` : ''}
+
+            <div class="hero-direct-action-bar">
+              <div class="hero-bar-price">
+                <span class="hero-bar-current">${money(pricing.price)}</span>
+                ${pricing.hasDiscount ? `<del class="hero-bar-orig">${money(pricing.originalPrice)}</del><span class="hero-bar-disc">${escapeHtml(pricing.discountBadge)}</span>` : ''}
+              </div>
+              <div class="hero-bar-btns">
+                <button type="button" class="hero-bar-btn-add" data-add="${featured.id}" aria-label="${isAr ? 'أضف للسلة' : 'Add to Cart'}">
+                  <span>＋</span> <span>${isAr ? 'أضف للسلة' : 'Add to Bag'}</span>
+                </button>
+                <a href="product.html?id=${encodeURIComponent(featured.id)}" class="hero-bar-btn-details">
+                  <span>${isAr ? 'التفاصيل' : 'Details'}</span> <span>←</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="hero-luxury-pillars">
+              <div class="hero-pillar">
+                <span class="pillar-icon">⏳</span>
+                <span>${isAr ? 'ثبات يدوم ٤٨ ساعة' : '48h Long Lasting'}</span>
+              </div>
+              <div class="hero-pillar">
+                <span class="pillar-icon">💨</span>
+                <span>${isAr ? 'فوحان ملكي مكثف' : 'Intense Sillage'}</span>
+              </div>
+              <div class="hero-pillar">
+                <span class="pillar-icon">✨</span>
+                <span>${isAr ? 'أصلي ومضمون ١٠٠٪' : '100% Authentic'}</span>
+              </div>
+              <div class="hero-pillar">
+                <span class="pillar-icon">🚚</span>
+                <span>${isAr ? 'معاينة قبل الاستلام' : 'Inspect on Delivery'}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Modal Overlay: Floating Product Info HUD Card (Opens on Click) -->
