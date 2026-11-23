@@ -4670,9 +4670,9 @@ body.light .cart-custom-box-card strong {
 .hero.hero-fullwidth {
   width: 100% !important;
   max-width: none !important;
-  min-height: auto !important;
+  min-height: calc(100vh - 110px);
   margin: 0 !important;
-  padding: 24px 30px 36px !important;
+  padding: 30px 40px 40px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -4691,7 +4691,7 @@ body.light .cart-custom-box-card strong {
 .hero-3d-showcase {
   position: relative;
   width: 100%;
-  min-height: 540px;
+  min-height: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -4727,12 +4727,12 @@ body.light .cart-custom-box-card strong {
 }
 
 .hero-bg-watermark.single-word {
-  font-size: clamp(55px, 12vw, 150px);
+  font-size: clamp(80px, 16vw, 210px);
   line-height: 1;
 }
 
 .hero-bg-watermark.multi-word {
-  font-size: clamp(38px, 8.2vw, 110px);
+  font-size: clamp(52px, 11vw, 150px);
   line-height: 0.86;
 }
 
@@ -4750,17 +4750,17 @@ body.light .cart-custom-box-card strong {
   align-items: center;
   justify-content: center;
   perspective: 1200px;
-  min-height: auto;
-  padding: 12px 0 16px;
+  min-height: 540px;
+  padding: 16px 0;
 }
 
 .hero-aura-glow {
   position: absolute;
-  width: 380px;
-  height: 380px;
+  width: 500px;
+  height: 500px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 143, 58, 0.25) 0%, rgba(75, 90, 60, 0.08) 55%, transparent 75%);
-  filter: blur(32px);
+  filter: blur(38px);
   pointer-events: none;
   z-index: -1;
 }
@@ -4801,10 +4801,10 @@ body.light .cart-custom-box-card strong {
 }
 
 .hero-bottle-3d-img {
-  max-height: clamp(300px, 46vh, 480px);
+  max-height: clamp(380px, 58vh, 540px);
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 25px 35px rgba(75, 90, 60, 0.28));
+  filter: drop-shadow(0 28px 42px rgba(75, 90, 60, 0.28));
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
   user-select: none;
   -webkit-user-drag: none;
@@ -4863,157 +4863,6 @@ body.light .cart-custom-box-card strong {
     transform: translateX(-50%) scale(0.82);
     opacity: 0.25;
   }
-}
-
-/* Hero Bottom Highlights Bar (استغلال المساحة أسفل العطر) */
-.hero-bottom-highlights {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  margin-top: 16px;
-  width: 100%;
-  max-width: 660px;
-  z-index: 4;
-}
-
-.hero-notes-preview {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-}
-
-.hero-note-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 14px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(75, 90, 60, 0.14);
-  color: var(--color-secondary);
-  font-size: 11px;
-  font-weight: 500;
-  box-shadow: 0 4px 14px rgba(75, 90, 60, 0.05);
-}
-
-.hero-direct-action-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 14px 20px;
-  padding: 9px 22px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(255, 143, 58, 0.38);
-  border-radius: 36px;
-  box-shadow: 0 10px 30px rgba(75, 90, 60, 0.08);
-}
-
-.hero-bar-price {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.hero-bar-current {
-  font-family: 'DM Sans', 'IBM Plex Sans Arabic', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--color-secondary);
-}
-
-.hero-bar-orig {
-  font-size: 12px;
-  color: var(--muted);
-  text-decoration: line-through;
-  opacity: 0.7;
-}
-
-.hero-bar-disc {
-  font-size: 10px;
-  font-weight: 700;
-  color: #ffffff;
-  background: var(--color-accent);
-  padding: 2px 7px;
-  border-radius: 8px;
-}
-
-.hero-bar-btns {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.hero-bar-btn-add {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--color-accent);
-  color: #ffffff;
-  border: none;
-  border-radius: 24px;
-  padding: 8px 18px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 14px rgba(255, 143, 58, 0.35);
-}
-
-.hero-bar-btn-add:hover {
-  background: var(--color-accent-dark);
-  transform: translateY(-1px);
-}
-
-.hero-bar-btn-details {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: transparent;
-  color: var(--color-secondary);
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  padding: 7px 14px;
-  font-size: 11px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.hero-bar-btn-details:hover {
-  background: var(--surface);
-  border-color: var(--color-accent);
-}
-
-.hero-luxury-pillars {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px 20px;
-  margin-top: 4px;
-}
-
-.hero-pillar {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--color-secondary);
-  opacity: 0.9;
-  font-weight: 500;
-}
-
-.hero-pillar .pillar-icon {
-  font-size: 13px;
-  color: var(--color-accent);
 }
 
 /* Modal Overlay for Hero Info HUD */
@@ -5281,79 +5130,39 @@ body.hero-modal-open {
 @media (max-width: 600px) {
   .hero.hero-fullwidth {
     min-height: auto !important;
-    padding: 16px 12px 24px !important;
-  }
-  .hero-bottle-center-stage {
-    min-height: auto !important;
-    padding: 6px 0 0 !important;
-  }
-  .hero-bottom-highlights {
-    gap: 10px;
-    margin-top: 14px;
-    padding: 0 4px;
-  }
-  .hero-notes-preview {
-    gap: 6px;
-  }
-  .hero-note-pill {
-    padding: 4px 10px;
-    font-size: 10px;
-  }
-  .hero-direct-action-bar {
-    width: 100%;
-    justify-content: space-between;
-    padding: 8px 14px;
-    border-radius: 24px;
-    gap: 6px;
-  }
-  .hero-bar-current {
-    font-size: 17px;
-  }
-  .hero-bar-btn-add {
-    padding: 7px 14px;
-    font-size: 11px;
-  }
-  .hero-bar-btn-details {
-    padding: 6px 10px;
-    font-size: 10px;
-  }
-  .hero-luxury-pillars {
-    gap: 6px 12px;
-  }
-  .hero-pillar {
-    font-size: 10px;
+    padding: 20px 14px 34px !important;
   }
   .hero-bg-watermark {
-    top: 22% !important;
+    top: 18% !important;
     max-width: 96vw !important;
     color: rgba(255, 143, 58, 0.42) !important;
     -webkit-text-stroke: 1.8px rgba(255, 143, 58, 0.85) !important;
     text-shadow: 0 4px 28px rgba(255, 143, 58, 0.3) !important;
   }
   .hero-bg-watermark.single-word {
-    font-size: clamp(48px, 14.5vw, 76px) !important;
-    letter-spacing: clamp(0.12em, 2.8vw, 0.22em) !important;
-    top: 22% !important;
+    font-size: clamp(56px, 17.5vw, 92px) !important;
+    letter-spacing: clamp(0.08em, 2vw, 0.16em) !important;
+    top: 18% !important;
   }
   .hero-bg-watermark.multi-word {
-    font-size: clamp(32px, 9.8vw, 50px) !important;
-    letter-spacing: clamp(0.08em, 1.8vw, 0.16em) !important;
-    top: 20% !important;
+    font-size: clamp(38px, 11vw, 62px) !important;
+    letter-spacing: clamp(0.06em, 1.6vw, 0.12em) !important;
+    top: 17% !important;
     line-height: 0.9;
   }
   .hero-bottle-center-stage {
-    min-height: 320px;
-    padding: 10px 0 4px;
+    min-height: 420px !important;
+    padding: 12px 0 8px !important;
   }
   .hero-bottle-3d-img {
-    max-height: 235px;
-    max-width: 68vw;
-    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.28));
+    max-height: 350px !important;
+    max-width: 84vw !important;
+    filter: drop-shadow(0 24px 36px rgba(0, 0, 0, 0.28)) !important;
   }
   .hero-aura-glow {
-    width: 250px;
-    height: 250px;
-    top: 48%;
+    width: 320px !important;
+    height: 320px !important;
+    top: 46% !important;
   }
   .hero-info-hud {
     padding: 18px 16px;
@@ -5380,9 +5189,9 @@ body.hero-modal-open {
     right: 12px;
   }
   .hero-bottle-trigger-btn {
-    margin-top: 14px;
-    padding: 8px 18px;
-    font-size: 12px;
+    margin-top: 18px !important;
+    padding: 11px 26px !important;
+    font-size: 13px !important;
   }
   .hero-product-title {
     font-size: 22px;
