@@ -1613,6 +1613,7 @@
       discount_badge:   p.discount_badge || meta.discount_badge || '',
       stock_quantity:   p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : ''),
       cost_price:       p.cost_price !== undefined && p.cost_price !== null ? p.cost_price : (meta.cost_price !== undefined && meta.cost_price !== null ? meta.cost_price : ''),
+      supplier_source:  p.supplier_source || meta.supplier_source || meta.supplier || 'المصدر 1',
       in_solar_system:  Boolean(p.in_solar_system !== undefined ? p.in_solar_system : meta.in_solar_system),
       images:           Array.isArray(p.images) && p.images.length ? p.images : (Array.isArray(meta.images) && meta.images.length ? meta.images : (p.image_url ? [p.image_url] : [])),
       sizes:            Array.isArray(p.sizes) && p.sizes.length ? p.sizes : (Array.isArray(meta.sizes) && meta.sizes.length ? meta.sizes : [])
@@ -1766,6 +1767,7 @@
       if (saleInp) saleInp.value = details.sale_price || '';
       if (badgeInp) badgeInp.value = details.discount_badge || '';
       if ($('#prodCostPrice')) $('#prodCostPrice').value = details.cost_price !== '' && details.cost_price !== undefined ? details.cost_price : '';
+      if ($('#prodSupplierSource')) $('#prodSupplierSource').value = details.supplier_source || 'المصدر 1';
       if ($('#prodBoxItems')) $('#prodBoxItems').value = details.box_items || product.box_items || '';
       if ($('#prodCustomBox')) $('#prodCustomBox').checked = Boolean(details.is_custom_box || product.is_custom_box);
       if ($('#prodExtraPrice')) $('#prodExtraPrice').value = (details.extra_item_price !== '' && details.extra_item_price !== undefined) ? details.extra_item_price : '';
@@ -1800,6 +1802,7 @@
       if (pctInp) pctInp.value = '';
       if (badgeInp) badgeInp.value = '';
       if ($('#prodCostPrice')) $('#prodCostPrice').value = '';
+      if ($('#prodSupplierSource')) $('#prodSupplierSource').value = 'المصدر 1';
       if ($('#prodBoxItems')) $('#prodBoxItems').value = '';
       if ($('#prodCustomBox')) $('#prodCustomBox').checked = false;
       if ($('#prodExtraPrice')) $('#prodExtraPrice').value = '';
@@ -2932,6 +2935,7 @@
       price:       rawPrice,
       sale_price:  validSalePrice,
       cost_price:  costPrice,
+      supplier_source: ($('#prodSupplierSource')?.value || 'المصدر 1'),
       discount_percent: validPercent,
       discount_badge:   validBadge,
       category:    category,
@@ -3010,6 +3014,7 @@
               seasons:      payload.seasons,
               sale_price:   payload.sale_price,
               cost_price:   costPrice,
+              supplier_source: payload.supplier_source,
               discount_percent: payload.discount_percent,
               discount_badge: payload.discount_badge,
               stock_quantity: stockQty,
@@ -4157,7 +4162,47 @@
     window.RoohUtils?.showToast(adminLang === 'ar' ? 'تم تصدير ملف CSV' : 'CSV exported');
   });
 
-  // ── 📦 نظام إدارة المخزون والمستودع (Inventory Management Engine) ───────────
+  // ── 📦 نظام إدارة المخزون والمستودع التفاعلي وتتبع مصادر البضاعة ───────────
+  let selectedInvProductIds = new Set();
+
+  function updateInventorySelectionBar() {
+    const bar = $('#invSelectionBar');
+    if (!bar) return;
+
+    if (!selectedInvProductIds.size) {
+      bar.style.display = 'none';
+      return;
+    }
+
+    let selUnits = 0;
+    let selSaleVal = 0;
+    let selCostVal = 0;
+
+    selectedInvProductIds.forEach(id => {
+      const p = currentProducts.find(item => String(item.id) === String(id));
+      if (!p) return;
+      const d = unpackProductDetails(p);
+      const isAvail = p.in_stock !== false;
+      const qty = d.stock_quantity !== '' && d.stock_quantity !== undefined ? parseInt(d.stock_quantity) : (isAvail ? 10 : 0);
+      const sellPrice = parseFloat(d.sale_price) || parseFloat(p.price) || 0;
+      const costPrice = parseFloat(d.cost_price) || 0;
+
+      selUnits += qty;
+      selSaleVal += (qty * sellPrice);
+      selCostVal += (qty * costPrice);
+    });
+
+    const selProfit = Math.max(0, selSaleVal - selCostVal);
+
+    if ($('#selPerfumeCount')) $('#selPerfumeCount').textContent = arabicNum(selectedInvProductIds.size);
+    if ($('#selUnitCount')) $('#selUnitCount').textContent = arabicNum(selUnits);
+    if ($('#selTotalSale')) $('#selTotalSale').textContent = money(selSaleVal);
+    if ($('#selTotalCost')) $('#selTotalCost').textContent = money(selCostVal);
+    if ($('#selTotalProfit')) $('#selTotalProfit').textContent = '+' + money(selProfit);
+
+    bar.style.display = 'block';
+  }
+
   function renderInventoryPanel() {
     const tableBody = $('#inventoryTable');
     if (!tableBody) return;
@@ -4175,17 +4220,26 @@
     let outOfStockCount = 0;
     let goodStockCount = 0;
     let totalValuation = 0;
+    let totalCostValuation = 0;
+
+    // 2-Sources breakdown counters
+    let src1Units = 0, src1Count = 0, src1SaleVal = 0, src1CostVal = 0;
+    let src2Units = 0, src2Count = 0, src2SaleVal = 0, src2CostVal = 0;
 
     rawList.forEach(p => {
       const d = unpackProductDetails(p);
       const isAvailable = p.in_stock !== false;
       const qtyRaw = d.stock_quantity !== '' && d.stock_quantity !== undefined ? parseInt(d.stock_quantity) : (isAvailable ? 10 : 0);
       const priceVal = parseFloat(d.sale_price) || parseFloat(p.price) || 0;
+      const costVal = parseFloat(d.cost_price) || 0;
+      const src = d.supplier_source || 'المصدر 1';
 
       if (isAvailable && qtyRaw > 0) {
         inStockCount++;
         totalUnits += qtyRaw;
         totalValuation += (qtyRaw * priceVal);
+        totalCostValuation += (qtyRaw * costVal);
+
         if (qtyRaw <= 5) {
           lowStockCount++;
         } else {
@@ -4194,7 +4248,28 @@
       } else {
         outOfStockCount++;
       }
+
+      // Group by supplier source
+      if (src === 'المصدر 2') {
+        src2Count++;
+        if (isAvailable && qtyRaw > 0) {
+          src2Units += qtyRaw;
+          src2SaleVal += (qtyRaw * priceVal);
+          src2CostVal += (qtyRaw * costVal);
+        }
+      } else {
+        src1Count++;
+        if (isAvailable && qtyRaw > 0) {
+          src1Units += qtyRaw;
+          src1SaleVal += (qtyRaw * priceVal);
+          src1CostVal += (qtyRaw * costVal);
+        }
+      }
     });
+
+    const totalProfit = Math.max(0, totalValuation - totalCostValuation);
+    const src1Profit = Math.max(0, src1SaleVal - src1CostVal);
+    const src2Profit = Math.max(0, src2SaleVal - src2CostVal);
 
     // Update KPI cards
     if ($('#invTotalUnits')) $('#invTotalUnits').textContent = arabicNum(totalUnits);
@@ -4202,6 +4277,21 @@
     if ($('#invLowStockCount')) $('#invLowStockCount').textContent = arabicNum(lowStockCount);
     if ($('#invOutOfStockCount')) $('#invOutOfStockCount').textContent = arabicNum(outOfStockCount);
     if ($('#invTotalValuation')) $('#invTotalValuation').textContent = money(totalValuation);
+    if ($('#invTotalCostValuation')) $('#invTotalCostValuation').textContent = money(totalCostValuation);
+    if ($('#invTotalExpectedProfit')) $('#invTotalExpectedProfit').textContent = '+' + money(totalProfit);
+
+    // Update Two Sources Comparison Cards
+    if ($('#src1SaleVal')) $('#src1SaleVal').textContent = money(src1SaleVal);
+    if ($('#src1CostVal')) $('#src1CostVal').textContent = money(src1CostVal);
+    if ($('#src1ProfitVal')) $('#src1ProfitVal').textContent = '+' + money(src1Profit);
+    if ($('#src1Units')) $('#src1Units').textContent = arabicNum(src1Units) + ' ' + (adminLang === 'ar' ? 'قطعة' : 'pcs');
+    if ($('#src1PerfumeCount')) $('#src1PerfumeCount').textContent = arabicNum(src1Count) + ' ' + (adminLang === 'ar' ? 'عطر' : 'perfumes');
+
+    if ($('#src2SaleVal')) $('#src2SaleVal').textContent = money(src2SaleVal);
+    if ($('#src2CostVal')) $('#src2CostVal').textContent = money(src2CostVal);
+    if ($('#src2ProfitVal')) $('#src2ProfitVal').textContent = '+' + money(src2Profit);
+    if ($('#src2Units')) $('#src2Units').textContent = arabicNum(src2Units) + ' ' + (adminLang === 'ar' ? 'قطعة' : 'pcs');
+    if ($('#src2PerfumeCount')) $('#src2PerfumeCount').textContent = arabicNum(src2Count) + ' ' + (adminLang === 'ar' ? 'عطر' : 'perfumes');
 
     // Update badge in sidebar
     const invBadge = $('#inventoryBadge');
@@ -4219,6 +4309,8 @@
 
     // Filter counts
     if ($('#invFilterAllCount')) $('#invFilterAllCount').textContent = arabicNum(rawList.length);
+    if ($('#invFilterSrc1Count')) $('#invFilterSrc1Count').textContent = arabicNum(src1Count);
+    if ($('#invFilterSrc2Count')) $('#invFilterSrc2Count').textContent = arabicNum(src2Count);
     if ($('#invFilterLowCount')) $('#invFilterLowCount').textContent = arabicNum(lowStockCount);
     if ($('#invFilterOutCount')) $('#invFilterOutCount').textContent = arabicNum(outOfStockCount);
     if ($('#invFilterGoodCount')) $('#invFilterGoodCount').textContent = arabicNum(goodStockCount);
@@ -4243,11 +4335,14 @@
       const d = unpackProductDetails(p);
       const isAvail = p.in_stock !== false;
       const qty = d.stock_quantity !== '' && d.stock_quantity !== undefined ? parseInt(d.stock_quantity) : (isAvail ? 10 : 0);
+      const src = d.supplier_source || 'المصدر 1';
 
-      // Status filter
+      // Status & Source filters
       if (inventoryFilter === 'low' && !(isAvail && qty > 0 && qty <= 5)) return false;
       if (inventoryFilter === 'out' && !(!isAvail || qty === 0)) return false;
       if (inventoryFilter === 'instock' && !(isAvail && qty > 5)) return false;
+      if (inventoryFilter === 'source1' && src !== 'المصدر 1') return false;
+      if (inventoryFilter === 'source2' && src !== 'المصدر 2') return false;
 
       // Search filter
       if (q) {
@@ -4255,14 +4350,23 @@
         const latinMatch = (p.latin || '').toLowerCase().includes(q);
         const brandMatch = (d.brand || '').toLowerCase().includes(q);
         const catMatch = (p.category || '').toLowerCase().includes(q);
-        if (!nameMatch && !latinMatch && !brandMatch && !catMatch) return false;
+        const srcMatch = src.toLowerCase().includes(q);
+        if (!nameMatch && !latinMatch && !brandMatch && !catMatch && !srcMatch) return false;
       }
       return true;
     });
 
     if (!filtered.length) {
-      tableBody.innerHTML = `<tr><td colspan="7" class="empty-table">${adminLang === 'ar' ? 'لا توجد عطور تطابق معايير الفلترة المحددة' : 'No items match the selected filter'}</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="9" class="empty-table">${adminLang === 'ar' ? 'لا توجد عطور تطابق معايير الفلترة المحددة' : 'No items match the selected filter'}</td></tr>`;
+      updateInventorySelectionBar();
       return;
+    }
+
+    // Header checkbox sync
+    const selectAllBox = $('#invSelectAll');
+    if (selectAllBox) {
+      const allFilteredSelected = filtered.every(p => selectedInvProductIds.has(String(p.id)));
+      selectAllBox.checked = filtered.length > 0 && allFilteredSelected;
     }
 
     tableBody.innerHTML = filtered.map(p => {
@@ -4271,9 +4375,12 @@
       const qty = d.stock_quantity !== '' && d.stock_quantity !== undefined ? parseInt(d.stock_quantity) : (isAvail ? 10 : 0);
       const sellPrice = parseFloat(d.sale_price) || parseFloat(p.price) || 0;
       const costPrice = parseFloat(d.cost_price) || 0;
+      const profitPerPiece = Math.max(0, sellPrice - costPrice);
+      const src = d.supplier_source || 'المصدر 1';
       const img = p.image_url || 'assets/branding/2.svg';
       const bObj = findBrandObject(p.brand || d.brand);
       const brand = bObj ? (adminLang === 'ar' ? bObj.ar : bObj.en) : (p.brand || d.brand || 'رُوح');
+      const isChecked = selectedInvProductIds.has(String(p.id));
 
       // Stock status calculations
       let statusClass = 'good';
@@ -4291,7 +4398,10 @@
       }
 
       return `
-        <tr data-inv-id="${p.id}">
+        <tr data-inv-id="${p.id}" class="${isChecked ? 'inv-selected-row' : ''}">
+          <td style="text-align:center;">
+            <input type="checkbox" class="inv-row-check" data-check-id="${p.id}" ${isChecked ? 'checked' : ''} aria-label="تحديد هذا العطر">
+          </td>
           <td>
             <img src="${escapeHtml(img)}" alt="${escapeHtml(p.name)}" class="table-thumb" style="width:48px;height:48px;object-fit:contain;background:var(--surface);border-radius:8px;padding:3px;border:1px solid var(--line);">
           </td>
@@ -4301,8 +4411,15 @@
             <span class="brand-pill" style="font-size:10.5px;padding:2px 8px;border-radius:12px;background:rgba(75,90,60,0.08);color:var(--color-secondary);">${escapeHtml(brand)}</span>
           </td>
           <td>
+            <select class="inv-source-select" data-source-id="${p.id}" title="تغيير مصدر هذا العطر">
+              <option value="المصدر 1" ${src === 'المصدر 1' ? 'selected' : ''}>🏢 المصدر 1</option>
+              <option value="المصدر 2" ${src === 'المصدر 2' ? 'selected' : ''}>🏢 المصدر 2</option>
+            </select>
+          </td>
+          <td>
             <div style="font-weight:700;color:var(--ink);">${money(sellPrice)}</div>
-            ${costPrice ? `<div style="font-size:11px;color:#10b981;">${adminLang === 'ar' ? 'تكلفة:' : 'Cost:'} ${money(costPrice)}</div>` : `<div style="font-size:11px;color:var(--muted);">${adminLang === 'ar' ? 'بدون تكلفة' : 'No cost set'}</div>`}
+            ${costPrice ? `<div style="font-size:11px;color:var(--color-accent-dark);font-weight:600;">${adminLang === 'ar' ? 'تكلفة:' : 'Cost:'} ${money(costPrice)}</div>` : `<div style="font-size:11px;color:var(--muted);">${adminLang === 'ar' ? 'بدون تكلفة' : 'No cost'}</div>`}
+            ${costPrice && profitPerPiece > 0 ? `<div style="font-size:10px;color:#059669;">${adminLang === 'ar' ? 'ربح:' : 'Profit:'} +${money(profitPerPiece)}</div>` : ''}
           </td>
           <td>
             <div class="stock-level-bar-wrap">
@@ -4336,6 +4453,8 @@
         </tr>
       `;
     }).join('');
+
+    updateInventorySelectionBar();
   }
 
   // Inventory Event Handlers
@@ -4353,6 +4472,18 @@
     });
   });
 
+  // Source card quick filter buttons
+  document.querySelectorAll('[data-source-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const src = btn.dataset.sourceFilter;
+      inventoryFilter = src;
+      $('#inventory-panel')?.querySelectorAll('.inv-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.invFilter === src);
+      });
+      renderInventoryPanel();
+    });
+  });
+
   $('#btnFilterLowStock')?.addEventListener('click', () => {
     $('#inventory-panel')?.querySelectorAll('.inv-chip').forEach(c => {
       c.classList.toggle('active', c.dataset.invFilter === 'low');
@@ -4366,6 +4497,188 @@
     window.RoohUtils?.showToast(adminLang === 'ar' ? 'جاري تحديث المخزون...' : 'Refreshing inventory...');
   });
 
+  // Select all checkbox
+  $('#invSelectAll')?.addEventListener('change', e => {
+    const isChecked = e.target.checked;
+    const rawList = currentProducts.filter(p =>
+      p.name !== '__system_announcements__' &&
+      p.name !== '__system_brands__' &&
+      p.name !== '__system_orders_meta__'
+    );
+    const q = (inventorySearch || '').trim().toLowerCase();
+    const visibleList = rawList.filter(p => {
+      const d = unpackProductDetails(p);
+      const isAvail = p.in_stock !== false;
+      const qty = d.stock_quantity !== '' && d.stock_quantity !== undefined ? parseInt(d.stock_quantity) : (isAvail ? 10 : 0);
+      const src = d.supplier_source || 'المصدر 1';
+      if (inventoryFilter === 'low' && !(isAvail && qty > 0 && qty <= 5)) return false;
+      if (inventoryFilter === 'out' && !(!isAvail || qty === 0)) return false;
+      if (inventoryFilter === 'instock' && !(isAvail && qty > 5)) return false;
+      if (inventoryFilter === 'source1' && src !== 'المصدر 1') return false;
+      if (inventoryFilter === 'source2' && src !== 'المصدر 2') return false;
+      if (q) {
+        const nameMatch = (p.name || '').toLowerCase().includes(q);
+        const latinMatch = (p.latin || '').toLowerCase().includes(q);
+        const brandMatch = (d.brand || '').toLowerCase().includes(q);
+        const catMatch = (p.category || '').toLowerCase().includes(q);
+        const srcMatch = src.toLowerCase().includes(q);
+        if (!nameMatch && !latinMatch && !brandMatch && !catMatch && !srcMatch) return false;
+      }
+      return true;
+    });
+
+    if (isChecked) {
+      visibleList.forEach(p => selectedInvProductIds.add(String(p.id)));
+    } else {
+      visibleList.forEach(p => selectedInvProductIds.delete(String(p.id)));
+    }
+    renderInventoryPanel();
+  });
+
+  // Table change events: row checkbox & source dropdown
+  $('#inventoryTable')?.addEventListener('change', async e => {
+    // Row Checkbox
+    const check = e.target.closest('.inv-row-check');
+    if (check) {
+      const id = String(check.dataset.checkId);
+      if (check.checked) {
+        selectedInvProductIds.add(id);
+      } else {
+        selectedInvProductIds.delete(id);
+      }
+      const tr = check.closest('tr');
+      if (tr) tr.classList.toggle('inv-selected-row', check.checked);
+      updateInventorySelectionBar();
+
+      // Check header checkbox state
+      const selectAllBox = $('#invSelectAll');
+      if (selectAllBox) {
+        const allChecks = document.querySelectorAll('.inv-row-check');
+        selectAllBox.checked = allChecks.length > 0 && Array.from(allChecks).every(c => c.checked);
+      }
+      return;
+    }
+
+    // Source Selector
+    const srcSelect = e.target.closest('.inv-source-select');
+    if (srcSelect) {
+      const id = srcSelect.dataset.sourceId;
+      const targetProduct = currentProducts.find(p => String(p.id) === String(id));
+      if (!targetProduct) return;
+      const newSource = srcSelect.value;
+      targetProduct.supplier_source = newSource;
+
+      // Update packed notes JSON
+      let meta = {};
+      if (targetProduct.notes && typeof targetProduct.notes === 'string') {
+        try { meta = JSON.parse(targetProduct.notes); } catch (_) {}
+      }
+      meta.supplier_source = newSource;
+      targetProduct.notes = JSON.stringify(meta);
+
+      try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
+      window.RoohUtils?.showToast(adminLang === 'ar' ? `تم تحويل العطر إلى ${newSource} ✓` : `Assigned to ${newSource} ✓`);
+
+      try {
+        await supaFetch('products', {
+          method: 'PATCH',
+          filters: `&id=eq.${encodeURIComponent(id)}`,
+          body: {
+            supplier_source: newSource,
+            notes: targetProduct.notes
+          }
+        });
+      } catch (err) {
+        console.warn('Could not sync supplier source to remote:', err);
+      }
+
+      renderInventoryPanel();
+      return;
+    }
+  });
+
+  // Bulk set source 1
+  $('#bulkSetSource1')?.addEventListener('click', async () => {
+    if (!selectedInvProductIds.size) return;
+    const count = selectedInvProductIds.size;
+    selectedInvProductIds.forEach(id => {
+      const p = currentProducts.find(item => String(item.id) === String(id));
+      if (p) {
+        p.supplier_source = 'المصدر 1';
+        let meta = {};
+        if (p.notes && typeof p.notes === 'string') {
+          try { meta = JSON.parse(p.notes); } catch (_) {}
+        }
+        meta.supplier_source = 'المصدر 1';
+        p.notes = JSON.stringify(meta);
+      }
+    });
+
+    try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
+    window.RoohUtils?.showToast(adminLang === 'ar' ? `تم تعيين ${arabicNum(count)} عطور إلى المصدر 1 ✓` : `${count} items set to Source 1 ✓`);
+
+    // Async batch sync
+    selectedInvProductIds.forEach(async id => {
+      const p = currentProducts.find(item => String(item.id) === String(id));
+      if (!p) return;
+      try {
+        await supaFetch('products', {
+          method: 'PATCH',
+          filters: `&id=eq.${encodeURIComponent(id)}`,
+          body: { supplier_source: 'المصدر 1', notes: p.notes }
+        });
+      } catch (_) {}
+    });
+
+    renderInventoryPanel();
+  });
+
+  // Bulk set source 2
+  $('#bulkSetSource2')?.addEventListener('click', async () => {
+    if (!selectedInvProductIds.size) return;
+    const count = selectedInvProductIds.size;
+    selectedInvProductIds.forEach(id => {
+      const p = currentProducts.find(item => String(item.id) === String(id));
+      if (p) {
+        p.supplier_source = 'المصدر 2';
+        let meta = {};
+        if (p.notes && typeof p.notes === 'string') {
+          try { meta = JSON.parse(p.notes); } catch (_) {}
+        }
+        meta.supplier_source = 'المصدر 2';
+        p.notes = JSON.stringify(meta);
+      }
+    });
+
+    try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
+    window.RoohUtils?.showToast(adminLang === 'ar' ? `تم تعيين ${arabicNum(count)} عطور إلى المصدر 2 ✓` : `${count} items set to Source 2 ✓`);
+
+    // Async batch sync
+    selectedInvProductIds.forEach(async id => {
+      const p = currentProducts.find(item => String(item.id) === String(id));
+      if (!p) return;
+      try {
+        await supaFetch('products', {
+          method: 'PATCH',
+          filters: `&id=eq.${encodeURIComponent(id)}`,
+          body: { supplier_source: 'المصدر 2', notes: p.notes }
+        });
+      } catch (_) {}
+    });
+
+    renderInventoryPanel();
+  });
+
+  // Bulk clear selection
+  $('#bulkClearSelection')?.addEventListener('click', () => {
+    selectedInvProductIds.clear();
+    const selectAllBox = $('#invSelectAll');
+    if (selectAllBox) selectAllBox.checked = false;
+    document.querySelectorAll('.inv-row-check').forEach(c => c.checked = false);
+    document.querySelectorAll('.inv-selected-row').forEach(r => r.classList.remove('inv-selected-row'));
+    updateInventorySelectionBar();
+  });
+
   // Export Inventory CSV
   $('#exportInventoryBtn')?.addEventListener('click', () => {
     const rawList = currentProducts.filter(p =>
@@ -4377,7 +4690,7 @@
       window.RoohUtils?.showToast(adminLang === 'ar' ? 'لا توجد بيانات بالمخزون للتصدير' : 'No inventory data to export');
       return;
     }
-    const headers = ['ID', 'Name', 'Latin Name', 'Brand', 'Category', 'Price', 'Sale Price', 'Cost Price', 'In Stock', 'Stock Quantity', 'Stock Valuation'];
+    const headers = ['ID', 'Name', 'Latin Name', 'Brand', 'Category', 'Source', 'Price', 'Sale Price', 'Cost Price', 'In Stock', 'Stock Quantity', 'Stock Valuation'];
     const rows = rawList.map(p => {
       const d = unpackProductDetails(p);
       const isAvail = p.in_stock !== false;
@@ -4390,6 +4703,7 @@
         p.latin || '',
         d.brand || '',
         p.category || '',
+        d.supplier_source || 'المصدر 1',
         p.price || 0,
         d.sale_price || '',
         costPrice || '',

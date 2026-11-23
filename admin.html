@@ -68,6 +68,7 @@
           </tbody>
         </table>
       </div>
+
     </section>
 
     <!-- أقسام البراندات والماركات -->
@@ -284,6 +285,77 @@
           <small class="inv-kpi-desc">إجمالي قيمة البضاعة بسعر البيع</small>
           <i class="inv-kpi-icon">💰</i>
         </article>
+        <article class="inventory-kpi-card">
+          <span class="inv-kpi-title">إجمالي تكلفة الشراء</span>
+          <strong class="inv-kpi-value text-primary" id="invTotalCostValuation">٠ ج.م</strong>
+          <small class="inv-kpi-desc">إجمالي قيمة البضاعة بسعر الشراء (التكلفة)</small>
+          <i class="inv-kpi-icon">🏷️</i>
+        </article>
+        <article class="inventory-kpi-card">
+          <span class="inv-kpi-title">صافي الأرباح المتوقعة</span>
+          <strong class="inv-kpi-value text-success" id="invTotalExpectedProfit">٠ ج.م</strong>
+          <small class="inv-kpi-desc">فارق سعر البيع عن سعر التكلفة</small>
+          <i class="inv-kpi-icon">📈</i>
+        </article>
+      </div>
+
+      <!-- 🏢 تفصيل ومقارنة مصادر البضاعة (المصدر 1 مقابل المصدر 2) -->
+      <div class="inventory-sources-grid" id="inventorySourcesGrid">
+        <div class="source-card source-card-1" id="sourceCard1">
+          <div class="source-card-header">
+            <div class="source-badge-title">
+              <span class="source-dot dot-1"></span>
+              <h4>المصدر الأول (المورد 1)</h4>
+            </div>
+            <button type="button" class="btn-source-filter" data-source-filter="source1">تصفية بضاعة المصدر 1 🔍</button>
+          </div>
+          <div class="source-metrics-row">
+            <div class="source-metric">
+              <span>قيمة البضاعة بسعر البيع:</span>
+              <strong id="src1SaleVal">٠ ج.م</strong>
+            </div>
+            <div class="source-metric">
+              <span>سعر الشراء (التكلفة):</span>
+              <strong id="src1CostVal" style="color:var(--color-accent-dark);">٠ ج.م</strong>
+            </div>
+            <div class="source-metric">
+              <span>الأرباح المتوقعة:</span>
+              <strong id="src1ProfitVal" style="color:#059669;">٠ ج.م</strong>
+            </div>
+            <div class="source-metric">
+              <span>المخزون المتوفر:</span>
+              <strong id="src1Units">٠ قطعة</strong> (<small id="src1PerfumeCount">0 عطر</small>)
+            </div>
+          </div>
+        </div>
+
+        <div class="source-card source-card-2" id="sourceCard2">
+          <div class="source-card-header">
+            <div class="source-badge-title">
+              <span class="source-dot dot-2"></span>
+              <h4>المصدر الثاني (المورد 2)</h4>
+            </div>
+            <button type="button" class="btn-source-filter" data-source-filter="source2">تصفية بضاعة المصدر 2 🔍</button>
+          </div>
+          <div class="source-metrics-row">
+            <div class="source-metric">
+              <span>قيمة البضاعة بسعر البيع:</span>
+              <strong id="src2SaleVal">٠ ج.م</strong>
+            </div>
+            <div class="source-metric">
+              <span>سعر الشراء (التكلفة):</span>
+              <strong id="src2CostVal" style="color:var(--color-accent-dark);">٠ ج.م</strong>
+            </div>
+            <div class="source-metric">
+              <span>الأرباح المتوقعة:</span>
+              <strong id="src2ProfitVal" style="color:#059669;">٠ ج.م</strong>
+            </div>
+            <div class="source-metric">
+              <span>المخزون المتوفر:</span>
+              <strong id="src2Units">٠ قطعة</strong> (<small id="src2PerfumeCount">0 عطر</small>)
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- تنبيه العطور منخفضة المخزون -->
@@ -303,6 +375,8 @@
         </div>
         <div class="inv-filter-chips">
           <button type="button" class="inv-chip active" data-inv-filter="all">الكل (<span id="invFilterAllCount">0</span>)</button>
+          <button type="button" class="inv-chip chip-source" data-inv-filter="source1">🏢 المصدر 1 (<span id="invFilterSrc1Count">0</span>)</button>
+          <button type="button" class="inv-chip chip-source" data-inv-filter="source2">🏢 المصدر 2 (<span id="invFilterSrc2Count">0</span>)</button>
           <button type="button" class="inv-chip chip-warning" data-inv-filter="low">أوشك على النفاد ⚠️ (<span id="invFilterLowCount">0</span>)</button>
           <button type="button" class="inv-chip chip-danger" data-inv-filter="out">نفد من المخزن 🚫 (<span id="invFilterOutCount">0</span>)</button>
           <button type="button" class="inv-chip chip-success" data-inv-filter="instock">متوفر بوفرة ✓ (<span id="invFilterGoodCount">0</span>)</button>
@@ -314,19 +388,49 @@
         <table>
           <thead>
             <tr>
+              <th style="width:40px; text-align:center;"><input type="checkbox" id="invSelectAll" title="تحديد / إلغاء تحديد الكل"></th>
               <th style="width:65px;">الصورة</th>
               <th>اسم العطر والبراند</th>
+              <th style="width:130px;">مصدر البضاعة</th>
               <th>السعر والتكلفة</th>
               <th style="width:160px;">مستوى المخزون</th>
-              <th style="width:130px;">حالة التوفر</th>
-              <th style="width:180px;">الكمية بالمخزن</th>
-              <th style="width:120px;">إجراء سريع</th>
+              <th style="width:120px;">حالة التوفر</th>
+              <th style="width:160px;">الكمية بالمخزن</th>
+              <th style="width:110px;">إجراء سريع</th>
             </tr>
           </thead>
           <tbody id="inventoryTable">
-            <tr><td colspan="7" class="empty-table">جاري تحميل بيانات المخزون…</td></tr>
+            <tr><td colspan="9" class="empty-table">جاري تحميل بيانات المخزون…</td></tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- شريط الحساب التفاعلي للعطور المحددة -->
+      <div class="inv-selection-bar" id="invSelectionBar" style="display:none;">
+        <div class="inv-sel-inner">
+          <div class="inv-sel-lead">
+            <span class="inv-sel-badge">🎯 تم تحديد <strong id="selPerfumeCount">0</strong> عطر (<strong id="selUnitCount">0</strong> قطعة)</span>
+          </div>
+          <div class="inv-sel-metrics">
+            <div class="inv-sel-metric">
+              <span>سعر البيع:</span>
+              <strong id="selTotalSale">٠ ج.م</strong>
+            </div>
+            <div class="inv-sel-metric">
+              <span>سعر الشراء (التكلفة):</span>
+              <strong id="selTotalCost" style="color:#f59e0b;">٠ ج.م</strong>
+            </div>
+            <div class="inv-sel-metric">
+              <span>صافي الأرباح:</span>
+              <strong id="selTotalProfit" style="color:#10b981;">٠ ج.م</strong>
+            </div>
+          </div>
+          <div class="inv-sel-actions">
+            <button type="button" class="btn-inv-bulk" id="bulkSetSource1">📦 تعيين للمصدر 1</button>
+            <button type="button" class="btn-inv-bulk" id="bulkSetSource2">📦 تعيين للمصدر 2</button>
+            <button type="button" class="btn-inv-bulk-close" id="bulkClearSelection">إلغاء التحديد ✕</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -639,6 +743,12 @@
             </label>
             <label>سعر الشراء / التكلفة (ج.م)
               <input id="prodCostPrice" name="cost_price" type="number" step="0.01" min="0" placeholder="مثال: 200">
+            </label>
+            <label>مصدر البضاعة / المورد
+              <select id="prodSupplierSource" name="supplier_source">
+                <option value="المصدر 1">المصدر 1 (المورد الأول)</option>
+                <option value="المصدر 2">المصدر 2 (المورد الثاني)</option>
+              </select>
             </label>
             <label>الصنف *
               <select id="prodCategory" name="category" required>
