@@ -344,6 +344,7 @@
   let isHeroQuickActive = false;
   let inventoryFilter = 'all';
   let inventorySearch = '';
+  let selectedInvProductIds = new Set();
 
   const campaignKey = 'rooh-campaign-settings';
   const defaultCampaign = {
@@ -4163,7 +4164,6 @@
   });
 
   // ── 📦 نظام إدارة المخزون والمستودع التفاعلي وتتبع مصادر البضاعة ───────────
-  let selectedInvProductIds = new Set();
 
   function updateInventorySelectionBar() {
     const bar = $('#invSelectionBar');
