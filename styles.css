@@ -5430,3 +5430,55 @@ body.hero-modal-open {
   }
 }
 
+/* ==========================================================
+   Safe Header Logo Enlargement (preserves 1.svg mask bounds)
+   ========================================================== */
+.site-header .header-inner {
+  height: 104px;
+}
+
+.site-header .brand,
+.site-header .brand-logo-wrap {
+  height: 94px;
+  overflow: visible;
+}
+
+.site-header .brand-logo {
+  height: 156px;
+  width: auto;
+  max-width: 320px;
+  margin: -28px -18px;
+  object-fit: contain;
+}
+
+@media (max-width: 900px) {
+  .site-header .header-inner {
+    height: 92px;
+  }
+  .site-header .brand,
+  .site-header .brand-logo-wrap {
+    height: 84px;
+  }
+  .site-header .brand-logo {
+    height: 132px;
+    max-width: 260px;
+    margin: -22px -14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-header .header-inner {
+    height: 82px;
+  }
+  .site-header .brand,
+  .site-header .brand-logo-wrap {
+    height: 74px;
+  }
+  .site-header .brand-logo {
+    height: 112px;
+    max-width: 220px;
+    margin: -18px -10px;
+  }
+}
+
+
