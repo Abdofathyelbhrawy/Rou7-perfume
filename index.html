@@ -28,7 +28,98 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="#home" aria-label="رُوح | Rou7 Perfume"><img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume"></a>
+      <a class="brand" id="brandHeaderStage" href="#home" aria-label="رُوح | Rou7 Perfume" title="انقر لإعادة تشغيل الحركة">
+        <div class="brand-cinema" id="brandCinema" aria-hidden="true">
+          <svg class="brand-cinema-svg" viewBox="0 0 320 92" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="roohMistGrad" x1="138" y1="36" x2="318" y2="46" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FF8F3A" stop-opacity="0.95"/>
+                <stop offset="55%" stop-color="#D97828" stop-opacity="0.8"/>
+                <stop offset="100%" stop-color="#4B5A3C" stop-opacity="0.9"/>
+              </linearGradient>
+              <filter id="roohGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="1.6" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            <!-- 1. Continuous minimalist line-art person + arm + hand holding bottle -->
+            <g class="sketch-person" stroke="var(--ink)" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Head & poised profile silhouette -->
+              <path class="p-head" pathLength="100" d="M 36 30 C 36 17 48 11 58 14 C 66 17 69 25 68 33 C 71 36 72 39 69 42 C 67 45 64 47 59 48 C 54 50 51 54 51 60"/>
+              <!-- Hair / crown elegance & jawline -->
+              <path class="p-profile" pathLength="100" d="M 37 26 C 32 33 33 43 38 49 C 40 53 39 58 32 64 C 24 70 20 79 20 88"/>
+              <!-- Shoulder & raised forearm extending to the hand holding bottle -->
+              <path class="p-arm" pathLength="100" d="M 51 60 C 56 66 64 73 76 74 C 91 75 102 68 111 63"/>
+              <!-- Collar / draped fabric accent -->
+              <path class="p-collar" pathLength="100" d="M 39 63 C 46 69 55 70 61 65"/>
+              <!-- Hand cradling the perfume flacon & index finger resting on nozzle -->
+              <path class="p-hand" pathLength="100" d="M 105 56 C 109 53 114 53 117 56 M 108 64 C 115 67 125 68 131 64 C 134 62 135 58 132 56 M 113 42 C 115 35 121 29 128 29 C 133 29 136 31 136 33"/>
+            </g>
+
+            <!-- 2. Perfume bottle held in hand -->
+            <g class="sketch-bottle" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Faceted glass flacon -->
+              <path class="b-body" pathLength="100" stroke="var(--ink)" stroke-width="1.45" d="M 118 44 L 138 44 L 140 72 C 140 75 137 77 134 77 L 122 77 C 119 77 116 75 116 72 Z"/>
+              <!-- Golden neck collar -->
+              <path class="b-collar" pathLength="100" stroke="var(--accent)" stroke-width="1.6" d="M 123 44 L 123 39 L 133 39 L 133 44"/>
+              <!-- Liquid wave line inside bottle -->
+              <path class="b-liquid" pathLength="100" stroke="var(--accent)" stroke-width="1.2" d="M 118 59 Q 128 57 138 59"/>
+              <!-- Pressable sprayer nozzle -->
+              <g class="sketch-nozzle">
+                <path class="b-nozzle" pathLength="100" stroke="var(--ink)" stroke-width="1.45" d="M 124 39 L 124 34 L 132 34 L 132 39"/>
+                <circle class="nozzle-tip" cx="133.5" cy="36" r="1.4" fill="var(--accent)"/>
+                <circle class="nozzle-flash" cx="136" cy="36" r="5" fill="var(--accent)" filter="url(#roohGlow)"/>
+              </g>
+            </g>
+
+            <!-- 3. Fragrant mist ribbons & droplets flying toward the logo -->
+            <g class="sketch-spray">
+              <path class="spray-line s1" pathLength="100" stroke="url(#roohMistGrad)" stroke-width="1.75" stroke-linecap="round" d="M 139 36 C 175 24 218 18 258 28 C 282 34 300 30 316 26"/>
+              <path class="spray-line s2" pathLength="100" stroke="url(#roohMistGrad)" stroke-width="2.1" stroke-linecap="round" filter="url(#roohGlow)" d="M 139 36 C 182 36 226 48 268 42 C 288 39 304 42 318 45"/>
+              <path class="spray-line s3" pathLength="100" stroke="url(#roohMistGrad)" stroke-width="1.35" stroke-linecap="round" d="M 139 37 C 178 48 220 62 262 56 C 286 52 302 58 316 60"/>
+
+              <!-- Shimmering fragrance droplets -->
+              <circle class="spray-dot d1" cx="164" cy="33" r="1.8" fill="var(--accent)"/>
+              <circle class="spray-dot d2" cx="192" cy="27" r="1.5" fill="var(--ink)"/>
+              <circle class="spray-dot d3" cx="218" cy="40" r="2.1" fill="var(--accent)"/>
+              <circle class="spray-dot d4" cx="244" cy="31" r="1.4" fill="var(--accent)"/>
+              <circle class="spray-dot d5" cx="268" cy="48" r="1.9" fill="var(--ink)"/>
+              <circle class="spray-dot d6" cx="288" cy="36" r="2.2" fill="var(--accent)" filter="url(#roohGlow)"/>
+              <circle class="spray-dot d7" cx="304" cy="44" r="1.6" fill="var(--accent)"/>
+              <circle class="spray-dot d8" cx="232" cy="52" r="1.3" fill="var(--accent)"/>
+            </g>
+          </svg>
+        </div>
+
+        <div class="brand-logo-wrap" id="brandLogoWrap">
+          <img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume">
+          <!-- Calligraphic rewrite overlay tracing right-to-left over the logo -->
+          <svg class="brand-rewrite-svg" viewBox="0 0 120 84" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <filter id="roohNibGlow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="2.2" result="b"/>
+                <feMerge>
+                  <feMergeNode in="b"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <!-- Letter ر (rightmost) -->
+            <path class="rewrite-stroke r-1" pathLength="100" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" filter="url(#roohNibGlow)" d="M 88 29 C 89 37 86 46 77 50"/>
+            <!-- Letter و (center) -->
+            <path class="rewrite-stroke r-2" pathLength="100" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#roohNibGlow)" d="M 67 34 C 72 34 74 40 69 43 C 64 44 63 37 67 34 C 72 41 69 51 58 54"/>
+            <!-- Letter ح (leftmost sweeping loop) -->
+            <path class="rewrite-stroke r-3" pathLength="100" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#roohNibGlow)" d="M 35 28 C 44 25 50 30 47 36 C 41 42 29 45 31 54 C 33 61 46 61 52 53"/>
+            <!-- Diacritics & Perfume / Tagline flourishes -->
+            <path class="rewrite-stroke r-4" pathLength="100" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" d="M 43 17 L 39 22 M 65 20 C 68 20 69 23 66 25"/>
+            <path class="rewrite-stroke r-5" pathLength="100" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" d="M 90 67 C 68 65 44 65 24 67"/>
+          </svg>
+        </div>
+      </a>
       <div class="header-nav-actions-group">
         <nav class="desktop-nav" aria-label="القائمة الرئيسية">
           <a href="#home" class="active" data-i18n="nav_home">الرئيسية</a>

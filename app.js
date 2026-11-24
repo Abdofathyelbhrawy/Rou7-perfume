@@ -4378,6 +4378,33 @@ ${itemsTextAr}
   setTimeout(dismissLoader, 350); // Fast failsafe
   setTimeout(dismissLoader, 1200); // Ultimate failsafe — never get stuck
 
+  // ── Header Line-Art Cinema (Person -> Spray -> Logo Rewrite) ────────────
+  function initHeaderBrandCinema() {
+    const stage = document.getElementById('brandHeaderStage');
+    if (!stage) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let endTimer = null;
+    const play = () => {
+      clearTimeout(endTimer);
+      stage.classList.remove('is-playing');
+      void stage.offsetWidth; // restart CSS keyframe timeline cleanly
+      stage.classList.add('is-playing');
+      endTimer = setTimeout(() => {
+        stage.classList.remove('is-playing');
+      }, 4600);
+    };
+
+    // Auto-play once right after the page loader settles
+    setTimeout(play, 450);
+
+    // Allow replaying anytime when the user clicks the logo
+    stage.addEventListener('click', () => {
+      play();
+    });
+  }
+  initHeaderBrandCinema();
+
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
       drawer(false);

@@ -5212,3 +5212,215 @@ body.hero-modal-open {
     font-size: 12px !important;
   }
 }
+
+/* ==========================================================
+   Header Line-Art Cinema Animation (Person -> Spray -> Logo Rewrite)
+   ========================================================== */
+.brand {
+  direction: ltr;
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.brand-logo-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brand-cinema {
+  position: absolute;
+  right: calc(100% + 4px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 280px;
+  height: 84px;
+  pointer-events: none;
+  opacity: 0;
+  overflow: visible;
+}
+
+.brand.is-playing .brand-cinema {
+  opacity: 1;
+}
+
+.brand-cinema-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.brand-rewrite-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Initial stroke states inside cinema */
+.sketch-person path,
+.sketch-bottle path,
+.sketch-spray .spray-line,
+.brand-rewrite-svg .rewrite-stroke {
+  stroke-dasharray: 102;
+  stroke-dashoffset: 102;
+}
+
+.sketch-spray .spray-dot,
+.sketch-bottle .nozzle-flash {
+  opacity: 0;
+}
+
+/* 1. Person & bottle self-drawing (0.0s -> 1.45s), then fade out smoothly at end (3.85s -> 4.4s) */
+.brand.is-playing .brand-cinema {
+  animation: roohCinemaStage 4.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.brand.is-playing .p-head    { animation: roohDrawPath 0.55s ease-out 0.05s forwards; }
+.brand.is-playing .p-profile { animation: roohDrawPath 0.50s ease-out 0.30s forwards; }
+.brand.is-playing .p-collar  { animation: roohDrawPath 0.35s ease-out 0.55s forwards; }
+.brand.is-playing .p-arm     { animation: roohDrawPath 0.55s ease-out 0.50s forwards; }
+.brand.is-playing .p-hand    { animation: roohDrawPath 0.45s ease-out 0.85s forwards; }
+
+.brand.is-playing .b-body    { animation: roohDrawPath 0.55s ease-out 0.75s forwards; }
+.brand.is-playing .b-collar  { animation: roohDrawPath 0.30s ease-out 1.05s forwards; }
+.brand.is-playing .b-liquid  { animation: roohDrawPath 0.35s ease-out 1.15s forwards; }
+.brand.is-playing .b-nozzle  { animation: roohDrawPath 0.30s ease-out 1.20s forwards; }
+
+/* 2. Finger presses sprayer nozzle + golden flash (1.45s -> 1.85s) */
+.brand.is-playing .sketch-nozzle {
+  animation: roohNozzlePress 0.38s ease-in-out 1.45s forwards;
+}
+.brand.is-playing .nozzle-flash {
+  animation: roohNozzleFlash 0.45s ease-out 1.50s forwards;
+}
+
+/* 3. Fragrant spray lines & mist particles travel from nozzle to logo (1.55s -> 2.65s) */
+.brand.is-playing .spray-line.s1 { animation: roohSprayRibbon 1.05s cubic-bezier(0.25, 0.8, 0.25, 1) 1.56s forwards; }
+.brand.is-playing .spray-line.s2 { animation: roohSprayRibbon 1.10s cubic-bezier(0.25, 0.8, 0.25, 1) 1.62s forwards; }
+.brand.is-playing .spray-line.s3 { animation: roohSprayRibbon 1.00s cubic-bezier(0.25, 0.8, 0.25, 1) 1.68s forwards; }
+
+.brand.is-playing .spray-dot.d1 { animation: roohMistDot 0.70s ease-out 1.58s forwards; }
+.brand.is-playing .spray-dot.d2 { animation: roohMistDot 0.75s ease-out 1.66s forwards; }
+.brand.is-playing .spray-dot.d3 { animation: roohMistDot 0.80s ease-out 1.72s forwards; }
+.brand.is-playing .spray-dot.d4 { animation: roohMistDot 0.80s ease-out 1.78s forwards; }
+.brand.is-playing .spray-dot.d5 { animation: roohMistDot 0.85s ease-out 1.84s forwards; }
+.brand.is-playing .spray-dot.d6 { animation: roohMistDot 0.85s ease-out 1.90s forwards; }
+.brand.is-playing .spray-dot.d7 { animation: roohMistDot 0.85s ease-out 1.96s forwards; }
+.brand.is-playing .spray-dot.d8 { animation: roohMistDot 0.78s ease-out 1.75s forwards; }
+
+/* 4. Logo dissolves slightly on mist hit and rewrites itself right-to-left (1.95s -> 4.10s) */
+.brand.is-playing .brand-logo {
+  animation: roohLogoRewrite 2.35s cubic-bezier(0.22, 1, 0.36, 1) 1.90s forwards;
+}
+
+.brand.is-playing .brand-rewrite-svg {
+  animation: roohRewriteOverlay 2.35s ease-out 1.95s forwards;
+}
+
+.brand.is-playing .rewrite-stroke.r-1 { animation: roohRewriteStroke 0.50s ease-out 2.05s forwards; }
+.brand.is-playing .rewrite-stroke.r-2 { animation: roohRewriteStroke 0.60s ease-out 2.35s forwards; }
+.brand.is-playing .rewrite-stroke.r-3 { animation: roohRewriteStroke 0.65s ease-out 2.70s forwards; }
+.brand.is-playing .rewrite-stroke.r-4 { animation: roohRewriteStroke 0.45s ease-out 3.10s forwards; }
+.brand.is-playing .rewrite-stroke.r-5 { animation: roohRewriteStroke 0.55s ease-out 3.25s forwards; }
+
+@keyframes roohDrawPath {
+  from { stroke-dashoffset: 102; }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes roohNozzlePress {
+  0%   { transform: translateY(0); }
+  45%  { transform: translateY(2.4px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes roohNozzleFlash {
+  0%   { opacity: 0; transform: scale(0.4); }
+  35%  { opacity: 0.85; transform: scale(1.25); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+
+@keyframes roohSprayRibbon {
+  0%   { stroke-dashoffset: 102; opacity: 0; }
+  18%  { opacity: 0.95; }
+  62%  { stroke-dashoffset: 0; opacity: 0.9; }
+  100% { stroke-dashoffset: -104; opacity: 0; }
+}
+
+@keyframes roohMistDot {
+  0%   { opacity: 0; transform: translate(-10px, 2px) scale(0.4); }
+  30%  { opacity: 0.95; transform: translate(2px, -1px) scale(1.15); }
+  100% { opacity: 0; transform: translate(16px, -4px) scale(0.3); }
+}
+
+@keyframes roohLogoRewrite {
+  0%   { opacity: 1; clip-path: inset(0 0 0 0); filter: blur(0px); }
+  14%  { opacity: 0.12; clip-path: inset(0 0 0 98%); filter: blur(1.2px); }
+  34%  { opacity: 0.92; clip-path: inset(0 0 0 64%); filter: blur(0.4px); }
+  56%  { opacity: 0.98; clip-path: inset(0 0 0 32%); filter: blur(0px); }
+  76%  { opacity: 1; clip-path: inset(0 0 0 0); }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); filter: none; }
+}
+
+@keyframes roohRewriteOverlay {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  80%  { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+@keyframes roohRewriteStroke {
+  0%   { stroke-dashoffset: 102; opacity: 0.95; }
+  70%  { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: -102; opacity: 0; }
+}
+
+@keyframes roohCinemaStage {
+  0%   { opacity: 1; transform: translate(0, -50%); }
+  86%  { opacity: 1; transform: translate(0, -50%); }
+  100% { opacity: 0; transform: translate(4px, -50%); }
+}
+
+@media (max-width: 1100px) {
+  .brand-cinema {
+    width: 195px;
+    height: 72px;
+  }
+}
+
+@media (max-width: 900px) {
+  .brand-cinema {
+    width: 155px;
+    height: 64px;
+  }
+}
+
+@media (max-width: 600px) {
+  .brand-cinema {
+    width: 108px;
+    height: 52px;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand-cinema {
+    width: 82px;
+    height: 46px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-cinema,
+  .brand-rewrite-svg {
+    display: none !important;
+  }
+}
+
