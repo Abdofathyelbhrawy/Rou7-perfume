@@ -5481,4 +5481,194 @@ body.hero-modal-open {
   }
 }
 
+/* ==========================================================
+   Global Typography Scale-Up & Card Description Cleanup
+   ========================================================== */
+.product-card .product-desc {
+  display: none !important;
+}
+
+body {
+  font-size: 16px;
+}
+
+.desktop-nav a {
+  font-size: 15.5px;
+  font-weight: 500;
+}
+
+.mobile-menu a,
+.mobile-menu button {
+  font-size: 16px;
+}
+
+.eyebrow,
+.cp-eyebrow,
+.mood-eyebrow {
+  font-size: 13px;
+}
+
+.button {
+  font-size: 14px;
+}
+
+/* Perfume Cards */
+.card-brand-badge {
+  font-size: 12px;
+}
+
+.product-meta h3,
+.prod-title-link {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.product-meta h3 small {
+  font-size: 12.5px !important;
+}
+
+.product-meta span,
+.price-current {
+  font-size: 16.5px;
+  font-weight: 700;
+}
+
+.price-old {
+  font-size: 13px;
+}
+
+.card-inspired-tag {
+  font-size: 12.5px;
+}
+
+.ck-pill,
+.accord-pill {
+  font-size: 12px;
+}
+
+.btn-explore-notes {
+  font-size: 13px;
+}
+
+.quick-add {
+  font-size: 13px;
+}
+
+.product-tag {
+  font-size: 11px;
+}
+
+/* Sections, Filters, Story, Quote, Newsletter, Footer & Cart */
+.filter,
+.brand-chip,
+.collection-brand-select,
+.collection-sort-select,
+.result-count {
+  font-size: 13.5px;
+}
+
+.cp-main-title {
+  font-size: clamp(26px, 3.6vw, 40px);
+}
+
+.cp-description,
+.sfb-copy p,
+.mood-subtitle,
+.story-copy > p:not(.eyebrow):not(.story-signature),
+.newsletter p {
+  font-size: 15.5px;
+  line-height: 1.9;
+}
+
+.cp-feat-item,
+.mood-desc {
+  font-size: 13.5px;
+}
+
+.mood-title {
+  font-size: 16.5px;
+}
+
+.story-current-price {
+  font-size: 22px;
+}
+
+.quote-band p {
+  font-size: clamp(26px, 3.8vw, 42px);
+}
+
+.quote-caption {
+  font-size: 13px;
+}
+
+.footer-top > p {
+  font-size: 13.5px;
+}
+
+.footer-links a {
+  font-size: 13px;
+}
+
+.footer-bottom {
+  font-size: 11.5px;
+}
+
+.cart-row h3 {
+  font-size: 14.5px;
+}
+
+.cart-row p {
+  font-size: 12.5px;
+}
+
+.cart-summary > div {
+  font-size: 14px;
+}
+
+.cart-summary strong {
+  font-size: 17px;
+}
+
+@media (max-width: 600px) {
+  .product-meta h3,
+  .prod-title-link {
+    font-size: 15.5px;
+  }
+
+  .product-meta span,
+  .price-current {
+    font-size: 14.5px;
+  }
+
+  .quick-add {
+    font-size: 11.5px;
+  }
+
+  .product-tag {
+    font-size: 10px;
+  }
+
+  .filter,
+  .brand-chip,
+  .collection-brand-select,
+  .collection-sort-select,
+  .result-count {
+    font-size: 12.5px;
+  }
+
+  .cp-description,
+  .sfb-copy p,
+  .mood-subtitle,
+  .story-copy > p:not(.eyebrow):not(.story-signature),
+  .newsletter p {
+    font-size: 14px;
+  }
+
+  .quote-band p {
+    font-size: 24px;
+  }
+}
+
+
 

@@ -2870,13 +2870,12 @@
             <div class="product-info">
               <span class="card-brand-badge" data-brand-filter="${escapeHtml(prodBrandKey)}">${brandLogoBadge}<span>${escapeHtml(prodBrandDisplay)}</span></span>
               <div class="product-meta">
-                <h3><a href="product.html?id=${product.id}" class="prod-title-link">${escapeHtml(prodName)}</a> ${prodSub ? `<small style="font-size:10px;opacity:.7;display:block;">${escapeHtml(prodSub)}</small>` : ''}</h3>
+                <h3><a href="product.html?id=${product.id}" class="prod-title-link">${escapeHtml(prodName)}</a> ${prodSub ? `<small style="font-size:12.5px;opacity:.7;display:block;">${escapeHtml(prodSub)}</small>` : ''}</h3>
                 ${priceHtml}
               </div>
               ${d.inspired_by ? `<div class="card-inspired-tag"><span class="ci-label">${currentLang === 'ar' ? 'مستوحى من' : 'Inspired by'}</span> <strong>${escapeHtml(d.inspired_by)}</strong></div>` : ''}
               ${notesPreview}
               ${moodMatchPillHtml}
-              <p class="product-desc">${escapeHtml(prodDesc)}</p>
               ${d.accords ? `<div class="card-accords-row">${renderAccordPills(d.accords)}</div>` : ''}
               <div class="card-action-links">
                 <a href="product.html?id=${product.id}" class="btn-explore-notes"><span>✦</span> ${currentLang === 'ar' ? 'تفاصيل وتحليل العطر' : 'Fragrance Profile & Notes'}</a>
