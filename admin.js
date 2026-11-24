@@ -441,6 +441,122 @@
   setAdminLanguage(adminLang, false);
 
   const campaignForm = $('#campaignForm');
+  let campaignRaw = {};
+  try {
+    campaignRaw = JSON.parse(localStorage.getItem(campaignKey) || localStorage.getItem('rooh-announcements') || '{}') || {};
+  } catch (_) {}
+
+  const HOME_SECTION_DEFS = [
+    {
+      id: 'customPerfumeSection',
+      icon: '🔍',
+      name: 'طلب توفير عطر',
+      fields: [
+        { key: 'eyebrow', label: 'العنوان الفرعي (Eyebrow)', type: 'text' },
+        { key: 'title', label: 'العنوان الرئيسي', type: 'text' },
+        { key: 'text', label: 'الوصف', type: 'textarea' },
+        { key: 'cta', label: 'نص الزر', type: 'text' }
+      ]
+    },
+    {
+      id: 'collection',
+      icon: '🛍️',
+      name: 'تسوق العطور (المختارات)',
+      fields: [
+        { key: 'eyebrow', label: 'العنوان الفرعي (Eyebrow)', type: 'text' },
+        { key: 'title', label: 'العنوان الرئيسي', type: 'text' }
+      ],
+      extras: [
+        { key: 'show_finder', label: 'إظهار مستشار رُوح الذكي' },
+        { key: 'show_mood', label: 'إظهار بوابة اللحظات والمشاعر' }
+      ]
+    },
+    {
+      id: 'story',
+      icon: '📖',
+      name: 'حكايتنا وعطر اليوم',
+      note: 'ملاحظة: لو حددت عنوان أو وصف مخصص في قسم "عطر اليوم"، ستكون له الأولوية على نصوص هذا القسم.',
+      fields: [
+        { key: 'eyebrow', label: 'العنوان الفرعي (Eyebrow)', type: 'text' },
+        { key: 'title', label: 'العنوان الرئيسي', type: 'text' },
+        { key: 'text', label: 'النص الوصفي', type: 'textarea' }
+      ]
+    },
+    {
+      id: 'quoteBand',
+      icon: '✳',
+      name: 'شريط الاقتباس',
+      fields: [
+        { key: 'text', label: 'نص الاقتباس', type: 'text' },
+        { key: 'caption', label: 'النص التعريفي أسفل الاقتباس', type: 'text' }
+      ]
+    },
+    {
+      id: 'newsletterSection',
+      icon: '✉️',
+      name: 'الاشتراك في الرسائل',
+      fields: [
+        { key: 'eyebrow', label: 'العنوان الفرعي (Eyebrow)', type: 'text' },
+        { key: 'title', label: 'العنوان الرئيسي', type: 'text' },
+        { key: 'text', label: 'النص التوضيحي', type: 'textarea' }
+      ]
+    }
+  ];
+
+  function getDefaultHomeLayout() {
+    const sections = {};
+    HOME_SECTION_DEFS.forEach(def => {
+      const sec = { visible: true };
+      def.fields.forEach(f => {
+        sec[`${f.key}_ar`] = '';
+        sec[`${f.key}_en`] = '';
+      });
+      if (def.extras) {
+        def.extras.forEach(ex => { sec[ex.key] = true; });
+      }
+      sections[def.id] = sec;
+    });
+    return {
+      order: HOME_SECTION_DEFS.map(d => d.id),
+      sections
+    };
+  }
+
+  function normalizeHomeLayout(raw) {
+    const def = getDefaultHomeLayout();
+    if (!raw || typeof raw !== 'object') return def;
+
+    const knownIds = def.order;
+    const rawOrder = Array.isArray(raw.order) ? raw.order : [];
+    const order = [];
+    rawOrder.forEach(id => {
+      if (knownIds.includes(id) && !order.includes(id)) order.push(id);
+    });
+    knownIds.forEach(id => {
+      if (!order.includes(id)) order.push(id);
+    });
+
+    const rawSections = (raw.sections && typeof raw.sections === 'object') ? raw.sections : {};
+    const sections = {};
+    HOME_SECTION_DEFS.forEach(d => {
+      const src = (rawSections[d.id] && typeof rawSections[d.id] === 'object') ? rawSections[d.id] : {};
+      const merged = { ...def.sections[d.id], ...src };
+      merged.visible = src.visible !== false;
+      if (d.extras) {
+        d.extras.forEach(ex => {
+          merged[ex.key] = src[ex.key] !== false;
+        });
+      }
+      sections[d.id] = merged;
+    });
+
+    return { order, sections };
+  }
+
+  let homeLayoutDraft = normalizeHomeLayout(campaignRaw.home_layout);
+  let homeLayoutDirty = false;
+  let expandedHomeSections = new Set();
+  let draggedHomeSectionId = null;
 
   function showCampaignPreview() {
     const topBarInput = $('#topBarTextInput');
@@ -585,6 +701,7 @@
         if (rows && rows.length && rows[0].notes) {
           try {
             const data = JSON.parse(rows[0].notes);
+            campaignRaw = data;
             populateCampaignInputs({
               ...defaultCampaign,
               ...data
@@ -593,6 +710,7 @@
               localStorage.setItem(campaignKey, JSON.stringify(data));
               localStorage.setItem('rooh-announcements', JSON.stringify(data));
             } catch (_) {}
+            if (typeof renderHomeLayoutEditor === 'function') renderHomeLayoutEditor();
           } catch (e) {
             console.error('Error parsing campaign notes:', e);
           }
@@ -601,6 +719,55 @@
       .catch(err => console.warn('Campaign fetch error:', err));
   }
   loadCampaignFromSupa();
+
+  async function persistCampaignPayload(obj) {
+    try {
+      localStorage.setItem(campaignKey, JSON.stringify(obj));
+      localStorage.setItem('rooh-announcements', JSON.stringify(obj));
+    } catch (_) {}
+
+    try {
+      const updatedRows = await supaFetch('products', {
+        method: 'PATCH',
+        filters: '&name=eq.__system_announcements__',
+        body: {
+          notes: JSON.stringify(obj),
+          category: 'unisex',
+          in_stock: false
+        }
+      });
+      if (!updatedRows || !updatedRows.length) {
+        await supaFetch('products', {
+          method: 'POST',
+          body: {
+            name: '__system_announcements__',
+            category: 'unisex',
+            price: 0,
+            in_stock: false,
+            notes: JSON.stringify(obj)
+          }
+        });
+      }
+      return true;
+    } catch (err) {
+      console.error('Failed to save to Supabase:', err);
+      try {
+        await supaFetch('products', {
+          method: 'POST',
+          body: {
+            name: '__system_announcements__',
+            category: 'unisex',
+            price: 0,
+            in_stock: false,
+            notes: JSON.stringify(obj)
+          }
+        });
+        return true;
+      } catch (e2) {
+        return false;
+      }
+    }
+  }
 
   if (campaignForm) {
     campaignForm.addEventListener('input', showCampaignPreview);
@@ -623,6 +790,7 @@
       }
 
       const updatedCampaign = {
+        ...campaignRaw,
         top_bar: $('#topBarTextInput')?.value.trim() || '',
         top_bar_active: $('#topBarActiveInput')?.checked !== false,
         promo_title: $('#promoTitleInput')?.value.trim() || '',
@@ -655,8 +823,6 @@
       };
 
       try {
-        localStorage.setItem(campaignKey, JSON.stringify(updatedCampaign));
-        localStorage.setItem('rooh-announcements', JSON.stringify(updatedCampaign));
         localStorage.setItem('rooh-promo', JSON.stringify({
           title: updatedCampaign.promo_title,
           details: updatedCampaign.promo_details,
@@ -666,58 +832,259 @@
         }));
       } catch (_) {}
 
-      try {
-        const updatedRows = await supaFetch('products', {
-          method: 'PATCH',
-          filters: '&name=eq.__system_announcements__',
-          body: {
-            notes: JSON.stringify(updatedCampaign),
-            category: 'unisex',
-            in_stock: false
-          }
-        });
-        if (!updatedRows || !updatedRows.length) {
-          await supaFetch('products', {
-            method: 'POST',
-            body: {
-              name: '__system_announcements__',
-              category: 'unisex',
-              price: 0,
-              in_stock: false,
-              notes: JSON.stringify(updatedCampaign)
-            }
-          });
-        }
-        if (status) {
+      campaignRaw = updatedCampaign;
+      const savedRemote = await persistCampaignPayload(updatedCampaign);
+      if (status) {
+        if (savedRemote) {
           status.className = 'saved';
           status.textContent = 'تم حفظ ونشر الإعلانات وعطر اليوم بنجاح في المتجر! ✓';
-        }
-      } catch (err) {
-        console.error('Failed to save to Supabase:', err);
-        try {
-          await supaFetch('products', {
-            method: 'POST',
-            body: {
-              name: '__system_announcements__',
-              category: 'unisex',
-              price: 0,
-              in_stock: false,
-              notes: JSON.stringify(updatedCampaign)
-            }
-          });
-          if (status) {
-            status.className = 'saved';
-            status.textContent = 'تم حفظ ونشر الإعلانات وعطر اليوم بنجاح في المتجر! ✓';
-          }
-        } catch (e2) {
-          if (status) {
-            status.className = 'error';
-            status.textContent = 'تم الحفظ محلياً فقط. تحقق من اتصال الإنترنت أو إعدادات Supabase.';
-          }
+        } else {
+          status.className = 'error';
+          status.textContent = 'تم الحفظ محلياً فقط. تحقق من اتصال الإنترنت أو إعدادات Supabase.';
         }
       }
     });
   }
+
+  // ── 🧩 Homepage Sections Layout Editor (تنسيق الصفحة الرئيسية) ────────────
+  function renderHomeLayoutEditor(forceFromDraft = false) {
+    const listEl = $('#homeSectionsList');
+    if (!listEl) return;
+
+    if (!forceFromDraft && !homeLayoutDirty) {
+      homeLayoutDraft = normalizeHomeLayout(campaignRaw.home_layout);
+    }
+
+    const total = homeLayoutDraft.order.length;
+    listEl.innerHTML = homeLayoutDraft.order.map((id, idx) => {
+      const def = HOME_SECTION_DEFS.find(d => d.id === id);
+      if (!def) return '';
+      const sec = homeLayoutDraft.sections[id] || { visible: true };
+      const isVisible = sec.visible !== false;
+      const isExpanded = expandedHomeSections.has(id);
+
+      const fieldsHtml = def.fields.map(f => {
+        const valAr = escapeHtml(sec[`${f.key}_ar`] || '');
+        const valEn = escapeHtml(sec[`${f.key}_en`] || '');
+        const ctrlAr = f.type === 'textarea'
+          ? `<textarea rows="2" data-field="${f.key}_ar" placeholder="اتركه فارغاً للنص الافتراضي">${valAr}</textarea>`
+          : `<input type="text" data-field="${f.key}_ar" value="${valAr}" placeholder="اتركه فارغاً للنص الافتراضي">`;
+        const ctrlEn = f.type === 'textarea'
+          ? `<textarea rows="2" dir="ltr" data-field="${f.key}_en" placeholder="Leave empty for default text">${valEn}</textarea>`
+          : `<input type="text" dir="ltr" data-field="${f.key}_en" value="${valEn}" placeholder="Leave empty for default text">`;
+        return `
+          <div class="home-field-group">
+            <span class="home-field-label">${escapeHtml(f.label)}</span>
+            <div class="home-field-pair">
+              <label><small>عربي</small>${ctrlAr}</label>
+              <label><small>English</small>${ctrlEn}</label>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const extrasHtml = def.extras ? `
+        <div class="home-extras-row">
+          ${def.extras.map(ex => `
+            <label class="home-extra-check">
+              <input type="checkbox" data-flag="${ex.key}" ${sec[ex.key] !== false ? 'checked' : ''}>
+              <span>${escapeHtml(ex.label)}</span>
+            </label>
+          `).join('')}
+        </div>
+      ` : '';
+
+      const noteHtml = def.note ? `<p class="home-section-note">${escapeHtml(def.note)}</p>` : '';
+
+      return `
+        <li class="home-section-row ${isVisible ? '' : 'is-hidden'}" draggable="true" data-id="${id}">
+          <div class="home-row-head">
+            <div class="home-row-info">
+              <span class="home-row-num">${arabicNum(idx + 1)}</span>
+              <span class="home-drag-handle" title="اسحب لإعادة الترتيب">⋮⋮</span>
+              <span class="home-row-icon">${def.icon}</span>
+              <strong class="home-row-name">${escapeHtml(def.name)}</strong>
+            </div>
+            <div class="home-row-controls">
+              <button type="button" class="home-move-btn" data-move="-1" title="تحريك لأعلى" ${idx === 0 ? 'disabled' : ''}>↑</button>
+              <button type="button" class="home-move-btn" data-move="1" title="تحريك لأسفل" ${idx === total - 1 ? 'disabled' : ''}>↓</button>
+              <label class="home-vis-switch" title="إظهار أو إخفاء القسم">
+                <input type="checkbox" data-visible ${isVisible ? 'checked' : ''}>
+                <span class="home-vis-label">${isVisible ? 'ظاهر' : 'مخفي'}</span>
+              </label>
+              <button type="button" class="home-edit-toggle ${isExpanded ? 'active' : ''}" data-toggle-edit>✏️ تعديل النصوص</button>
+            </div>
+          </div>
+          <div class="home-section-fields ${isExpanded ? 'open' : ''}">
+            ${noteHtml}
+            ${extrasHtml}
+            ${fieldsHtml}
+          </div>
+        </li>
+      `;
+    }).join('');
+  }
+
+  const homeSectionsListEl = $('#homeSectionsList');
+  if (homeSectionsListEl) {
+    homeSectionsListEl.addEventListener('click', e => {
+      const row = e.target.closest('.home-section-row');
+      if (!row) return;
+      const id = row.dataset.id;
+
+      const moveBtn = e.target.closest('[data-move]');
+      if (moveBtn) {
+        const dir = parseInt(moveBtn.dataset.move, 10);
+        const idx = homeLayoutDraft.order.indexOf(id);
+        const newIdx = idx + dir;
+        if (idx >= 0 && newIdx >= 0 && newIdx < homeLayoutDraft.order.length) {
+          const arr = homeLayoutDraft.order;
+          [arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
+          homeLayoutDirty = true;
+          renderHomeLayoutEditor(true);
+        }
+        return;
+      }
+
+      const editBtn = e.target.closest('[data-toggle-edit]');
+      if (editBtn) {
+        if (expandedHomeSections.has(id)) {
+          expandedHomeSections.delete(id);
+        } else {
+          expandedHomeSections.add(id);
+        }
+        const fieldsBox = row.querySelector('.home-section-fields');
+        if (fieldsBox) fieldsBox.classList.toggle('open', expandedHomeSections.has(id));
+        editBtn.classList.toggle('active', expandedHomeSections.has(id));
+      }
+    });
+
+    const handleFieldChange = e => {
+      const row = e.target.closest('.home-section-row');
+      if (!row) return;
+      const id = row.dataset.id;
+      const sec = homeLayoutDraft.sections[id];
+      if (!sec) return;
+
+      if (e.target.hasAttribute('data-visible')) {
+        sec.visible = e.target.checked;
+        homeLayoutDirty = true;
+        row.classList.toggle('is-hidden', !sec.visible);
+        const lbl = row.querySelector('.home-vis-label');
+        if (lbl) lbl.textContent = sec.visible ? 'ظاهر' : 'مخفي';
+        return;
+      }
+
+      if (e.target.hasAttribute('data-flag')) {
+        const flagKey = e.target.getAttribute('data-flag');
+        sec[flagKey] = e.target.checked;
+        homeLayoutDirty = true;
+        return;
+      }
+
+      if (e.target.hasAttribute('data-field')) {
+        const fieldKey = e.target.getAttribute('data-field');
+        sec[fieldKey] = e.target.value;
+        homeLayoutDirty = true;
+      }
+    };
+
+    homeSectionsListEl.addEventListener('input', handleFieldChange);
+    homeSectionsListEl.addEventListener('change', handleFieldChange);
+
+    homeSectionsListEl.addEventListener('dragstart', e => {
+      const row = e.target.closest('.home-section-row');
+      if (!row) return;
+      draggedHomeSectionId = row.dataset.id;
+      row.classList.add('dragging');
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedHomeSectionId);
+      }
+    });
+
+    homeSectionsListEl.addEventListener('dragend', () => {
+      draggedHomeSectionId = null;
+      homeSectionsListEl.querySelectorAll('.home-section-row').forEach(r => {
+        r.classList.remove('dragging', 'drag-over');
+      });
+    });
+
+    homeSectionsListEl.addEventListener('dragover', e => {
+      e.preventDefault();
+      const targetRow = e.target.closest('.home-section-row');
+      homeSectionsListEl.querySelectorAll('.home-section-row').forEach(r => {
+        if (r !== targetRow) r.classList.remove('drag-over');
+      });
+      if (targetRow && targetRow.dataset.id !== draggedHomeSectionId) {
+        targetRow.classList.add('drag-over');
+      }
+    });
+
+    homeSectionsListEl.addEventListener('dragleave', e => {
+      const row = e.target.closest('.home-section-row');
+      if (row && !row.contains(e.relatedTarget)) {
+        row.classList.remove('drag-over');
+      }
+    });
+
+    homeSectionsListEl.addEventListener('drop', e => {
+      e.preventDefault();
+      const targetRow = e.target.closest('.home-section-row');
+      if (!targetRow || !draggedHomeSectionId) return;
+      const targetId = targetRow.dataset.id;
+      if (targetId === draggedHomeSectionId) return;
+
+      const rect = targetRow.getBoundingClientRect();
+      const after = (e.clientY - rect.top) > (rect.height / 2);
+
+      const order = homeLayoutDraft.order.filter(item => item !== draggedHomeSectionId);
+      let insertIdx = order.indexOf(targetId);
+      if (insertIdx === -1) return;
+      if (after) insertIdx += 1;
+      order.splice(insertIdx, 0, draggedHomeSectionId);
+
+      homeLayoutDraft.order = order;
+      homeLayoutDirty = true;
+      draggedHomeSectionId = null;
+      renderHomeLayoutEditor(true);
+    });
+  }
+
+  $('#homeLayoutResetBtn')?.addEventListener('click', () => {
+    if (!confirm('هل تريد استرجاع الترتيب والنصوص الافتراضية لجميع أقسام الصفحة الرئيسية؟')) return;
+    homeLayoutDraft = getDefaultHomeLayout();
+    homeLayoutDirty = true;
+    renderHomeLayoutEditor(true);
+    const st = $('#homeLayoutStatus');
+    if (st) {
+      st.className = '';
+      st.textContent = 'تم استرجاع الترتيب الافتراضي — اضغط "حفظ ونشر" لتطبيقه على المتجر.';
+    }
+  });
+
+  $('#saveHomeLayoutBtn')?.addEventListener('click', async () => {
+    const st = $('#homeLayoutStatus');
+    if (st) {
+      st.className = '';
+      st.textContent = 'جاري حفظ ونشر ترتيب الصفحة الرئيسية...';
+    }
+    const updated = { ...campaignRaw, home_layout: homeLayoutDraft };
+    const savedRemote = await persistCampaignPayload(updated);
+    campaignRaw = updated;
+    homeLayoutDirty = false;
+    if (st) {
+      if (savedRemote) {
+        st.className = 'saved';
+        st.textContent = 'تم حفظ ونشر ترتيب الصفحة الرئيسية بنجاح ✓';
+      } else {
+        st.className = 'error';
+        st.textContent = 'تم الحفظ محلياً فقط. تحقق من اتصال الإنترنت أو إعدادات Supabase.';
+      }
+    }
+  });
+
+  renderHomeLayoutEditor();
 
   // ── Load orders & products from Supabase ──────────────────────────────────
   function cleanPhoneForWhatsApp(phone) {
@@ -3726,7 +4093,7 @@
   });
 
   // ── Admin Views & Tab Routing Engine (صفحات الداشبورد المستقلة) ────────────
-  const ADMIN_PANEL_IDS = ['products-panel', 'brands-panel', 'campaign', 'orders', 'inventory-panel', 'sales-panel', 'traffic-panel'];
+  const ADMIN_PANEL_IDS = ['products-panel', 'brands-panel', 'campaign', 'homepage-panel', 'orders', 'inventory-panel', 'sales-panel', 'traffic-panel'];
 
   function switchAdminView(targetHash) {
     const rawHash = (targetHash !== undefined ? targetHash : (window.location.hash || '#overview')).trim();
@@ -3750,6 +4117,7 @@
       'products-panel': adminLang === 'ar' ? 'إدارة العطور' : 'Fragrances',
       'brands-panel': adminLang === 'ar' ? 'إدارة البراندات' : 'Brands',
       'campaign': adminLang === 'ar' ? 'عطر اليوم والخصومات' : 'Daily Spotlight & Discounts',
+      'homepage-panel': adminLang === 'ar' ? 'تنسيق الصفحة الرئيسية' : 'Homepage Layout',
       'orders': adminLang === 'ar' ? 'إدارة الطلبات' : 'Orders',
       'inventory-panel': adminLang === 'ar' ? 'إدارة المخزون' : 'Inventory',
       'sales-panel': adminLang === 'ar' ? 'تقارير المبيعات والأرباح' : 'Sales Analytics',

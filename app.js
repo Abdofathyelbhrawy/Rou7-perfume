@@ -694,6 +694,7 @@
     if (typeof quizModal !== 'undefined' && quizModal && quizModal.classList.contains('open')) {
       renderQuizStep();
     }
+    if (typeof applyHomeLayout === 'function') applyHomeLayout();
   }
 
   function updateMoodPortalLang() {
@@ -1246,9 +1247,12 @@
       if (data.spotlight_title && data.spotlight_active !== false) {
         headingEl.innerHTML = escapeHtml(data.spotlight_title);
       } else {
-        headingEl.innerHTML = currentLang === 'ar'
-          ? `العطر لغةٌ<br>تسبق <em>الكلام</em>`
-          : `Fragrance is a language<br>before <em>words</em>`;
+        const ovT = getHomeText('story', 'title');
+        headingEl.innerHTML = ovT
+          ? formatHomeText(ovT)
+          : (currentLang === 'ar'
+            ? `العطر لغةٌ<br>تسبق <em>الكلام</em>`
+            : `Fragrance is a language<br>before <em>words</em>`);
       }
     }
 
@@ -1258,8 +1262,13 @@
           ? (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(data.spotlight_desc, 'ar', target.id, target.name) : data.spotlight_desc)
           : (window.PerfumeI18n ? window.PerfumeI18n.translateDesc(data.spotlight_desc, 'en', target.id, target.latin || target.name) : data.spotlight_desc);
       } else {
-        const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(target, currentLang) : null;
-        descEl.textContent = (localized && localized.desc) ? localized.desc : (currentLang === 'ar' ? 'عطر فاخر صُنع بعناية ليعكس حضورك المتميز ويترك أثراً لا يُنسى في كل لحظة.' : 'An exquisite fragrance meticulously blended to reflect your unique presence and leave an indelible impression.');
+        const ovD = getHomeText('story', 'text');
+        if (ovD) {
+          descEl.textContent = ovD;
+        } else {
+          const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(target, currentLang) : null;
+          descEl.textContent = (localized && localized.desc) ? localized.desc : (currentLang === 'ar' ? 'عطر فاخر صُنع بعناية ليعكس حضورك المتميز ويترك أثراً لا يُنسى في كل لحظة.' : 'An exquisite fragrance meticulously blended to reflect your unique presence and leave an indelible impression.');
+        }
       }
     }
 
@@ -1492,6 +1501,86 @@
     step();
   }
 
+  const HOME_DEFAULT_ORDER = ['customPerfumeSection', 'collection', 'story', 'quoteBand', 'newsletterSection'];
+
+  function formatHomeText(str) {
+    return escapeHtml(str).replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/\n/g, '<br>');
+  }
+
+  function getHomeText(sectionId, field) {
+    const val = currentAnnouncements?.home_layout?.sections?.[sectionId]?.[`${field}_${currentLang}`];
+    return typeof val === 'string' ? val.trim() : '';
+  }
+
+  function applyHomeLayout() {
+    const layout = currentAnnouncements && currentAnnouncements.home_layout;
+    if (!layout) return;
+
+    const main = document.querySelector('main');
+    const hero = document.getElementById('home');
+    if (main) {
+      const rawOrder = Array.isArray(layout.order) ? layout.order : [];
+      const order = [];
+      rawOrder.forEach(id => {
+        if (HOME_DEFAULT_ORDER.includes(id) && !order.includes(id)) order.push(id);
+      });
+      HOME_DEFAULT_ORDER.forEach(id => {
+        if (!order.includes(id)) order.push(id);
+      });
+      order.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) main.appendChild(el);
+      });
+      if (hero && main.firstElementChild !== hero) {
+        main.insertBefore(hero, main.firstElementChild);
+      }
+    }
+
+    const sections = layout.sections || {};
+    HOME_DEFAULT_ORDER.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const sec = sections[id] || {};
+      el.style.display = sec.visible === false ? 'none' : '';
+    });
+
+    const collSec = sections.collection || {};
+    const finderEl = document.getElementById('scentFinderBanner');
+    if (finderEl) finderEl.style.display = collSec.show_finder === false ? 'none' : '';
+    const moodEl = document.getElementById('moodPortalSection');
+    if (moodEl) moodEl.style.display = collSec.show_mood === false ? 'none' : '';
+
+    const setField = (root, selector, value, isHtml = false) => {
+      if (!root || !value) return;
+      const target = root.querySelector(selector);
+      if (!target) return;
+      if (isHtml) target.innerHTML = formatHomeText(value);
+      else target.textContent = value;
+    };
+
+    const cpEl = document.getElementById('customPerfumeSection');
+    setField(cpEl, '[data-i18n="cp_eyebrow"]', getHomeText('customPerfumeSection', 'eyebrow'));
+    setField(cpEl, '[data-i18n-html="cp_title"]', getHomeText('customPerfumeSection', 'title'), true);
+    setField(cpEl, '[data-i18n="cp_desc"]', getHomeText('customPerfumeSection', 'text'));
+    setField(cpEl, '[data-i18n="cp_cta"]', getHomeText('customPerfumeSection', 'cta'));
+
+    const collEl = document.getElementById('collection');
+    setField(collEl, '[data-i18n="coll_eyebrow"]', getHomeText('collection', 'eyebrow'));
+    setField(collEl, '[data-i18n-html="coll_title"]', getHomeText('collection', 'title'), true);
+
+    const storyEl = document.getElementById('story');
+    setField(storyEl, '#storyEyebrow', getHomeText('story', 'eyebrow'));
+
+    const quoteEl = document.getElementById('quoteBand');
+    setField(quoteEl, '[data-i18n-html="quote_text"]', getHomeText('quoteBand', 'text'), true);
+    setField(quoteEl, '[data-i18n="quote_caption"]', getHomeText('quoteBand', 'caption'));
+
+    const newsEl = document.getElementById('newsletterSection');
+    setField(newsEl, '[data-i18n="news_eyebrow"]', getHomeText('newsletterSection', 'eyebrow'));
+    setField(newsEl, '[data-i18n-html="news_title"]', getHomeText('newsletterSection', 'title'), true);
+    setField(newsEl, '[data-i18n="news_text"]', getHomeText('newsletterSection', 'text'));
+  }
+
   function applyAnnouncements(data) {
     if (!data) return;
     currentAnnouncements = data;
@@ -1551,6 +1640,9 @@
         });
       }
     }
+
+    // 5. Dynamic Homepage Sections Layout & Overrides
+    applyHomeLayout();
   }
 
   function loadAnnouncements() {
@@ -1576,7 +1668,8 @@
           storewide_discount_percent: parsed.storewide_discount_percent || '',
           storewide_discount_scope: parsed.storewide_discount_scope || 'only_no_custom',
           storewide_discount_badge: parsed.storewide_discount_badge || '',
-          values_strip: parsed.values_strip || null
+          values_strip: parsed.values_strip || null,
+          home_layout: parsed.home_layout || null
         });
       }
     } catch (_) {}
