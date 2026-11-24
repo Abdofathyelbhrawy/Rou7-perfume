@@ -1828,8 +1828,46 @@
 
   // ── 3D Featured Perfume Showcase (عطر الواجهة الرئيسي ثلاثي الأبعاد) ─────────
   let heroTiltRaf = null;
+  let heroSlideIndex = 0;
+  let heroSlidesList = [];
+  const heroPreloadedImgs = new Set();
 
-  function renderHeroProduct() {
+  function getHeroBestSellers(candidates) {
+    const list = [];
+    const seen = new Set();
+    const pushUnique = p => {
+      if (!p) return;
+      const key = String(p.id);
+      if (seen.has(key)) return;
+      seen.add(key);
+      list.push(p);
+    };
+
+    // 1. Admin-picked Best Sellers (is_featured)
+    candidates.filter(p => Boolean(p.is_featured)).forEach(pushUnique);
+    // 2. Explicit best-seller flag or tag
+    candidates.filter(p =>
+      Boolean(p.is_best_seller) ||
+      /best|الأكثر|مبيع|بيست/i.test(String(p.tag || ''))
+    ).forEach(pushUnique);
+    // 3. Ensure the Best Sellers carousel always has multiple items to flip between
+    if (list.length < 2) {
+      candidates.slice(0, 5).forEach(pushUnique);
+    }
+
+    // Preload images for silky transitions
+    list.forEach(p => {
+      if (p.image_url && !heroPreloadedImgs.has(p.image_url)) {
+        heroPreloadedImgs.add(p.image_url);
+        const im = new Image();
+        im.src = p.image_url;
+      }
+    });
+
+    return list;
+  }
+
+  function renderHeroProduct(slideDir = 0) {
     const hero = $('#heroProduct');
     if (!hero) return;
     const isAr = currentLang === 'ar';
@@ -1837,6 +1875,10 @@
     if (heroTiltRaf) {
       cancelAnimationFrame(heroTiltRaf);
       heroTiltRaf = null;
+    }
+    if (heroAutoTimer) {
+      clearInterval(heroAutoTimer);
+      heroAutoTimer = null;
     }
 
     const candidates = products.filter(p =>
@@ -1847,12 +1889,16 @@
     );
 
     if (!candidates.length) {
+      heroSlidesList = [];
       hero.innerHTML = `<div class="hero-product-empty"><span>✳</span><p>${isAr ? 'المنتج المميز سيظهر هنا' : 'Featured fragrance will appear here'}</p></div>`;
       return;
     }
 
-    // Admin controls the single featured perfume (is_featured === true)
-    const featured = candidates.find(p => p.is_featured) || candidates[0];
+    heroSlidesList = getHeroBestSellers(candidates);
+    const totalSlides = heroSlidesList.length;
+    heroSlideIndex = ((heroSlideIndex % totalSlides) + totalSlides) % totalSlides;
+
+    const featured = heroSlidesList[heroSlideIndex];
     const d = unpackProduct(featured);
     const pricing = computeProductPrice(featured);
 
@@ -1889,10 +1935,35 @@
     if (featured.gender === 'men' || featured.category === 'men') genderText = isAr ? 'عطر رجالي 🎩' : 'For Men 🎩';
     else if (featured.gender === 'women' || featured.category === 'women') genderText = isAr ? 'عطر نسائي 🌸' : 'For Her 🌸';
 
+    const animClass = slideDir > 0 ? 'hero-slide-enter from-next' : (slideDir < 0 ? 'hero-slide-enter from-prev' : '');
+
+    const navArrowsHtml = totalSlides > 1 ? `
+      <button type="button" class="hero-nav-btn hero-prev" id="heroPrevBtn" aria-label="${isAr ? 'العطر السابق' : 'Previous Best Seller'}">‹</button>
+      <button type="button" class="hero-nav-btn hero-next" id="heroNextBtn" aria-label="${isAr ? 'العطر التالي' : 'Next Best Seller'}">›</button>
+    ` : '';
+
+    const dotsHtml = totalSlides > 1 ? `
+      <div class="hero-carousel-dots" role="tablist" aria-label="${isAr ? 'عطور الأكثر مبيعاً' : 'Best Sellers'}">
+        ${heroSlidesList.map((item, idx) => {
+          const itemLabel = escapeHtml(isAr ? item.name : (item.latin || item.name));
+          return `<button type="button" class="hero-dot ${idx === heroSlideIndex ? 'active' : ''}" data-hero-slide="${idx}" role="tab" aria-selected="${idx === heroSlideIndex ? 'true' : 'false'}" aria-label="${itemLabel}" title="${itemLabel}"></button>`;
+        }).join('')}
+      </div>
+    ` : '';
+
     hero.innerHTML = `
-      <div class="hero-3d-showcase" id="hero3dShowcase">
+      <div class="hero-3d-showcase ${animClass}" id="hero3dShowcase">
+        <!-- Best Seller Top Label -->
+        <div class="hero-bestseller-eyebrow">
+          <span>✦</span>
+          <span>${isAr ? 'الأكثر مبيعاً · BEST SELLERS' : 'BEST SELLERS'}</span>
+          <span>✦</span>
+        </div>
+
         <!-- Giant High-Fashion Background Watermark Typography -->
         <div class="hero-bg-watermark ${isMultiWord ? 'multi-word' : 'single-word'}" id="heroWatermark" aria-hidden="true">${watermarkHtml}</div>
+
+        ${navArrowsHtml}
 
         <!-- Center Stage: 3D Floating Perfume Bottle -->
         <div class="hero-bottle-center-stage" id="heroBottleStage">
@@ -1908,6 +1979,8 @@
           <button type="button" class="hero-bottle-trigger-btn" id="heroBottleTriggerBtn" aria-label="${isAr ? `عرض تفاصيل عطر ${shortName}` : `Show Fragrance Details for ${shortName}`}">
             <span>${isAr ? `اضغط لاكتشاف عطر ${shortName}` : `Discover ${shortName}`}</span>
           </button>
+
+          ${dotsHtml}
         </div>
 
         <!-- Modal Overlay: Floating Product Info HUD Card (Opens on Click) -->
@@ -1918,7 +1991,7 @@
             <div class="hero-hud-badge-row">
               <span class="hero-badge-pill">
                 <span class="hero-badge-spark">✦</span>
-                <span>${isAr ? 'عطر الواجهة الاستثنائي' : 'Featured Signature Fragrance'}</span>
+                <span>${isAr ? 'الأكثر مبيعاً · Best Seller' : 'Best Seller Fragrance'}</span>
                 <span class="hero-badge-spark">✦</span>
               </span>
               <span class="hero-gender-badge">${genderText}</span>
@@ -1959,17 +2032,64 @@
       </div>
     `;
 
-    // ── Interactive 3D Parallax & Tilt Physics ──────────────────────────────
+    // ── Best Sellers Carousel Controls & Auto-Cycle ─────────────────────────
     const showcase = $('#hero3dShowcase');
     const bottleWrap = $('#heroBottleWrap');
     const watermark = $('#heroWatermark');
+    const overlay = hero.querySelector('#heroHudModalOverlay');
+    let heroHoverPaused = false;
 
+    function goToHeroSlide(nextIdx, dir) {
+      if (totalSlides <= 1) return;
+      heroSlideIndex = ((nextIdx % totalSlides) + totalSlides) % totalSlides;
+      renderHeroProduct(dir);
+    }
+
+    function startHeroAutoCycle() {
+      if (totalSlides <= 1) return;
+      clearInterval(heroAutoTimer);
+      heroAutoTimer = setInterval(() => {
+        if (heroHoverPaused) return;
+        if (overlay && overlay.classList.contains('active')) return;
+        if (document.hidden) return;
+        goToHeroSlide(heroSlideIndex + 1, 1);
+      }, 4200);
+    }
+
+    hero.querySelector('#heroPrevBtn')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      goToHeroSlide(heroSlideIndex - 1, -1);
+    });
+
+    hero.querySelector('#heroNextBtn')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      goToHeroSlide(heroSlideIndex + 1, 1);
+    });
+
+    hero.querySelectorAll('[data-hero-slide]').forEach(dot => {
+      dot.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const targetIdx = parseInt(dot.dataset.heroSlide, 10);
+        if (!isNaN(targetIdx) && targetIdx !== heroSlideIndex) {
+          goToHeroSlide(targetIdx, targetIdx > heroSlideIndex ? 1 : -1);
+        }
+      });
+    });
+
+    startHeroAutoCycle();
+
+    // ── Interactive 3D Parallax, Tilt Physics & Mobile Swipe ────────────────
     if (showcase && bottleWrap) {
       let isInteracting = false;
       let targetRotX = 0;
       let targetRotY = 0;
       let currentRotX = 0;
       let currentRotY = 0;
+      let touchStartX = 0;
+      let touchStartY = 0;
 
       function updateTilt() {
         currentRotX += (targetRotX - currentRotX) * 0.12;
@@ -2001,16 +2121,28 @@
         if (!heroTiltRaf) heroTiltRaf = requestAnimationFrame(updateTilt);
       }
 
+      showcase.addEventListener('mouseenter', () => {
+        heroHoverPaused = true;
+      });
+
       showcase.addEventListener('mousemove', e => {
         onPointerMove(e.clientX, e.clientY);
       });
 
       showcase.addEventListener('mouseleave', () => {
+        heroHoverPaused = false;
         targetRotX = 0;
         targetRotY = 0;
         isInteracting = false;
         if (!heroTiltRaf) heroTiltRaf = requestAnimationFrame(updateTilt);
       });
+
+      showcase.addEventListener('touchstart', e => {
+        if (e.touches && e.touches[0]) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        }
+      }, { passive: true });
 
       showcase.addEventListener('touchmove', e => {
         if (e.touches && e.touches[0]) {
@@ -2018,16 +2150,23 @@
         }
       }, { passive: true });
 
-      showcase.addEventListener('touchend', () => {
+      showcase.addEventListener('touchend', e => {
         targetRotX = 0;
         targetRotY = 0;
         isInteracting = false;
         if (!heroTiltRaf) heroTiltRaf = requestAnimationFrame(updateTilt);
+
+        if (totalSlides > 1 && e.changedTouches && e.changedTouches[0]) {
+          const dx = e.changedTouches[0].clientX - touchStartX;
+          const dy = e.changedTouches[0].clientY - touchStartY;
+          if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+            goToHeroSlide(heroSlideIndex + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+          }
+        }
       });
     }
 
     // Modal Open & Close logic
-    const overlay = hero.querySelector('#heroHudModalOverlay');
     const closeBtn = hero.querySelector('#heroHudCloseBtn');
     const bottleLink = hero.querySelector('#heroBottleLink');
     const triggerBtn = hero.querySelector('#heroBottleTriggerBtn');

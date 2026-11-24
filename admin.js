@@ -465,10 +465,6 @@
       fields: [
         { key: 'eyebrow', label: 'العنوان الفرعي (Eyebrow)', type: 'text' },
         { key: 'title', label: 'العنوان الرئيسي', type: 'text' }
-      ],
-      extras: [
-        { key: 'show_finder', label: 'إظهار مستشار رُوح الذكي' },
-        { key: 'show_mood', label: 'إظهار بوابة اللحظات والمشاعر' }
       ]
     },
     {
@@ -1616,13 +1612,13 @@
                   : (adminLang === 'ar' ? 'متوفر ✓' : 'In Stock ✓'))
               : (adminLang === 'ar' ? 'نفد من المخزون (0)' : 'Out of Stock (0)')}
           </span>
-          ${p.is_featured ? `<span class="featured-mark" title="${adminLang === 'ar' ? 'عطر الواجهة الرئيسي 3D ⭐' : '3D Featured Hero Fragrance ⭐'}">⭐ ${adminLang === 'ar' ? 'الواجهة' : 'Hero'}</span>` : ''}
+          ${p.is_featured ? `<span class="featured-mark" title="${adminLang === 'ar' ? 'معروض في الأكثر مبيعاً بالواجهة 3D ⭐' : 'In 3D Best Sellers Hero ⭐'}">⭐ ${adminLang === 'ar' ? 'الأكثر مبيعاً' : 'Best Seller'}</span>` : ''}
           ${p.tag ? `<span class="tag-badge">${escapeHtml(p.tag)}</span>` : ''}
         </td>
         <td>
           <div class="action-btns">
-            <button class="btn-action btn-hero-toggle ${p.is_featured ? 'in-hero' : ''}" data-toggle-hero="${p.id}" title="${p.is_featured ? (adminLang === 'ar' ? 'معروض في واجهة المتجر 3D' : 'Featured in 3D Hero') : (adminLang === 'ar' ? 'تعيين كعطر الواجهة الرئيسي 3D' : 'Set as Featured 3D Hero')}">
-              ${p.is_featured ? (adminLang === 'ar' ? '⭐ بالواجهة' : '⭐ Hero') : (adminLang === 'ar' ? '＋ للواجهة' : '＋ To Hero')}
+            <button class="btn-action btn-hero-toggle ${p.is_featured ? 'in-hero' : ''}" data-toggle-hero="${p.id}" title="${p.is_featured ? (adminLang === 'ar' ? 'معروض في الأكثر مبيعاً بالواجهة 3D (انقر للإزالة)' : 'In 3D Best Sellers Hero (click to remove)') : (adminLang === 'ar' ? 'إضافة إلى الأكثر مبيعاً بالواجهة 3D' : 'Add to 3D Best Sellers Hero')}">
+              ${p.is_featured ? (adminLang === 'ar' ? '⭐ بيست سيلر' : '⭐ Best Seller') : (adminLang === 'ar' ? '＋ بيست سيلر' : '＋ Best Seller')}
             </button>
             <button class="btn-action btn-duplicate" data-duplicate="${p.id}" title="${adminLang === 'ar' ? 'نسخ هذا العطر كمنتج جديد' : 'Duplicate Product'}">${adminLang === 'ar' ? 'نسخ ⧉' : 'Duplicate ⧉'}</button>
             <button class="btn-action btn-edit" data-edit="${p.id}" title="${adminLang === 'ar' ? 'تعديل' : 'Edit'}">${adminLang === 'ar' ? 'تعديل ✎' : 'Edit ✎'}</button>
@@ -3091,26 +3087,13 @@
       if (!targetProduct) return;
       const willBeFeatured = !targetProduct.is_featured;
 
-      // Exactly ONE product featured in the 3D Hero: feature this one and unfeature others
-      currentProducts.forEach(p => {
-        if (String(p.id) === String(id)) {
-          p.is_featured = willBeFeatured;
-        } else if (willBeFeatured) {
-          p.is_featured = false;
-        }
-      });
+      // Multi-select Best Sellers for the 3D Hero Carousel
+      targetProduct.is_featured = willBeFeatured;
 
       try { localStorage.setItem('rooh-cached-products', JSON.stringify(currentProducts)); } catch (_) {}
       renderProductsTable();
 
       try {
-        if (willBeFeatured) {
-          await supaFetch('products', {
-            method: 'PATCH',
-            filters: `&id=neq.${encodeURIComponent(id)}`,
-            body: { is_featured: false }
-          }).catch(() => {});
-        }
         await supaFetch('products', {
           method: 'PATCH',
           filters: `&id=eq.${encodeURIComponent(id)}`,
@@ -3410,19 +3393,6 @@
         } else {
           throw colErr;
         }
-      }
-
-      if (payload.is_featured) {
-        if (id) {
-          supaFetch('products', {
-            method: 'PATCH',
-            filters: `&id=neq.${encodeURIComponent(id)}`,
-            body: { is_featured: false }
-          }).catch(() => {});
-        }
-        currentProducts.forEach(p => {
-          if (!id || String(p.id) !== String(id)) p.is_featured = false;
-        });
       }
 
       formStatus.className = 'saved';
