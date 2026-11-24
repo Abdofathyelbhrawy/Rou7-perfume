@@ -5266,6 +5266,7 @@ body.hero-modal-open {
 
 /* Initial stroke states inside cinema */
 .sketch-person path,
+.sketch-person-front path,
 .sketch-bottle path,
 .sketch-spray .spray-line,
 .brand-rewrite-svg .rewrite-stroke {
@@ -5283,19 +5284,24 @@ body.hero-modal-open {
   animation: roohCinemaStage 4.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.brand.is-playing .p-head    { animation: roohDrawPath 0.55s ease-out 0.05s forwards; }
-.brand.is-playing .p-profile { animation: roohDrawPath 0.50s ease-out 0.30s forwards; }
-.brand.is-playing .p-collar  { animation: roohDrawPath 0.35s ease-out 0.55s forwards; }
-.brand.is-playing .p-arm     { animation: roohDrawPath 0.55s ease-out 0.50s forwards; }
-.brand.is-playing .p-hand    { animation: roohDrawPath 0.45s ease-out 0.85s forwards; }
+.brand.is-playing .p-hair          { animation: roohDrawPath 0.50s ease-out 0.04s forwards; }
+.brand.is-playing .p-face          { animation: roohDrawPath 0.55s ease-out 0.16s forwards; }
+.brand.is-playing .p-features      { animation: roohDrawPath 0.45s ease-out 0.34s forwards; }
+.brand.is-playing .p-torso         { animation: roohDrawPath 0.55s ease-out 0.42s forwards; }
+.brand.is-playing .p-arm           { animation: roohDrawPath 0.55s ease-out 0.58s forwards; }
+.brand.is-playing .p-hand          { animation: roohDrawPath 0.40s ease-out 0.85s forwards; }
+.brand.is-playing .p-finger        { animation: roohDrawPath 0.35s ease-out 1.00s forwards; }
+.brand.is-playing .p-fingers-front { animation: roohDrawPath 0.45s ease-out 0.98s forwards; }
 
-.brand.is-playing .b-body    { animation: roohDrawPath 0.55s ease-out 0.75s forwards; }
-.brand.is-playing .b-collar  { animation: roohDrawPath 0.30s ease-out 1.05s forwards; }
-.brand.is-playing .b-liquid  { animation: roohDrawPath 0.35s ease-out 1.15s forwards; }
-.brand.is-playing .b-nozzle  { animation: roohDrawPath 0.30s ease-out 1.20s forwards; }
+.brand.is-playing .b-body    { animation: roohDrawPath 0.50s ease-out 0.72s forwards; }
+.brand.is-playing .b-inner   { animation: roohDrawPath 0.45s ease-out 0.86s forwards; }
+.brand.is-playing .b-collar  { animation: roohDrawPath 0.30s ease-out 1.02s forwards; }
+.brand.is-playing .b-liquid  { animation: roohDrawPath 0.35s ease-out 1.12s forwards; }
+.brand.is-playing .b-nozzle  { animation: roohDrawPath 0.30s ease-out 1.18s forwards; }
 
 /* 2. Finger presses sprayer nozzle + golden flash (1.45s -> 1.85s) */
-.brand.is-playing .sketch-nozzle {
+.brand.is-playing .sketch-nozzle,
+.brand.is-playing .sketch-finger-press {
   animation: roohNozzlePress 0.38s ease-in-out 1.45s forwards;
 }
 .brand.is-playing .nozzle-flash {

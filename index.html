@@ -46,41 +46,54 @@
               </filter>
             </defs>
 
-            <!-- 1. Continuous minimalist line-art person + arm + hand holding bottle -->
-            <g class="sketch-person" stroke="var(--ink)" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round">
-              <!-- Head & poised profile silhouette -->
-              <path class="p-head" pathLength="100" d="M 36 30 C 36 17 48 11 58 14 C 66 17 69 25 68 33 C 71 36 72 39 69 42 C 67 45 64 47 59 48 C 54 50 51 54 51 60"/>
-              <!-- Hair / crown elegance & jawline -->
-              <path class="p-profile" pathLength="100" d="M 37 26 C 32 33 33 43 38 49 C 40 53 39 58 32 64 C 24 70 20 79 20 88"/>
-              <!-- Shoulder & raised forearm extending to the hand holding bottle -->
-              <path class="p-arm" pathLength="100" d="M 51 60 C 56 66 64 73 76 74 C 91 75 102 68 111 63"/>
-              <!-- Collar / draped fabric accent -->
-              <path class="p-collar" pathLength="100" d="M 39 63 C 46 69 55 70 61 65"/>
-              <!-- Hand cradling the perfume flacon & index finger resting on nozzle -->
-              <path class="p-hand" pathLength="100" d="M 105 56 C 109 53 114 53 117 56 M 108 64 C 115 67 125 68 131 64 C 134 62 135 58 132 56 M 113 42 C 115 35 121 29 128 29 C 133 29 136 31 136 33"/>
+            <!-- 1. Natural editorial line-art person (profile, torso, two-contour arm & anatomical hand) -->
+            <g class="sketch-person" stroke="var(--ink)" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Hair crown, volume & natural waves -->
+              <path class="p-hair" pathLength="100" stroke-width="1.35" d="M 50 17 C 47 11 38 9 30 12 C 23 15 21 24 23 34 C 24 38 26 41 29 43 M 47 16 C 40 16 34 20 30 26 M 36 13 C 30 17 27 24 27 32"/>
+              <!-- Realistic side facial profile (forehead, nose, lips, chin, jawline) -->
+              <path class="p-face" pathLength="100" stroke-width="1.4" d="M 50 17 C 53 20 53.5 23 52.8 25 L 57 31.2 C 58 33 56.2 34.6 53.6 34.6 L 54.6 36.6 C 55.6 37.6 54.4 38.6 52.8 38.9 C 54.4 39.7 54 41.2 52.5 41.6 C 53.4 43.8 51.4 46.2 47.8 46.6 C 42.8 47 38 44 35.8 39"/>
+              <!-- Delicate facial features (brow, eye looking at bottle, nostril, lip crease, ear) -->
+              <path class="p-features" pathLength="100" stroke-width="1.05" d="M 48 24.4 Q 50.8 23.4 53.2 24.5 M 48.5 27.6 Q 51 26.5 53 27.6 M 51.2 27.7 L 52.2 27.7 M 54 33.4 Q 55 33.8 55.4 33.1 M 50.8 38.9 L 52.8 38.9 M 34 29 C 31.4 28.6 30.5 33.2 32 37 C 33 38.5 34.8 38 35.4 36"/>
+              <!-- Neck, tailored collar, lapel & upper torso -->
+              <path class="p-torso" pathLength="100" stroke-width="1.35" d="M 29.5 42 C 29.8 48 27 52 20 56 C 14 59 12 68 12 88 M 43 46.5 C 43 51 45 55.5 50 58 C 56 60 61.5 62 65.5 64 M 30 52 C 34 57.5 41 60 46 58 L 43 72 L 38 89 M 54 68 C 55 75 54 82 53 89"/>
+              <!-- Two-contour arm & wrist cuff -->
+              <path class="p-arm" pathLength="100" stroke-width="1.35" d="M 22 60 C 24 72 31 82 46 84 C 63 86 82 77 100 66 M 52 64 C 56 71 61 73 70 70 C 81 67 90 61 98 57 M 97 56 C 98 60 99 63 101 67"/>
+              <!-- Anatomical palm heel & thumb behind bottle shoulder -->
+              <path class="p-hand" pathLength="100" stroke-width="1.3" d="M 99 57 C 104 54 108 51 111 46 C 113 43 116 43 117 45.2 C 117.5 47.2 115 51 113 54 M 101 66 C 106 70 111 72 116 71"/>
+              <!-- Index finger poised over sprayer cap (presses down in sync with nozzle) -->
+              <g class="sketch-finger-press">
+                <path class="p-finger" pathLength="100" stroke-width="1.3" d="M 106 51 C 109 41 115 32 122 31.5 C 126 31.3 128.5 32.5 128 34.2 C 127.5 35.2 124 34.8 121 35"/>
+              </g>
             </g>
 
-            <!-- 2. Perfume bottle held in hand -->
+            <!-- 2. Crystal perfume bottle held naturally in hand -->
             <g class="sketch-bottle" stroke-linecap="round" stroke-linejoin="round">
-              <!-- Faceted glass flacon -->
-              <path class="b-body" pathLength="100" stroke="var(--ink)" stroke-width="1.45" d="M 118 44 L 138 44 L 140 72 C 140 75 137 77 134 77 L 122 77 C 119 77 116 75 116 72 Z"/>
+              <!-- Outer faceted glass flacon -->
+              <path class="b-body" pathLength="100" stroke="var(--ink)" stroke-width="1.35" d="M 116 45 L 136 45 C 138 45 139 47 139 49 L 138 73 C 138 76 135 78 132 78 L 120 78 C 117 78 114 76 114 73 L 113 49 C 113 47 114 45 116 45 Z"/>
+              <!-- Inner glass contour & perfume label -->
+              <path class="b-inner" pathLength="100" stroke="var(--ink)" stroke-width="0.9" opacity="0.65" d="M 117 48 L 117 72 C 117 73.5 118.5 74.5 120 74.5 L 132 74.5 C 133.5 74.5 135 73.5 135 72 L 135 48 M 120 53 L 132 53 L 132 66 L 120 66 Z"/>
               <!-- Golden neck collar -->
-              <path class="b-collar" pathLength="100" stroke="var(--accent)" stroke-width="1.6" d="M 123 44 L 123 39 L 133 39 L 133 44"/>
-              <!-- Liquid wave line inside bottle -->
-              <path class="b-liquid" pathLength="100" stroke="var(--accent)" stroke-width="1.2" d="M 118 59 Q 128 57 138 59"/>
+              <path class="b-collar" pathLength="100" stroke="var(--accent)" stroke-width="1.5" d="M 121 45 L 121 40 L 131 40 L 131 45"/>
+              <!-- Liquid wave & dip tube -->
+              <path class="b-liquid" pathLength="100" stroke="var(--accent)" stroke-width="1.1" d="M 117 61 Q 126 59 135 61 M 126 45 L 126 73"/>
               <!-- Pressable sprayer nozzle -->
               <g class="sketch-nozzle">
-                <path class="b-nozzle" pathLength="100" stroke="var(--ink)" stroke-width="1.45" d="M 124 39 L 124 34 L 132 34 L 132 39"/>
-                <circle class="nozzle-tip" cx="133.5" cy="36" r="1.4" fill="var(--accent)"/>
-                <circle class="nozzle-flash" cx="136" cy="36" r="5" fill="var(--accent)" filter="url(#roohGlow)"/>
+                <path class="b-nozzle" pathLength="100" stroke="var(--ink)" stroke-width="1.35" d="M 122 40 L 122 34.5 L 130 34.5 L 130 40"/>
+                <circle class="nozzle-tip" cx="132" cy="36.5" r="1.3" fill="var(--accent)"/>
+                <circle class="nozzle-flash" cx="135" cy="36.5" r="5" fill="var(--accent)" filter="url(#roohGlow)"/>
               </g>
+            </g>
+
+            <!-- Front fingers wrapping naturally around the glass bottle -->
+            <g class="sketch-person-front" stroke="var(--ink)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path class="p-fingers-front" pathLength="100" d="M 112 53 C 116 51 123 51 125 53.5 C 125.5 55.5 121 56.5 114 56 M 112 58 C 117 57 123 57.5 124.5 59.5 C 125 61.5 120 62.5 114 61.5 M 113 64 C 117 63.5 122 64 123 66 C 123.5 67.5 119 68.5 114 67.5"/>
             </g>
 
             <!-- 3. Fragrant mist ribbons & droplets flying toward the logo -->
             <g class="sketch-spray">
-              <path class="spray-line s1" pathLength="100" stroke="url(#roohMistGrad)" stroke-width="1.75" stroke-linecap="round" d="M 139 36 C 175 24 218 18 258 28 C 282 34 300 30 316 26"/>
-              <path class="spray-line s2" pathLength="100" stroke="url(#roohMistGrad)" stroke-width="2.1" stroke-linecap="round" filter="url(#roohGlow)" d="M 139 36 C 182 36 226 48 268 42 C 288 39 304 42 318 45"/>
-              <path class="spray-line s3" pathLength="100" stroke="url(#roohMistGrad)" stroke-width="1.35" stroke-linecap="round" d="M 139 37 C 178 48 220 62 262 56 C 286 52 302 58 316 60"/>
+              <path class="spray-line s1" pathLength="100" stroke="url(#roohMistGrad)" stroke-width="1.75" stroke-linecap="round" d="M 135 36.5 C 173 24 218 18 258 28 C 282 34 300 30 316 26"/>
+              <path class="spray-line s2" pathLength="100" stroke="url(#roohMistGrad)" stroke-width="2.1" stroke-linecap="round" filter="url(#roohGlow)" d="M 135 36.5 C 180 36 226 48 268 42 C 288 39 304 42 318 45"/>
+              <path class="spray-line s3" pathLength="100" stroke="url(#roohMistGrad)" stroke-width="1.35" stroke-linecap="round" d="M 135 37.5 C 176 48 220 62 262 56 C 286 52 302 58 316 60"/>
 
               <!-- Shimmering fragrance droplets -->
               <circle class="spray-dot d1" cx="164" cy="33" r="1.8" fill="var(--accent)"/>
