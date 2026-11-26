@@ -1958,15 +1958,51 @@
       : 'Confidence, wrapped<br>in timeless elegance';
   }
 
-  function getHeroShortDesc(d, isAr) {
-    let raw = String(d.desc || d.notes || '').trim();
-    if (raw.startsWith('{') || raw.startsWith('[')) raw = '';
-    if (!raw) {
-      return isAr
-        ? 'تركيبة عطرية فاخرة من مختارات رُوح الأكثر مبيعاً، تمنحك حضوراً استثنائياً وثباتاً يدوم طوال اليوم.'
-        : 'A signature bestseller from Rou7 Perfume, crafted to elevate every moment with lasting allure and refined warmth.';
+  function renderHeroNotesHtml(d, isAr) {
+    const parseNotes = raw => String(raw || '')
+      .split(/[,،]/)
+      .map(s => s.trim())
+      .filter(Boolean)
+      .slice(0, 3)
+      .map(n => {
+        const trans = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(n, currentLang) : n;
+        return String(trans || n).trim();
+      })
+      .filter(Boolean);
+
+    const tiers = [
+      { label: isAr ? 'القمة' : 'Top', notes: parseNotes(d?.top_notes) },
+      { label: isAr ? 'القلب' : 'Heart', notes: parseNotes(d?.middle_notes) },
+      { label: isAr ? 'القاعدة' : 'Base', notes: parseNotes(d?.base_notes) }
+    ].filter(t => t.notes.length > 0);
+
+    if (!tiers.length) {
+      const accordList = String(d?.accords || d?.main_accord || '')
+        .split(/[,،]/)
+        .map(s => s.trim())
+        .filter(Boolean)
+        .slice(0, 4);
+      if (accordList.length) {
+        tiers.push({
+          label: isAr ? 'النوتات' : 'Notes',
+          notes: accordList.map(n => {
+            const trans = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(n, currentLang) : n;
+            return String(trans || n).trim();
+          }).filter(Boolean)
+        });
+      }
     }
-    return raw;
+
+    if (!tiers.length) return '';
+
+    return tiers.map(t => `
+      <div class="hstage-notes-row">
+        <span class="hstage-note-tier">${escapeHtml(t.label)}</span>
+        <div class="hstage-note-chips">
+          ${t.notes.map(n => `<span class="hstage-note-chip">${escapeHtml(n)}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
   }
 
   function detectBottleVolume(featured, d) {
@@ -2113,7 +2149,7 @@
               </div>
               <h1 class="hstage-title" id="hstageTitle"></h1>
               <p class="hstage-inspired" id="hstageInspired" hidden></p>
-              <p class="hstage-desc" id="hstageDesc"></p>
+              <div class="hstage-notes" id="hstageNotes" aria-label="Fragrance Notes"></div>
               <div class="hstage-cta-row">
                 <button type="button" class="hstage-cta-primary" id="hstageAddBtn" data-add="" data-price="" data-size="">
                   <span class="hstage-cta-label" id="hstageAddLabel">أضف للسلة</span>
@@ -2444,7 +2480,7 @@
     // Left/Start Editorial Copy & CTAs
     const titleEl = stage.querySelector('#hstageTitle');
     const inspiredEl = stage.querySelector('#hstageInspired');
-    const descEl = stage.querySelector('#hstageDesc');
+    const notesEl = stage.querySelector('#hstageNotes');
     const addLabelEl = stage.querySelector('#hstageAddLabel');
     const exploreLinkEl = stage.querySelector('#hstageExploreLink');
     const exploreLabelEl = stage.querySelector('#hstageExploreLabel');
@@ -2461,8 +2497,10 @@
         inspiredEl.hidden = true;
       }
     }
-    if (descEl) {
-      descEl.textContent = getHeroShortDesc(d, isAr);
+    if (notesEl) {
+      const notesHtml = renderHeroNotesHtml(d, isAr);
+      notesEl.innerHTML = notesHtml;
+      notesEl.hidden = !notesHtml;
     }
     if (addLabelEl) {
       addLabelEl.textContent = isAr ? 'أضف للسلة' : 'Add to Bag';
