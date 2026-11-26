@@ -1845,10 +1845,10 @@
       spotGlow: 'rgba(255, 118, 128, 0.36)'
     },
     pearl: {
-      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #bdb5a9 0%, #8c857b 56%, #5f5a52 100%)',
-      outerGlow: 'rgba(165, 156, 144, 0.24)',
-      shadow: 'rgba(70, 64, 56, 0.36)',
-      spotGlow: 'rgba(255, 250, 240, 0.42)'
+      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #8d8a84 0%, #615e59 56%, #3d3b37 100%)',
+      outerGlow: 'rgba(141, 138, 132, 0.24)',
+      shadow: 'rgba(48, 46, 42, 0.42)',
+      spotGlow: 'rgba(255, 250, 240, 0.40)'
     },
     obsidian: {
       bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #3c3e45 0%, #1b1c21 56%, #0c0d10 100%)',
@@ -1869,21 +1869,264 @@
       spotGlow: 'rgba(182, 209, 152, 0.30)'
     },
     sapphire: {
-      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #2c5b88 0%, #15314f 56%, #0a192b 100%)',
-      outerGlow: 'rgba(44, 91, 136, 0.24)',
-      shadow: 'rgba(10, 26, 46, 0.44)',
-      spotGlow: 'rgba(130, 195, 255, 0.30)'
+      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #2c68a4 0%, #163d66 56%, #0a2038 100%)',
+      outerGlow: 'rgba(44, 104, 164, 0.25)',
+      shadow: 'rgba(10, 32, 56, 0.46)',
+      spotGlow: 'rgba(130, 198, 255, 0.34)'
+    },
+    emerald: {
+      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #1f7a54 0%, #0f4730 56%, #062418 100%)',
+      outerGlow: 'rgba(31, 122, 84, 0.25)',
+      shadow: 'rgba(6, 36, 24, 0.46)',
+      spotGlow: 'rgba(116, 232, 180, 0.34)'
+    },
+    rose: {
+      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #c64e78 0%, #7d2546 56%, #450f24 100%)',
+      outerGlow: 'rgba(198, 78, 120, 0.24)',
+      shadow: 'rgba(69, 15, 36, 0.45)',
+      spotGlow: 'rgba(255, 168, 200, 0.36)'
     }
   };
 
-  const HERO_THEME_ORDER = ['crimson', 'pearl', 'obsidian', 'amber', 'olive', 'sapphire'];
+  const HERO_THEME_ORDER = ['crimson', 'pearl', 'obsidian', 'amber', 'olive', 'sapphire', 'emerald', 'rose'];
+  const heroBottleThemeCache = new Map();
+  const heroBottleThemePending = new Set();
+
+  function rgbToHsl(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    let h = 0;
+    let s = 0;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h /= 6;
+    }
+    return { h: h * 360, s, l };
+  }
+
+  function buildHeroThemeFromHsl(h, s, l, isNeutral = false) {
+    const H = ((Math.round(h) % 360) + 360) % 360;
+    if (isNeutral) {
+      if (l < 0.34) {
+        const sat = Math.round(Math.min(10, s * 30));
+        return {
+          bg: `radial-gradient(ellipse 68% 72% at 50% 44%, hsl(${H}, ${sat}%, 24%) 0%, hsl(${H}, ${sat}%, 12%) 56%, hsl(${H}, ${sat}%, 6%) 100%)`,
+          outerGlow: `hsla(${H}, ${sat}%, 28%, 0.22)`,
+          shadow: 'rgba(8, 10, 14, 0.48)',
+          spotGlow: `hsla(${H}, 18%, 78%, 0.24)`
+        };
+      }
+      const sat = Math.round(Math.min(14, s * 35));
+      return {
+        bg: `radial-gradient(ellipse 68% 72% at 50% 44%, hsl(${H}, ${sat}%, 52%) 0%, hsl(${H}, ${sat}%, 36%) 56%, hsl(${H}, ${sat}%, 23%) 100%)`,
+        outerGlow: `hsla(${H}, ${sat}%, 54%, 0.24)`,
+        shadow: `hsla(${H}, ${sat}%, 16%, 0.40)`,
+        spotGlow: 'rgba(255, 250, 240, 0.38)'
+      };
+    }
+
+    const satCenter = Math.round(Math.max(36, Math.min(76, s * 100 * 0.92)));
+    const satMid = Math.round(Math.max(32, Math.min(70, s * 100 * 0.88)));
+    const satEdge = Math.round(Math.max(28, Math.min(64, s * 100 * 0.84)));
+
+    const lCenter = Math.round(Math.max(33, Math.min(47, 26 + l * 32)));
+    const lMid = Math.round(Math.max(19, Math.min(29, lCenter - 15)));
+    const lEdge = Math.round(Math.max(9, Math.min(16, lMid - 11)));
+
+    return {
+      bg: `radial-gradient(ellipse 68% 72% at 50% 44%, hsl(${H}, ${satCenter}%, ${lCenter}%) 0%, hsl(${H}, ${satMid}%, ${lMid}%) 56%, hsl(${H}, ${satEdge}%, ${lEdge}%) 100%)`,
+      outerGlow: `hsla(${H}, ${satCenter}%, ${Math.min(54, lCenter + 6)}%, 0.25)`,
+      shadow: `hsla(${H}, ${satEdge}%, 9%, 0.48)`,
+      spotGlow: `hsla(${H}, ${Math.min(86, satCenter + 12)}%, 72%, 0.36)`
+    };
+  }
+
+  function analyzeBottlePixels(rgbaData, width, height) {
+    if (!rgbaData || !width || !height) return null;
+    const BINS = 24;
+    const binWeights = new Float64Array(BINS);
+    const binSatWeighted = new Float64Array(BINS);
+    const binLumWeighted = new Float64Array(BINS);
+
+    let totalValid = 0;
+    let chromaticCount = 0;
+    let neutralLumSum = 0;
+    let neutralCount = 0;
+    let neutralCos = 0;
+    let neutralSin = 0;
+    let neutralSatSum = 0;
+
+    for (let y = 0; y < height; y++) {
+      const ny = y / height;
+      for (let x = 0; x < width; x++) {
+        const nx = x / width;
+        const idx = (y * width + x) * 4;
+        const a = rgbaData[idx + 3];
+        if (a < 140) continue;
+
+        const r = rgbaData[idx];
+        const g = rgbaData[idx + 1];
+        const b = rgbaData[idx + 2];
+        const { h, s, l } = rgbToHsl(r, g, b);
+
+        // Ignore bright white studio backdrops and white bottle caps
+        if ((r > 235 && g > 235 && b > 235) || (l > 0.92 && s < 0.14)) continue;
+
+        totalValid++;
+        const inBottleBody = nx >= 0.2 && nx <= 0.8 && ny >= 0.24 && ny <= 0.88;
+        const bodyBoost = inBottleBody ? 1.45 : 1.0;
+
+        if (s >= 0.15 && l >= 0.08 && l <= 0.89) {
+          chromaticCount++;
+          const w = (0.35 + s * 1.7) * (1 - Math.abs(l - 0.5) * 0.65) * bodyBoost;
+          const bin = Math.floor((h % 360) / (360 / BINS));
+          binWeights[bin] += w;
+          binSatWeighted[bin] += s * w;
+          binLumWeighted[bin] += l * w;
+        } else {
+          neutralCount += bodyBoost;
+          neutralLumSum += l * bodyBoost;
+          neutralSatSum += s * bodyBoost;
+          const rad = (h * Math.PI) / 180;
+          neutralCos += Math.cos(rad) * bodyBoost;
+          neutralSin += Math.sin(rad) * bodyBoost;
+        }
+      }
+    }
+
+    if (totalValid < 6) return null;
+
+    if (chromaticCount >= Math.max(8, totalValid * 0.14)) {
+      let bestBin = 0;
+      for (let i = 1; i < BINS; i++) {
+        if (binWeights[i] > binWeights[bestBin]) bestBin = i;
+      }
+
+      let totalW = 0;
+      let cosSum = 0;
+      let sinSum = 0;
+      let satSum = 0;
+      let lumSum = 0;
+      const binWidth = 360 / BINS;
+
+      for (let offset = -1; offset <= 1; offset++) {
+        const b = (bestBin + offset + BINS) % BINS;
+        const w = binWeights[b];
+        if (w <= 0) continue;
+        const angle = ((b + 0.5) * binWidth * Math.PI) / 180;
+        totalW += w;
+        cosSum += Math.cos(angle) * w;
+        sinSum += Math.sin(angle) * w;
+        satSum += binSatWeighted[b];
+        lumSum += binLumWeighted[b];
+      }
+
+      if (totalW > 0) {
+        let domH = (Math.atan2(sinSum, cosSum) * 180) / Math.PI;
+        if (domH < 0) domH += 360;
+        return buildHeroThemeFromHsl(domH, satSum / totalW, lumSum / totalW, false);
+      }
+    }
+
+    if (neutralCount > 0) {
+      let avgH = (Math.atan2(neutralSin, neutralCos) * 180) / Math.PI;
+      if (avgH < 0) avgH += 360;
+      return buildHeroThemeFromHsl(avgH, neutralSatSum / neutralCount, neutralLumSum / neutralCount, true);
+    }
+
+    return null;
+  }
+
+  function extractBottleThemeFromUrl(url, onResolved) {
+    if (!url) return;
+    if (heroBottleThemeCache.has(url)) {
+      const cached = heroBottleThemeCache.get(url);
+      if (cached && typeof onResolved === 'function') onResolved(cached);
+      return;
+    }
+    if (heroBottleThemePending.has(url)) return;
+    heroBottleThemePending.add(url);
+
+    const probeImg = new Image();
+    probeImg.crossOrigin = 'anonymous';
+    probeImg.onload = () => {
+      heroBottleThemePending.delete(url);
+      try {
+        const size = 48;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          heroBottleThemeCache.set(url, null);
+          return;
+        }
+        ctx.drawImage(probeImg, 0, 0, size, size);
+        const imgData = ctx.getImageData(0, 0, size, size);
+        const theme = analyzeBottlePixels(imgData.data, size, size);
+        heroBottleThemeCache.set(url, theme);
+        if (theme && typeof onResolved === 'function') onResolved(theme);
+      } catch (_) {
+        heroBottleThemeCache.set(url, null);
+      }
+    };
+    probeImg.onerror = () => {
+      heroBottleThemePending.delete(url);
+      heroBottleThemeCache.set(url, null);
+    };
+    probeImg.src = url;
+  }
+
+  function applyHeroStageTheme(stage, theme, animateCrossfade) {
+    if (!stage || !theme) return;
+    stage.style.setProperty('--hstage-shadow', theme.shadow);
+    stage.style.setProperty('--hstage-spot-glow', theme.spotGlow);
+    const homeSec = $('#home');
+    if (homeSec) homeSec.style.setProperty('--hero-outer-glow', theme.outerGlow);
+
+    const bgA = stage.querySelector('#hstageBgA');
+    const bgB = stage.querySelector('#hstageBgB');
+    if (!bgA || !bgB) return;
+
+    if (stage.dataset.activeBg === theme.bg) return;
+    stage.dataset.activeBg = theme.bg;
+
+    if (animateCrossfade) {
+      heroBgToggle = !heroBgToggle;
+      const incoming = heroBgToggle ? bgB : bgA;
+      const outgoing = heroBgToggle ? bgA : bgB;
+      incoming.style.background = theme.bg;
+      incoming.classList.add('is-active');
+      outgoing.classList.remove('is-active');
+    } else {
+      heroBgToggle = false;
+      bgA.style.background = theme.bg;
+      bgA.classList.add('is-active');
+      bgB.classList.remove('is-active');
+    }
+  }
 
   function matchHeroThemeKey(p, idx) {
+    const titleRaw = [p?.name, p?.latin].filter(Boolean).join(' ').toLowerCase();
+    if (/emerald|green|vert|أخضر|زمرد/.test(titleRaw)) return 'emerald';
+    if (/pink|blush|peach|arrogate pink|بينك|وردي|زهري/.test(titleRaw)) return 'rose';
+    if (/blue|colt|aqua|marine|ocean|sapphire|navy|azure|أزرق|بحر|بصمة/.test(titleRaw)) return 'sapphire';
+    if (/silver|grey|gray|white|pearl|supremacy|nude|فضي|رمادي|أبيض|لؤلؤ/.test(titleRaw)) return 'pearl';
+    if (/red|ruby|crimson|cherry|rouge|أحمر|ياقوت|كرز/.test(titleRaw)) return 'crimson';
+    if (/black|dark|noir|tobacco|asrar|أسود|داكن|أسرار/.test(titleRaw)) return 'obsidian';
+    if (/amber|gold|orange|honey|kalemat|caramel|عنبر|عسل|ذهب|كلمات/.test(titleRaw)) return 'amber';
+
     const raw = [
       p?.main_accord,
       p?.accords,
-      p?.name,
-      p?.latin,
       p?.tag,
       p?.category
     ].filter(Boolean).join(' ').toLowerCase();
@@ -1910,25 +2153,7 @@
   }
 
   function resolveHeroSlideThemes(slides) {
-    const resolved = [];
-    for (let i = 0; i < slides.length; i++) {
-      let key = matchHeroThemeKey(slides[i], i);
-      const prevKey = i > 0 ? resolved[i - 1] : null;
-      const avoidFirst = slides.length > 2 && i === slides.length - 1 ? resolved[0] : null;
-
-      if (key === prevKey || key === avoidFirst) {
-        const startPos = Math.max(0, HERO_THEME_ORDER.indexOf(key));
-        for (let step = 1; step < HERO_THEME_ORDER.length; step++) {
-          const candidate = HERO_THEME_ORDER[(startPos + step) % HERO_THEME_ORDER.length];
-          if (candidate !== prevKey && candidate !== avoidFirst) {
-            key = candidate;
-            break;
-          }
-        }
-      }
-      resolved.push(key);
-    }
-    return resolved;
+    return slides.map((slide, idx) => matchHeroThemeKey(slide, idx));
   }
 
   function getHeroTagline(d, isAr) {
@@ -2055,12 +2280,21 @@
       candidates.slice(0, 5).forEach(pushUnique);
     }
 
-    // Preload images for silky transitions
+    // Preload images and extract bottle color themes in background
     list.forEach(p => {
       if (p.image_url && !heroPreloadedImgs.has(p.image_url)) {
         heroPreloadedImgs.add(p.image_url);
         const im = new Image();
         im.src = p.image_url;
+      }
+      if (p.image_url) {
+        extractBottleThemeFromUrl(p.image_url, extractedTheme => {
+          const stageEl = document.getElementById('heroEditorialStage');
+          const curSlide = heroSlidesList[heroSlideIndex];
+          if (stageEl && curSlide && String(curSlide.id) === String(p.id) && extractedTheme) {
+            applyHeroStageTheme(stageEl, extractedTheme, true);
+          }
+        });
       }
     });
 
@@ -2470,31 +2704,20 @@
 
     const hadStage = Boolean(hero.querySelector('#heroEditorialStage'));
     const stage = ensureHeroStageShell(hero);
-    const bgA = stage.querySelector('#hstageBgA');
-    const bgB = stage.querySelector('#hstageBgB');
 
     const themeKey = heroSlideThemes[heroSlideIndex] || 'crimson';
-    const theme = HERO_THEMES[themeKey] || HERO_THEMES.crimson;
+    const fallbackTheme = HERO_THEMES[themeKey] || HERO_THEMES.crimson;
+    const cachedBottleTheme = featured.image_url ? heroBottleThemeCache.get(featured.image_url) : null;
+    const activeTheme = cachedBottleTheme || fallbackTheme;
     stage.dataset.theme = themeKey;
-    stage.style.setProperty('--hstage-shadow', theme.shadow);
-    stage.style.setProperty('--hstage-spot-glow', theme.spotGlow);
-    const homeSec = $('#home');
-    if (homeSec) homeSec.style.setProperty('--hero-outer-glow', theme.outerGlow);
+    applyHeroStageTheme(stage, activeTheme, hadStage && slideDir !== 0);
 
-    if (bgA && bgB) {
-      if (hadStage && slideDir !== 0) {
-        heroBgToggle = !heroBgToggle;
-        const incoming = heroBgToggle ? bgB : bgA;
-        const outgoing = heroBgToggle ? bgA : bgB;
-        incoming.style.background = theme.bg;
-        incoming.classList.add('is-active');
-        outgoing.classList.remove('is-active');
-      } else {
-        heroBgToggle = false;
-        bgA.style.background = theme.bg;
-        bgA.classList.add('is-active');
-        bgB.classList.remove('is-active');
-      }
+    if (featured.image_url && !heroBottleThemeCache.has(featured.image_url)) {
+      extractBottleThemeFromUrl(featured.image_url, extractedTheme => {
+        if (extractedTheme && String(heroCurrentProdId) === String(featured.id)) {
+          applyHeroStageTheme(stage, extractedTheme, true);
+        }
+      });
     }
 
     const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(featured, currentLang) : null;

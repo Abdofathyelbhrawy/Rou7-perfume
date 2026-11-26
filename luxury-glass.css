@@ -1042,8 +1042,7 @@ html.rooh-motion-ready .rooh-reveal.is-visible {
   overflow-y: hidden;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.34) transparent;
+  scrollbar-width: none;
 }
 
 html[dir="rtl"] .hstage-pill-nav {
@@ -1051,16 +1050,7 @@ html[dir="rtl"] .hstage-pill-nav {
 }
 
 .hstage-pill-nav::-webkit-scrollbar {
-  height: 4px;
-}
-
-.hstage-pill-nav::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.hstage-pill-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.34);
-  border-radius: 999px;
+  display: none;
 }
 
 .hstage-pill-nav[hidden] {
