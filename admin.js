@@ -44,7 +44,10 @@
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 4000);
       try {
-        const url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
+        const cleanFilters = filters ? filters.replace(/^&/, '') : '';
+        const url = method === 'DELETE'
+          ? `${SUPABASE_URL}/rest/v1/${table}${cleanFilters ? `?${cleanFilters}` : ''}`
+          : `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
         const res = await fetch(url, {
           method,
           signal: controller.signal,
@@ -52,13 +55,13 @@
             'apikey':        SUPABASE_ANON,
             'Authorization': `Bearer ${SUPABASE_ANON}`,
             'Content-Type':  'application/json',
-            'Prefer':        (method === 'POST' || method === 'PATCH') ? 'return=representation' : '',
+            'Prefer':        (method === 'POST' || method === 'PATCH' || method === 'DELETE') ? 'return=representation' : '',
           },
           body: body ? JSON.stringify(body) : undefined,
         });
         clearTimeout(timeoutId);
         if (!res.ok) throw new Error(await res.text());
-        if (res.status === 204 || method === 'DELETE') return null;
+        if (res.status === 204) return null;
         const text = await res.text();
         return text ? JSON.parse(text) : null;
       } catch (err) {
@@ -290,9 +293,9 @@
     const cachedO = localStorage.getItem('rooh-cached-orders');
     if (cachedO) {
       const parsed = JSON.parse(cachedO);
-      if (Array.isArray(parsed) && parsed.length) {
+      if (Array.isArray(parsed)) {
         currentOrders = parsed
-          .filter(o => !deletedOrderIds.has(String(o.id)))
+          .filter(o => !deletedOrderIds.has(String(o.id)) && !(o.order_number && deletedOrderIds.has(String(o.order_number))))
           .map(o => {
             if (orderStatusMap[o.id]) o.status = orderStatusMap[o.id];
             return o;
@@ -300,9 +303,6 @@
       }
     }
   } catch (_) {}
-  if (!currentOrders.length) {
-    currentOrders = DEFAULT_ORDERS.filter(o => !deletedOrderIds.has(String(o.id)));
-  }
 
   // ── Brands Registry Setup ────────────────────────────────────────────────
   const DEFAULT_BRANDS = [
@@ -1117,7 +1117,10 @@
   }
 
   function renderOrders(orders) {
-    currentOrders = orders || [];
+    currentOrders = (orders || []).filter(o =>
+      !deletedOrderIds.has(String(o.id)) &&
+      !(o.order_number && deletedOrderIds.has(String(o.order_number)))
+    );
     try { localStorage.setItem('rooh-cached-orders', JSON.stringify(currentOrders)); } catch (_) {}
     const count = currentOrders.length;
     $('#statOrders').textContent = arabicNum(count);
@@ -1130,6 +1133,7 @@
 
     if (!count) {
       $('#ordersTable').innerHTML = `<tr><td colspan="7" class="empty-table">${adminLang === 'ar' ? 'لا توجد طلبات مسجلة بعد. ستظهر الطلبات الجديدة هنا فور تسجيلها.' : 'No orders recorded yet. New orders will appear here automatically.'}</td></tr>`;
+      calculateSalesAnalytics();
       return;
     }
 
@@ -1198,7 +1202,10 @@
     const now = Date.now();
     const dayMs = 24 * 60 * 60 * 1000;
 
-    let filteredOrders = (currentOrders || []).filter(o => !deletedOrderIds.has(String(o.id)));
+    let filteredOrders = (currentOrders || []).filter(o =>
+      !deletedOrderIds.has(String(o.id)) &&
+      !(o.order_number && deletedOrderIds.has(String(o.order_number)))
+    );
 
     if (range === 'today') {
       const todayStart = new Date().setHours(0, 0, 0, 0);
@@ -1415,41 +1422,42 @@
       // 1. Fetch remote orders metadata (deleted IDs & status overrides)
       try {
         const metaRows = await supaFetch('products', { filters: '&name=eq.__system_orders_meta__' });
-        if (metaRows && metaRows.length && metaRows[0].notes) {
-          const meta = JSON.parse(metaRows[0].notes);
-          if (meta.deleted && Array.isArray(meta.deleted)) {
-            meta.deleted.forEach(delId => deletedOrderIds.add(String(delId)));
+        if (Array.isArray(metaRows) && metaRows.length) {
+          metaRows.forEach(row => {
+            if (!row || !row.notes) return;
+            try {
+              const meta = JSON.parse(row.notes);
+              if (meta.deleted && Array.isArray(meta.deleted)) {
+                meta.deleted.forEach(delId => {
+                  if (delId !== undefined && delId !== null && delId !== '') {
+                    deletedOrderIds.add(String(delId));
+                  }
+                });
+              }
+              if (meta.statuses && typeof meta.statuses === 'object') {
+                orderStatusMap = { ...orderStatusMap, ...meta.statuses };
+              }
+            } catch (_) {}
+          });
+          try {
             localStorage.setItem('rooh-deleted-orders', JSON.stringify([...deletedOrderIds]));
-          }
-          if (meta.statuses && typeof meta.statuses === 'object') {
-            orderStatusMap = { ...orderStatusMap, ...meta.statuses };
             localStorage.setItem('rooh-order-statuses', JSON.stringify(orderStatusMap));
-          }
+          } catch (_) {}
         }
       } catch (_) {}
 
       // 2. Fetch live orders from Supabase
       const rawOrders = await supaFetch('orders', { filters: '&order=created_at.desc&limit=100' });
       if (Array.isArray(rawOrders)) {
-        let filteredOrders = rawOrders
-          .filter(o => !deletedOrderIds.has(String(o.id)))
+        const filteredOrders = rawOrders
+          .filter(o =>
+            !deletedOrderIds.has(String(o.id)) &&
+            !(o.order_number && deletedOrderIds.has(String(o.order_number)))
+          )
           .map(o => {
             if (orderStatusMap[o.id]) o.status = orderStatusMap[o.id];
             return o;
           });
-
-        // Self-healing: if the deletion register swallowed every live order, the
-        // register is stale/corrupted — restore the orders instead of showing none.
-        if (!filteredOrders.length && rawOrders.length) {
-          console.warn('Orders: deleted register covers all live orders — resetting it.');
-          deletedOrderIds = new Set();
-          try { localStorage.removeItem('rooh-deleted-orders'); } catch (_) {}
-          await persistOrdersMeta();
-          filteredOrders = rawOrders.map(o => {
-            if (orderStatusMap[o.id]) o.status = orderStatusMap[o.id];
-            return o;
-          });
-        }
 
         renderOrders(filteredOrders);
       }
@@ -3519,17 +3527,32 @@
 
       try {
         deletedOrderIds.add(String(id));
-        currentOrders = currentOrders.filter(o => String(o.id) !== String(id));
+        if (orderNum) deletedOrderIds.add(String(orderNum));
+        try { localStorage.setItem('rooh-deleted-orders', JSON.stringify([...deletedOrderIds])); } catch (_) {}
+
+        currentOrders = currentOrders.filter(o =>
+          String(o.id) !== String(id) &&
+          (!orderNum || String(o.order_number) !== String(orderNum))
+        );
         renderOrders(currentOrders);
 
-        await persistOrdersMeta();
-
+        // Attempt hard delete in Supabase orders table (both by id and order_number fallback)
         try {
           await supaFetch('orders', {
             method: 'DELETE',
             filters: `&id=eq.${encodeURIComponent(id)}`,
           });
-        } catch (_) {}
+        } catch (delErr) {
+          console.warn('Remote orders DELETE notice (persisting via deleted registry):', delErr);
+        }
+
+        // Persist deletion registry to Supabase so it stays deleted across all devices even if RLS blocks DELETE
+        await persistOrdersMeta();
+
+        window.RoohUtils?.showToast?.(adminLang === 'ar'
+          ? `تم حذف الطلب ${orderNum ? `#${orderNum}` : ''} بنجاح ✓`
+          : `Order ${orderNum ? `#${orderNum}` : ''} deleted ✓`
+        );
       } catch (err) {
         console.warn('Delete order notice:', err);
       }
@@ -4130,7 +4153,7 @@
     renderProductsTable(currentProducts);
     renderInventoryPanel();
   }
-  if (currentOrders.length) renderOrders(currentOrders);
+  if (currentOrders.length || localStorage.getItem('rooh-cached-orders') !== null) renderOrders(currentOrders);
   calculateSalesAnalytics('all');
   calculateTrafficAnalytics('all');
   renderBrandsTable();
@@ -4149,6 +4172,11 @@
       supaClient.channel('admin-realtime-feed')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, payload => {
           console.log('Realtime product change:', payload);
+          const changedName = payload?.new?.name || payload?.old?.name;
+          if (changedName === '__system_orders_meta__') {
+            loadOrders();
+            return;
+          }
           loadProducts();
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {

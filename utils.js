@@ -146,7 +146,10 @@ async function supaFetch(table, { method = 'GET', filters = '', body = null, sel
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000);
   try {
-    const url = `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
+    const cleanFilters = filters ? filters.replace(/^&/, '') : '';
+    const url = method === 'DELETE'
+      ? `${SUPABASE_URL}/rest/v1/${table}${cleanFilters ? `?${cleanFilters}` : ''}`
+      : `${SUPABASE_URL}/rest/v1/${table}?select=${select}${filters}`;
     const res = await fetch(url, {
       method,
       signal: controller.signal,
@@ -154,13 +157,13 @@ async function supaFetch(table, { method = 'GET', filters = '', body = null, sel
         'apikey':        SUPABASE_ANON,
         'Authorization': `Bearer ${SUPABASE_ANON}`,
         'Content-Type':  'application/json',
-        'Prefer':        (method === 'POST' || method === 'PATCH') ? 'return=representation' : '',
+        'Prefer':        (method === 'POST' || method === 'PATCH' || method === 'DELETE') ? 'return=representation' : '',
       },
       body: body ? JSON.stringify(body) : undefined,
     });
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error(await res.text());
-    if (res.status === 204 || method === 'DELETE') return null;
+    if (res.status === 204) return null;
     const text = await res.text();
     return text ? JSON.parse(text) : null;
   } catch (err) {
