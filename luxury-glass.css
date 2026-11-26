@@ -1,0 +1,879 @@
+/* ==========================================================================
+   ROU7 PERFUME — AWWWARDS LUXURY GLASSMORPHISM & 3D MOTION DESIGN SYSTEM
+   Brand Palette Preserved:
+     Sand Cream (#E3D8C5) | Botanical Olive (#4B5A3C) | Radiant Amber (#FF8F3A)
+   Strict 8px Spacing System | GPU-Accelerated 60fps Micro-Interactions
+   ========================================================================== */
+
+:root {
+  --rooh-bg: #E3D8C5;
+  --rooh-bg-warm: #EDE5D8;
+  --rooh-ink: #4B5A3C;
+  --rooh-ink-deep: #2E3A23;
+  --rooh-muted: #656E59;
+  --rooh-accent: #FF8F3A;
+  --rooh-accent-deep: #E57420;
+
+  /* Refined Translucent Glass Layers */
+  --glass-bg: rgba(255, 252, 247, 0.58);
+  --glass-bg-strong: rgba(255, 252, 248, 0.78);
+  --glass-bg-subtle: rgba(255, 251, 245, 0.42);
+  --glass-border: rgba(255, 255, 255, 0.68);
+  --glass-border-outer: rgba(75, 90, 60, 0.13);
+  --glass-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.88), inset 0 -1px 0 rgba(75, 90, 60, 0.05);
+  --glass-blur: blur(18px) saturate(145%);
+  --glass-blur-heavy: blur(24px) saturate(160%);
+  --glass-shadow: 0 18px 44px rgba(75, 90, 60, 0.08), 0 2px 10px rgba(75, 90, 60, 0.04);
+  --glass-shadow-hover: 0 28px 64px rgba(75, 90, 60, 0.14), 0 8px 24px rgba(255, 143, 58, 0.12);
+
+  /* Typography Pairings */
+  --font-display: 'IBM Plex Sans Arabic', 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', sans-serif;
+
+  /* Motion & Spring Physics */
+  --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Strict 8px Spacing Scale */
+  --sp-1: 8px;
+  --sp-2: 16px;
+  --sp-3: 24px;
+  --sp-4: 32px;
+  --sp-5: 40px;
+  --sp-6: 48px;
+  --sp-8: 64px;
+  --sp-10: 80px;
+  --sp-12: 96px;
+}
+
+/* ── Global Typography, Canvas & Overflow Safety ─────────────────────────── */
+html {
+  overflow-x: clip;
+  font-family: var(--font-body);
+}
+
+body,
+body.light {
+  font-family: var(--font-body);
+  line-height: 1.65;
+  overflow-x: clip;
+  background-color: var(--rooh-bg);
+  background-image:
+    radial-gradient(ellipse 68% 55% at 12% 8%, rgba(255, 143, 58, 0.13) 0%, transparent 62%),
+    radial-gradient(ellipse 60% 50% at 88% 18%, rgba(75, 90, 60, 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 72% 62% at 50% 92%, rgba(255, 250, 240, 0.65) 0%, transparent 68%);
+  background-attachment: fixed;
+  color: var(--rooh-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4,
+.section-heading h2,
+.story-copy h2,
+.newsletter h2,
+.cp-main-title,
+.prod-main-title,
+.analysis-heading,
+.welcome h1 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* ── Ambient Floating Mesh Orbs Layer ────────────────────────────────────── */
+.rooh-ambient-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+}
+
+.rooh-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(88px);
+  will-change: transform;
+  opacity: 0.55;
+}
+
+.rooh-orb-1 {
+  width: min(560px, 65vw);
+  height: min(560px, 65vw);
+  top: -12%;
+  right: -8%;
+  background: radial-gradient(circle, rgba(255, 143, 58, 0.24) 0%, rgba(255, 178, 107, 0.08) 55%, transparent 75%);
+  animation: roohOrbDrift1 22s ease-in-out infinite alternate;
+}
+
+.rooh-orb-2 {
+  width: min(620px, 70vw);
+  height: min(620px, 70vw);
+  bottom: -18%;
+  left: -12%;
+  background: radial-gradient(circle, rgba(75, 90, 60, 0.18) 0%, rgba(75, 90, 60, 0.05) 55%, transparent 75%);
+  animation: roohOrbDrift2 26s ease-in-out infinite alternate;
+}
+
+.rooh-orb-3 {
+  width: min(440px, 55vw);
+  height: min(440px, 55vw);
+  top: 42%;
+  left: 38%;
+  background: radial-gradient(circle, rgba(255, 250, 242, 0.65) 0%, rgba(255, 143, 58, 0.10) 50%, transparent 75%);
+  animation: roohOrbDrift3 30s ease-in-out infinite alternate;
+}
+
+@keyframes roohOrbDrift1 {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(-48px, 36px, 0) scale(1.08); }
+}
+
+@keyframes roohOrbDrift2 {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(52px, -40px, 0) scale(1.06); }
+}
+
+@keyframes roohOrbDrift3 {
+  0%   { transform: translate3d(0, 0, 0) scale(0.96); }
+  100% { transform: translate3d(-32px, -28px, 0) scale(1.1); }
+}
+
+/* Keep main layers cleanly above the fixed ambient mesh */
+.site-header,
+main,
+.site-footer,
+.admin-sidebar,
+.admin-main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Three.js Real 3D WebGL Canvas inside Hero ───────────────────────────── */
+.hero.hero-fullwidth {
+  position: relative;
+  isolation: isolate;
+}
+
+#roohThreeCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-luxury);
+}
+
+#roohThreeCanvas.is-ready {
+  opacity: 1;
+}
+
+.hero-art,
+.hero-3d-showcase {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Glassmorphic Sticky Storefront Header ───────────────────────────────── */
+.site-header {
+  z-index: 40;
+  background: rgba(237, 229, 216, 0.62) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55) !important;
+  box-shadow: inset 0 -1px 0 rgba(75, 90, 60, 0.08);
+  transition: background 0.35s var(--ease-luxury), box-shadow 0.35s var(--ease-luxury);
+}
+
+.site-header.is-scrolled {
+  background: rgba(245, 239, 230, 0.80) !important;
+  box-shadow: 0 12px 36px rgba(75, 90, 60, 0.10), inset 0 -1px 0 rgba(75, 90, 60, 0.09);
+}
+
+.desktop-nav a {
+  position: relative;
+  padding: 6px 2px;
+  transition: color 0.25s var(--ease-luxury);
+}
+
+.desktop-nav a::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--rooh-accent), var(--rooh-ink));
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.32s var(--ease-luxury);
+}
+
+.desktop-nav a:hover::after,
+.desktop-nav a.active::after {
+  transform: scaleX(1);
+}
+
+.icon-btn,
+.lang-toggle,
+.lang-toggle-btn {
+  border-radius: 999px;
+  transition: transform 0.25s var(--ease-luxury), background 0.25s var(--ease-luxury), box-shadow 0.25s var(--ease-luxury), border-color 0.25s var(--ease-luxury);
+}
+
+.icon-btn:hover,
+.lang-toggle-btn:hover {
+  background: rgba(255, 252, 247, 0.72);
+  box-shadow: 0 6px 18px rgba(75, 90, 60, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.icon-btn:active,
+.lang-toggle-btn:active {
+  transform: scale(0.94);
+}
+
+.mobile-menu,
+.search-bar,
+.search-live-dropdown {
+  background: rgba(248, 243, 235, 0.88) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border-color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* ── Premium Animated Buttons & CTAs ─────────────────────────────────────── */
+.button,
+.btn-custom-order,
+.hero-bottle-trigger-btn,
+.quick-add,
+.btn-explore-notes,
+.btn-atomizer-spray,
+.btn-stock-save,
+.btn-inv-bulk {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.32s var(--ease-luxury),
+    box-shadow 0.32s var(--ease-luxury),
+    background 0.3s var(--ease-luxury),
+    border-color 0.3s var(--ease-luxury),
+    color 0.25s var(--ease-luxury);
+  will-change: transform;
+}
+
+/* Shimmer / Spotlight Sweep on Primary CTAs */
+.button-primary::after,
+.button-gold::after,
+.btn-custom-order::after,
+.btn-hero-explore::after,
+.btn-atomizer-spray::after,
+.btn-stock-save::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -130%;
+  width: 65%;
+  height: 200%;
+  background: linear-gradient(
+    112deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 38%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.18) 62%,
+    transparent 100%
+  );
+  transform: skewX(-18deg);
+  pointer-events: none;
+  transition: left 0.72s var(--ease-luxury);
+}
+
+.button-primary:hover::after,
+.button-gold:hover::after,
+.btn-custom-order:hover::after,
+.btn-hero-explore:hover::after,
+.btn-atomizer-spray:hover::after,
+.btn-stock-save:hover::after {
+  left: 145%;
+}
+
+.button-primary,
+.button-gold {
+  border-radius: 999px;
+  box-shadow: 0 10px 28px rgba(255, 143, 58, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.button-primary:hover,
+.button-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(255, 143, 58, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.45) inset;
+}
+
+.button-outline {
+  border-radius: 999px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border-outer);
+  box-shadow: var(--glass-inner-glow);
+}
+
+.button-outline:hover {
+  background: var(--glass-bg-strong);
+  border-color: var(--rooh-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(75, 90, 60, 0.10);
+}
+
+/* Tactile Click State */
+.button:active,
+button:active,
+.filter:active,
+.brand-chip:active,
+.inv-chip:active,
+.hero-bottle-trigger-btn:active {
+  transform: scale(0.97) !important;
+}
+
+/* Smooth Sliding Arrow Icons on Hover */
+.button .arrow-icon,
+.text-link .arrow-icon,
+.btn-custom-order .arrow-icon {
+  display: inline-block;
+  transition: transform 0.32s var(--ease-luxury);
+}
+
+html[dir="rtl"] .button:hover .arrow-icon,
+html[dir="rtl"] .text-link:hover .arrow-icon,
+html[dir="rtl"] .btn-custom-order:hover .arrow-icon {
+  transform: translateX(-5px);
+}
+
+html[dir="ltr"] .button:hover .arrow-icon,
+html[dir="ltr"] .text-link:hover .arrow-icon,
+html[dir="ltr"] .btn-custom-order:hover .arrow-icon {
+  transform: translateX(5px);
+}
+
+/* Crisp Focus States for Accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--rooh-accent);
+  outline-offset: 2px;
+}
+
+/* ── Storefront Sections: 8px Spacing Rhythm & Generous Whitespace ───────── */
+.custom-perfume-section {
+  padding: var(--sp-10) var(--sp-3);
+}
+
+.custom-perfume-card {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 32px !important;
+  padding: var(--sp-6) !important;
+  box-shadow: var(--glass-shadow), var(--glass-inner-glow) !important;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.45s var(--ease-luxury), box-shadow 0.45s var(--ease-luxury);
+}
+
+.custom-perfume-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(460px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.48), transparent 62%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s var(--ease-luxury);
+}
+
+.custom-perfume-card:hover::before {
+  opacity: 1;
+}
+
+.cp-features-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+.cp-feat-item {
+  background: rgba(255, 252, 247, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 16px;
+  padding: var(--sp-2);
+  box-shadow: 0 6px 18px rgba(75, 90, 60, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.section-wrap {
+  padding-block: var(--sp-10) var(--sp-12);
+}
+
+/* Filter Pills & Controls (Glassmorphism) */
+.filter,
+.brand-chip,
+.collection-brand-select,
+.collection-sort-select {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 10px 18px;
+  box-shadow: 0 4px 14px rgba(75, 90, 60, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.28s var(--ease-luxury);
+}
+
+.filter:hover,
+.brand-chip:hover {
+  background: var(--glass-bg-strong);
+  border-color: rgba(255, 143, 58, 0.45);
+  transform: translateY(-2px);
+}
+
+.filter.active,
+.brand-chip.active {
+  background: var(--rooh-ink) !important;
+  color: #FFFBF5 !important;
+  border-color: var(--rooh-ink) !important;
+  box-shadow: 0 10px 24px rgba(75, 90, 60, 0.22);
+}
+
+/* ── Glassmorphic 3D Tilt Product Cards ──────────────────────────────────── */
+.product-grid {
+  gap: var(--sp-4) var(--sp-3);
+}
+
+.product-card {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: var(--sp-2);
+  box-shadow: var(--glass-shadow), var(--glass-inner-glow);
+  transform-style: preserve-3d;
+  transition:
+    transform 0.42s var(--ease-luxury),
+    box-shadow 0.42s var(--ease-luxury),
+    border-color 0.3s var(--ease-luxury);
+  will-change: transform;
+}
+
+.product-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 30%), rgba(255, 255, 255, 0.52), transparent 62%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.32s var(--ease-luxury);
+}
+
+.product-card:hover {
+  border-color: rgba(255, 143, 58, 0.42);
+  box-shadow: var(--glass-shadow-hover), var(--glass-inner-glow);
+}
+
+.product-card:hover::before {
+  opacity: 1;
+}
+
+.product-image {
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(155deg, rgba(255, 252, 247, 0.72) 0%, rgba(235, 226, 210, 0.48) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+}
+
+.product-image img {
+  transition: transform 0.55s var(--ease-luxury), filter 0.45s var(--ease-luxury);
+}
+
+.product-card:hover .product-image img {
+  transform: translateY(-6px) scale(1.06);
+  filter: drop-shadow(0 18px 24px rgba(75, 90, 60, 0.18));
+}
+
+.product-info {
+  padding: var(--sp-2) var(--sp-1) var(--sp-1);
+}
+
+.quick-add {
+  border-radius: 0 0 18px 18px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.btn-explore-notes {
+  border-radius: 12px;
+  background: rgba(255, 252, 247, 0.65);
+  border: 1px solid rgba(75, 90, 60, 0.14);
+}
+
+.btn-explore-notes:hover {
+  background: var(--rooh-ink);
+  color: #FFFBF5;
+  border-color: var(--rooh-ink);
+}
+
+/* ── Hero Glassmorphic Accents ───────────────────────────────────────────── */
+.hero-bottle-trigger-btn {
+  background: rgba(255, 252, 247, 0.78) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 14px 36px rgba(75, 90, 60, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+
+.hero-bottle-trigger-btn:hover {
+  background: var(--rooh-accent) !important;
+  border-color: var(--rooh-accent) !important;
+  color: #ffffff !important;
+}
+
+.hero-bestseller-eyebrow,
+.hero-nav-btn {
+  background: rgba(255, 252, 247, 0.68) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid rgba(255, 255, 255, 0.78) !important;
+  box-shadow: 0 10px 28px rgba(75, 90, 60, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+.hero-info-hud,
+.modal-card,
+.cart-drawer {
+  background: rgba(248, 243, 234, 0.82) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  box-shadow: 0 32px 80px rgba(46, 58, 35, 0.22), var(--glass-inner-glow) !important;
+}
+
+.hero-info-hud,
+.modal-card {
+  border-radius: 28px !important;
+}
+
+/* ── Story / Spotlight & Quote & Newsletter Glass Elevation ──────────────── */
+.story {
+  max-width: 1320px;
+  margin: var(--sp-8) auto;
+  border-radius: 32px;
+  overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow), var(--glass-inner-glow);
+}
+
+.story-spotlight-box {
+  background: rgba(255, 252, 247, 0.68) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.78) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 12px 30px rgba(75, 90, 60, 0.08), var(--glass-inner-glow);
+}
+
+.quote-band {
+  padding-block: var(--sp-12);
+}
+
+.newsletter {
+  max-width: 1240px;
+  margin: 0 auto var(--sp-10);
+  border-radius: 32px;
+  padding: var(--sp-8) var(--sp-6);
+  background: linear-gradient(135deg, rgba(255, 143, 58, 0.88) 0%, rgba(235, 126, 48, 0.92) 100%) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow: 0 24px 60px rgba(230, 126, 51, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* ── Product Details Page (product.html) Glass Bento Architecture ────────── */
+.prod-visual-stage,
+body.light .prod-visual-stage {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 32px !important;
+  box-shadow: var(--glass-shadow), var(--glass-inner-glow) !important;
+}
+
+.pdp-inspired-card,
+.prod-desc-block,
+.trust-item,
+.pdp-card,
+.perf-pill-box,
+.sillage-hud {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 22px !important;
+  box-shadow: var(--glass-shadow), var(--glass-inner-glow) !important;
+  transition: transform 0.4s var(--ease-luxury), box-shadow 0.4s var(--ease-luxury), border-color 0.3s var(--ease-luxury);
+}
+
+.pdp-card {
+  position: relative;
+  overflow: hidden;
+  padding: var(--sp-4) !important;
+}
+
+.pdp-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 30%), rgba(255, 255, 255, 0.48), transparent 62%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease-luxury);
+}
+
+.pdp-card:hover {
+  border-color: rgba(255, 143, 58, 0.4) !important;
+  box-shadow: var(--glass-shadow-hover), var(--glass-inner-glow) !important;
+}
+
+.pdp-card:hover::before {
+  opacity: 1;
+}
+
+.sticky-mobile-buy-bar {
+  background: rgba(245, 239, 230, 0.86) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.72) !important;
+}
+
+/* ── Admin Dashboard (admin.html) Luxury Glass Redesign ──────────────────── */
+.admin-sidebar {
+  background: rgba(246, 240, 231, 0.72) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 0 0 40px rgba(75, 90, 60, 0.08);
+}
+
+.admin-sidebar .side-link {
+  border-radius: 14px;
+  transition: background 0.25s var(--ease-luxury), transform 0.25s var(--ease-luxury), color 0.2s;
+}
+
+.admin-sidebar .side-link:hover {
+  background: rgba(255, 252, 247, 0.75);
+  transform: translateX(-3px);
+}
+
+.admin-sidebar .side-link.selected {
+  background: linear-gradient(135deg, rgba(75, 90, 60, 0.94), rgba(61, 74, 47, 0.96)) !important;
+  color: #FFFBF5 !important;
+  box-shadow: 0 10px 24px rgba(75, 90, 60, 0.22);
+}
+
+.admin-topbar {
+  background: rgba(246, 240, 231, 0.68) !important;
+  backdrop-filter: var(--glass-blur-heavy) !important;
+  -webkit-backdrop-filter: var(--glass-blur-heavy) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 20px !important;
+  padding: var(--sp-2) var(--sp-3) !important;
+  margin-bottom: var(--sp-3);
+  box-shadow: var(--glass-shadow), var(--glass-inner-glow);
+}
+
+.welcome {
+  background: linear-gradient(135deg, rgba(255, 252, 247, 0.66) 0%, rgba(255, 143, 58, 0.12) 100%) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 24px !important;
+  padding: var(--sp-4) !important;
+  box-shadow: var(--glass-shadow), var(--glass-inner-glow);
+}
+
+/* Admin Bento KPI & Source Cards */
+.stat-card,
+.inventory-kpi-card,
+.sales-kpi-card,
+.source-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 20px !important;
+  padding: var(--sp-3) !important;
+  box-shadow: var(--glass-shadow), var(--glass-inner-glow) !important;
+  transition: transform 0.38s var(--ease-luxury), box-shadow 0.38s var(--ease-luxury), border-color 0.3s;
+}
+
+.stat-card::before,
+.inventory-kpi-card::before,
+.sales-kpi-card::before,
+.source-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 30%), rgba(255, 255, 255, 0.52), transparent 62%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease-luxury);
+}
+
+.stat-card:hover,
+.inventory-kpi-card:hover,
+.sales-kpi-card:hover,
+.source-card:hover {
+  border-color: rgba(255, 143, 58, 0.42) !important;
+  box-shadow: var(--glass-shadow-hover), var(--glass-inner-glow) !important;
+}
+
+.stat-card:hover::before,
+.inventory-kpi-card:hover::before,
+.sales-kpi-card:hover::before,
+.source-card:hover::before {
+  opacity: 1;
+}
+
+/* Admin Main Panels & Tables */
+.products-panel,
+.brands-panel,
+.campaign-panel,
+.homepage-panel,
+.orders-panel,
+.inventory-panel,
+.sales-panel,
+.traffic-panel,
+.analytics-box {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--glass-shadow), var(--glass-inner-glow) !important;
+}
+
+.home-section-row {
+  background: rgba(255, 252, 247, 0.70) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 6px 20px rgba(75, 90, 60, 0.05), var(--glass-inner-glow);
+}
+
+.admin-search-input,
+.admin-filter-select,
+.inv-source-select {
+  background: rgba(255, 252, 247, 0.72) !important;
+  border: 1px solid rgba(75, 90, 60, 0.16) !important;
+  border-radius: 12px !important;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.admin-search-input:focus,
+.admin-filter-select:focus,
+.inv-source-select:focus {
+  border-color: var(--rooh-accent) !important;
+  box-shadow: 0 0 0 3px rgba(255, 143, 58, 0.16);
+}
+
+/* ── Scroll-Triggered Reveal Animations (60fps GPU-Accelerated) ──────────── */
+html.rooh-motion-ready .rooh-reveal {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0) scale(0.985);
+  transition:
+    opacity 0.72s var(--ease-luxury) var(--stagger, 0ms),
+    transform 0.72s var(--ease-luxury) var(--stagger, 0ms);
+  will-change: opacity, transform;
+}
+
+html.rooh-motion-ready .rooh-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* ── Responsive Refinements (8px rhythm on Mobile & Tablet) ──────────────── */
+@media (max-width: 900px) {
+  .cp-features-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-perfume-card {
+    padding: var(--sp-4) var(--sp-3) !important;
+    border-radius: 24px !important;
+  }
+
+  .story,
+  .newsletter {
+    margin-inline: var(--sp-2);
+    border-radius: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .custom-perfume-section {
+    padding: var(--sp-6) var(--sp-2);
+  }
+
+  .section-wrap {
+    padding-block: var(--sp-8) var(--sp-8);
+  }
+
+  .product-card {
+    padding: var(--sp-1);
+    border-radius: 18px;
+  }
+
+  .product-image {
+    border-radius: 14px;
+  }
+
+  .newsletter {
+    padding: var(--sp-5) var(--sp-3);
+  }
+
+  .rooh-orb {
+    filter: blur(64px);
+    opacity: 0.4;
+  }
+}
+
+/* ── Reduced Motion Support ──────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .rooh-orb {
+    animation: none !important;
+  }
+
+  html.rooh-motion-ready .rooh-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  #roohThreeCanvas {
+    display: none !important;
+  }
+}

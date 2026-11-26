@@ -8,9 +8,10 @@
   <link rel="icon" type="image/png" href="assets/branding/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="product.css">
+  <link rel="stylesheet" href="luxury-glass.css">
 </head>
 <body class="light">
   <div class="loader" id="loader" aria-label="جاري التحميل">
@@ -37,25 +38,29 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <button class="icon-btn menu-toggle" id="menuToggle" aria-label="فتح القائمة"><span></span><span></span><span></span></button>
-      <nav class="desktop-nav" aria-label="التنقل الرئيسي">
-        <a href="index.html" data-i18n="nav_home">الرئيسية</a>
-        <a href="index.html#collection" data-i18n="nav_collection">تسوق العطور</a>
-        <a href="index.html#story" data-i18n="nav_story">حكايتنا</a>
-        <a href="https://wa.me/message/2YHV6BH76ZRGO1" target="_blank" rel="noopener" data-i18n="nav_contact">تواصل معنا</a>
-      </nav>
       <a class="brand" href="index.html" aria-label="رُوح | Rou7 Perfume">
-        <img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume">
+        <div class="brand-logo-wrap">
+          <img class="brand-logo" src="assets/branding/1.svg" data-dark="assets/branding/1.svg" data-light="assets/branding/1.svg" alt="رُوح | Rou7 Perfume">
+        </div>
       </a>
-      <div class="header-actions">
-        <button class="lang-toggle-btn" id="langToggle" aria-label="Switch Language" title="تغيير اللغة | Switch Language">
-          <span class="lang-globe">🌐</span>
-          <span id="langText">EN</span>
-        </button>
-        <button class="icon-btn" id="cartToggle" aria-label="سلة الشراء">
-          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          <span class="cart-count" id="cartCount">0</span>
-        </button>
+      <div class="header-nav-actions-group">
+        <nav class="desktop-nav" aria-label="التنقل الرئيسي">
+          <a href="index.html" data-i18n="nav_home">الرئيسية</a>
+          <a href="index.html#collection" data-i18n="nav_collection">تسوق العطور</a>
+          <a href="index.html#story" data-i18n="nav_story">حكايتنا</a>
+          <a href="https://wa.me/message/2YHV6BH76ZRGO1" target="_blank" rel="noopener" data-i18n="nav_contact">تواصل معنا</a>
+        </nav>
+        <div class="header-actions">
+          <button class="lang-toggle-btn" id="langToggle" aria-label="Switch Language" title="تغيير اللغة | Switch Language">
+            <span class="lang-globe">🌐</span>
+            <span id="langText">EN</span>
+          </button>
+          <button class="icon-btn" id="cartToggle" aria-label="سلة الشراء">
+            <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
+        </div>
+        <button class="icon-btn menu-toggle" id="menuToggle" aria-label="فتح القائمة"><span></span><span></span><span></span></button>
       </div>
     </div>
     <div class="mobile-menu" id="mobileMenu">
@@ -421,5 +426,6 @@
   <script src="perfume-i18n.js" defer></script>
   <script src="analytics.js" defer></script>
   <script src="product.js" defer></script>
+  <script src="luxury-motion.js" defer></script>
 </body>
 </html>
