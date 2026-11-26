@@ -70,7 +70,7 @@
       val_3: 'صُنع بحب في مصر',
       val_4: 'هدية تحكي عنك',
       val_custom: 'لو في عطر مش موجود ومحتاجه نقدر نوفرهولك',
-      cp_eyebrow: 'خدمة رُوح الخاصة للأصالة والفخامة ✦',
+      cp_eyebrow: 'خدمة رُوح الخاصة للأصالة والفخامة',
       cp_title: 'لو في عطر مش موجود ومحتاجه… <em>نقدر نوفرهولك</em>',
       cp_desc: 'بتدور على عطر معين (ماركة عالمية، نيش، أو نادر) ومش لاقيه في متجرنا؟ ابعتلنا اسمه أو صورته على واتساب وهنوفرهولك فوراً بأفضل سعر وأعلى جودة وأصلية مضمونة 100%.',
       cp_feat_1: 'نوفر لك أي عطر أصلي غير متوفر بالمتجر',
@@ -114,8 +114,8 @@
       spotlight_quick_buy: 'أضف للسلة بالعرض',
       spotlight_explore_notes: 'تحليل النوتات',
       spotlight_save_prefix: 'وفر',
-      hero_badge: 'عطر الواجهة الرئيسي ✦ تحفة رُوح',
-      hero_explore: 'استكشف العطر ✦',
+      hero_badge: 'عطر الواجهة الرئيسي · تحفة رُوح',
+      hero_explore: 'استكشف العطر',
       hero_add: '＋ أضف للسلة',
       quote_text: '“بعض الحكايات لا تُروى… <em>بل تُشمّ.</em>”',
       quote_caption: 'رُوح · عطر يلامس أعماقك',
@@ -127,7 +127,7 @@
       news_disclaimer: 'بالاشتراك، أنت توافق على استقبال رسائل رُوح.',
       footer_tagline: 'عطر يلامس أعماقك.<br>رائحة تُشبهك، وذكرى تبقى.',
       footer_rights: '© ٢٠٢٦ رُوح | Rou7 Perfume. جميع الحقوق محفوظة.',
-      footer_made: 'صُنع بحب في مصر <b>✳</b>',
+      footer_made: 'صُنع بحب في مصر',
       checkout_eyebrow: 'خطوة أخيرة',
       checkout_title: 'بيانات <em>التوصيل</em>',
       checkout_order_total: 'إجمالي طلبك:',
@@ -153,8 +153,8 @@
       track_not_found: 'لم نجد هذا الطلب. راجع الرقم أو تواصل معنا للمساعدة.',
       wa_tooltip: 'تواصل معنا عبر واتساب 💬',
       wa_inquiry_msg: 'مرحباً رُوح | Rou7-perfume، أود الاستفسار عن عطوركم 🌸',
-      toast_added: 'اتضاف عطرك للسلة ✳',
-      toast_newsletter: 'أهلاً بك في حكاية رُوح ✳',
+      toast_added: 'اتضاف عطرك للسلة',
+      toast_newsletter: 'أهلاً بك في حكاية رُوح',
       lang_btn_code: 'EN',
       lang_btn_mobile: 'English',
       lang_switch_title: 'Switch to English',
@@ -224,7 +224,7 @@
       val_3: 'Crafted with love in Egypt',
       val_4: 'A gift that speaks of you',
       val_custom: 'Looking for a scent not listed? We can provide it for you',
-      cp_eyebrow: 'Rou7 Exclusive Luxury Sourcing ✦',
+      cp_eyebrow: 'Rou7 Exclusive Luxury Sourcing',
       cp_title: 'Can’t find your favorite perfume? <em>We can provide it for you</em>',
       cp_desc: 'Searching for a specific fragrance (designer, niche, or rare) not listed in our store? Message us on WhatsApp with its name or photo and we will source it for you at the best price with 100% authenticity guaranteed.',
       cp_feat_1: 'We source any authentic perfume not listed',
@@ -268,8 +268,8 @@
       spotlight_quick_buy: 'Add to Bag with Offer',
       spotlight_explore_notes: 'Scent Analysis',
       spotlight_save_prefix: 'Save',
-      hero_badge: 'Signature Masterpiece ✦ Featured Fragrance',
-      hero_explore: 'Explore Scent ✦',
+      hero_badge: 'Signature Masterpiece · Featured Fragrance',
+      hero_explore: 'Explore Scent',
       hero_add: '＋ Add to Bag',
       quote_text: '“Some stories aren\'t told… <em>they are smelled.</em>”',
       quote_caption: 'Rou7 · A Scent Touching Your Depths',
@@ -281,7 +281,7 @@
       news_disclaimer: 'By subscribing, you agree to receive letters from Rou7.',
       footer_tagline: 'A scent that touches your depths.<br>A fragrance like you, a memory that lasts.',
       footer_rights: '© 2026 Rou7 Perfume. All rights reserved.',
-      footer_made: 'Crafted with love in Egypt <b>✳</b>',
+      footer_made: 'Crafted with love in Egypt',
       checkout_eyebrow: 'One Last Step',
       checkout_title: 'Delivery <em>Details</em>',
       checkout_order_total: 'Order total:',
@@ -307,8 +307,8 @@
       track_not_found: 'Order not found. Please verify the number or contact us.',
       wa_tooltip: 'Chat with us on WhatsApp 💬',
       wa_inquiry_msg: 'Hello Rou7-perfume, I would like to inquire about your fragrances 🌸',
-      toast_added: 'Added to your shopping bag ✳',
-      toast_newsletter: 'Welcome to the story of Rou7 ✳',
+      toast_added: 'Added to your shopping bag',
+      toast_newsletter: 'Welcome to the story of Rou7',
       lang_btn_code: 'عربي',
       lang_btn_mobile: 'العربية',
       lang_switch_title: 'التبديل إلى اللغة العربية',
@@ -1817,13 +1817,13 @@
 
     // Fallbacks
     if (phase === 'top') {
-      return isAr ? 'نفحات افتتاحية تأسر الحواس في أول ربع ساعة ✦' : 'Crisp opening note in first 15 mins';
+      return isAr ? 'نفحات افتتاحية تأسر الحواس في أول ربع ساعة' : 'Crisp opening note in first 15 mins';
     } else if (phase === 'middle') {
-      return isAr ? 'قلب العطر الآسر ينبض بروعة حتى 3 ساعات ✦' : 'Alluring heart note lasting up to 3h';
+      return isAr ? 'قلب العطر الآسر ينبض بروعة حتى 3 ساعات' : 'Alluring heart note lasting up to 3h';
     } else if (phase === 'base') {
-      return isAr ? 'قاعدة دافئة غنية تثبت لأكثر من 10 ساعات ✦' : 'Deep warm base resting on skin for 10+ hours';
+      return isAr ? 'قاعدة دافئة غنية تثبت لأكثر من 10 ساعات' : 'Deep warm base resting on skin for 10+ hours';
     }
-    return isAr ? 'نوتة عطرية مميزة لشخصية العطر ✦' : 'Signature aromatic note';
+    return isAr ? 'نوتة عطرية مميزة لشخصية العطر' : 'Signature aromatic note';
   }
 
   // ── Editorial Color-Shifting Hero Showcase (الواجهة التفاعلية المميزة) ───────
@@ -2011,6 +2011,27 @@
     return match ? `${match[1]}ml` : '100ml';
   }
 
+  function localizeSizeLabel(sizeText, lang = currentLang) {
+    const raw = String(sizeText || '').trim();
+    if (!raw) return '';
+    let norm = raw.replace(/[٠-٩]/g, ch => String('٠١٢٣٤٥٦٧٨٩'.indexOf(ch)));
+    if (lang === 'en') {
+      norm = norm
+        .replace(/\s*(ملليتر|ملليلتر|مليلتر|مللي|ملي|مل)(?![a-zA-Z\u0600-\u06FF])/gi, 'ml')
+        .replace(/\s*(جرام|غم|جم)(?![a-zA-Z\u0600-\u06FF])/gi, 'g')
+        .replace(/\s*(أونصة|اونصة|أونص|اونص)(?![a-zA-Z\u0600-\u06FF])/gi, 'oz')
+        .replace(/\s*(تولة|توله)(?![a-zA-Z\u0600-\u06FF])/gi, 'tola')
+        .replace(/(\d+)\s+(ml|g|oz)\b/gi, '$1$2');
+      return norm.trim();
+    }
+    norm = norm
+      .replace(/(\d+)\s*(ml|ملليتر|ملليلتر|مليلتر|مللي|ملي|مل)(?![a-zA-Z\u0600-\u06FF])/gi, '$1 مل')
+      .replace(/(\d+)\s*(g|جرام|غم|جم)(?![a-zA-Z\u0600-\u06FF])/gi, '$1 جم')
+      .replace(/(\d+)\s*(oz|أونصة|اونصة|أونص|اونص)(?![a-zA-Z\u0600-\u06FF])/gi, '$1 أونصة')
+      .replace(/\bml\b/gi, 'مل');
+    return norm.trim();
+  }
+
   function getHeroBestSellers(candidates) {
     const list = [];
     const seen = new Set();
@@ -2129,7 +2150,6 @@
 
         <div class="hstage-topbar">
           <div class="hstage-brand-cue">
-            <span class="hstage-spark">✦</span>
             <span id="hstageEyebrowText">الأكثر مبيعاً</span>
             <span class="hstage-counter" id="hstageCounter"></span>
           </div>
@@ -2392,7 +2412,7 @@
     if (!candidates.length) {
       heroSlidesList = [];
       heroCurrentProdId = null;
-      hero.innerHTML = `<div class="hero-product-empty"><span>✳</span><p>${isAr ? 'المنتج المميز سيظهر هنا' : 'Featured fragrance will appear here'}</p></div>`;
+      hero.innerHTML = `<div class="hero-product-empty"><p>${isAr ? 'المنتج المميز سيظهر هنا' : 'Featured fragrance will appear here'}</p></div>`;
       return;
     }
 
@@ -2558,12 +2578,12 @@
     if (sizeListEl) {
       if (Array.isArray(d.sizes) && d.sizes.length > 0) {
         sizeListEl.innerHTML = d.sizes.map((s, idx) => {
-          const label = escapeHtml(String(s.size || '').trim() || '100ml');
+          const label = escapeHtml(localizeSizeLabel(String(s.size || '').trim() || '100ml', currentLang));
           const active = idx === heroSelectedSizeIdx;
           return `<button type="button" class="hstage-size-btn ${active ? 'is-active' : ''}" data-hstage-size-idx="${idx}" role="radio" aria-checked="${active ? 'true' : 'false'}">${label}</button>`;
         }).join('');
       } else {
-        const vol = detectBottleVolume(featured, d);
+        const vol = localizeSizeLabel(detectBottleVolume(featured, d), currentLang);
         sizeListEl.innerHTML = `
           <span class="hstage-size-btn is-active is-static">${escapeHtml(vol)}</span>
           <span class="hstage-size-btn is-static">EDP</span>
@@ -3359,18 +3379,6 @@
             ? `<button class="quick-add disabled" type="button" disabled style="opacity: 0.65; cursor: not-allowed; background: rgba(0,0,0,0.6);">${currentLang === 'ar' ? 'نفد من المخزون' : 'Out of Stock'} <span>✕</span></button>`
             : `<button class="quick-add" data-add="${product.id}" type="button">${t.quick_add} <span>＋</span></button>`;
 
-          // Key notes preview
-          let notesPreview = '';
-          const topN = localized ? localized.top_notes : d.top_notes;
-          const midN = localized ? localized.middle_notes : d.middle_notes;
-          const baseN = localized ? localized.base_notes : d.base_notes;
-          if (topN || midN || baseN) {
-            const rawParts = [topN, midN, baseN].filter(Boolean).join(',').split(/[,،]/).map(s => s.trim()).filter(Boolean).slice(0, 3);
-            if (rawParts.length) {
-              notesPreview = `<div class="card-keynotes-pills">${rawParts.map(n => `<span class="ck-pill">${escapeHtml(n)}</span>`).join('')}</div>`;
-            }
-          }
-
           // Mood match indicator
           const moodScore = activeMood ? getProductMoodScore(product, activeMood) : 0;
           const moodProfile = activeMood ? MOOD_PROFILES[activeMood] : null;
@@ -3393,11 +3401,9 @@
                 ${priceHtml}
               </div>
               ${d.inspired_by ? `<div class="card-inspired-tag"><span class="ci-label">${currentLang === 'ar' ? 'مستوحى من' : 'Inspired by'}</span> <strong>${escapeHtml(d.inspired_by)}</strong></div>` : ''}
-              ${notesPreview}
               ${moodMatchPillHtml}
-              ${d.accords ? `<div class="card-accords-row">${renderAccordPills(d.accords)}</div>` : ''}
               <div class="card-action-links">
-                <a href="product.html?id=${product.id}" class="btn-explore-notes"><span>✦</span> ${currentLang === 'ar' ? 'تفاصيل وتحليل العطر' : 'Fragrance Profile & Notes'}</a>
+                <a href="product.html?id=${product.id}" class="btn-explore-notes">${currentLang === 'ar' ? 'تفاصيل وتحليل العطر' : 'Fragrance Profile & Notes'}</a>
                 <button type="button" class="btn-card-quickview" data-quickview="${product.id}" title="${currentLang === 'ar' ? 'نظرة سريعة على النوتات' : 'Quick View'}">
                   <span>👁️</span>
                 </button>
@@ -3410,7 +3416,7 @@
           <p style="font-size: 13px; color: var(--muted); margin: 0 0 20px;">${currentLang === 'ar' ? 'جرّب البحث بكلمة أخرى، أو باسم البراند، أو تصفح كل العطور.' : 'Try a different keyword or browse all fragrances.'}</p>
           <button type="button" class="button button-primary" id="btnResetSearchGrid" style="border-radius: 999px;">${currentLang === 'ar' ? 'عرض كل العطور' : 'View All Fragrances'}</button>
         </div>`
-      : `<div class="catalog-empty"><span>✳</span><h3>${currentLang === 'ar' ? 'قريباً، عطور رُوح هنا' : 'Rou7 Fragrances Coming Soon'}</h3></div>`;
+      : `<div class="catalog-empty"><h3>${currentLang === 'ar' ? 'قريباً، عطور رُوح هنا' : 'Rou7 Fragrances Coming Soon'}</h3></div>`;
 
     const countText = currentLang === 'ar'
       ? `${arabicDigits(visible.length)} ${visible.length === 1 ? 'عطر' : 'عطور'}`
@@ -3680,7 +3686,7 @@
         <div class="cart-thumb">${product.image_url ? `<img src="${product.image_url}" alt="" loading="lazy">` : ''}</div>
         <div>
           <h3>${escapeHtml(prodName)}</h3>
-          ${row.selectedSize ? `<div style="margin:2px 0;"><span style="display:inline-block; font-size:11px; background:rgba(140, 115, 85, 0.12); color:#8c7355; border:1px solid rgba(140, 115, 85, 0.25); padding:1px 8px; border-radius:12px; font-weight:600;">🧴 ${escapeHtml(row.selectedSize)}</span></div>` : ''}
+          ${row.selectedSize ? `<div style="margin:2px 0;"><span style="display:inline-block; font-size:11px; background:rgba(140, 115, 85, 0.12); color:#8c7355; border:1px solid rgba(140, 115, 85, 0.25); padding:1px 8px; border-radius:12px; font-weight:600;">🧴 ${escapeHtml(localizeSizeLabel(row.selectedSize, currentLang))}</span></div>` : ''}
           <p>${priceDisplay}</p>
           <div class="qty">
             <button data-cart-idx="${idx}" data-qty="${product.id}" data-step="-1" aria-label="تقليل">−</button>
@@ -4342,7 +4348,7 @@
             <div class="quiz-result-body">
               ${p.image_url ? `<a href="product.html?id=${encodeURIComponent(p.id)}" class="quiz-result-img-wrap"><img src="${p.image_url}" alt="${escapeHtml(prodName)}" class="quiz-result-bottle"></a>` : ''}
               <h4 class="quiz-result-name"><a href="product.html?id=${encodeURIComponent(p.id)}">${escapeHtml(prodName)}</a></h4>
-              ${d.inspired_by ? `<span class="quiz-result-inspired">✦ ${isAr ? 'مستوحى من' : 'Inspired by'}: ${escapeHtml(d.inspired_by)}</span>` : ''}
+              ${d.inspired_by ? `<span class="quiz-result-inspired">${isAr ? 'مستوحى من' : 'Inspired by'}: ${escapeHtml(d.inspired_by)}</span>` : ''}
               ${reasons.length ? `<div class="quiz-result-reasons">${reasons.slice(0, 3).map(r => `<span class="quiz-reason-chip">${escapeHtml(r)}</span>`).join('')}</div>` : ''}
               <div class="quiz-result-price">
                 <span class="quiz-price-current">${money(pricing.price)}</span>
@@ -4350,7 +4356,7 @@
               </div>
             </div>
             <div class="quiz-result-cta">
-              <a href="product.html?id=${encodeURIComponent(p.id)}" class="btn-quiz-explore">${isAr ? 'استكشف العطر' : 'Explore'} ✦</a>
+              <a href="product.html?id=${encodeURIComponent(p.id)}" class="btn-quiz-explore">${isAr ? 'استكشف العطر' : 'Explore'}</a>
               <button type="button" class="btn-quiz-add" data-add="${p.id}">＋ ${isAr ? 'أضف للسلة' : 'Add to Bag'}</button>
             </div>
           </div>

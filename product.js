@@ -94,8 +94,8 @@
       checkout_note: 'الدفع عند الاستلام · تأكيد عبر واتساب',
       footer_tagline: 'عطر يلامس أعماقك.<br>رائحة تُشبهك، وذكرى تبقى.',
       footer_rights: '© ٢٠٢٦ رُوح | Rou7-perfume. جميع الحقوق محفوظة.',
-      footer_made: 'صُنع بحب في مصر <b>✳</b>',
-      toast_added: 'تمت إضافة العطر إلى الحقيبة ✳',
+      footer_made: 'صُنع بحب في مصر',
+      toast_added: 'تمت إضافة العطر إلى الحقيبة',
       toast_qty_err: 'يرجى اختيار كمية صحيحة',
       currency: 'ج.م',
       spray_btn_text: 'بخّة الرذاذ واختبار الفوحان',
@@ -164,8 +164,8 @@
       checkout_note: 'Cash on delivery · Order confirmation via WhatsApp',
       footer_tagline: 'In every note a story, in every trace a memory.<br>A scent crafted to resemble you.',
       footer_rights: '© 2026 Rou7-perfume. All rights reserved.',
-      footer_made: 'Crafted with love in Egypt <b>✳</b>',
-      toast_added: 'Added to your shopping bag ✳',
+      footer_made: 'Crafted with love in Egypt',
+      toast_added: 'Added to your shopping bag',
       toast_qty_err: 'Please select a valid quantity',
       currency: 'EGP',
       wa_inquiry_msg: 'Hello Rou7-perfume, I would like to inquire about your fragrances 🌸',
@@ -632,6 +632,27 @@
     updateWaOrderLink();
   }
 
+  function localizeSizeLabel(sizeText, lang = currentLang) {
+    const raw = String(sizeText || '').trim();
+    if (!raw) return '';
+    let norm = raw.replace(/[٠-٩]/g, ch => String('٠١٢٣٤٥٦٧٨٩'.indexOf(ch)));
+    if (lang === 'en') {
+      norm = norm
+        .replace(/\s*(ملليتر|ملليلتر|مليلتر|مللي|ملي|مل)(?![a-zA-Z\u0600-\u06FF])/gi, 'ml')
+        .replace(/\s*(جرام|غم|جم)(?![a-zA-Z\u0600-\u06FF])/gi, 'g')
+        .replace(/\s*(أونصة|اونصة|أونص|اونص)(?![a-zA-Z\u0600-\u06FF])/gi, 'oz')
+        .replace(/\s*(تولة|توله)(?![a-zA-Z\u0600-\u06FF])/gi, 'tola')
+        .replace(/(\d+)\s+(ml|g|oz)\b/gi, '$1$2');
+      return norm.trim();
+    }
+    norm = norm
+      .replace(/(\d+)\s*(ml|ملليتر|ملليلتر|مليلتر|مللي|ملي|مل)(?![a-zA-Z\u0600-\u06FF])/gi, '$1 مل')
+      .replace(/(\d+)\s*(g|جرام|غم|جم)(?![a-zA-Z\u0600-\u06FF])/gi, '$1 جم')
+      .replace(/(\d+)\s*(oz|أونصة|اونصة|أونص|اونص)(?![a-zA-Z\u0600-\u06FF])/gi, '$1 أونصة')
+      .replace(/\bml\b/gi, 'مل');
+    return norm.trim();
+  }
+
   function renderPdpSizeSelector(d) {
     const sizeSection = $('#pdpSizeSection');
     const sizeOptions = $('#pdpSizeOptions');
@@ -645,7 +666,7 @@
       sizeOptions.innerHTML = d.sizes.map((s, idx) => {
         const isAct = idx === currentSelectedSizeIndex;
         return `<button type="button" class="pdp-size-btn ${isAct ? 'active' : ''}" data-size-idx="${idx}" role="radio" aria-checked="${isAct}">
-          <span>${escapeHtml(s.size)}</span>
+          <span>${escapeHtml(localizeSizeLabel(s.size, currentLang))}</span>
         </button>`;
       }).join('');
     } else {
@@ -978,7 +999,7 @@
 
           inspector.hidden = false;
           inspector.innerHTML = `
-            <div class="pni-icon" style="background:${st.color}22; color:${st.color};">✦</div>
+            <div class="pni-icon" style="background:${st.color}22; color:${st.color};">•</div>
             <div class="pni-copy">
               <strong>${escapeHtml(noteName)}</strong>
               <p>${desc}</p>
@@ -1204,7 +1225,8 @@
     const pricing = computeProductPrice(currentProduct, campaignSettings, currentSelectedSizeIndex);
     const prodName = currentLang === 'en' ? (currentProduct.latin || currentProduct.name) : currentProduct.name;
     const totalPrice = (pricing.price * currentQty);
-    const sizeNote = pricing.selectedSize ? (currentLang === 'ar' ? ` (حجم: ${pricing.selectedSize})` : ` (Size: ${pricing.selectedSize})`) : '';
+    const localizedSize = pricing.selectedSize ? localizeSizeLabel(pricing.selectedSize, currentLang) : '';
+    const sizeNote = localizedSize ? (currentLang === 'ar' ? ` (حجم: ${localizedSize})` : ` (Size: ${localizedSize})`) : '';
     const text = currentLang === 'ar'
       ? `مرحباً رُوح، أود طلب عطر "${prodName}"${sizeNote} عدد (${arabicDigits(currentQty)}) عبوة.\nالقيمة الإجمالية: ${totalPrice} ج.م.\nبرجاء تأكيد الطلب ومعلومات الشحن.`
       : `Hello Rou7, I would like to order "${prodName}"${sizeNote} quantity (${currentQty}).\nTotal Price: ${totalPrice} EGP.\nPlease confirm order and shipping details.`;
@@ -1311,7 +1333,7 @@
             </div>
             <div class="cart-item-info">
               <h4>${escapeHtml(title)}</h4>
-              ${item.selectedSize ? `<span class="cart-item-size-badge">🧴 ${escapeHtml(item.selectedSize)}</span>` : ''}
+              ${item.selectedSize ? `<span class="cart-item-size-badge">🧴 ${escapeHtml(localizeSizeLabel(item.selectedSize, currentLang))}</span>` : ''}
               <span class="cart-item-price">${money(item.price)}</span>
               <div class="cart-qty-row">
                 <button type="button" class="cart-qty-btn" data-cart-idx="${idx}" data-qty-change="${item.id}" data-step="-1">−</button>
