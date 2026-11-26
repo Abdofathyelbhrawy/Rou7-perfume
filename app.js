@@ -2153,7 +2153,15 @@
             <span id="hstageEyebrowText">الأكثر مبيعاً</span>
             <span class="hstage-counter" id="hstageCounter"></span>
           </div>
-          <div class="hstage-pill-nav" id="hstagePillNav" role="tablist"></div>
+          <div class="hstage-pill-scroller" id="hstagePillScroller">
+            <button type="button" class="hstage-pill-scroll-btn" id="hstagePillScrollPrev" aria-label="Scroll left">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="hstage-pill-nav" id="hstagePillNav" role="tablist"></div>
+            <button type="button" class="hstage-pill-scroll-btn" id="hstagePillScrollNext" aria-label="Scroll right">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
         </div>
 
         <div class="hstage-grid">
@@ -2265,7 +2273,10 @@
       goToHeroSlide(heroSlideIndex + 1, 1);
     });
 
-    stage.querySelector('#hstagePillNav')?.addEventListener('click', e => {
+    const pillNavEl = stage.querySelector('#hstagePillNav');
+    const pillScrollerEl = stage.querySelector('#hstagePillScroller');
+
+    pillNavEl?.addEventListener('click', e => {
       const pill = e.target.closest('[data-hstage-pill]');
       if (!pill) return;
       e.preventDefault();
@@ -2274,6 +2285,34 @@
         goToHeroSlide(targetIdx, targetIdx > heroSlideIndex ? 1 : -1);
       }
     });
+
+    stage.querySelector('#hstagePillScrollPrev')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      pillNavEl?.scrollBy({ left: -220, behavior: 'smooth' });
+    });
+
+    stage.querySelector('#hstagePillScrollNext')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      pillNavEl?.scrollBy({ left: 220, behavior: 'smooth' });
+    });
+
+    pillNavEl?.addEventListener('wheel', e => {
+      if (pillNavEl.scrollWidth <= pillNavEl.clientWidth) return;
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        pillNavEl.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+
+    pillScrollerEl?.addEventListener('touchstart', e => {
+      e.stopPropagation();
+    }, { passive: true });
+
+    pillScrollerEl?.addEventListener('touchend', e => {
+      e.stopPropagation();
+    }, { passive: true });
 
     stage.querySelector('#hstageSizeList')?.addEventListener('click', e => {
       const sizeBtn = e.target.closest('[data-hstage-size-idx]');
@@ -2464,10 +2503,11 @@
     const safeImg = escapeHtml(featured.image_url || 'assets/branding/2.svg');
     const prodHref = `product.html?id=${encodeURIComponent(featured.id)}`;
 
-    // Topbar eyebrow & counter & clickable Best Sellers pill tabs
+    // Topbar eyebrow & counter & scrollable Best Sellers pill tabs
     const eyebrowEl = stage.querySelector('#hstageEyebrowText');
     const counterEl = stage.querySelector('#hstageCounter');
     const pillNavEl = stage.querySelector('#hstagePillNav');
+    const pillScrollerEl = stage.querySelector('#hstagePillScroller');
     if (eyebrowEl) eyebrowEl.textContent = isAr ? 'الأكثر مبيعاً' : 'BEST SELLERS';
     if (counterEl) {
       counterEl.textContent = totalSlides > 1
@@ -2476,15 +2516,31 @@
     }
     if (pillNavEl) {
       if (totalSlides > 1) {
+        if (pillScrollerEl) pillScrollerEl.hidden = false;
         pillNavEl.hidden = false;
-        pillNavEl.innerHTML = heroSlidesList.slice(0, 5).map((item, idx) => {
+        pillNavEl.innerHTML = heroSlidesList.map((item, idx) => {
           const loc = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(item, currentLang) : null;
           const rawLabel = loc ? loc.name : (isAr ? item.name : (item.latin || item.name));
-          const compactLabel = String(rawLabel || '').split(/[-–—|(]/)[0].trim().split(/\s+/).slice(0, 2).join(' ');
+          let compactLabel = String(rawLabel || '').split(/[-–—|(]/)[0].trim().split(/\s+/).slice(0, 3).join(' ');
+          if (compactLabel.length > 22) compactLabel = `${compactLabel.slice(0, 21)}…`;
           const activeClass = idx === heroSlideIndex ? 'is-active' : '';
           return `<button type="button" class="hstage-pill-btn ${activeClass}" data-hstage-pill="${idx}" role="tab" aria-selected="${idx === heroSlideIndex ? 'true' : 'false'}" title="${escapeHtml(rawLabel)}">${escapeHtml(compactLabel)}</button>`;
         }).join('');
+
+        const activePill = pillNavEl.querySelector('.hstage-pill-btn.is-active');
+        if (activePill) {
+          requestAnimationFrame(() => {
+            if (pillNavEl.scrollWidth <= pillNavEl.clientWidth) return;
+            const navRect = pillNavEl.getBoundingClientRect();
+            const pillRect = activePill.getBoundingClientRect();
+            const delta = (pillRect.left + pillRect.width / 2) - (navRect.left + navRect.width / 2);
+            if (Math.abs(delta) > 4) {
+              pillNavEl.scrollBy({ left: delta, behavior: hadStage && slideDir !== 0 ? 'smooth' : 'auto' });
+            }
+          });
+        }
       } else {
+        if (pillScrollerEl) pillScrollerEl.hidden = true;
         pillNavEl.hidden = true;
       }
     }
