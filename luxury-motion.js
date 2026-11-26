@@ -361,7 +361,7 @@
   // ── 5. Magnetic Pull Micro-Interaction on Primary CTAs ───────────────────
   function initMagneticButtons() {
     if (prefersReducedMotion) return;
-    const MAG_SELECTOR = '.button-primary, .button-gold, .hero-bottle-trigger-btn, .btn-atomizer-spray';
+    const MAG_SELECTOR = '.button-primary, .button-gold, .hero-bottle-trigger-btn, .btn-atomizer-spray, .hstage-cta-primary';
     let activeBtn = null;
 
     document.addEventListener('pointermove', e => {

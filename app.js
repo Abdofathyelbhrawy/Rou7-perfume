@@ -1826,11 +1826,154 @@
     return isAr ? 'نوتة عطرية مميزة لشخصية العطر ✦' : 'Signature aromatic note';
   }
 
-  // ── 3D Featured Perfume Showcase (عطر الواجهة الرئيسي ثلاثي الأبعاد) ─────────
+  // ── Editorial Color-Shifting Hero Showcase (الواجهة التفاعلية المميزة) ───────
   let heroTiltRaf = null;
   let heroSlideIndex = 0;
   let heroSlidesList = [];
   const heroPreloadedImgs = new Set();
+  let heroSelectedSizeIdx = 0;
+  let heroBgToggle = false;
+  let heroCurrentProdId = null;
+  let heroHoverPaused = false;
+  let heroSlideThemes = [];
+
+  const HERO_THEMES = {
+    crimson: {
+      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #be1d2d 0%, #740a16 56%, #3f0309 100%)',
+      outerGlow: 'rgba(176, 26, 42, 0.22)',
+      shadow: 'rgba(82, 8, 18, 0.42)',
+      spotGlow: 'rgba(255, 118, 128, 0.36)'
+    },
+    pearl: {
+      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #bdb5a9 0%, #8c857b 56%, #5f5a52 100%)',
+      outerGlow: 'rgba(165, 156, 144, 0.24)',
+      shadow: 'rgba(70, 64, 56, 0.36)',
+      spotGlow: 'rgba(255, 250, 240, 0.42)'
+    },
+    obsidian: {
+      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #3c3e45 0%, #1b1c21 56%, #0c0d10 100%)',
+      outerGlow: 'rgba(38, 40, 48, 0.20)',
+      shadow: 'rgba(10, 11, 16, 0.48)',
+      spotGlow: 'rgba(215, 222, 238, 0.22)'
+    },
+    amber: {
+      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #e5721c 0%, #9f4007 56%, #592002 100%)',
+      outerGlow: 'rgba(255, 143, 58, 0.26)',
+      shadow: 'rgba(110, 44, 6, 0.42)',
+      spotGlow: 'rgba(255, 196, 128, 0.38)'
+    },
+    olive: {
+      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #5e724b 0%, #374629 56%, #1e2716 100%)',
+      outerGlow: 'rgba(75, 90, 60, 0.24)',
+      shadow: 'rgba(34, 44, 24, 0.42)',
+      spotGlow: 'rgba(182, 209, 152, 0.30)'
+    },
+    sapphire: {
+      bg: 'radial-gradient(ellipse 68% 72% at 50% 44%, #2c5b88 0%, #15314f 56%, #0a192b 100%)',
+      outerGlow: 'rgba(44, 91, 136, 0.24)',
+      shadow: 'rgba(10, 26, 46, 0.44)',
+      spotGlow: 'rgba(130, 195, 255, 0.30)'
+    }
+  };
+
+  const HERO_THEME_ORDER = ['crimson', 'pearl', 'obsidian', 'amber', 'olive', 'sapphire'];
+
+  function matchHeroThemeKey(p, idx) {
+    const raw = [
+      p?.main_accord,
+      p?.accords,
+      p?.name,
+      p?.latin,
+      p?.tag,
+      p?.category
+    ].filter(Boolean).join(' ').toLowerCase();
+
+    if (/rose|ruby|crimson|cherry|saffron|red|rouge|bakarat|baccarat|ورد|زعفران|ياقوت|كرز|أحمر/.test(raw)) {
+      return 'crimson';
+    }
+    if (/vanilla|musk|powder|white|pearl|silk|nude|coco|jasmine|فانيليا|مسك|بودر|أبيض|نود|لؤلؤ|ياسمين/.test(raw)) {
+      return 'pearl';
+    }
+    if (/black|dark|noir|smoke|smoky|tobacco|leather|ink|asrar|supremacy|أسود|داكن|تبغ|جلد|دخان|أسرار/.test(raw)) {
+      return 'obsidian';
+    }
+    if (/amber|citrus|orange|honey|gold|kalemat|caramel|spicy|warm|عنبر|عسل|ذهب|كلمات|كراميل|برتقال|حمضيات/.test(raw)) {
+      return 'amber';
+    }
+    if (/green|vetiver|olive|herbal|aromatic|pine|cypress|matcha|أخضر|زيتون|أعشاب|سرو|فتيفر|أروماتك/.test(raw)) {
+      return 'olive';
+    }
+    if (/aqua|aquatic|marine|blue|ocean|sea|breeze|fresh|bussma|بحر|مائي|أزرق|منعش|بصمة|نسيم/.test(raw)) {
+      return 'sapphire';
+    }
+    return HERO_THEME_ORDER[idx % HERO_THEME_ORDER.length];
+  }
+
+  function resolveHeroSlideThemes(slides) {
+    const resolved = [];
+    for (let i = 0; i < slides.length; i++) {
+      let key = matchHeroThemeKey(slides[i], i);
+      const prevKey = i > 0 ? resolved[i - 1] : null;
+      const avoidFirst = slides.length > 2 && i === slides.length - 1 ? resolved[0] : null;
+
+      if (key === prevKey || key === avoidFirst) {
+        const startPos = Math.max(0, HERO_THEME_ORDER.indexOf(key));
+        for (let step = 1; step < HERO_THEME_ORDER.length; step++) {
+          const candidate = HERO_THEME_ORDER[(startPos + step) % HERO_THEME_ORDER.length];
+          if (candidate !== prevKey && candidate !== avoidFirst) {
+            key = candidate;
+            break;
+          }
+        }
+      }
+      resolved.push(key);
+    }
+    return resolved;
+  }
+
+  function getHeroTagline(d, isAr) {
+    const rawList = [d.top_notes, d.middle_notes, d.base_notes]
+      .filter(Boolean)
+      .join(',')
+      .split(/[,،]/)
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    const uniqueNotes = [];
+    rawList.forEach(n => {
+      const translated = window.PerfumeI18n ? window.PerfumeI18n.translateNotes(n, currentLang) : n;
+      const clean = String(translated || n).trim();
+      if (clean && !uniqueNotes.includes(clean)) uniqueNotes.push(clean);
+    });
+
+    if (uniqueNotes.length >= 2) {
+      const n1 = escapeHtml(uniqueNotes[0]);
+      const n2 = escapeHtml(uniqueNotes[1]);
+      return isAr
+        ? `${n1} و${n2}،<br>حضور فاخر يبقى أثره`
+        : `${n1} &amp; ${n2},<br>crafted to linger`;
+    }
+    return isAr
+      ? 'عطر يلامس أعماقك،<br>ويترك أثراً لا يُنسى'
+      : 'Confidence, wrapped<br>in timeless elegance';
+  }
+
+  function getHeroShortDesc(d, isAr) {
+    let raw = String(d.desc || d.notes || '').trim();
+    if (raw.startsWith('{') || raw.startsWith('[')) raw = '';
+    if (!raw) {
+      return isAr
+        ? 'تركيبة عطرية فاخرة من مختارات رُوح الأكثر مبيعاً، تمنحك حضوراً استثنائياً وثباتاً يدوم طوال اليوم.'
+        : 'A signature bestseller from Rou7 Perfume, crafted to elevate every moment with lasting allure and refined warmth.';
+    }
+    return raw;
+  }
+
+  function detectBottleVolume(featured, d) {
+    const hay = [featured?.name, featured?.latin, d?.desc].filter(Boolean).join(' ');
+    const match = hay.match(/(?:^|[^\d])(\d{2,3})\s*(ml|مل)(?![a-zA-Z\u0600-\u06FF])/i);
+    return match ? `${match[1]}ml` : '100ml';
+  }
 
   function getHeroBestSellers(candidates) {
     const list = [];
@@ -1850,7 +1993,7 @@
       Boolean(p.is_best_seller) ||
       /best|الأكثر|مبيع|بيست/i.test(String(p.tag || ''))
     ).forEach(pushUnique);
-    // 3. Ensure the Best Sellers carousel always has multiple items to flip between
+    // 3. Ensure the Best Sellers showcase always has multiple items to flip between
     if (list.length < 2) {
       candidates.slice(0, 5).forEach(pushUnique);
     }
@@ -1867,15 +2010,337 @@
     return list;
   }
 
+  function goToHeroSlide(nextIdx, dir = 1) {
+    const totalSlides = heroSlidesList.length;
+    if (totalSlides <= 1) return;
+    heroSlideIndex = ((nextIdx % totalSlides) + totalSlides) % totalSlides;
+    renderHeroProduct(dir);
+  }
+
+  function startHeroAutoCycle() {
+    clearInterval(heroAutoTimer);
+    if (heroSlidesList.length <= 1) {
+      heroAutoTimer = null;
+      return;
+    }
+    heroAutoTimer = setInterval(() => {
+      if (heroHoverPaused || document.hidden) return;
+      if (heroSlidesList.length <= 1) return;
+      goToHeroSlide(heroSlideIndex + 1, 1);
+    }, 5200);
+  }
+
+  function updateHeroSizeAndPriceDisplay(featured, d, animatePop = false) {
+    const hero = $('#heroProduct');
+    if (!hero || !featured) return;
+
+    const hasSizes = Array.isArray(d.sizes) && d.sizes.length > 0;
+    const clampedIdx = hasSizes ? Math.max(0, Math.min(heroSelectedSizeIdx, d.sizes.length - 1)) : null;
+    if (hasSizes) heroSelectedSizeIdx = clampedIdx;
+
+    const pricing = computeProductPrice(featured, currentAnnouncements, clampedIdx);
+    const priceNowEl = hero.querySelector('#hstagePriceNow');
+    const priceOldRowEl = hero.querySelector('#hstagePriceOldRow');
+    const priceOldEl = hero.querySelector('#hstagePriceOld');
+    const discBadgeEl = hero.querySelector('#hstageDiscountBadge');
+    const addBtn = hero.querySelector('#hstageAddBtn');
+
+    if (priceNowEl) {
+      priceNowEl.textContent = money(pricing.price);
+      if (animatePop) {
+        priceNowEl.classList.remove('is-pop');
+        void priceNowEl.offsetWidth;
+        priceNowEl.classList.add('is-pop');
+      }
+    }
+
+    if (priceOldRowEl && priceOldEl && discBadgeEl) {
+      if (pricing.hasDiscount && pricing.originalPrice > pricing.price) {
+        priceOldEl.textContent = money(pricing.originalPrice);
+        discBadgeEl.textContent = pricing.discountBadge || '';
+        discBadgeEl.hidden = !pricing.discountBadge;
+        priceOldRowEl.hidden = false;
+      } else {
+        priceOldRowEl.hidden = true;
+      }
+    }
+
+    if (addBtn) {
+      addBtn.dataset.add = String(featured.id);
+      addBtn.dataset.price = String(pricing.price);
+      addBtn.dataset.size = pricing.selectedSize || '';
+    }
+
+    const sizeBtns = hero.querySelectorAll('[data-hstage-size-idx]');
+    sizeBtns.forEach(btn => {
+      const idx = parseInt(btn.dataset.hstageSizeIdx, 10);
+      const active = idx === heroSelectedSizeIdx;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-checked', active ? 'true' : 'false');
+    });
+  }
+
+  function ensureHeroStageShell(hero) {
+    const existing = hero.querySelector('#heroEditorialStage');
+    if (existing) return existing;
+
+    heroBgToggle = false;
+    hero.innerHTML = `
+      <div class="hero-editorial-stage" id="heroEditorialStage" data-theme="crimson">
+        <div class="hstage-bg-layer is-active" id="hstageBgA" aria-hidden="true"></div>
+        <div class="hstage-bg-layer" id="hstageBgB" aria-hidden="true"></div>
+        <div class="hstage-vignette" aria-hidden="true"></div>
+
+        <div class="hstage-topbar">
+          <div class="hstage-brand-cue">
+            <span class="hstage-spark">✦</span>
+            <span id="hstageEyebrowText">الأكثر مبيعاً</span>
+            <span class="hstage-counter" id="hstageCounter"></span>
+          </div>
+          <div class="hstage-pill-nav" id="hstagePillNav" role="tablist"></div>
+        </div>
+
+        <div class="hstage-grid">
+          <div class="hstage-col-info">
+            <div class="hstage-info-body" id="hstageInfoBody">
+              <div class="hstage-arrows-row" id="hstageArrowsRow">
+                <button type="button" class="hstage-arrow-btn" id="hstagePrevBtn" aria-label="السابق">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button type="button" class="hstage-arrow-btn" id="hstageNextBtn" aria-label="التالي">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+              </div>
+              <h1 class="hstage-title" id="hstageTitle"></h1>
+              <p class="hstage-inspired" id="hstageInspired" hidden></p>
+              <p class="hstage-desc" id="hstageDesc"></p>
+              <div class="hstage-cta-row">
+                <button type="button" class="hstage-cta-primary" id="hstageAddBtn" data-add="" data-price="" data-size="">
+                  <span class="hstage-cta-label" id="hstageAddLabel">أضف للسلة</span>
+                  <span class="hstage-cta-chevron" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                  </span>
+                </button>
+                <a href="#" class="hstage-cta-secondary" id="hstageExploreLink">
+                  <span id="hstageExploreLabel">تفاصيل العطر</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="hstage-socials" aria-label="Rou7 Social Links">
+              <a href="https://www.instagram.com/roou7_perfume?mdxt=MWR6bnhobnNjNjZjNg==" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+              </a>
+              <a href="https://www.facebook.com/share/1ZeZtRoWD5/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              </a>
+              <a href="https://wa.me/message/2YHV6BH76ZRGO1" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">
+                <svg viewBox="0 0 32 32" width="16" height="16" fill="currentColor"><path d="M16.02 2C8.28 2 2 8.28 2 16.02c0 2.58.7 5.1 2.03 7.3L2 30l6.89-1.99a13.9 13.9 0 0 0 7.13 1.95h.01c7.74 0 14.02-6.28 14.02-14.02 0-3.75-1.46-7.27-4.11-9.92A13.95 13.95 0 0 0 16.02 2zm8.21 19.83c-.35.98-1.74 1.88-2.82 2.11-.74.16-1.71.29-4.96-1.06-4.16-1.72-6.84-5.96-7.05-6.23-.2-.28-1.7-2.26-1.7-4.31 0-2.05 1.07-3.06 1.45-3.48.38-.42.83-.53 1.1-.53.28 0 .55.01.8.02.25.01.6.09.92.77.34.72 1.15 2.8 1.25 3.01.1.21.17.46.03.73-.13.28-.21.45-.41.68-.21.24-.43.53-.62.71-.21.2-.42.42-.18.83.24.42 1.07 1.76 2.3 2.85 1.58 1.41 2.91 1.85 3.33 2.05.41.21.66.17.9-.1.25-.28 1.07-1.25 1.35-1.68.28-.42.56-.35.95-.21.38.14 2.45 1.15 2.87 1.36.42.21.7.31.8.49.1.17.1 1-.25 1.98z"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="hstage-col-bottle">
+            <div class="hstage-bottle-stage" id="hstageBottleStage">
+              <div class="hstage-bottle-glow" id="hstageBottleGlow" aria-hidden="true"></div>
+              <div class="hstage-bottle-wrap" id="hstageBottleWrap">
+                <div class="hstage-bottle-shadow" aria-hidden="true"></div>
+                <a href="#" class="hstage-bottle-link" id="hstageBottleLink">
+                  <img class="hstage-bottle-img" id="hstageBottleImg" src="" alt="" loading="eager">
+                </a>
+              </div>
+            </div>
+            <p class="hstage-tagline" id="hstageTagline"></p>
+          </div>
+
+          <div class="hstage-col-meta">
+            <div class="hstage-meta-top">
+              <div class="hstage-price-block">
+                <span class="hstage-price-now" id="hstagePriceNow"></span>
+                <div class="hstage-price-old-row" id="hstagePriceOldRow" hidden>
+                  <del class="hstage-price-old" id="hstagePriceOld"></del>
+                  <span class="hstage-discount-badge" id="hstageDiscountBadge"></span>
+                </div>
+              </div>
+
+              <div class="hstage-size-block">
+                <span class="hstage-size-label" id="hstageSizeLabel">اختر الحجم:</span>
+                <div class="hstage-size-list" id="hstageSizeList" role="radiogroup"></div>
+              </div>
+            </div>
+
+            <button type="button" class="hstage-next-preview" id="hstageNextThumbBtn" aria-label="العطر التالي" hidden>
+              <span class="hstage-next-thumb-wrap">
+                <img class="hstage-next-thumb-img" id="hstageNextThumbImg" src="" alt="" loading="eager">
+              </span>
+              <span class="hstage-next-caption">
+                <span class="hstage-next-eyebrow" id="hstageNextEyebrow">التالي ↗</span>
+                <span class="hstage-next-name" id="hstageNextName"></span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const stage = hero.querySelector('#heroEditorialStage');
+    bindHeroStageEvents(hero, stage);
+    return stage;
+  }
+
+  function bindHeroStageEvents(hero, stage) {
+    if (!hero || !stage) return;
+
+    stage.querySelector('#hstagePrevBtn')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      goToHeroSlide(heroSlideIndex - 1, -1);
+    });
+
+    stage.querySelector('#hstageNextBtn')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      goToHeroSlide(heroSlideIndex + 1, 1);
+    });
+
+    stage.querySelector('#hstageNextThumbBtn')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      goToHeroSlide(heroSlideIndex + 1, 1);
+    });
+
+    stage.querySelector('#hstagePillNav')?.addEventListener('click', e => {
+      const pill = e.target.closest('[data-hstage-pill]');
+      if (!pill) return;
+      e.preventDefault();
+      const targetIdx = parseInt(pill.dataset.hstagePill, 10);
+      if (!isNaN(targetIdx) && targetIdx !== heroSlideIndex) {
+        goToHeroSlide(targetIdx, targetIdx > heroSlideIndex ? 1 : -1);
+      }
+    });
+
+    stage.querySelector('#hstageSizeList')?.addEventListener('click', e => {
+      const sizeBtn = e.target.closest('[data-hstage-size-idx]');
+      if (!sizeBtn) return;
+      e.preventDefault();
+      const idx = parseInt(sizeBtn.dataset.hstageSizeIdx, 10);
+      const featured = heroSlidesList[heroSlideIndex];
+      if (!featured || isNaN(idx)) return;
+      heroSelectedSizeIdx = idx;
+      updateHeroSizeAndPriceDisplay(featured, unpackProduct(featured), true);
+      startHeroAutoCycle();
+    });
+
+    stage.querySelector('#hstageAddBtn')?.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      const prodId = btn.dataset.add;
+      if (!prodId) return;
+      const customPrice = btn.dataset.price ? Number(btn.dataset.price) : null;
+      const selectedSize = btn.dataset.size || null;
+      addToCart(prodId, btn, customPrice, selectedSize);
+    });
+
+    // Keyboard navigation when focused or hovering inside stage
+    stage.setAttribute('tabindex', '0');
+    stage.addEventListener('keydown', e => {
+      if (heroSlidesList.length <= 1) return;
+      if (e.key === 'ArrowLeft') {
+        goToHeroSlide(heroSlideIndex - 1, -1);
+      } else if (e.key === 'ArrowRight') {
+        goToHeroSlide(heroSlideIndex + 1, 1);
+      }
+    });
+
+    // 3D Tilt Physics & Mobile Swipe
+    const bottleWrap = stage.querySelector('#hstageBottleWrap');
+    let isInteracting = false;
+    let targetRotX = 0;
+    let targetRotY = 0;
+    let currentRotX = 0;
+    let currentRotY = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    function updateTilt() {
+      currentRotX += (targetRotX - currentRotX) * 0.12;
+      currentRotY += (targetRotY - currentRotY) * 0.12;
+
+      if (bottleWrap) {
+        bottleWrap.style.transform = `rotateX(${currentRotX.toFixed(2)}deg) rotateY(${currentRotY.toFixed(2)}deg)`;
+      }
+
+      if (isInteracting || Math.abs(targetRotX - currentRotX) > 0.05 || Math.abs(targetRotY - currentRotY) > 0.05) {
+        heroTiltRaf = requestAnimationFrame(updateTilt);
+      } else {
+        heroTiltRaf = null;
+      }
+    }
+
+    function onPointerMove(clientX, clientY) {
+      const rect = stage.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const nx = (clientX - rect.left) / rect.width - 0.5;
+      const ny = (clientY - rect.top) / rect.height - 0.5;
+      targetRotX = -ny * 14;
+      targetRotY = nx * 18;
+      isInteracting = true;
+      if (!heroTiltRaf) heroTiltRaf = requestAnimationFrame(updateTilt);
+    }
+
+    stage.addEventListener('mouseenter', () => {
+      heroHoverPaused = true;
+    });
+
+    stage.addEventListener('mousemove', e => {
+      onPointerMove(e.clientX, e.clientY);
+    });
+
+    stage.addEventListener('mouseleave', () => {
+      heroHoverPaused = false;
+      targetRotX = 0;
+      targetRotY = 0;
+      isInteracting = false;
+      if (!heroTiltRaf) heroTiltRaf = requestAnimationFrame(updateTilt);
+    });
+
+    stage.addEventListener('touchstart', e => {
+      heroHoverPaused = true;
+      if (e.touches && e.touches[0]) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    stage.addEventListener('touchmove', e => {
+      if (e.touches && e.touches[0]) {
+        onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    stage.addEventListener('touchend', e => {
+      heroHoverPaused = false;
+      targetRotX = 0;
+      targetRotY = 0;
+      isInteracting = false;
+      if (!heroTiltRaf) heroTiltRaf = requestAnimationFrame(updateTilt);
+
+      if (heroSlidesList.length > 1 && e.changedTouches && e.changedTouches[0]) {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+          goToHeroSlide(heroSlideIndex + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+        }
+      }
+    });
+  }
+
   function renderHeroProduct(slideDir = 0) {
     const hero = $('#heroProduct');
     if (!hero) return;
     const isAr = currentLang === 'ar';
 
-    if (heroTiltRaf) {
-      cancelAnimationFrame(heroTiltRaf);
-      heroTiltRaf = null;
-    }
     if (heroAutoTimer) {
       clearInterval(heroAutoTimer);
       heroAutoTimer = null;
@@ -1890,350 +2355,217 @@
 
     if (!candidates.length) {
       heroSlidesList = [];
+      heroCurrentProdId = null;
       hero.innerHTML = `<div class="hero-product-empty"><span>✳</span><p>${isAr ? 'المنتج المميز سيظهر هنا' : 'Featured fragrance will appear here'}</p></div>`;
       return;
     }
 
     heroSlidesList = getHeroBestSellers(candidates);
+    heroSlideThemes = resolveHeroSlideThemes(heroSlidesList);
     const totalSlides = heroSlidesList.length;
     heroSlideIndex = ((heroSlideIndex % totalSlides) + totalSlides) % totalSlides;
 
     const featured = heroSlidesList[heroSlideIndex];
     const d = unpackProduct(featured);
-    const pricing = computeProductPrice(featured);
+
+    if (String(heroCurrentProdId) !== String(featured.id)) {
+      heroSelectedSizeIdx = 0;
+      heroCurrentProdId = String(featured.id);
+    }
+
+    const hadStage = Boolean(hero.querySelector('#heroEditorialStage'));
+    const stage = ensureHeroStageShell(hero);
+    const bgA = stage.querySelector('#hstageBgA');
+    const bgB = stage.querySelector('#hstageBgB');
+
+    const themeKey = heroSlideThemes[heroSlideIndex] || 'crimson';
+    const theme = HERO_THEMES[themeKey] || HERO_THEMES.crimson;
+    stage.dataset.theme = themeKey;
+    stage.style.setProperty('--hstage-shadow', theme.shadow);
+    stage.style.setProperty('--hstage-spot-glow', theme.spotGlow);
+    const homeSec = $('#home');
+    if (homeSec) homeSec.style.setProperty('--hero-outer-glow', theme.outerGlow);
+
+    if (bgA && bgB) {
+      if (hadStage && slideDir !== 0) {
+        heroBgToggle = !heroBgToggle;
+        const incoming = heroBgToggle ? bgB : bgA;
+        const outgoing = heroBgToggle ? bgA : bgB;
+        incoming.style.background = theme.bg;
+        incoming.classList.add('is-active');
+        outgoing.classList.remove('is-active');
+      } else {
+        heroBgToggle = false;
+        bgA.style.background = theme.bg;
+        bgA.classList.add('is-active');
+        bgB.classList.remove('is-active');
+      }
+    }
 
     const localized = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(featured, currentLang) : null;
     const prodName = localized ? localized.name : (isAr ? featured.name : (featured.latin || featured.name));
-
-    // Clean, prestigious watermark text behind the bottle (perfume latin name or brand)
-    let rawWatermark = (featured.latin || featured.name || 'ROUH').trim();
-    // Remove parentheses/brackets and take 1-2 primary words
-    rawWatermark = rawWatermark.replace(/[\(\)\[\]\{\}]/g, '').replace(/[-_]/g, ' ').split(/\s+/).slice(0, 2).join(' ').trim().toUpperCase();
-    if (!rawWatermark || rawWatermark.length < 2) rawWatermark = 'ROUH';
-
-    const wmWords = rawWatermark.split(/\s+/).filter(Boolean);
-    const isMultiWord = wmWords.length > 1;
-    const watermarkHtml = wmWords.map(w => `<span class="wm-line">${escapeHtml(w)}</span>`).join('');
-
-    const safeImg = escapeHtml(featured.image_url || 'assets/branding/2.svg');
     const safeName = escapeHtml(prodName || 'Rou7');
-    const shortName = escapeHtml(prodName ? prodName.split(/[-–—|]/)[0].trim() : 'Rou7');
-    const inspiredText = d.inspired_by ? `${isAr ? 'مستوحى من' : 'Inspired by'}: <strong>${escapeHtml(d.inspired_by)}</strong>` : '';
+    const safeImg = escapeHtml(featured.image_url || 'assets/branding/2.svg');
+    const prodHref = `product.html?id=${encodeURIComponent(featured.id)}`;
 
-    // Extract fragrance key notes
-    const topRaw = d.top_notes || '';
-    const midRaw = d.middle_notes || '';
-    const baseRaw = d.base_notes || '';
-    const transNote = raw => window.PerfumeI18n ? window.PerfumeI18n.translateNotes(raw, currentLang) : raw;
-
-    const topList = topRaw ? topRaw.split(/[,،]/).map(s => s.trim()).filter(Boolean).slice(0, 2) : [];
-    const midList = midRaw ? midRaw.split(/[,،]/).map(s => s.trim()).filter(Boolean).slice(0, 2) : [];
-    const baseList = baseRaw ? baseRaw.split(/[,،]/).map(s => s.trim()).filter(Boolean).slice(0, 2) : [];
-
-    // Gender Category text
-    let genderText = isAr ? 'للجميع (Unisex)' : 'Unisex';
-    if (featured.gender === 'men' || featured.category === 'men') genderText = isAr ? 'عطر رجالي 🎩' : 'For Men 🎩';
-    else if (featured.gender === 'women' || featured.category === 'women') genderText = isAr ? 'عطر نسائي 🌸' : 'For Her 🌸';
-
-    const animClass = slideDir > 0 ? 'hero-slide-enter from-next' : (slideDir < 0 ? 'hero-slide-enter from-prev' : '');
-
-    const navArrowsHtml = totalSlides > 1 ? `
-      <button type="button" class="hero-nav-btn hero-prev" id="heroPrevBtn" aria-label="${isAr ? 'العطر السابق' : 'Previous Best Seller'}">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-      </button>
-      <button type="button" class="hero-nav-btn hero-next" id="heroNextBtn" aria-label="${isAr ? 'العطر التالي' : 'Next Best Seller'}">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
-      </button>
-    ` : '';
-
-    const dotsHtml = totalSlides > 1 ? `
-      <div class="hero-carousel-dots" role="tablist" aria-label="${isAr ? 'عطور الأكثر مبيعاً' : 'Best Sellers'}">
-        ${heroSlidesList.map((item, idx) => {
-          const itemLabel = escapeHtml(isAr ? item.name : (item.latin || item.name));
-          return `<button type="button" class="hero-dot ${idx === heroSlideIndex ? 'active' : ''}" data-hero-slide="${idx}" role="tab" aria-selected="${idx === heroSlideIndex ? 'true' : 'false'}" aria-label="${itemLabel}" title="${itemLabel}"></button>`;
-        }).join('')}
-      </div>
-    ` : '';
-
-    hero.innerHTML = `
-      <div class="hero-3d-showcase ${animClass}" id="hero3dShowcase">
-        <!-- Best Seller Top Label -->
-        <div class="hero-bestseller-eyebrow">
-          <span>✦</span>
-          <span>${isAr ? 'الأكثر مبيعاً · BEST SELLERS' : 'BEST SELLERS'}</span>
-          <span>✦</span>
-        </div>
-
-        <!-- Giant High-Fashion Background Watermark Typography -->
-        <div class="hero-bg-watermark ${isMultiWord ? 'multi-word' : 'single-word'}" id="heroWatermark" aria-hidden="true">${watermarkHtml}</div>
-
-        ${navArrowsHtml}
-
-        <!-- Center Stage: 3D Floating Perfume Bottle -->
-        <div class="hero-bottle-center-stage" id="heroBottleStage">
-          <div class="hero-aura-glow" aria-hidden="true"></div>
-          <div class="hero-bottle-float-wrap" id="heroBottleWrap">
-            <div class="hero-bottle-contact-shadow" aria-hidden="true"></div>
-            <a href="product.html?id=${encodeURIComponent(featured.id)}" class="hero-bottle-3d-link" id="heroBottleLink" title="${safeName}">
-              <img class="hero-bottle-3d-img" src="${safeImg}" alt="${safeName}" loading="eager">
-            </a>
-          </div>
-
-          <!-- Interactive Trigger Button -->
-          <button type="button" class="hero-bottle-trigger-btn" id="heroBottleTriggerBtn" aria-label="${isAr ? `عرض تفاصيل عطر ${shortName}` : `Show Fragrance Details for ${shortName}`}">
-            <span>${isAr ? `اضغط لاكتشاف عطر ${shortName}` : `Discover ${shortName}`}</span>
-          </button>
-
-          ${dotsHtml}
-        </div>
-
-        <!-- Modal Overlay: Floating Product Info HUD Card (Opens on Click) -->
-        <div class="hero-hud-modal-overlay" id="heroHudModalOverlay" aria-hidden="true">
-          <div class="hero-info-hud" id="heroInfoHud" role="dialog" aria-modal="true" aria-labelledby="heroProductTitle">
-            <button type="button" class="hero-hud-close-btn" id="heroHudCloseBtn" aria-label="${isAr ? 'إغلاق' : 'Close'}">✕</button>
-
-            <div class="hero-hud-badge-row">
-              <span class="hero-badge-pill">
-                <span class="hero-badge-spark">✦</span>
-                <span>${isAr ? 'الأكثر مبيعاً · Best Seller' : 'Best Seller Fragrance'}</span>
-                <span class="hero-badge-spark">✦</span>
-              </span>
-              <span class="hero-gender-badge">${genderText}</span>
-            </div>
-
-            <h2 class="hero-product-title" id="heroProductTitle">
-              <a href="product.html?id=${encodeURIComponent(featured.id)}">${safeName}</a>
-            </h2>
-
-            ${inspiredText ? `<p class="hero-inspired-by"><span>✦</span> ${inspiredText}</p>` : ''}
-
-            ${(topList.length || midList.length || baseList.length) ? `
-              <div class="hero-notes-chips-row">
-                ${topList.map(n => `<span class="hero-note-chip">🌸 ${escapeHtml(transNote(n))}</span>`).join('')}
-                ${midList.map(n => `<span class="hero-note-chip">💖 ${escapeHtml(transNote(n))}</span>`).join('')}
-                ${baseList.map(n => `<span class="hero-note-chip">🌲 ${escapeHtml(transNote(n))}</span>`).join('')}
-              </div>
-            ` : ''}
-
-            <div class="hero-pricing-cta-row">
-              <div class="hero-price-block">
-                <span class="hero-price-current">${money(pricing.price)}</span>
-                ${pricing.hasDiscount ? `<del class="hero-price-original">${money(pricing.originalPrice)}</del><span class="hero-sale-badge">${escapeHtml(pricing.discountBadge)}</span>` : ''}
-              </div>
-              <div class="hero-buttons-group">
-                <a href="product.html?id=${encodeURIComponent(featured.id)}" class="button button-primary btn-hero-explore">
-                  <span>${isAr ? 'استكشف العطر' : 'Explore Fragrance'}</span>
-                  <span class="arrow-icon">←</span>
-                </a>
-                <button type="button" class="button btn-hero-quickadd" data-add="${featured.id}">
-                  <span>＋</span>
-                  <span>${isAr ? 'أضف للسلة' : 'Add to Bag'}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // ── Best Sellers Carousel Controls & Auto-Cycle ─────────────────────────
-    const showcase = $('#hero3dShowcase');
-    const bottleWrap = $('#heroBottleWrap');
-    const watermark = $('#heroWatermark');
-    const overlay = hero.querySelector('#heroHudModalOverlay');
-    let heroHoverPaused = false;
-
-    function goToHeroSlide(nextIdx, dir) {
-      if (totalSlides <= 1) return;
-      heroSlideIndex = ((nextIdx % totalSlides) + totalSlides) % totalSlides;
-      renderHeroProduct(dir);
+    // Topbar eyebrow & counter & clickable Best Sellers pill tabs
+    const eyebrowEl = stage.querySelector('#hstageEyebrowText');
+    const counterEl = stage.querySelector('#hstageCounter');
+    const pillNavEl = stage.querySelector('#hstagePillNav');
+    if (eyebrowEl) eyebrowEl.textContent = isAr ? 'الأكثر مبيعاً' : 'BEST SELLERS';
+    if (counterEl) {
+      counterEl.textContent = totalSlides > 1
+        ? `· ${formatDigits(heroSlideIndex + 1)} / ${formatDigits(totalSlides)}`
+        : '';
+    }
+    if (pillNavEl) {
+      if (totalSlides > 1) {
+        pillNavEl.hidden = false;
+        pillNavEl.innerHTML = heroSlidesList.slice(0, 5).map((item, idx) => {
+          const loc = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(item, currentLang) : null;
+          const rawLabel = loc ? loc.name : (isAr ? item.name : (item.latin || item.name));
+          const compactLabel = String(rawLabel || '').split(/[-–—|(]/)[0].trim().split(/\s+/).slice(0, 2).join(' ');
+          const activeClass = idx === heroSlideIndex ? 'is-active' : '';
+          return `<button type="button" class="hstage-pill-btn ${activeClass}" data-hstage-pill="${idx}" role="tab" aria-selected="${idx === heroSlideIndex ? 'true' : 'false'}" title="${escapeHtml(rawLabel)}">${escapeHtml(compactLabel)}</button>`;
+        }).join('');
+      } else {
+        pillNavEl.hidden = true;
+      }
     }
 
-    function startHeroAutoCycle() {
-      if (totalSlides <= 1) return;
-      clearInterval(heroAutoTimer);
-      heroAutoTimer = setInterval(() => {
-        if (heroHoverPaused) return;
-        if (overlay && overlay.classList.contains('active')) return;
-        if (document.hidden) return;
-        goToHeroSlide(heroSlideIndex + 1, 1);
-      }, 4200);
+    // Arrows visibility & labels
+    const arrowsRow = stage.querySelector('#hstageArrowsRow');
+    const prevBtn = stage.querySelector('#hstagePrevBtn');
+    const nextBtn = stage.querySelector('#hstageNextBtn');
+    if (arrowsRow) arrowsRow.hidden = totalSlides <= 1;
+    if (prevBtn) prevBtn.setAttribute('aria-label', isAr ? 'العطر السابق' : 'Previous Best Seller');
+    if (nextBtn) nextBtn.setAttribute('aria-label', isAr ? 'العطر التالي' : 'Next Best Seller');
+
+    // Left/Start Editorial Copy & CTAs
+    const titleEl = stage.querySelector('#hstageTitle');
+    const inspiredEl = stage.querySelector('#hstageInspired');
+    const descEl = stage.querySelector('#hstageDesc');
+    const addLabelEl = stage.querySelector('#hstageAddLabel');
+    const exploreLinkEl = stage.querySelector('#hstageExploreLink');
+    const exploreLabelEl = stage.querySelector('#hstageExploreLabel');
+
+    if (titleEl) {
+      const cleanTitle = prodName ? prodName.split(/[-–—|]/)[0].trim() : 'Rou7';
+      titleEl.textContent = cleanTitle;
+    }
+    if (inspiredEl) {
+      if (d.inspired_by) {
+        inspiredEl.innerHTML = `${isAr ? 'مستوحى من' : 'Inspired by'}: <strong>${escapeHtml(d.inspired_by)}</strong>`;
+        inspiredEl.hidden = false;
+      } else {
+        inspiredEl.hidden = true;
+      }
+    }
+    if (descEl) {
+      descEl.textContent = getHeroShortDesc(d, isAr);
+    }
+    if (addLabelEl) {
+      addLabelEl.textContent = isAr ? 'أضف للسلة' : 'Add to Bag';
+    }
+    if (exploreLinkEl) {
+      exploreLinkEl.href = prodHref;
+    }
+    if (exploreLabelEl) {
+      exploreLabelEl.textContent = isAr ? 'تفاصيل العطر' : 'Explore';
     }
 
-    hero.querySelector('#heroPrevBtn')?.addEventListener('click', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      goToHeroSlide(heroSlideIndex - 1, -1);
-    });
+    // Center Bottle & Moody Tagline
+    const bottleImgEl = stage.querySelector('#hstageBottleImg');
+    const bottleLinkEl = stage.querySelector('#hstageBottleLink');
+    const taglineEl = stage.querySelector('#hstageTagline');
+    const infoBodyEl = stage.querySelector('#hstageInfoBody');
 
-    hero.querySelector('#heroNextBtn')?.addEventListener('click', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      goToHeroSlide(heroSlideIndex + 1, 1);
-    });
+    if (bottleLinkEl) {
+      bottleLinkEl.href = prodHref;
+      bottleLinkEl.title = safeName;
+    }
+    if (bottleImgEl) {
+      bottleImgEl.src = featured.image_url || 'assets/branding/2.svg';
+      bottleImgEl.alt = prodName || 'Rou7 Perfume';
+    }
+    if (taglineEl) {
+      taglineEl.innerHTML = getHeroTagline(d, isAr);
+    }
 
-    hero.querySelectorAll('[data-hero-slide]').forEach(dot => {
-      dot.addEventListener('click', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        const targetIdx = parseInt(dot.dataset.heroSlide, 10);
-        if (!isNaN(targetIdx) && targetIdx !== heroSlideIndex) {
-          goToHeroSlide(targetIdx, targetIdx > heroSlideIndex ? 1 : -1);
+    // Re-trigger smooth entrance animations on slide switches
+    if (hadStage && slideDir !== 0) {
+      if (bottleImgEl) {
+        bottleImgEl.classList.remove('is-enter-next', 'is-enter-prev');
+        void bottleImgEl.offsetWidth;
+        bottleImgEl.classList.add(slideDir < 0 ? 'is-enter-prev' : 'is-enter-next');
+      }
+      if (infoBodyEl) {
+        infoBodyEl.classList.remove('is-enter');
+        void infoBodyEl.offsetWidth;
+        infoBodyEl.classList.add('is-enter');
+      }
+      if (taglineEl) {
+        taglineEl.classList.remove('is-enter');
+        void taglineEl.offsetWidth;
+        taglineEl.classList.add('is-enter');
+      }
+    }
+
+    // Column 3: Circular Sizes & Live Price
+    const sizeLabelEl = stage.querySelector('#hstageSizeLabel');
+    const sizeListEl = stage.querySelector('#hstageSizeList');
+    if (sizeLabelEl) {
+      sizeLabelEl.textContent = isAr ? 'اختر الحجم:' : 'Choose your size:';
+    }
+    if (sizeListEl) {
+      if (Array.isArray(d.sizes) && d.sizes.length > 0) {
+        sizeListEl.innerHTML = d.sizes.map((s, idx) => {
+          const label = escapeHtml(String(s.size || '').trim() || '100ml');
+          const active = idx === heroSelectedSizeIdx;
+          return `<button type="button" class="hstage-size-btn ${active ? 'is-active' : ''}" data-hstage-size-idx="${idx}" role="radio" aria-checked="${active ? 'true' : 'false'}">${label}</button>`;
+        }).join('');
+      } else {
+        const vol = detectBottleVolume(featured, d);
+        sizeListEl.innerHTML = `
+          <span class="hstage-size-btn is-active is-static">${escapeHtml(vol)}</span>
+          <span class="hstage-size-btn is-static">EDP</span>
+        `;
+      }
+    }
+    updateHeroSizeAndPriceDisplay(featured, d, false);
+
+    // Bottom Corner Next-Perfume Mini-Bottle Preview
+    const nextThumbBtn = stage.querySelector('#hstageNextThumbBtn');
+    const nextThumbImg = stage.querySelector('#hstageNextThumbImg');
+    const nextEyebrow = stage.querySelector('#hstageNextEyebrow');
+    const nextNameEl = stage.querySelector('#hstageNextName');
+    if (nextThumbBtn) {
+      if (totalSlides > 1) {
+        const nextProd = heroSlidesList[(heroSlideIndex + 1) % totalSlides];
+        const nextLoc = window.PerfumeI18n ? window.PerfumeI18n.getLocalizedProduct(nextProd, currentLang) : null;
+        const nextProdName = nextLoc ? nextLoc.name : (isAr ? nextProd.name : (nextProd.latin || nextProd.name));
+        const compactNext = String(nextProdName || '').split(/[-–—|]/)[0].trim();
+
+        if (nextThumbImg) {
+          nextThumbImg.src = nextProd.image_url || 'assets/branding/2.svg';
+          nextThumbImg.alt = compactNext;
         }
-      });
-    });
+        if (nextEyebrow) nextEyebrow.textContent = isAr ? 'التالي ↗' : 'Next ↗';
+        if (nextNameEl) nextNameEl.textContent = compactNext;
+        nextThumbBtn.setAttribute('aria-label', isAr ? `العطر التالي: ${compactNext}` : `Next: ${compactNext}`);
+        nextThumbBtn.hidden = false;
+
+        if (hadStage && slideDir !== 0) {
+          nextThumbBtn.classList.remove('is-bump');
+          void nextThumbBtn.offsetWidth;
+          nextThumbBtn.classList.add('is-bump');
+        }
+      } else {
+        nextThumbBtn.hidden = true;
+      }
+    }
 
     startHeroAutoCycle();
-
-    // ── Interactive 3D Parallax, Tilt Physics & Mobile Swipe ────────────────
-    if (showcase && bottleWrap) {
-      let isInteracting = false;
-      let targetRotX = 0;
-      let targetRotY = 0;
-      let currentRotX = 0;
-      let currentRotY = 0;
-      let touchStartX = 0;
-      let touchStartY = 0;
-
-      function updateTilt() {
-        currentRotX += (targetRotX - currentRotX) * 0.12;
-        currentRotY += (targetRotY - currentRotY) * 0.12;
-
-        if (bottleWrap) {
-          bottleWrap.style.transform = `rotateX(${currentRotX.toFixed(2)}deg) rotateY(${currentRotY.toFixed(2)}deg)`;
-        }
-        if (watermark) {
-          const wmShiftX = -currentRotY * 1.6;
-          const wmShiftY = -currentRotX * 1.6;
-          watermark.style.transform = `translate(calc(-50% + ${wmShiftX.toFixed(1)}px), calc(-50% + ${wmShiftY.toFixed(1)}px))`;
-        }
-
-        if (isInteracting || Math.abs(targetRotX - currentRotX) > 0.05 || Math.abs(targetRotY - currentRotY) > 0.05) {
-          heroTiltRaf = requestAnimationFrame(updateTilt);
-        } else {
-          heroTiltRaf = null;
-        }
-      }
-
-      function onPointerMove(clientX, clientY) {
-        const rect = showcase.getBoundingClientRect();
-        const nx = (clientX - rect.left) / rect.width - 0.5;
-        const ny = (clientY - rect.top) / rect.height - 0.5;
-        targetRotX = -ny * 16;
-        targetRotY = nx * 22;
-        isInteracting = true;
-        if (!heroTiltRaf) heroTiltRaf = requestAnimationFrame(updateTilt);
-      }
-
-      showcase.addEventListener('mouseenter', () => {
-        heroHoverPaused = true;
-      });
-
-      showcase.addEventListener('mousemove', e => {
-        onPointerMove(e.clientX, e.clientY);
-      });
-
-      showcase.addEventListener('mouseleave', () => {
-        heroHoverPaused = false;
-        targetRotX = 0;
-        targetRotY = 0;
-        isInteracting = false;
-        if (!heroTiltRaf) heroTiltRaf = requestAnimationFrame(updateTilt);
-      });
-
-      showcase.addEventListener('touchstart', e => {
-        if (e.touches && e.touches[0]) {
-          touchStartX = e.touches[0].clientX;
-          touchStartY = e.touches[0].clientY;
-        }
-      }, { passive: true });
-
-      showcase.addEventListener('touchmove', e => {
-        if (e.touches && e.touches[0]) {
-          onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
-        }
-      }, { passive: true });
-
-      showcase.addEventListener('touchend', e => {
-        targetRotX = 0;
-        targetRotY = 0;
-        isInteracting = false;
-        if (!heroTiltRaf) heroTiltRaf = requestAnimationFrame(updateTilt);
-
-        if (totalSlides > 1 && e.changedTouches && e.changedTouches[0]) {
-          const dx = e.changedTouches[0].clientX - touchStartX;
-          const dy = e.changedTouches[0].clientY - touchStartY;
-          if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) {
-            goToHeroSlide(heroSlideIndex + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
-          }
-        }
-      });
-    }
-
-    // Modal Open & Close logic
-    const closeBtn = hero.querySelector('#heroHudCloseBtn');
-    const bottleLink = hero.querySelector('#heroBottleLink');
-    const triggerBtn = hero.querySelector('#heroBottleTriggerBtn');
-    const bottleWrapEl = hero.querySelector('#heroBottleWrap');
-
-    function openHudModal() {
-      if (!overlay) return;
-      overlay.classList.add('active');
-      overlay.setAttribute('aria-hidden', 'false');
-      document.body.classList.add('hero-modal-open');
-    }
-
-    function closeHudModal() {
-      if (!overlay) return;
-      overlay.classList.remove('active');
-      overlay.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('hero-modal-open');
-    }
-
-    bottleLink?.addEventListener('click', e => {
-      e.preventDefault();
-      openHudModal();
-    });
-
-    triggerBtn?.addEventListener('click', e => {
-      e.preventDefault();
-      openHudModal();
-    });
-
-    bottleWrapEl?.addEventListener('click', e => {
-      if (e.target.closest('#heroBottleTriggerBtn')) return;
-      e.preventDefault();
-      openHudModal();
-    });
-
-    closeBtn?.addEventListener('click', e => {
-      e.preventDefault();
-      closeHudModal();
-    });
-
-    overlay?.addEventListener('click', e => {
-      if (e.target === overlay) {
-        closeHudModal();
-      }
-    });
-
-    // Close on Escape key
-    if (window._heroEscHandler) {
-      window.removeEventListener('keydown', window._heroEscHandler);
-    }
-    window._heroEscHandler = e => {
-      if (e.key === 'Escape' && overlay?.classList.contains('active')) {
-        closeHudModal();
-      }
-    };
-    window.addEventListener('keydown', window._heroEscHandler);
-
-    // Quick add to cart
-    hero.querySelector('.btn-hero-quickadd')?.addEventListener('click', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      addToCart(featured.id, e.currentTarget);
-    });
   }
 
   function unpackProduct(p) {
@@ -2283,17 +2615,22 @@
       discount_percent: p.discount_percent || meta.discount_percent || '',
       discount_badge:   p.discount_badge || meta.discount_badge || '',
       stock_quantity:   p.stock_quantity !== undefined && p.stock_quantity !== null ? p.stock_quantity : (meta.stock_quantity !== undefined && meta.stock_quantity !== null ? meta.stock_quantity : ''),
-      in_solar_system:  Boolean(p.in_solar_system !== undefined ? p.in_solar_system : meta.in_solar_system)
+      in_solar_system:  Boolean(p.in_solar_system !== undefined ? p.in_solar_system : meta.in_solar_system),
+      sizes:            Array.isArray(p.sizes) && p.sizes.length ? p.sizes : (Array.isArray(meta.sizes) && meta.sizes.length ? meta.sizes : [])
     };
   }
 
-  function computeProductPrice(p, campaignData = currentAnnouncements) {
-    if (!p) return { price: 0, originalPrice: 0, hasDiscount: false, discountPercent: 0, discountBadge: '', savedAmount: 0 };
+  function computeProductPrice(p, campaignData = currentAnnouncements, sizeIndex = null) {
+    if (!p) return { price: 0, originalPrice: 0, hasDiscount: false, discountPercent: 0, discountBadge: '', savedAmount: 0, selectedSize: null };
 
-    const originalPrice = Number(p.price || 0);
     const d = unpackProduct(p);
+    const hasSizes = Array.isArray(d.sizes) && d.sizes.length > 0;
+    const activeSize = (sizeIndex !== null && typeof sizeIndex === 'number' && hasSizes && d.sizes[sizeIndex]) ? d.sizes[sizeIndex] : null;
 
-    const rawSale = Number(p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : d.sale_price);
+    const originalPrice = activeSize ? Number(activeSize.price || 0) : Number(p.price || 0);
+    const rawSale = activeSize && activeSize.sale_price !== undefined && activeSize.sale_price !== null
+      ? Number(activeSize.sale_price)
+      : Number(p.sale_price !== undefined && p.sale_price !== null ? p.sale_price : d.sale_price);
     const hasCustomSale = Boolean(rawSale && rawSale > 0 && rawSale < originalPrice);
 
     const camp = campaignData || currentAnnouncements || {};
@@ -2342,7 +2679,8 @@
       hasDiscount,
       discountPercent,
       discountBadge,
-      savedAmount
+      savedAmount,
+      selectedSize: activeSize ? (activeSize.size || null) : null
     };
   }
 
@@ -3352,7 +3690,7 @@
     saveCart();
   }
 
-  function addToCart(id, originBtn = null, customPrice = null) {
+  function addToCart(id, originBtn = null, customPrice = null, selectedSize = null) {
     const product = products.find(p => String(p.id) === String(id));
     if (!product) return;
 
@@ -3363,8 +3701,10 @@
       return;
     }
 
-    const row = cart.find(item => String(item.id) === String(id));
-    const currentQtyInCart = row ? row.qty : 0;
+    const row = cart.find(item => String(item.id) === String(id) && (item.selectedSize || null) === (selectedSize || null));
+    const currentQtyInCart = cart
+      .filter(item => String(item.id) === String(id))
+      .reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
     if (d.stock_quantity !== '' && d.stock_quantity !== undefined) {
       const maxStock = parseInt(d.stock_quantity) || 0;
       if (currentQtyInCart + 1 > maxStock) {
@@ -3378,9 +3718,15 @@
 
     if (row) {
       row.qty++;
-      if (finalPrice) row.customPrice = finalPrice;
+      if (finalPrice !== null && finalPrice !== undefined) row.customPrice = finalPrice;
+      if (selectedSize) row.selectedSize = selectedSize;
     } else {
-      cart.push({ id: String(id), qty: 1, ...(finalPrice ? { customPrice: finalPrice } : {}) });
+      cart.push({
+        id: String(id),
+        qty: 1,
+        ...(finalPrice !== null && finalPrice !== undefined ? { customPrice: finalPrice } : {}),
+        ...(selectedSize ? { selectedSize } : {})
+      });
     }
     updateCart();
 
