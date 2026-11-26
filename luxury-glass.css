@@ -27,8 +27,9 @@
   --glass-shadow-hover: 0 28px 64px rgba(75, 90, 60, 0.14), 0 8px 24px rgba(255, 143, 58, 0.12);
 
   /* Typography Pairings */
-  --font-display: 'BBH Bogle', 'Lalezar', 'IBM Plex Sans Arabic', sans-serif;
-  --font-body: 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', sans-serif;
+  --font-display: "BBH Bogle", "Lalezar", "IBM Plex Sans Arabic", sans-serif;
+  --font-body: "BBH Bogle", "Lalezar", "IBM Plex Sans Arabic", "Plus Jakarta Sans", sans-serif;
+  --font-ui-clean: "IBM Plex Sans Arabic", "Plus Jakarta Sans", sans-serif;
 
   /* Motion & Spring Physics */
   --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
@@ -67,16 +68,72 @@ body.light {
   text-rendering: optimizeLegibility;
 }
 
-.bbh-bogle-regular {
-  font-family: "BBH Bogle", sans-serif;
+html[lang="en"],
+html[dir="ltr"],
+html[dir="ltr"] body,
+html[dir="ltr"] body.light {
+  font-family: "BBH Bogle", "Lalezar", "Plus Jakarta Sans", sans-serif !important;
   font-weight: 400;
-  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+html[lang="ar"],
+html[dir="rtl"],
+html[dir="rtl"] body,
+html[dir="rtl"] body.light {
+  font-family: "BBH Bogle", "Lalezar", "IBM Plex Sans Arabic", sans-serif !important;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 .lalezar-regular {
   font-family: "Lalezar", sans-serif;
   font-weight: 400;
   font-style: normal;
+}
+
+.bbh-bogle-regular {
+  font-family: "BBH Bogle", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.desktop-nav a,
+.mobile-menu a,
+.button,
+.filter,
+.brand-chip,
+.hstage-pill-btn,
+.hstage-cta-primary,
+.hstage-cta-secondary,
+.hstage-note-chip,
+.hstage-tagline,
+.hstage-price-old,
+.hstage-size-btn,
+.hstage-next-name,
+.product-meta h3,
+.product-price-val,
+.card-brand-badge,
+.btn-explore-notes,
+.quick-add,
+.quote-band p,
+.prod-main-title,
+.prod-price-current,
+.pdp-size-btn,
+.btn-add-bag,
+.btn-wa-direct {
+  font-family: var(--font-display) !important;
+  font-weight: 400;
+}
+
+/* Keep form inputs & admin tables ultra-legible */
+input,
+textarea,
+select,
+.admin-main table,
+.admin-main input,
+.admin-main select {
+  font-family: var(--font-ui-clean);
 }
 
 h1, h2, h3, h4,
